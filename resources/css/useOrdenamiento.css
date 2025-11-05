@@ -1,0 +1,76 @@
+/* --- Estilos para el Control de Ordenamiento --- */
+
+.sort-control-container {
+    display: flex;
+    justify-content: flex-end; /* Alinea a la derecha */
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.sort-button-wrapper {
+    position: relative; /* Para posicionar el menú */
+}
+
+.sort-button {
+    background-color: #861542; /* Color de ejemplo, usa tu variable --color-primario */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.sort-button:hover {
+    background-color: #861542c9; /* Color de ejemplo, usa tu variable --color-primario */
+}
+
+/* --- Estilos para el Menú Desplegable (Dropdown) --- */
+
+.dropdown-menu-sort {
+    position: absolute;
+    top: 100%; /* Justo debajo del botón */
+    right: 0;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.dropdown-item-sort {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item-sort:hover {
+    background-color: #f0f0f0;
+}
+
+.dropdown-item-sort .icon {
+    margin-right: 8px;
+    min-width: 15px;
+    text-align: center;
+}
+
+.dropdown-item-sort.active {
+    background-color: #e0f7ff; /* Color para la opción activa */
+    color: #007bff;
+    font-weight: 700;
+}

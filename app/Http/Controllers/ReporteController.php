@@ -16,6 +16,10 @@ class ReporteController extends Controller
     {
         $nombreArchivo = 'reporte_superusuario.pdf';
 
+        // 🟢 PASO 1: Habilitar la detección de desconexión del cliente
+        // Si el cliente cancela la petición (desde React), PHP lo detectará.
+        ignore_user_abort(false); 
+
         // 1️⃣ OBTENER FILTROS
         $departamentosString = $request->query('departamentos');
         $tipoProyecto = $request->query('tipoProyecto');
@@ -29,6 +33,14 @@ class ReporteController extends Controller
         }
 
         $depIds = explode(',', $departamentosString);
+
+        // 🟢 OPTIMIZACIÓN 1: Pre-cargar nombres de Jefes (evita N+1)
+        $jefesPorDepartamento = DB::table('usuario as u')
+            ->join('c_usuario as cu', 'u.id_usuario', '=', 'cu.id_usuario')
+            ->where('u.rol', 'Jefe')
+            ->whereIn('cu.id_departamento', $depIds)
+            ->select('cu.id_departamento', DB::raw("CONCAT(cu.u_nombre, ' ', cu.a_paterno, ' ', cu.a_materno) as nombre_jefe"))
+            ->pluck('nombre_jefe', 'id_departamento');
 
         // 2️⃣ CONSULTA BASE
         $query = Proyecto::query()->whereIn('id_departamento', $depIds);
@@ -50,10 +62,22 @@ class ReporteController extends Controller
             }
         }
 
-        // 3️⃣ CARGAR RELACIONES
-        $proyectos = $query->with(['departamento.area', 'encargado', 'tareas'])->get();
+        // 3️⃣ CARGAR RELACIONES Y CONTEOS OPTIMIZADOS
+        $proyectos = $query->with([
+                'departamento.area', 
+                'encargado' => function ($query) {
+                    $query->select('id_usuario', 'u_nombre', 'a_paterno', 'a_materno');
+                }
+            ])
+            ->withCount(['tareas', 'tareasCompletadas']) 
+            ->get();
+            
+        // 🟢 PUNTO CRÍTICO 1: Verificar si el cliente canceló después de la consulta pesada
+        if (connection_aborted()) {
+            return response()->json(['message' => 'Proceso cancelado por el cliente antes de generar el PDF.'], 499);
+        }
 
-        // 4️⃣ CALCULAR RESPONSABLE, AVANCE Y AGRUPAR POR ÁREA Y ESTADO
+        // 4️⃣ CALCULAR RESPONSABLE, AVANCE Y AGRUPAR
         $proyectosAgrupados = [];
 
         foreach ($proyectos as $p) {
@@ -61,29 +85,19 @@ class ReporteController extends Controller
             if ($p->encargado) {
                 $nombreResponsable = $p->encargado->u_nombre . ' ' . $p->encargado->a_paterno . ' ' . $p->encargado->a_materno;
             } else {
-                $jefe = DB::table('usuario as u')
-                    ->join('c_usuario as cu', 'u.id_usuario', '=', 'cu.id_usuario')
-                    ->where('u.rol', 'Jefe')
-                    ->where('cu.id_departamento', $p->id_departamento)
-                    ->select('cu.u_nombre', 'cu.a_paterno', 'cu.a_materno')
-                    ->first();
-
-                $nombreResponsable = $jefe
-                    ? $jefe->u_nombre . ' ' . $jefe->a_paterno . ' ' . $jefe->a_materno
-                    : 'Sin Asignar';
+                $nombreResponsable = $jefesPorDepartamento[$p->id_departamento] ?? 'Sin Asignar';
             }
 
             $p->responsable = $nombreResponsable;
 
-            // Calcular porcentaje de avance
-            $total = $p->tareas->count();
-            $completadas = $p->tareas->where('t_estatus', 'Completada')->count();
+            // Calcular porcentaje de avance (Usando los conteos de withCount)
+            $total = $p->tareas_count; 
+            $completadas = $p->tareas_completadas_count; 
+            
             $p->avance_porcentaje = $total > 0 ? round(($completadas / $total) * 100) : 0;
 
-            // Nombre del área
+            // Nombre del área y estado
             $areaNombre = $p->departamento->area->nombre ?? 'Sin Área';
-
-            // Estado del proyecto
             $estado = $p->p_estatus;
 
             // Agrupar
@@ -91,11 +105,11 @@ class ReporteController extends Controller
         }
 
         // Ordenar por fecha de inicio ascendente (más antiguo primero)
-foreach ($proyectosAgrupados as $area => &$estados) {
-    foreach ($estados as $estado => &$listaProyectos) {
-        usort($listaProyectos, fn($a, $b) => strtotime($a->pf_inicio) - strtotime($b->pf_inicio));
-    }
-}
+        foreach ($proyectosAgrupados as $area => &$estados) {
+            foreach ($estados as $estado => &$listaProyectos) {
+                usort($listaProyectos, fn($a, $b) => strtotime($a->pf_inicio) - strtotime($b->pf_inicio));
+            }
+        }
 
 
         // 5️⃣ FECHA Y HORA
@@ -136,6 +150,11 @@ foreach ($proyectosAgrupados as $area => &$estados) {
             'hoy' => $hoy,
             'hora' => $hora,
         ];
+
+        // 🟢 PUNTO CRÍTICO 2: Verificar antes de renderizar el HTML final
+        if (connection_aborted()) {
+             return response()->json(['message' => 'Proceso cancelado durante la renderización de la vista.'], 499);
+        }
 
         // Renderizar vista
         $html = view('pdf.reporte_superusuario', $data)->render();

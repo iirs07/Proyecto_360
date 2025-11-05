@@ -26,7 +26,7 @@ class ProgresoController extends Controller
             ->get();
 
         // Mapear resultados y agregar responsable
-        $resultado = $proyectos->map(function($p) use ($progresos, $depId) {
+             $resultado = $proyectos->map(function($p) use ($progresos, $depId) {
             $prog = $progresos->firstWhere('id_proyecto', $p->id_proyecto);
             $total = $prog->total ?? 0;
             $completadas = $prog->completadas ?? 0;

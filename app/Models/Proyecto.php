@@ -20,25 +20,38 @@ class Proyecto extends Model
 
     public $timestamps = false; // desactiva created_at y updated_at
 
-    // Relación con tareas
+    // 🟢 RELACIÓN 1: Todas las tareas
     public function tareas()
     {
         return $this->hasMany(\App\Models\Tarea::class, 'id_proyecto', 'id_proyecto');
     }
+
+    // 🟢 RELACIÓN 2: Tareas completadas (¡Nueva relación clave para withCount!)
+    public function tareasCompletadas()
+    {
+        return $this->hasMany(\App\Models\Tarea::class, 'id_proyecto', 'id_proyecto')
+                    ->where('t_estatus', 'Completada'); 
+    }
+
+    // 🟢 RELACIÓN 3: Departamento
     public function departamento()
     {
-        // Se relaciona con la clave foránea 'id_departamento' en la tabla 'proyectos'
-        return $this->belongsTo(Departamento::class, 'id_departamento', 'id_departamento');
+        return $this->belongsTo(\App\Models\Departamento::class, 'id_departamento', 'id_departamento');
     }
-    // Ejemplo de relación Encargado (Asumiendo que tu modelo de usuario se llama User)
-public function encargado()
+    
+    // 🟢 RELACIÓN 4: Encargado directo
+    public function encargado()
     {
         // Se relaciona con CUsuario usando la clave foránea 'id_encargado' 
         // en la tabla 'proyectos' y la clave local 'id_usuario' en 'c_usuario'.
-        return $this->belongsTo(CUsuario::class, 'id_encargado', 'id_usuario');
+        return $this->belongsTo(\App\Models\CUsuario::class, 'id_encargado', 'id_usuario');
     }
     
-    // 🟢 AGREGAR ESTE ACCESOR para calcular el avance (si no tienes una columna fija)
+    /*
+    ⚠️ NOTA: Este accessor (getAvancePorcentajeAttribute) hará consultas N+1 si lo llamas 
+    en un bucle. Es más eficiente usar 'withCount' en el controlador. 
+    Lo mantenemos por si se usa en otras partes del código que no cargan withCount.
+    */
     public function getAvancePorcentajeAttribute()
     {
         $totalTareas = $this->tareas()->count();
@@ -47,10 +60,8 @@ public function encargado()
             return 0;
         }
         
-        // Asumiendo que las tareas completadas tienen estatus 'Completada'
         $tareasCompletadas = $this->tareas()->where('t_estatus', 'Completada')->count(); 
         
         return round(($tareasCompletadas / $totalTareas) * 100);
     }
-
 }

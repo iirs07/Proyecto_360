@@ -29,6 +29,9 @@ export const useProyectosOrdenados = (proyectos) => {
                 comparison = dateA - dateB;
             } else if (sortBy === "nombre") {
                 comparison = a.p_nombre.localeCompare(b.p_nombre);
+            } else if (sortBy === "porcentaje") { // 👈 NUEVO CRITERIO
+                // Asume que 'porcentaje' es un número
+                comparison = a.porcentaje - b.porcentaje;
             }
 
             return comparison * direction;
@@ -41,6 +44,19 @@ export const useProyectosOrdenados = (proyectos) => {
         setSortDirection(newSortDirection);
         setIsMenuOpen(false); // Cierra el menú al seleccionar
     };
+    
+    // 🟢 FUNCIÓN PARA ALTERNAR ENTRE ASC/DESC AL SELECCIONAR EL MISMO CRITERIO
+    const handleToggleSort = (newSortBy) => {
+        if (newSortBy === sortBy) {
+            // Si es el mismo, cambia la dirección
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            // Si es un criterio nuevo, establécelo a 'asc' por defecto
+            setSortBy(newSortBy);
+            setSortDirection('asc');
+        }
+        setIsMenuOpen(false);
+    };
 
     // 🟢 FUNCIÓN PARA OBTENER EL TEXTO DEL BOTÓN
     const getSortButtonText = () => {
@@ -48,11 +64,13 @@ export const useProyectosOrdenados = (proyectos) => {
             fechaInicio: "Fecha Inicio",
             fechaFin: "Fecha Fin",
             nombre: "Nombre",
+            porcentaje: "Progreso (%)", // 👈 NUEVO TEXTO
         };
         const icon = sortDirection === 'asc' ? ' ▲ (Asc.)' : ' ▼ (Desc.)'; 
         return `${criterioMap[sortBy] || 'Fecha Inicio'} ${icon}`;
     };
 
+    // 🟢 VALORES EXPORTADOS
     return {
         proyectosOrdenados,
         sortBy,
@@ -60,6 +78,7 @@ export const useProyectosOrdenados = (proyectos) => {
         isMenuOpen,
         setIsMenuOpen,
         handleSelectSort,
+        handleToggleSort, // Exportamos la nueva función para alternar
         getSortButtonText,
     };
 };

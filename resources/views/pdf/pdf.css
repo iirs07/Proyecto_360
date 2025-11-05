@@ -1,119 +1,139 @@
-
-   body {
+body {
     font-family: Arial, sans-serif;
     color: #000000;
     margin: 0;
     padding-bottom: 80px; /* respeta el espacio del footer */
-    }
+}
 
-    /* Encabezado tipo membrete */
-    .header {
-        width: 100%;
-        margin-bottom: 30px;
-    }
-    .logos-container {
+/* ===========================
+   🔹 ENCABEZADO (MEMBRETE)
+=========================== */
+
+.header {
+    width: 100%;
+    margin-bottom: 0; /* sin espacio debajo */
+    padding-bottom: 0;
+}
+
+.logos-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     height: 100px;
-    margin-bottom: 10px;
-    }
+    margin-bottom: 5px;
+}
 
-    .logo-left,
-    .logo-right,
-    .logo-center {
-        height: 70px;
-        width: auto;
-    }
-    .header-center {
-        text-align: center;
-        margin-top: 5px;
-    }
+.logo-left,
+.logo-right,
+.logo-center {
+    height: 70px;
+    width: auto;
+}
 
-    .header-center .titulo {
-        font-size: 18px;
-        font-weight: bold;
-        color: #861542;
-        margin-bottom: 5px;
-    }
+.header-center {
+    text-align: center;
+    margin-top: 5px;
+}
 
-    .header-center .subtitulo {
-        font-size: 14px;
-        font-weight: bold;
-        margin: 2px 0;
-    }
+.header-center .titulo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #861542;
+    margin-bottom: 3px;
+}
 
-    .divider {
-        border-top: 3px solid #861542;
-        margin: 10px 0 0 0;
-    }
+.header-center .subtitulo {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 2px 0;
+}
 
-    h2 {
-        text-align: center;
-        font-size: 24px;
-        color: #861542;
-        margin: 0 0 15px 0;
-    }
+/* 🔹 Línea divisora casi pegada al título */
+.divider {
+    border-top: 3px solid #861542;
+    margin: 0;
+    padding: 0;
+}
 
-    table {
-        width: 90%;
-        margin: 0 auto;
-        border-collapse: collapse;
-        font-size: 12px;
-        table-layout: fixed;
-    }
+/* 🔹 Título principal del reporte */
+.reporte-titulo {
+    text-align: center;
+    font-size: 24px;
+    color: #861542;
+    margin-top: 5px !important;     /* muy poco espacio arriba */
+    margin-bottom: 4px !important;  /* casi pegado al área */
+    padding: 0 !important;
+}
 
-    th, td {
-        border: 1px solid #861542;
-        padding: 6px;
-        text-align: center;
-        word-wrap: break-word;
-    }
+/* ===========================
+   🔹 TABLAS Y CONTENIDO
+=========================== */
 
-    th {
-        background-color: #861542;
-        color: #fff;
-    }
+table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+}
 
-    tbody tr:nth-child(even) {
-        background-color: #fdf0f2;
-    }
+th, td {
+    border: 1px solid #861542;
+    padding: 6px;
+    text-align: center;
+    word-wrap: break-word;
+}
 
-    .main-content {
-        padding-bottom: 20px; /* separación del footer */
-    }
+th {
+    background-color: #861542;
+    color: #fff;
+}
 
-    .logo-table {
+tbody tr:nth-child(even) {
+    background-color: #fdf0f2;
+}
+
+.main-content {
+    padding-bottom: 20px; /* separación del footer */
+}
+
+/* ===========================
+   🔹 TABLA DE LOGOS
+=========================== */
+
+.logo-table {
     width: 100%;
     table-layout: fixed;
     margin-bottom: 10px;
-    border-collapse: collapse; /* importante para evitar espacios entre celdas */
-    }
+    border-collapse: collapse;
+}
 
-    .logo-cell {
+.logo-cell {
     width: 33.33%;
     text-align: center;
     vertical-align: middle;
-    border: none; /* asegura que no haya borde en la celda */
-    }
-
-    .logo-img {
-    height: 70px;
-    width: auto;
-    }
-    .filtros-aplicados {
-    border: 1px solid #ccc;
-    background-color: #fdfdfd;
-    padding: 12px 20px;
-    margin: 20px 0;
-    border-radius: 4px;
-    font-family: "Times New Roman", serif;
-    font-size: 14px;
-    color: #222;
+    border: none;
 }
 
+.logo-img {
+    height: 70px;
+    width: auto;
+}
+
+/* ===========================
+   🔹 FILTROS
+=========================== */
+
 .filtros-aplicados p {
-    margin: 0;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
+}
+
+.filtros-aplicados {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    margin-top: 5px !important;
+    margin-bottom: 10px !important;
 }
 
 .filtros-aplicados .etiqueta {
@@ -131,34 +151,38 @@
     border: 1px solid #ddd;
     color: #444;
 }
-/* Ajustar anchos de columnas */
+
+/* ===========================
+   🔹 ANCHOS DE COLUMNAS
+=========================== */
+
 .tabla-proyectos th:nth-child(1),
 .tabla-proyectos td:nth-child(1) {
-    width: 30%; /* Proyecto más ancho */
+    width: 30%;
     text-align: left;
     padding-left: 8px;
 }
 
 .tabla-proyectos th:nth-child(2),
 .tabla-proyectos td:nth-child(2) {
-    width: 20%; /* Departamento */
+    width: 20%;
 }
 
 .tabla-proyectos th:nth-child(3),
 .tabla-proyectos td:nth-child(3) {
-    width: 20%; /* Responsable */
+    width: 20%;
 }
 
 .tabla-proyectos th:nth-child(4),
 .tabla-proyectos td:nth-child(4) {
-    width: 10%; /* Avance */
+    width: 10%;
 }
 
 .tabla-proyectos th:nth-child(5),
 .tabla-proyectos td:nth-child(5),
 .tabla-proyectos th:nth-child(6),
 .tabla-proyectos td:nth-child(6) {
-    width: 10%; /* Fechas */
+    width: 10%;
 }
 
 /* Mejorar presentación visual */
@@ -171,5 +195,57 @@
 }
 
 .tabla-proyectos tbody tr:hover {
-    background-color: #f7eaf0; /* Efecto al pasar el cursor */
+    background-color: #f7eaf0;
+}
+
+/* 🔹 Más espacio debajo de cada tabla */
+.tabla-proyectos {
+    margin-bottom: 22px !important;
+}
+
+/* ===========================
+   🔹 SECCIÓN DE ÁREA
+=========================== */
+
+.area-nombre {
+    background-color: #861542; 
+    color: #d5b690; 
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 96%;
+    margin-top: 2px !important;     /* muy pegado al título */
+    margin-bottom: 2px !important;
+    padding: 5px 12px !important;
+    border-radius: 4px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+/* ⚠️ Evitar margen extra dentro del área */
+.area-nombre h3 {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+}
+
+/* 🔹 Subtítulo de estado */
+.estado-proyecto {
+    margin-top: 2px !important;
+    margin-bottom: 6px !important;
+    font-size: 14px !important;
+    color: #861542 !important;
+    text-align: center;
+}
+
+/* Línea de separación visual sutil */
+.estado-subtitulo {
+    font-size: 16px;
+    font-weight: bold;
+    color: #861542; 
+    margin: 10px auto;
+    text-align: left;
+    width: 90%;
+    padding-left: 10px;
+    border-bottom: 2px solid #fdf0f2;
 }

@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { FaHome, FaFileAlt, FaUsers, FaTimesCircle } from "react-icons/fa"; 
+import React, { useState, useEffect, useRef } from "react";
+import { FaTimesCircle } from "react-icons/fa"; 
 import { useNavigate } from "react-router-dom";
 import "../css/global.css";
 import "../css/ReporteSuperUsuario.css";
 import logo3 from "../imagenes/logo3.png";
-import PdfViewer from "./PdfViewer"; 
+import PdfViewer from "./PdfViewer";
+import Layout from "../components/Layout";
+import MenuDinamico from "../components/MenuDinamico";
 
 export default function ReporteSuperUsuario() {
-    // ⬅️ ESTADOS AÑADIDOS PARA EL VISOR DE PDF
+    // ⬅️ ESTADOS
     const [pdfUrl, setPdfUrl] = useState(null);
     const [showPdfViewer, setShowPdfViewer] = useState(false);
-    // ⬆️ FIN DE ESTADOS AÑADIDOS
-
     const [areas, setAreas] = useState([]);
     const [seleccionados, setSeleccionados] = useState([]);
     const [areasAbiertas, setAreasAbiertas] = useState({});
@@ -21,43 +21,64 @@ export default function ReporteSuperUsuario() {
     const [fechaFin, setFechaFin] = useState("");
     const [anio, setAnio] = useState("");
     const [mes, setMes] = useState("");
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
-    
-    // 🟢 ESTADO PARA LA BARRA DE PROGRESO
-    const [generationProgress, setGenerationProgress] = useState(0); 
+    const [generationProgress, setGenerationProgress] = useState(0);
+    const [errorMessage, setErrorMessage] = useState(''); // Estado de error para mensaje en interfaz
+
+    // 🟢 REFERENCIAS CLAVE
+    const progressIntervalRef = useRef(null);
+    const abortControllerRef = useRef(null); 
 
     const navigate = useNavigate();
+    const token = localStorage.getItem('jwt_token');
 
     const listaMeses = [
-        { value: "01", label: "Enero" },
-        { value: "02", label: "Febrero" },
-        { value: "03", label: "Marzo" },
-        { value: "04", label: "Abril" },
-        { value: "05", label: "Mayo" },
-        { value: "06", label: "Junio" },
-        { value: "07", label: "Julio" },
-        { value: "08", label: "Agosto" },
-        { value: "09", label: "Septiembre" },
-        { value: "10", label: "Octubre" },
-        { value: "11", label: "Noviembre" },
-        { value: "12", label: "Diciembre" },
+        { value: "01", label: "Enero" }, { value: "02", label: "Febrero" },
+        { value: "03", label: "Marzo" }, { value: "04", label: "Abril" },
+        { value: "05", label: "Mayo" }, { value: "06", label: "Junio" },
+        { value: "07", label: "Julio" }, { value: "08", label: "Agosto" },
+        { value: "09", label: "Septiembre" }, { value: "10", label: "Octubre" },
+        { value: "11", label: "Noviembre" }, { value: "12", label: "Diciembre" },
     ];
 
     const listaAnios = [];
     const anioActual = new Date().getFullYear();
     for (let i = anioActual - 5; i <= anioActual + 1; i++) listaAnios.push(i);
 
-    // === CARGA DE DATOS ===
+
+    // 🟢 FUNCIÓN DE LOGOUT
+    const handleLogout = () => {
+        localStorage.removeItem("jwt_token");
+        navigate("/login", { replace: true });
+    };
+
+
+    // === CARGA DE DATOS (fetchAreas con AUTH) ===
     useEffect(() => {
+        if (!token) {
+            navigate("/login", { replace: true });
+            return;
+        }
+
         const fetchAreas = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/api/departamentos");
+                // Autenticación con Bearer Token
+                const response = await fetch("http://127.0.0.1:8000/api/departamentos", {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    handleLogout(); 
+                    return;
+                }
+
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const data = await response.json();
-
+                
                 const areasAdaptadas = data.map(area => ({
                     id: area.id,
                     nombre: area.nombre,
@@ -78,10 +99,13 @@ export default function ReporteSuperUsuario() {
         };
 
         fetchAreas();
-    }, []);
+    }, [token, navigate]);
+    // === FIN CARGA DE DATOS ===
 
-    // === FUNCIONES DE MANEJO DE ESTADOS ===
+
+    // === FUNCIONES DE MANEJO DE ESTADOS (CORREGIDAS para limpiar el error) ===
     const toggleDepartamento = (depId) => {
+        setErrorMessage(''); // Limpiar error al interactuar
         setSeleccionados((prev) =>
             prev.includes(depId)
                 ? prev.filter((d) => d !== depId)
@@ -90,122 +114,170 @@ export default function ReporteSuperUsuario() {
     };
 
     const toggleArea = (area) => {
+        setErrorMessage(''); // Limpiar error al interactuar
         const depIds = area.departamentos.map((dep) => dep.id_departamento);
         const allSelected = depIds.every((id) => seleccionados.includes(id));
-
-        if (allSelected) {
-            setSeleccionados((prev) => prev.filter((id) => !depIds.includes(id)));
-        } else {
-            setSeleccionados((prev) => [...new Set([...prev, ...depIds])]);
-        }
+        setSeleccionados((prev) => allSelected ? prev.filter((id) => !depIds.includes(id)) : [...new Set([...prev, ...depIds])]);
     };
 
     const toggleAbrirArea = (areaId) => {
         setAreasAbiertas((prev) => ({ ...prev, [areaId]: !prev[areaId] }));
     };
 
-    const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+    const handlePeriodoChange = (t) => {
+        setErrorMessage(''); // Limpiar error al cambiar periodo
+        setPeriodo(t);
+        if (t === "Año") {
+            setMes(""); setFechaInicio(""); setFechaFin("");
+        } else if (t === "Mes") {
+            setFechaInicio(""); setFechaFin("");
+        } else if (t === "Rango") {
+            setAnio(""); setMes("");
+        }
+    };
 
-    // 🟢 FUNCIÓN para simular el progreso (AJUSTADA AL 99%)
+
+    // 🟢 FUNCIÓN para simular el progreso (0% al 99%)
     const simulateProgress = () => {
-        setGenerationProgress(0); // Reiniciar al inicio
-        // Simular progreso cada 150ms
+        setGenerationProgress(0); 
+        let progress = 0;
+        
         const interval = setInterval(() => {
-            setGenerationProgress(prev => {
-                // Si ya estamos cerca del 99%, paramos aquí.
-                if (prev >= 95) { 
-                    clearInterval(interval);
-                    return 99; // 🟢 Aseguramos que se quede en 99%
-                }
-                // Incremento más dinámico para llegar al 99%
-                const increment = Math.floor(Math.random() * 8) + 3; // Incremento aleatorio entre 3 y 10
-                const nextProgress = prev + increment;
-                return nextProgress < 99 ? nextProgress : 99;
-            });
+            if (progress >= 99) { 
+                clearInterval(progressIntervalRef.current);
+                return;
+            }
+            const increment = Math.floor(Math.random() * 5) + 3; 
+            progress += increment;
+            const nextProgress = progress < 99 ? progress : 99;
+            setGenerationProgress(nextProgress);
         }, 150);
-        return interval;
+        
+        progressIntervalRef.current = interval; 
     };
     
-    // 🟢 FUNCIÓN para cancelar la generación 
+    // 🟢 FUNCIÓN para cancelar la generación (Ahora cancela el fetch)
     const handleCancelGeneration = () => {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort(); 
+            abortControllerRef.current = null; 
+        }
+
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+        }
         setIsGenerating(false);
         setGenerationProgress(0);
         console.log("Generación de reporte cancelada por el usuario.");
     };
 
 
-    // ⬇️ FUNCIÓN handleGenerarReporte (con limpieza del mes) ⬇️
-const handleGenerarReporte = async () => {
-    if (seleccionados.length === 0) {
-        alert("⚠️ Error: Selecciona al menos un departamento para generar el reporte.");
-        return;
-    }
+    // ⬇️ FUNCIÓN handleGenerarReporte (con AbortController y Validación Completa) ⬇️
+    const handleGenerarReporte = async () => {
+        setErrorMessage(''); // Limpiar error al iniciar nuevo intento
 
-    let urlFiltros = `?tipoProyecto=${tipoProyecto}&departamentos=${seleccionados.join(",")}`;
-    let alertaPeriodo = "";
-
-    if (periodo === "Año" && anio) {
-        urlFiltros += `&anio=${anio}`;
-    } else if (periodo === "Mes" && anio && mes) {
-        // 🟢 CORRECCIÓN: 'mes' ahora es solo el número del mes (ej: "01"), 
-        // ya no se requiere split() como en la versión anterior.
-        urlFiltros += `&anio=${anio}&mes=${mes}`; 
-    } else if (periodo === "Rango" && fechaInicio && fechaFin) {
-        urlFiltros += `&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
-    } else if (periodo === "Año" && !anio) {
-        alertaPeriodo = 'Año';
-    } else if (periodo === "Mes" && (!anio || !mes)) {
-        alertaPeriodo = 'Mes/Año';
-    } else if (periodo === "Rango" && (!fechaInicio || !fechaFin)) {
-        alertaPeriodo = 'Rango de fechas';
-    }
-
-    if (alertaPeriodo) {
-        alert(`⚠️ Error: Debes seleccionar un valor para el periodo de tipo "${alertaPeriodo}".`);
-        return;
-    }
-
-    const API_URL = `http://127.0.0.1:8000/api/reporte${urlFiltros}`;
-    console.log("Solicitando Reporte a:", API_URL);
-
-    let progressInterval = null; 
-
-    try {
-        setIsGenerating(true); 
-        progressInterval = simulateProgress(); 
-
-        const response = await fetch(API_URL);
-        
-        clearInterval(progressInterval); 
-
-        if (!response.ok) {
-            throw new Error(`Error al generar reporte (${response.status})`);
+        // 1. Validación de Selección
+        if (seleccionados.length === 0) {
+            setErrorMessage("⚠ Error: Selecciona al menos un departamento para generar el reporte.");
+            return;
         }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        setPdfUrl(url);
         
-        // Finaliza al 100% y abre el visor
-        setGenerationProgress(100); 
-        setTimeout(() => {
-            setShowPdfViewer(true);
-            setGenerationProgress(0); 
-        }, 500); 
+        let urlFiltros = `?tipoProyecto=${tipoProyecto}&departamentos=${seleccionados.join(",")}`;
+        let alertaPeriodo = "";
 
-    } catch (error) {
-        clearInterval(progressInterval); 
-        console.error("Error al generar el reporte:", error);
-        alert(`❌ Ocurrió un error al generar el reporte: ${error.message}`);
-        setGenerationProgress(0); 
-    } finally {
-        // La barra se oculta un poco después de que se abre el PDF (gracias al setTimeout)
-        // Pero es seguro dejarlo aquí para el caso de error
-        if (!showPdfViewer) {
-            setIsGenerating(false); 
+        // 2. Lógica de validación COMPLETA de periodos
+        if (periodo === "Año") {
+            if (!anio) {
+                alertaPeriodo = 'Año'; 
+            } else {
+                urlFiltros += `&anio=${anio}`; 
+            }
+        } else if (periodo === "Mes") {
+            if (!anio || !mes) {
+                alertaPeriodo = 'Mes y Año'; 
+            } else {
+                urlFiltros += `&anio=${anio}&mes=${mes}`; 
+            }
+        } else if (periodo === "Rango") {
+            if (!fechaInicio || !fechaFin) {
+                alertaPeriodo = 'Rango de fechas (Inicio y Fin)'; 
+            } else {
+                if (new Date(fechaInicio) > new Date(fechaFin)) {
+                    setErrorMessage("⚠  Error: La fecha de inicio no puede ser posterior a la fecha de fin.");
+                    return;
+                }
+                urlFiltros += `&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`; 
+            }
+        } 
+
+        if (alertaPeriodo) {
+            setErrorMessage(`⚠ Error: Debes seleccionar un valor para el periodo de tipo "${alertaPeriodo}".`);
+            return;
         }
-    }
-};
+        // --- Fin validación ---
+
+        const API_URL = `http://127.0.0.1:8000/api/reporte${urlFiltros}`;
+
+        try {
+            setIsGenerating(true); 
+            simulateProgress(); 
+
+            // 🟢 CREACIÓN DE ABORTCONTROLLER
+            const controller = new AbortController();
+            abortControllerRef.current = controller; 
+            const signal = controller.signal;
+
+            // 🟢 LLAMADA FETCH
+            const response = await fetch(API_URL, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                signal: signal 
+            }); 
+            
+            // 🟢 Limpiar referencias al finalizar la solicitud (EXITOSA)
+            if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+            abortControllerRef.current = null; 
+
+            if (response.status === 401) {
+                handleLogout();
+                return;
+            }
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessageText = `(${response.status}) Error desconocido.`;
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessageText = errorJson.message || errorMessageText;
+                } catch(e) { /* Si no es JSON, usa el error desconocido */ }
+                throw new Error(errorMessageText); 
+            }
+            
+            // PROCESAMIENTO FINAL
+            const blob = await response.blob(); 
+            const url = window.URL.createObjectURL(blob);
+            setPdfUrl(url);
+            
+            setGenerationProgress(100); 
+            
+            setTimeout(() => {
+                setShowPdfViewer(true);
+                setIsGenerating(false); 
+                setGenerationProgress(0); 
+            }, 500);
+
+        } catch (error) {
+            // 🛑 MANEJO DE ABORTERROR
+            if (error.name === 'AbortError') {
+                // Cancelación intencional, no mostrar error.
+            } else {
+                handleCancelGeneration();
+                setErrorMessage(`❌ Ocurrió un error en la generación: ${error.message}`); 
+            }
+        }
+    };
 
 
     // ⬅️ FUNCIÓN PARA CERRAR EL VISOR Y LIBERAR MEMORIA
@@ -229,259 +301,199 @@ const handleGenerarReporte = async () => {
             </div>
         );
     }
+    
     // === CONTENIDO PRINCIPAL ===
     return (
-        <div className="main-layout">
-            {/* Sidebar */}
-            <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
-                <ul>
-                    <li className="menu-item" onClick={() => navigate("/Principal")}>
-                        <FaHome className="icon" />
-                        {!sidebarCollapsed && <span className="label">Inicio</span>}
-                    </li>
-                    <li className="menu-item active" onClick={() => navigate("/ReporteSuperUsuario")}>
-                        <FaFileAlt className="icon" />
-                        {!sidebarCollapsed && <span className="label">Reportes</span>}
-                    </li>
-                    <li className="menu-item" onClick={() => navigate("/")}>
-                        <FaUsers className="icon" />
-                        {!sidebarCollapsed && <span className="label">Cerrar sesión</span>}
-                    </li>
-                </ul>
-            </div>
-
-            {/* Contenido principal */}
-            <div className={`main-content ${sidebarCollapsed ? "collapsed" : ""}`}>
-                <div className="logo-fondo">
-                    <img src={logo3} alt="Fondo" />
-                </div>
-
-                <div className="header-global">
-                    <div className="header-left" onClick={toggleSidebar}>
-                        <FaHome className="icono-casa-global" />
-                    </div>
-                    <div className="barra-center">
-                        <span className="titulo-barra-global">
-                            GENERAR REPORTES DE PROYECTOS EN LOS ÁREAS / DEPARTAMENTOS
-                        </span>
-                    </div>
-                </div>
-
-                <div className="reporte-container">
-                    <div className="main-form-container">
-                        {/* ⬅️ INICIO DE LÍNEAS DE CÓDIGO FALTANTES (Filtros) ⬅️ */}
-                        <div className="filtros-grid">
-                            {/* === 1. Áreas === */}
-                            <div className="form-section area-selection-panel">
-                                <label className="titulo-seccion"><strong>1. Seleccionar Áreas / Departamentos</strong></label>
-                                <div className="areas-list-scroll">
-                                    {areas.map((area) => (
-                                        <div key={area.id} className="area-item-contenedor">
-                                            <div className="area-header">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={area.departamentos.every((dep) =>
-                                                        seleccionados.includes(dep.id_departamento)
-                                                    )}
-                                                    onChange={() => toggleArea(area)}
-                                                />
-                                                <span
-                                                    className="area-nombre"
-                                                    onClick={() => toggleAbrirArea(area.id)}
-                                                >
-                                                    {area.nombre}
-                                                </span>
-                                                <span
-                                                    className="flecha-area"
-                                                    onClick={() => toggleAbrirArea(area.id)}
-                                                >
-                                                    {areasAbiertas[area.id] ? "▼" : "▶"}
-                                                </span>
-                                            </div>
-
-                                            {areasAbiertas[area.id] && (
-                                                <div className="area-departamentos-submenu">
-                                                    {area.departamentos.map((dep) => (
-                                                        <label key={dep.id_departamento} className="departamento-label">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={seleccionados.includes(dep.id_departamento)}
-                                                                onChange={() => toggleDepartamento(dep.id_departamento)}
-                                                            />
-                                                            <span className="departamento-texto">{dep.d_nombre}</span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
+        <Layout 
+            titulo="GENERAR REPORTES DE PROYECTOS EN LOS ÁREAS / DEPARTAMENTOS"
+            sidebar={
+                <MenuDinamico 
+                    tipo="principal" 
+                    activeRoute="reportes" 
+                    onLogout={handleLogout}
+                />
+            }
+        >
+            <div className="reporte-container">
+                <div className="main-form-container">
+                    
+                    <div className="filtros-grid">
+                        {/* === 1. Áreas === */}
+                         <div className="form-section area-selection-panel">
+                            <label className="titulo-seccion"><strong>1. Seleccionar Áreas / Departamentos</strong></label>
+                            <div className="areas-list-scroll">
+                                {areas.map((area) => (
+                                    <div key={area.id} className="area-item-contenedor">
+                                        <div className="area-header">
+                                            <input
+                                                type="checkbox"
+                                                checked={area.departamentos.every((dep) => seleccionados.includes(dep.id_departamento))}
+                                                onChange={() => toggleArea(area)}
+                                            />
+                                            <span
+                                                className="area-nombre"
+                                                onClick={() => toggleAbrirArea(area.id)}
+                                            >
+                                                {area.nombre}
+                                            </span>
+                                            <span
+                                                className="flecha-area"
+                                                onClick={() => toggleAbrirArea(area.id)}
+                                            >
+                                                {areasAbiertas[area.id] ? "▼" : "▶"}
+                                            </span>
                                         </div>
-                                    ))}
-                                </div>
+
+                                        {areasAbiertas[area.id] && (
+                                            <div className="area-departamentos-submenu">
+                                                {area.departamentos.map((dep) => (
+                                                    <label key={dep.id_departamento} className="departamento-label">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={seleccionados.includes(dep.id_departamento)}
+                                                            onChange={() => toggleDepartamento(dep.id_departamento)}
+                                                        />
+                                                        <span className="departamento-texto">{dep.d_nombre}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* === 2. Período === */}
+                        <div className="form-section periodo-section">
+                            <label className="titulo-seccion"><strong>2. Seleccionar Periodo</strong></label>
+                            <div className="periodo-tipo-tabs">
+                                {["Año", "Mes", "Rango"].map((t) => (
+                                    <button key={t} className={`periodo-tab ${periodo === t ? "active" : ""}`} onClick={() => handlePeriodoChange(t)} >
+                                        {t === "Rango" ? "Rango de fechas" : t}
+                                    </button>
+                                ))}
                             </div>
 
-                            {/* === 2. Período === */}
-                            <div className="form-section periodo-section">
-                                <label className="titulo-seccion"><strong>2. Seleccionar Periodo</strong></label>
-                                <div className="periodo-tipo-tabs">
-                                    {["Año", "Mes", "Rango"].map((t) => (
-                                        <button
-                                            key={t}
-                                            className={`periodo-tab ${periodo === t ? "active" : ""}`}
-                                            onClick={() => {
-                                                setPeriodo(t);
-                                                // Resetear valores no usados
-                                                if (t === "Año") {
-                                                    setMes("");
-                                                    setFechaInicio("");
-                                                    setFechaFin("");
-                                                } else if (t === "Mes") {
-                                                    setFechaInicio("");
-                                                    setFechaFin("");
-                                                } else if (t === "Rango") {
-                                                    setAnio("");
-                                                    setMes("");
-                                                }
-                                            }}
+                            <div className="periodo-inputs">
+                                {periodo === "Año" && (
+                                    <div className="input-group-field">
+                                        <label htmlFor="select-anio">Año:</label>
+                                        <select 
+                                            id="select-anio" 
+                                            value={anio} 
+                                            onChange={(e) => {setAnio(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
+                                            className="input-anio"
                                         >
-                                            {t === "Rango" ? "Rango de fechas" : t}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="periodo-inputs">
-                                    {periodo === "Año" && (
-                                        <div className="input-group-field">
-                                            <label htmlFor="select-anio">Año:</label>
-                                            <select
-                                                id="select-anio"
-                                                value={anio}
-                                                onChange={(e) => setAnio(e.target.value)}
-                                                className="input-anio"
+                                            <option value="">-- Seleccionar año --</option>
+                                            {listaAnios.map((a) => (<option key={a} value={a}>{a}</option>))}
+                                        </select>
+                                    </div>
+                                )}
+                                {periodo === "Mes" && (
+                                    <div className="input-group-field">
+                                        <label htmlFor="select-mes">Mes:</label>
+                                        <div className="mes-inputs">
+                                            <select 
+                                                id="select-mes-year" 
+                                                value={anio} 
+                                                onChange={(e) => {setAnio(e.target.value); setMes(""); setErrorMessage('');}} // 🟢 Limpieza de error
                                             >
-                                                <option value="">-- Seleccionar año --</option>
-                                                {listaAnios.map((a) => (
-                                                    <option key={a} value={a}>
-                                                        {a}
-                                                    </option>
-                                                ))}
+                                                <option value="">-- Año --</option>
+                                                {listaAnios.map((a) => (<option key={a} value={a}>{a}</option>))}
+                                            </select>
+                                            <select 
+                                                id="select-mes" 
+                                                value={mes} 
+                                                onChange={(e) => {setMes(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
+                                                disabled={!anio}
+                                            >
+                                                <option value="">-- Mes --</option>
+                                                {listaMeses.map((m) => (<option key={m.value} value={m.value}>{m.label}</option>))}
                                             </select>
                                         </div>
-                                    )}
-                                    {periodo === "Mes" && (
-                                        <div className="input-group-field">
-                                            <label htmlFor="select-mes">Mes:</label>
-                                            <div className="mes-inputs">
-                                                <select
-                                                    id="select-mes-year"
-                                                    value={anio}
-                                                    onChange={(e) => {
-                                                        setAnio(e.target.value);
-                                                        setMes(""); // Resetear mes al cambiar año
-                                                    }}
-                                                >
-                                                    <option value="">-- Año --</option>
-                                                    {listaAnios.map((a) => (
-                                                        <option key={a} value={a}>
-                                                            {a}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <select
-                                                    id="select-mes"
-                                                    value={mes}
-                                                    onChange={(e) => setMes(e.target.value)}
-                                                    disabled={!anio}
-                                                >
-                                                    <option value="">-- Mes --</option>
-                                                    {listaMeses.map((m) => (
-                                                        // 🟢 CORRECCIÓN: El valor es SOLO el mes.
-                                                        <option key={m.value} value={m.value}>
-                                                            {m.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {periodo === "Rango" && (
-                                        <div className="rango-fechas-inputs">
-                                            <label>Inicio:</label>
-                                            <input
-                                                type="date"
-                                                value={fechaInicio}
-                                                onChange={(e) => setFechaInicio(e.target.value)}
-                                            />
-                                            <label>Fin:</label>
-                                            <input
-                                                type="date"
-                                                value={fechaFin}
-                                                onChange={(e) => setFechaFin(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
+                                {periodo === "Rango" && (
+                                    <div className="rango-fechas-inputs">
+                                        <label>Inicio:</label>
+                                        <input 
+                                            type="date" 
+                                            value={fechaInicio} 
+                                            onChange={(e) => {setFechaInicio(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
+                                        />
+                                        <label>Fin:</label>
+                                        <input 
+                                            type="date" 
+                                            value={fechaFin} 
+                                            onChange={(e) => {setFechaFin(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
+                                        />
+                                    </div>
+                                )}
                             </div>
+                        </div>
 
-                            {/* === 3. Tipo de Proyecto === */}
-                            <div className="form-section tipo-proyecto-section">
-                                <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
-                                <select
-                                    value={tipoProyecto}
-                                    onChange={(e) => setTipoProyecto(e.target.value)}
-                                    className="input-estado"
+                        {/* === 3. Tipo de Proyecto === */}
+                        <div className="form-section tipo-proyecto-section">
+                            <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
+                            <select 
+                                value={tipoProyecto} 
+                                onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
+                                className="input-estado"
+                            >
+                                <option value="Finalizados">Finalizados</option>
+                                <option value="EnProceso">En proceso</option>
+                                <option value="Ambos">Ambos</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Botón y barra de progreso */}
+                    <div className="boton-generar-section">
+                        {isGenerating ? (
+                            // BARRA DE PROGRESO Y BOTÓN DE CANCELAR
+                            <div className="progress-container">
+                                <div className="progress-bar-label">
+                                    Generando Reporte: {generationProgress}%
+                                </div>
+                                <div className="progress-bar-wrapper">
+                                    <div 
+                                        className="progress-bar" 
+                                        style={{ width: `${generationProgress}%` }}
+                                    ></div>
+                                </div>
+                                <button 
+                                    className="btn-cancelar" 
+                                    onClick={handleCancelGeneration} 
                                 >
-                                    <option value="Finalizados">Finalizados</option>
-                                    <option value="EnProceso">En proceso</option>
-                                    <option value="Ambos">Ambos</option>
-                                </select>
+                                    <FaTimesCircle className="icon-cancelar" />
+                                    Cancelar
+                                </button>
                             </div>
-                        </div>
-                        {/* ⬆️ FIN DE LÍNEAS DE CÓDIGO FALTANTES ⬆️ */}
-
-                        {/* Botón y barra de progreso */}
-                        <div className="boton-generar-section">
-                            {isGenerating ? (
-                                // 🟢 BARRA DE PROGRESO Y BOTÓN DE CANCELAR
-                                <div className="progress-container">
-                                    <div className="progress-bar-label">
-                                        Generando Reporte: {generationProgress}%
-                                    </div>
-                                    <div className="progress-bar-wrapper">
-                                        <div 
-                                            className="progress-bar" 
-                                            style={{ width: `${generationProgress}%` }}
-                                        ></div>
-                                    </div>
-                                    <button 
-                                        className="btn-cancelar" 
-                                        onClick={handleCancelGeneration}
-                                    >
-                                        <FaTimesCircle className="icon-cancelar" />
-                                        Cancelar
-                                    </button>
-                                </div>
-                            ) : (
-                                // 🟢 BOTÓN DE GENERAR (visible cuando no se está generando)
-                                <>
-                                    <button
-                                        className="btn-generar"
-                                        onClick={handleGenerarReporte}
-                                        disabled={seleccionados.length === 0}
-                                    >
-                                        Generar Reporte
-                                    </button>
-                                    {seleccionados.length === 0 && (
-                                        <p className="alerta-seleccion">
-                                            ⚠ Selecciona al menos un departamento para habilitar el reporte.
-                                        </p>
-                                    )}
-                                </>
-                            )}
-                        </div>
+                        ) : (
+                            // BOTÓN DE GENERAR (visible cuando no se está generando)
+                            <>
+                                <button
+                                    className="btn-generar"
+                                    onClick={handleGenerarReporte}
+                                    // El botón se habilita si hay seleccionados Y no hay un errorMessage activo.
+                                    disabled={seleccionados.length === 0 || !!errorMessage} 
+                                >
+                                    Generar Reporte
+                                </button>
+                                {/* 🟢 MOSTRAR MENSAJE DE ERROR/ADVERTENCIA FIJO */}
+                                {(seleccionados.length === 0 || errorMessage) && (
+                                    <p className="alerta-seleccion">
+                                        {/* Muestra el error específico O la advertencia inicial */}
+                                        {errorMessage || "⚠ Selecciona al menos un departamento para habilitar el reporte."}
+                                    </p>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
             
-            {/* 🟢 VISOR DE PDF */}
+            {/* VISOR DE PDF */}
             {showPdfViewer && pdfUrl && (
                 <PdfViewer 
                     pdfUrl={pdfUrl} 
@@ -489,6 +501,6 @@ const handleGenerarReporte = async () => {
                     onClose={handleClosePdfViewer} 
                 />
             )}
-        </div>
+        </Layout>
     );
 }

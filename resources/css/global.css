@@ -45,17 +45,17 @@ html {
   cursor: pointer;
 }
 
-.icono-casa-global {
-  width: 35px;
-  height: 32px;
+.icono-hamburguesa-global {
+  width: 46px;
+  height: 23px;
   fill: #d5b690;
   transition: transform 0.2s;
 }
 
-.icono-casa-global:hover {
-  transform: scale(1.2);
+.icono-hamburguesa-global:hover {
+  transform: scale(1.1); /* Hacemos el efecto hover un poco más sutil */
+  color: #ffffff;
 }
-
 /* Contenedor del título */
 .barra-center {
   flex: none;
