@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo1 from "../imagenes/logo1.png";
 import logo2 from "../imagenes/logo4.png";
@@ -20,7 +20,13 @@ function Login() {
   const navigate = useNavigate();
   const domains = ["gmail.com", "outlook.com", "hotmail.com", "minatitlan.gob.mx"];
 
+  // 1. Crear referencia para el input de la contraseña
+  const passwordInputRef = useRef(null);
+
   const handleLogin = async () => {
+    // Es buena práctica agregar un chequeo de 'loading' aquí para evitar clics dobles, aunque el botón esté deshabilitado.
+    if (loading) return;
+    
     let hasError = false;
     setErrorUsername("");
     setErrorPassword("");
@@ -119,6 +125,21 @@ if (!username) {
     }
   };
 
+  // 2. Manejador para la tecla Enter
+  const handleKeyDown = (event, nextAction) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); 
+      
+      if (typeof nextAction === 'function') {
+        // Si es una función (ej: handleLogin), la ejecuta
+        nextAction();
+      } else if (nextAction && nextAction.current) {
+        // Si es una referencia, mueve el foco
+        nextAction.current.focus();
+      }
+    }
+  };
+
   return (
     <div className="login-body">
       <div className="login-container">
@@ -144,12 +165,16 @@ if (!username) {
                 const valorFiltrado = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
                 setUsername(valorFiltrado);
               }}
+              // 3. Enter salta a Contraseña
+              onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             />
             <span className="login-at">@</span>
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="login-select dominio-select"
+              // Enter salta a Contraseña
+              onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             >
               {domains.map((d) => (
                 <option key={d} value={d}>{d}</option>
@@ -173,6 +198,9 @@ if (!username) {
                 const valorSinEspacios = e.target.value.replace(/\s/g, '');
                 setPassword(valorSinEspacios);
               }}
+              ref={passwordInputRef} // 4. Asignar referencia
+              // 5. Enter ejecuta handleLogin
+              onKeyDown={(e) => handleKeyDown(e, handleLogin)}
             />
             {password.length > 0 && (
               <span

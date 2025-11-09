@@ -53,8 +53,9 @@ class RegistroPaso1Controller extends Controller
 
         // 4️⃣ Enviar correo al usuario
         try {
-            Mail::raw("Tu código de verificación es: $tokenVerificacion", function ($message) use ($correo) {
-                $message->to($correo)->subject('Verificación de correo');
+            Mail::send('emails.verificacion', ['token' => $tokenVerificacion], function ($message) use ($correo) {
+                $message->to($correo)
+                        ->subject('Verificación de correo');
             });
         } catch (\Exception $e) {
             return response()->json([

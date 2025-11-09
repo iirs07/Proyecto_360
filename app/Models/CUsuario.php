@@ -7,7 +7,7 @@ class CUsuario extends Model
 {
     protected $table = 'c_usuario';
     protected $primaryKey = 'id_usuario';
-    public $timestamps = false; // Evitar created_at y updated_at
+    public $timestamps = false;
 
     protected $fillable = [
         'id_departamento',
@@ -16,5 +16,10 @@ class CUsuario extends Model
         'a_materno',
         'telefono',
     ];
-}
 
+    // 🔹 Relación inversa: un usuario puede tener muchas tareas
+    public function tareas()
+    {
+        return $this->hasMany(\App\Models\Tarea::class, 'id_usuario', 'id_usuario');
+    }
+}

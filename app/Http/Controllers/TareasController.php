@@ -2,30 +2,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tarea;
-use App\Models\CUsuario;
-use App\Models\Evidencia; // Importamos Evidencia
 use Illuminate\Http\Request;
 
 class TareasController extends Controller
 {
-    // Obtener todas las tareas de un proyecto
     public function obtenerPorProyecto($idProyecto)
     {
-        $tareas = Tarea::where('id_proyecto', $idProyecto)->get();
+        // 🔹 Carga tareas + usuario + evidencias en una sola consulta
+        $tareas = Tarea::with(['usuario', 'evidencias'])
+            ->where('id_proyecto', $idProyecto)
+            ->get();
 
-        $tareasConResponsableYEvidencias = $tareas->map(function ($tarea) {
-            $usuario = CUsuario::find($tarea->id_usuario);
-
-            $responsable = $usuario
-                ? $usuario->u_nombre . ' ' . $usuario->a_paterno . ' ' . $usuario->a_materno
+        // 🔹 Formateamos los datos
+        $resultado = $tareas->map(function ($tarea) {
+            $responsable = $tarea->usuario
+                ? "{$tarea->usuario->u_nombre} {$tarea->usuario->a_paterno} {$tarea->usuario->a_materno}"
                 : 'No definido';
 
-            // Obtener todas las evidencias asociadas a la tarea
-            $evidencias = Evidencia::where('id_tarea', $tarea->id_tarea)->get()->map(function($e){
+            $evidencias = $tarea->evidencias->map(function ($e) {
                 return [
-                    'id' => $e->id_evidencia,
-                    'url' => $e->archivo_url, // Aquí usamos el accessor que ya creaste
-                    'fecha' => $e->fecha
+                    'id'    => $e->id_evidencia,
+                    'url'   => $e->archivo_url,
+                    'fecha' => $e->fecha,
                 ];
             });
 
@@ -39,10 +37,10 @@ class TareasController extends Controller
                 'tf_fin'      => $tarea->tf_fin,
                 't_estatus'   => $tarea->t_estatus,
                 'responsable' => $responsable,
-                'evidencias'  => $evidencias, // <-- Aquí devolvemos las fotos o archivos
+                'evidencias'  => $evidencias,
             ];
         });
 
-        return response()->json($tareasConResponsableYEvidencias);
+        return response()->json($resultado);
     }
 }

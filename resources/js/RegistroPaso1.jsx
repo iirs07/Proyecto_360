@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; 
 import { useNavigate, useParams } from 'react-router-dom';
 import '../css/Login.css';
 import logo1 from '../imagenes/logo1.png';
@@ -20,6 +20,10 @@ function RegistroPaso1() {
   const { token } = useParams();
 
   const domains = ['gmail.com', 'outlook.com', 'hotmail.com', 'minatitlan.gob.mx'];
+
+  // 1. Referencias para los inputs
+  const passwordInputRef = useRef(null);
+  const nextButtonRef = useRef(null);
 
   const handleSiguiente = async () => {
     let hasError = false;
@@ -95,6 +99,27 @@ function RegistroPaso1() {
     }
   };
 
+  // 2. Manejador para la tecla Enter
+  const handleKeyDown = (event, actionRef) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Previene el envío por defecto del formulario
+
+      if (actionRef && actionRef.current) {
+        // Si es una referencia de input (ej. contraseña), enfoca
+        if (actionRef.current instanceof HTMLInputElement) {
+          actionRef.current.focus();
+        } 
+        // Si es una referencia de botón o no hay referencia, ejecuta la acción
+        else {
+          handleSiguiente();
+        }
+      } else {
+        // Para el caso del input de contraseña, ejecuta la función de envío
+        handleSiguiente();
+      }
+    }
+  };
+
   return (
     <div className="login-body">
       <div className="login-container">
@@ -121,12 +146,16 @@ function RegistroPaso1() {
                 const valorFiltrado = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
                 setUsername(valorFiltrado);
               }}
+              // 3. Enter salta a Contraseña
+              onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             />
             <span className="login-at">@</span>
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="login-select dominio-select"
+              // 3. Enter salta a Contraseña
+              onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             >
               {domains.map((d) => (
                 <option key={d} value={d}>
@@ -152,6 +181,9 @@ function RegistroPaso1() {
                 const valorSinEspacios = e.target.value.replace(/\s/g, '');
                 setPassword(valorSinEspacios);
               }}
+              ref={passwordInputRef} // 4. Asignar referencia
+              // 5. Enter ejecuta handleSiguiente
+              onKeyDown={(e) => handleKeyDown(e)} 
             />
             {password.length > 0 && (
               <span
@@ -178,6 +210,7 @@ function RegistroPaso1() {
           className="login-button"
           onClick={handleSiguiente}
           disabled={loading}
+          ref={nextButtonRef} // Referencia del botón (Opcional, pero buena práctica)
         >
           {loading ? <span className="spinner"></span> : 'SIGUIENTE'}
         </button>

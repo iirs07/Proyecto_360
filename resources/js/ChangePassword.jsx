@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react'; // 👈 Importamos useRef
 import { useNavigate } from 'react-router-dom';
 import '../css/Login.css';
 import logo1 from '../imagenes/logo1.png';
@@ -21,12 +21,35 @@ export default function ChangePassword() {
   const navigate = useNavigate();
   const domains = ['gmail.com', 'outlook.com', 'hotmail.com', 'minatitlan.gob.mx'];
 
+  // 1. Crear referencias
+  const userInputRef = useRef(null);
+  const codigoRef = useRef(null);
+  const passwordRef = useRef(null);
+
   const fullEmail = `${username}@${domain}`;
+
+  // 2. Manejador de Enter
+  const handleKeyDown = (event, nextAction) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); 
+      
+      if (typeof nextAction === 'function') {
+        // Si es una función (ej: enviarCodigo o cambiarContrasena), la ejecutamos
+        nextAction();
+      } else if (nextAction && nextAction.current) {
+        // Si es una referencia, movemos el foco
+        nextAction.current.focus();
+      }
+    }
+  };
 
   // Paso 1: enviar código
   const enviarCodigo = async () => {
     setErrorUsername('');
-    if (!username) { setErrorUsername('❌ Ingresa tu usuario'); return; }
+    if (!username) { 
+      setErrorUsername('❌ Ingresa tu usuario'); 
+      return; 
+    }
 
     setLoading(true);
     try {
@@ -39,6 +62,8 @@ export default function ChangePassword() {
       if (res.ok) {
         setCodigoEnviado(true);
         setErrorUsername('');
+        // Después de enviar código, enfocamos el campo de código
+        setTimeout(() => codigoRef.current?.focus(), 100); 
       } else {
         setErrorUsername(data.message || '❌ Error al enviar código');
       }
@@ -49,7 +74,7 @@ export default function ChangePassword() {
   };
 
   // Paso 2: cambiar contraseña
-  const cambiarContrasena  = async () => {
+  const cambiarContrasena = async () => {
     setErrorCodigo('');
     setErrorPassword('');
     let hasError = false;
@@ -90,7 +115,7 @@ export default function ChangePassword() {
 
         <h1 className="login-title">CAMBIAR CONTRASEÑA</h1>
 
-        {/* Usuario */}
+        {/* Usuario (Fase 1: Enviar Código) */}
         <div className="login-campo">
           <label>Correo:</label>
           <div className="login-input-contenedor correo-linea">
@@ -104,12 +129,16 @@ export default function ChangePassword() {
               const valorFiltrado = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
               setUsername(valorFiltrado);
               }}
+              ref={userInputRef} // 3. Asignar referencia
+              onKeyDown={(e) => handleKeyDown(e, enviarCodigo)} // 4. Enter ejecuta enviarCodigo
+              disabled={codigoEnviado} // Deshabilitar si ya se envió el código
             />
             <span className="login-at">@</span>
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="login-select dominio-select"
+              onKeyDown={(e) => handleKeyDown(e, enviarCodigo)} // 4. Enter ejecuta enviarCodigo
               disabled={codigoEnviado}
             >
               {domains.map((d) => (
@@ -131,13 +160,14 @@ export default function ChangePassword() {
           )}
         </div>
 
-        {/* Código y nueva contraseña solo si se envió el código */}
+        {/* Fase 2: Aplicar Código y Nueva Contraseña */}
         {codigoEnviado && (
           <>
+            {/* Código recibido -> Siguiente: Nueva contraseña */}
             <div className="login-campo">
               <label>Código recibido:</label>
               <input
-                            type="text"
+                type="text"
                 className="login-input"
                 placeholder="Ingresa tu código"
                 value={codigo}
@@ -146,10 +176,13 @@ export default function ChangePassword() {
                   setCodigo(valor);
                 }}
                 maxLength={8}
+                ref={codigoRef} // 3. Asignar referencia
+                onKeyDown={(e) => handleKeyDown(e, passwordRef)} // 4. Mover a Nueva Contraseña
               />
               {errorCodigo && <div className="login-error-msg">{errorCodigo}</div>}
             </div>
 
+            {/* Nueva Contraseña -> Siguiente: Cambiar Contraseña (Enviar) */}
             <div className="login-campo">
               <label>Nueva contraseña:</label>
               <div className="login-input-contenedor">
@@ -162,6 +195,8 @@ export default function ChangePassword() {
                     const valorSinEspacios = e.target.value.replace(/\s/g, ''); // elimina todos los espacios
                     setPassword(valorSinEspacios);
                   }}
+                  ref={passwordRef} // 3. Asignar referencia
+                  onKeyDown={(e) => handleKeyDown(e, cambiarContrasena)} // 4. Enter ejecuta cambiarContrasena
                 />
                 {password.length > 0 && (
                   <span

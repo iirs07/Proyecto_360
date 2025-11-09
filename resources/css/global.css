@@ -1,359 +1,406 @@
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
-/* ==== FORZAR SCROLL SIEMPRE VISIBLE ==== */
+/* ==== VARIABLES Y AJUSTES BASE ==== */
 html {
-  overflow-y: scroll;
+    overflow-y: scroll;
 }
 
 :root {
-  --header-height: 50px;
-  --sidebar-width: 250px;
-  --sidebar-collapsed: 70px;
-  --header-min-height: 50px;
+    --header-height: 50px;
+    --sidebar-width: 250px;
+    --sidebar-collapsed: 70px;
+    --primary-color: #861542; /* Vino Tinto / Borgoña */
+    --secondary-color: #d5b690; /* Oro Pálido / Beige */
+    --hover-bg: rgba(213, 182, 144, 0.15);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh; 
 }
 
 /* ===========================
-   HEADER GLOBAL
+    HEADER GLOBAL 🍷 (Centrado Dinámico del Título)
 =========================== */
 .header-global {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  min-height: var(--header-min-height);
-  background-color: #861542;
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 10px;
-  box-sizing: border-box;
-  text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: var(--header-height);
+    background-color: var(--primary-color);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Ícono izquierdo (casa) */
+/* Ícono izquierdo (Casa/Hamburguesa) */
 .header-left {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  z-index: 210;
-  cursor: pointer;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    z-index: 1010;
+    cursor: pointer;
 }
 
 .icono-hamburguesa-global {
-  width: 46px;
-  height: 23px;
-  fill: #d5b690;
-  transition: transform 0.2s;
+    width: 46px;
+    height: 23px;
+    fill: var(--secondary-color);
+    transition: transform 0.2s;
 }
 
 .icono-hamburguesa-global:hover {
-  transform: scale(1.1); /* Hacemos el efecto hover un poco más sutil */
-  color: #ffffff;
+    transform: scale(1.1);
+    fill: #ffffff;
 }
-/* Contenedor del título */
+
+/* Contenedor del título - CORRECCIÓN DEL CENTRADO EN ESCRITORIO */
 .barra-center {
-  flex: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  text-align: center;
-  padding: 0 50px;
-  box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Centra el título dentro de su espacio */
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+    transition: left 0.3s, width 0.3s;
+}
+
+/* Aplicación del centrado dinámico en escritorio (>= 768px) */
+@media (min-width: 768px) {
+    /* Menú abierto */
+    .header-global:not(.collapsed) .barra-center {
+        left: var(--sidebar-width); /* Empieza después de los 250px */
+        width: calc(100% - var(--sidebar-width));
+    }
+
+    /* Menú colapsado */
+    .header-global.collapsed .barra-center {
+        left: var(--sidebar-collapsed); /* Empieza después de los 70px */
+        width: calc(100% - var(--sidebar-collapsed));
+    }
 }
 
 /* Título de la barra */
 .titulo-barra-global {
-  font-family: 'Merriweather', serif;
-  color: #d5b690;
-  font-weight: bold;
-  font-size: clamp(14px, 2vw, 19px);
-  line-height: 1.3em;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: normal;
-  word-break: break-word;
-  max-width: 100%;
+    font-family: 'Merriweather', serif;
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: clamp(14px, 2vw, 19px);
+    line-height: 1.3em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
 }
 
 /* ===========================
-   LAYOUT PRINCIPAL
+    LAYOUT PRINCIPAL
 =========================== */
 .main-layout {
-  display: flex;
-  transition: margin-left 0.3s;
+    display: flex;
+    transition: margin-left 0.3s;
+    min-height: calc(100vh - var(--header-height)); 
 }
 
 /* ===========================
-   SIDEBAR
+    SIDEBAR (ALTURA CORREGIDA: 100vh)
 =========================== */
 .sidebar {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
-  background-color: #861542;
-  color: #d5b690;
-  padding-top: 20px;
-  overflow-y: auto;
-  transition: width 0.3s;
-  z-index: 150;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh; /* Se extiende hasta el final de la ventana */
+    padding-top: 20px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    overflow-y: auto;
+    transition: width 0.3s, transform 0.3s; 
+    z-index: 150;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .sidebar.collapsed {
-  width: var(--sidebar-collapsed);
+    width: var(--sidebar-collapsed);
 }
 
 /* ===========================
-   MENÚ PRINCIPAL
+    MENÚ PRINCIPAL Y SUBMENÚ (Mantenidos)
 =========================== */
 .sidebar ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
 
 .menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  margin: 0 auto;
-  padding: 12px 15px;
-  border-radius: 12px;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-align: left;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 90%;
+    margin: 5px auto;
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: left;
+    gap: 12px;
 }
 
 .menu-item:hover {
-  background-color: rgba(213, 182, 144, 0.15);
+    background-color: var(--hover-bg);
 }
 
 .menu-item .icon {
-  font-size: 28px;
-  color: #d5b690;
-  transition: transform 0.3s, color 0.3s;
+    font-size: 24px;
+    color: var(--secondary-color);
+    transition: transform 0.3s, color 0.3s;
+    min-width: 26px;
 }
 
 .menu-item .label {
-  font-size: 18px;
-  color: #d5b690;
-  font-weight: 500;
-  transition: opacity 0.3s, visibility 0.3s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    font-size: 14px;
+    color: var(--secondary-color);
+    font-weight: 500;
+    transition: opacity 0.3s, visibility 0.3s, width 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* ===========================
-   ESTADO COLAPSADO
-=========================== */
-.sidebar.collapsed .menu-item {
-  justify-content: center;
-  padding: 12px 0;
-  gap: 0;
-  height: 50px;
-}
-
-.sidebar.collapsed .menu-item .icon {
-  margin: 0;
-  font-size: 26px;
-}
-
-.sidebar.collapsed .menu-item .label {
-  opacity: 0;
-  visibility: hidden;
-  width: 0;
-  margin: 0;
-  padding: 0;
-}
-
-/* ===========================
-   SUBMENÚ
-=========================== */
 .submenu {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
 
 .submenu li {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: 85%;
-  margin: 0 auto;
-  padding: 10px 15px;
-  border-radius: 10px;
-  cursor: pointer;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 85%;
+    margin: 3px auto;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    gap: 8px;
 }
 
 .submenu li:hover {
-  background-color: rgba(213, 182, 144, 0.1);
+    background-color: rgba(213, 182, 144, 0.1);
 }
 
 .submenu li .icon {
-  font-size: 20px;
-  color: #d5b690;
+    font-size: 18px;
+    color: var(--secondary-color);
 }
 
 .submenu li .label {
-  color: #d5b690;
-  font-size: 14px;
+    color: var(--secondary-color);
+    font-size: 14px;
+}
+
+/* Estado Colapsado */
+.sidebar.collapsed .menu-item {
+    justify-content: center;
+    padding: 12px 0;
+    gap: 0;
+}
+
+.sidebar.collapsed .menu-item .icon {
+    margin: 0;
+}
+
+.sidebar.collapsed .menu-item .label {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar.collapsed .submenu {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
 }
 
 /* ===========================
-   EFECTOS VISUALES
-=========================== */
-.menu-item:hover .icon {
-  transform: scale(1.1);
-  color: #ffffff;
-}
-
-/* ===========================
-   CONTENIDO PRINCIPAL
+    CONTENIDO PRINCIPAL
 =========================== */
 .main-content {
-  flex: 1;
-  margin-top: var(--header-height);
-  margin-left: var(--sidebar-width);
-  padding: 20px;
-  transition: margin-left 0.3s;
+    flex: 1;
+    margin-top: var(--header-height);
+    margin-left: var(--sidebar-width); /* Sidebar abierto (empuja) */
+    padding: 20px;
+    transition: margin-left 0.3s;
+    min-height: calc(100vh - var(--header-height));
+    box-sizing: border-box;
+    position: relative; 
 }
 
 .main-content.collapsed {
-  margin-left: var(--sidebar-collapsed);
+    margin-left: var(--sidebar-collapsed); /* Sidebar colapsado (empuja menos) */
 }
 
 /* ===========================
-   FONDO CON LOGO
+    FONDO CON LOGO
 =========================== */
 .logo-fondo {
-  position: fixed;
-  top: 50%;
-  left: 52%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  max-width: 80%;
-  opacity: 0.4;
-  z-index: 1;
-  pointer-events: none;
-  transition: transform 0.3s, width 0.3s;
-}
-
-@media (min-width: 769px) {
-  .main-content:not(.collapsed) .logo-fondo {
-    transform: translate(calc(-50% + 95px), -50%);
-  }
-
-  .main-content.collapsed .logo-fondo {
+    position: absolute; 
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
-  }
+    width: 300px;
+    max-width: 80%;
+    opacity: 0.4;
+    z-index: 1;
+    pointer-events: none;
+    transition: transform 0.3s, width 0.3s;
 }
 
 .logo-fondo img {
-  width: 100%;
-  height: auto;
+    width: 100%;
+    height: auto;
+}
+
+@media (min-width: 768px) {
+    .logo-fondo {
+        /* Centrado respecto al área de main-content, que se mueve con el margen */
+        transform: translate(-50%, -50%); 
+    }
 }
 
 /* ===========================
-   SCROLLBAR PERSONALIZADO
+    RESPONSIVO MÓVIL (Max-width: 767px)
+=========================== */
+@media (max-width: 767px) {
+    
+    /* 1. Sidebar en Móvil: Se desliza y se superpone */
+    .sidebar {
+        width: var(--sidebar-width);
+        transform: translateX(-100%); 
+        z-index: 1050; 
+    }
+
+    /* El estado 'abierto' en móvil lo mueve a su posición visible */
+    .sidebar:not(.collapsed) {
+        transform: translateX(0); 
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* 2. Contenido principal en Móvil: No es empujado */
+    .main-content,
+    .main-content.collapsed {
+        margin-left: 0; 
+        width: 100%;
+    }
+
+    /* 3. Título Superior Dinámico en Móvil: Fijo a la derecha del ícono */
+    .header-global .barra-center {
+        left: var(--sidebar-collapsed); 
+        width: calc(100% - var(--sidebar-collapsed));
+    }
+    
+    /* 4. Logo de fondo: Centrado puro en el área de contenido */
+    .logo-fondo {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        left: 50%; 
+        top: 50%;
+    }
+
+    /* Ajuste de menú para que se muestre correctamente al abrirse */
+    .sidebar .menu-item {
+        justify-content: flex-start;
+    }
+    .sidebar .menu-item .label {
+        opacity: 1;
+        visibility: visible;
+        width: auto;
+    }
+}
+
+
+/* ===========================
+    SCROLLBAR, LOADER (Mantenidos)
 =========================== */
 .sidebar::-webkit-scrollbar {
-  width: 8px;
+    width: 6px;
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(213, 182, 144, 0.3);
-  border-radius: 5px;
+    background-color: rgba(213, 182, 144, 0.4);
+    border-radius: 5px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(213, 182, 144, 0.5);
+    background-color: rgba(213, 182, 144, 0.6);
 }
 
-/* ===========================
-   RESPONSIVO
-=========================== */
-@media (max-width: 767px) {
-  .sidebar {
-    width: var(--sidebar-width);
-    height: calc(100vh - var(--header-height));
-    z-index: 300;
-  }
-
-  .sidebar.collapsed {
-    width: var(--sidebar-collapsed);
-  }
-
-  .main-content {
-    margin-left: var(--sidebar-collapsed);
-  }
-}
-
-/* ===========================
-   LOADER MEJORADO
-=========================== */
 .loader-container {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #ffffff, #ffe6f0);
-  font-family: "Segoe UI", sans-serif;
-  z-index: 9999;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ffffff, #ffe6f0);
+    font-family: "Poppins", sans-serif;
+    z-index: 9999;
 }
 
 .loader-logo img {
-  width: 100px;
-  opacity: 0.95;
-  animation: bounce 1.5s infinite;
-  filter: drop-shadow(0 4px 10px rgba(134, 21, 66, 0.2));
+    width: 100px;
+    opacity: 0.95;
+    animation: bounce 1.5s infinite;
+    filter: drop-shadow(0 4px 10px rgba(134, 21, 66, 0.2));
 }
 
 .loader-texto {
-  font-size: 22px;
-  font-weight: bold;
-  margin: 20px 0 15px;
-  text-align: center;
-  color: #861542;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    font-size: 20px;
+    font-weight: 600;
+    margin: 20px 0 15px;
+    text-align: center;
+    color: var(--primary-color);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
 }
 
 .loader-spinner {
-  width: 40px;
-  height: 40px;
-  border: 7px solid rgba(134, 21, 66, 0.15);
-  border-top: 5px solid #861542;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+    width: 40px;
+    height: 40px;
+    border: 7px solid rgba(134, 21, 66, 0.15);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
 }

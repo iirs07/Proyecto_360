@@ -17,8 +17,9 @@
         <div class="titulo">H. Ayuntamiento de Minatitlán, Ver.</div>
         <div class="subtitulo">Sistema de Gestión de Proyectos</div>
         <div class="subtitulo reporte-fecha-hora">
-            Fecha: {!! $hoy ?? date('d/m/Y') !!} | Hora: {!! $hora ?? date('H:i:s') !!}
+            Fecha: {!! $hoy ?? date('d/m/Y') !!} | Hora: {!! $hora ?? date('H:i:s') !!} <br>
         </div>
+        <div class="subtitulo">Presidencia Municipal: {{ $usuarioGenera ?? 'Desconocido' }}</div> 
     </div>
 
     <div class="divider"></div> 

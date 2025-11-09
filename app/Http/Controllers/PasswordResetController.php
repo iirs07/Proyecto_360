@@ -18,10 +18,9 @@ class PasswordResetController extends Controller
             'correo' => 'required|email',
         ]);
 
-        // ✅ Verificar si el usuario existe
+        // Verificar si el usuario existe
         $usuario = DB::table('usuario')->where('correo', $request->correo)->first();
         if (!$usuario) {
-            // Si no existe, informar al usuario
             return response()->json([
                 'ok' => false,
                 'message' => '❌ Este correo no está registrado'
@@ -35,9 +34,10 @@ class PasswordResetController extends Controller
             ->delete();
 
         // Generar nuevo token
-        $token = Str::random(8);
-        $expira_en = Carbon::now()->addMinutes(30);
+        $token = Str::upper(Str::random(8)); 
+        $expira_en = Carbon::now()->addMinutes(20);
 
+        // Guardar en base de datos
         DB::table('password_reset_tokens')->insert([
             'correo' => $request->correo,
             'token' => $token,
@@ -46,16 +46,16 @@ class PasswordResetController extends Controller
             'expira_en' => $expira_en
         ]);
 
-        // Enviar correo
+        // Enviar correo con diseño HTML
         try {
-            Mail::raw("Tu código para cambiar contraseña es: $token", function($message) use ($request){
+            Mail::send('emails.tokenReset', ['token' => $token], function($message) use ($request) {
                 $message->to($request->correo)
                         ->subject('Recuperación de contraseña');
             });
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => '❌ Error al enviar correo: '.$e->getMessage()
+                'message' => '❌ Error al enviar correo: ' . $e->getMessage()
             ], 500);
         }
 

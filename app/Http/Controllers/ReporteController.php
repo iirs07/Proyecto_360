@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Mpdf\Mpdf;
 use App\Models\Proyecto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth; // Necesario para obtener el usuario autenticado
 
 class ReporteController extends Controller
 {
@@ -17,7 +18,6 @@ class ReporteController extends Controller
         $nombreArchivo = 'reporte_superusuario.pdf';
 
         // 🟢 PASO 1: Habilitar la detección de desconexión del cliente
-        // Si el cliente cancela la petición (desde React), PHP lo detectará.
         ignore_user_abort(false); 
 
         // 1️⃣ OBTENER FILTROS
@@ -33,6 +33,28 @@ class ReporteController extends Controller
         }
 
         $depIds = explode(',', $departamentosString);
+        
+        // 🎯 NUEVO CÓDIGO: OBTENER NOMBRE DEL USUARIO GENERADOR
+        $usuarioGeneraNombre = 'Desconocido';
+        $usuarioLogin = Auth::user(); // Obtiene el modelo de la tabla 'usuario' (Auth)
+
+        if ($usuarioLogin) {
+            // Consulta la tabla c_usuario usando el ID de enlace (asumiendo id_usuario_login)
+            $cUsuario = DB::table('c_usuario')
+                            ->where('id_usuario', $usuarioLogin->id_usuario_login)
+                            ->first();
+
+            if ($cUsuario) {
+                 // Concatena y limpia el nombre completo
+                 $usuarioGeneraNombre = trim(
+                     $cUsuario->u_nombre . ' ' . 
+                     $cUsuario->a_paterno . ' ' . 
+                     ($cUsuario->a_materno ?? '')
+                 );
+            }
+        }
+        // FIN: NUEVO CÓDIGO
+        
 
         // 🟢 OPTIMIZACIÓN 1: Pre-cargar nombres de Jefes (evita N+1)
         $jefesPorDepartamento = DB::table('usuario as u')
@@ -44,7 +66,7 @@ class ReporteController extends Controller
 
         // 2️⃣ CONSULTA BASE
         $query = Proyecto::query()->whereIn('id_departamento', $depIds);
-
+        
         // Filtrar por estatus
         if ($tipoProyecto !== 'Ambos') {
             $estatusDB = ($tipoProyecto === 'Finalizados') ? 'Finalizado' : 'En proceso';
@@ -149,6 +171,8 @@ class ReporteController extends Controller
             ],
             'hoy' => $hoy,
             'hora' => $hora,
+            // 🎯 PASAMOS EL NOMBRE DEL USUARIO A LA VISTA
+            'usuarioGenera' => $usuarioGeneraNombre, 
         ];
 
         // 🟢 PUNTO CRÍTICO 2: Verificar antes de renderizar el HTML final

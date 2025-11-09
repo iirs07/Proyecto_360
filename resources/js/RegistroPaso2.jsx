@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // 👈 Importamos useRef
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/Login1.css';
 import logo1 from '../imagenes/logo1.png';
@@ -10,11 +10,21 @@ function RegistroPaso2() {
   const navigate = useNavigate();
   const { correo, password, token: tokenInvitacion } = location.state || {};
 
+  // 1. Crear referencias para todos los inputs y el botón
+  const nombreRef = useRef(null);
+  const apPaternoRef = useRef(null);
+  const apMaternoRef = useRef(null);
+  const telefonoRef = useRef(null);
+  const tokenRef = useRef(null);
+  const botonFinalRef = useRef(null);
+
   useEffect(() => {
     if (!correo || !password || !tokenInvitacion) {
       alert('Debes completar primero el Paso 1');
       navigate(`/RegistroPaso1/${tokenInvitacion || ''}`);
     }
+    // Opcional: enfocar el primer campo cuando el componente se carga
+    nombreRef.current?.focus();
   }, [correo, password, tokenInvitacion, navigate]);
 
   const [nombre, setNombre] = useState('');
@@ -39,12 +49,12 @@ function RegistroPaso2() {
 
   // Función para validar y formatear nombres/apellidos
   const validarTexto = (texto) => texto.toUpperCase().replace(/[^A-ZÁÉÍÓÚÜÑ\s]/g, '');
-  
+
   // Función para validar teléfono
   const validarTelefono = (texto) => texto.replace(/\D/g, '').slice(0, 10);
 
   const handleRegistroFinal = async (e) => {
-    e.preventDefault();
+    e && e.preventDefault(); // Asegúrate de prevenir el comportamiento por defecto si se llama desde un evento
     let hasError = false;
 
     // Limpiar errores previos
@@ -93,6 +103,21 @@ function RegistroPaso2() {
     } finally { setLoading(false); }
   };
 
+  // 2. Manejador para la tecla Enter
+  const handleKeyDown = (event, nextRef) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Evita el envío por defecto
+
+      if (nextRef && nextRef.current) {
+        // Si hay una referencia siguiente, mueve el foco
+        nextRef.current.focus();
+      } else {
+        // Si no hay referencia siguiente (estamos en el último campo), envía
+        handleRegistroFinal();
+      }
+    }
+  };
+
   return (
     <div className="login-body">
       <div className="login-container registro-compacto">
@@ -109,6 +134,7 @@ function RegistroPaso2() {
           <input type="text" value={correo || ''} className="login-input" disabled />
         </div>
 
+        {/* Nombre(s) -> Siguiente: Apellido Paterno */}
         <div className="login-campo">
           <label>Nombre(s):</label>
           <input
@@ -118,10 +144,13 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setNombre(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu nombre"
             className="login-input"
+            ref={nombreRef} // 3. Asignar referencia
+            onKeyDown={(e) => handleKeyDown(e, apPaternoRef)} // 4. Mover a Apellido Paterno
           />
           {errorNombre && <div className="login-error-msg">{errorNombre}</div>}
         </div>
 
+        {/* Apellido Paterno -> Siguiente: Apellido Materno */}
         <div className="login-campo">
           <label>Apellido Paterno:</label>
           <input
@@ -131,10 +160,13 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setApellidoPaterno(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu apellido paterno"
             className="login-input"
+            ref={apPaternoRef} // 3. Asignar referencia
+            onKeyDown={(e) => handleKeyDown(e, apMaternoRef)} // 4. Mover a Apellido Materno
           />
           {errorApellidoP && <div className="login-error-msg">{errorApellidoP}</div>}
         </div>
 
+        {/* Apellido Materno -> Siguiente: Teléfono */}
         <div className="login-campo">
           <label>Apellido Materno:</label>
           <input
@@ -144,10 +176,13 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setApellidoMaterno(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu apellido materno"
             className="login-input"
+            ref={apMaternoRef} // 3. Asignar referencia
+            onKeyDown={(e) => handleKeyDown(e, telefonoRef)} // 4. Mover a Teléfono
           />
           {errorApellidoM && <div className="login-error-msg">{errorApellidoM}</div>}
         </div>
 
+        {/* Teléfono -> Siguiente: Token de verificación */}
         <div className="login-campo">
           <label>Teléfono:</label>
           <input
@@ -157,10 +192,13 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setTelefono(validarTelefono(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu teléfono (10 dígitos)"
             className="login-input"
+            ref={telefonoRef} // 3. Asignar referencia
+            onKeyDown={(e) => handleKeyDown(e, tokenRef)} // 4. Mover a Token
           />
           {errorTelefono && <div className="login-error-msg">{errorTelefono}</div>}
         </div>
 
+        {/* Token de verificación -> Siguiente: Enviar (handleRegistroFinal) */}
         <div className="login-campo">
           <label>Token de verificación (8 dígitos):</label>
           <input
@@ -171,6 +209,8 @@ function RegistroPaso2() {
             maxLength={8}
             placeholder="Ingresa el token recibido por correo"
             className="login-input"
+            ref={tokenRef} // 3. Asignar referencia
+            onKeyDown={(e) => handleKeyDown(e, botonFinalRef)} // 4. Mover a Enviar (Llamará handleRegistroFinal)
           />
           {errorToken && <div className="login-error-msg">{errorToken}</div>}
         </div>
@@ -178,7 +218,13 @@ function RegistroPaso2() {
         {errorGeneral && <div className="login-error-general">{errorGeneral}</div>}
 
         <div className="login-campo" style={{ marginTop: '15px' }}>
-          <button type="button" className="login-button" onClick={handleRegistroFinal} disabled={loading}>
+          <button 
+            type="button" 
+            className="login-button" 
+            onClick={handleRegistroFinal} 
+            disabled={loading}
+            ref={botonFinalRef} // 3. Asignar referencia al botón
+          >
             {loading ? <div className="spinner"></div> : 'COMPLETAR REGISTRO'}
           </button>
         </div>
