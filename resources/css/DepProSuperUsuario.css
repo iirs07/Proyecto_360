@@ -1,55 +1,61 @@
 /* =========================================================================
-   CONTENEDOR Y TARJETA DE PROYECTOS (ESTÉTICA COMPACTADA)
+   CONTENEDOR Y TARJETA DE PROYECTOS (ESTÉTICA COMPACTADA ORIGINAL)
    ========================================================================= */
 
 /* Contenedor general de proyectos */
 .proyectos-linea {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Reducido de 16px */
-    padding: 15px; /* Reducido de 20px */
+    gap: 12px;
+    padding: 15px;
+    background-color: #f8f8f8;
+    border-radius: 12px;
 }
 
-/* Tarjeta de Proyecto (Item) */
+/* =========================================================================
+   TARJETA DE PROYECTO (ESTILO ORIGINAL RESTAURADO - FONDO BLANCO)
+   ========================================================================= */
+
 .proyecto-linea-item {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Reducido de 12px */
-    
+    gap: 10px; 
     background-color: #ffffff; 
-    padding: 12px 20px; /* ✅ REDUCIDO: Menos padding interno */
-    border-radius: 10px; /* Ligeramente menos redondeado */
-    
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); /* Sombra más sutil */
-    
+    padding: 18px 20px 18px 30px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     z-index: 2;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: .5px solid #861542; 
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease; 
+    border: 1px solid #f0f0f0; 
+    border-left: 10px solid #861542; 
 }
 
 .proyecto-linea-item:hover {
-    transform: translateY(-2px); /* Movimiento de hover más sutil */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px); 
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); 
+    border-color: #dddddd; 
+    border-left-color: #600d2a; 
 }
 
-/* Fila 1: Nombre del proyecto (Título principal) */
 .proyecto-nombre {
     margin-bottom: 5px;
-    padding-bottom: 5px; /* Menos espacio bajo el nombre */
-    border-bottom: 1px solid #f5f5f5; /* Línea separadora más sutil */
+    padding-bottom: 5px; 
+    border-bottom: 1px solid #f5f5f5; 
 }
 
 .proyecto-nombre .proyecto-label {
-    font-size: 0.8rem; /* Título label más pequeño */
+    font-size: 0.8rem; 
     margin-bottom: 2px;
+    color: #600d2a;
 }
 
 .proyecto-nombre .proyecto-valor {
-    font-size: 1rem; /* Título un poco más pequeño */
-    font-weight: 1000; /* Se mantiene audaz */
+    font-size: 1rem; 
+    font-weight: 1000; 
+    color: #000000; 
 }
 
-/* Fila 2: Contenedor de datos cortos */
+/* Fila 2: Contenedor de datos cortos - ESTRUCTURA PROTEGIDA */
 .proyecto-columnas {
     display: flex;
     flex-direction: row;
@@ -72,16 +78,16 @@
 /* Fila 3: Barra de progreso */
 .proyecto-linea-progreso-container {
     width: 100%;
-    padding-top: 10px; /* Reducido */
+    padding-top: 10px; 
     border-top: 1px solid #f0f0f0; 
 }
 
-/* Etiquetas y valores - JERARQUÍA CLARA */
+/* Etiquetas y valores - RESTAURADO A OSCURO */
 .proyecto-label {
     font-family: 'Poppins', sans-serif; 
-    font-weight: 600; /* Ligeramente más ligero */
+    font-weight: 600; 
     color: #600d2a; 
-    font-size: 0.75rem; /* ✅ Más pequeño y compacto */
+    font-size: 0.75rem; 
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -90,14 +96,14 @@
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
     color: #000000; 
-    font-size: 0.9rem; /* ✅ Más pequeño y compacto */
+    font-size: 0.9rem; 
     line-height: 1.3;
 }
 
 /* Estilo específico para el valor de estatus */
 .proyecto-valor[style*="Finalizado"] {
     font-weight: 700;
-    color: #28A745;
+    color: #28A745; 
 }
 
 /* Mensaje si no hay proyectos */
@@ -110,18 +116,99 @@
     font-size: 0.9rem;
 }
 
+/* =========================================================================
+   ✅ ESTILOS PARA MÉTRICAS Y ORDENAMIENTO (ROJO/BLANCO, COMPARTEN FILA)
+   ========================================================================= */
+
+/* Contenedor principal para el ordenamiento y el conteo */
+.resumen-metricas-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 0 15px;
+    margin-bottom: 20px; 
+}
+
+/* Contenedor del botón de Ordenar (Va a la derecha, orden: 1) */
+.sort-control-container {
+    min-height: auto; 
+    padding: 0; 
+    order: 1; 
+}
+
+/* Tarjeta de Conteo (Métrica) - ROJO/BLANCO (Va a la izquierda, order: -1) */
+.conteo-proyectos-card {
+    position: static; 
+    order: -1;  
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
+    padding: 10px 15px;     
+    border-radius: 8px;
+    background-color: #861542; 
+    border: 1px solid #c9a4b3; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-left: 5px solid #ffffff; 
+}
+
+.conteo-valor {
+    font-size: 1.8rem; 
+    font-weight: 800;
+    color: #ffffff; 
+    line-height: 1; 
+}
+
+.conteo-label {
+    font-size: 0.75rem; 
+    font-weight: 600;
+    color: #f9e2e9; 
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
 
 /* =========================================================================
    MEDIA QUERIES (RESPONSIVIDAD COMPACTA)
    ========================================================================= */
 
 @media (max-width: 768px) {
-    .proyecto-linea-item {
+    /* REORGANIZACIÓN PARA MÓVIL/TABLET */
+    .resumen-metricas-container {
+        flex-direction: column; 
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+    
+    /* El CONTEO se mantiene arriba (order: -1) y toma el ancho completo */
+    .conteo-proyectos-card {
+        width: 100%;
+        order: -1; 
+        margin-bottom: 15px; 
+        
+        /* ✅ AJUSTE TAMAÑO TABLET */
         padding: 10px 15px; /* Más compacto en tablet */
+    }
+
+    /* El ORDENAMIENTO va debajo y toma el ancho completo */
+    .sort-control-container {
+        width: 100%;
+        order: 0; 
+        margin-bottom: 15px;
+    }
+    
+    .conteo-valor {
+        font-size: 1.6rem; /* Ajuste más pequeño para tablet */
+    }
+
+    /* Ajustes de tarjeta en tablet */
+    .proyecto-linea-item {
+        padding: 10px 15px 10px 25px; 
+        border-left: 8px solid #861542; 
     }
     
     .proyecto-columnas {
-        gap: 10px 15px; /* Más compacto */
+        gap: 10px 15px; 
     }
     
     .proyecto-linea-columna {
@@ -131,29 +218,26 @@
 }
 
 @media (max-width: 480px) {
+    /* AJUSTES PARA MÓVIL ESTRECHO */
+    
+    .conteo-valor {
+        font-size: 1.5rem; /* Aún más pequeño en móvil */
+    }
+    
+    .conteo-proyectos-card {
+        padding: 8px 12px; /* Aún más compacto en móvil */
+    }
+    
     .proyecto-linea-item {
-        padding: 10px 12px;
+        padding: 10px 12px 10px 20px; 
+        border-left: 6px solid #861542; 
     }
     
     .proyecto-nombre .proyecto-valor {
         font-size: 1.05rem;
     }
     
-    /* En móvil estrecho, forzamos una columna completa */
-    .proyecto-columnas {
-        gap: 8px;
-    }
-
-    .proyecto-linea-columna {
-        flex: 1 1 100%; /* Una columna por fila */
-        min-width: 100%;
-    }
-
-    .proyecto-label {
-        font-size: 0.7rem;
-    }
-
-    .proyecto-valor {
-        font-size: 0.85rem;
+    .sort-control-container .sort-button {
+        width: 100%;
     }
 }

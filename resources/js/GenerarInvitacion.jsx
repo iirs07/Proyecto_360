@@ -1,129 +1,279 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Layout from "../components/Layout";
+import MenuDinamico from "../components/MenuDinamico";
 import '../css/GenerarInvitacion.css';
 
+const ROLES = [
+    { value: 'Usuario', name: 'Usuario' },
+    { value: 'Jefe', name: 'Jefe' },
+    { value: 'Superusuario', name: 'Superusuario' }
+];
+
 function GenerarInvitacion() {
-  const [rol, setRol] = useState('Usuario');
-  const [departamentos, setDepartamentos] = useState([]);
-  const [idDepartamento, setIdDepartamento] = useState('');
-  const [cantidad, setCantidad] = useState(1);
-  const [link, setLink] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/departamentos')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP status ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        // Aplanar todos los departamentos de todas las áreas
-        const allDepartamentos = data.flatMap(area => area.departamentos);
-        setDepartamentos(allDepartamentos);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Error fetch departamentos:', err);
-        setError('No se pudieron cargar los departamentos');
-        setLoading(false);
-      });
-  }, []);
+    const navigate = useNavigate();
+    const token = localStorage.getItem("jwt_token");
 
-  const handleGenerar = async () => {
-    if (!idDepartamento) {
-      alert('Selecciona un departamento');
-      return;
-    }
+    const [rol, setRol] = useState('');
+    const [selectedRolText, setSelectedRolText] = useState("Selecciona un rol");
+    const [isRolOpen, setIsRolOpen] = useState(false);
 
-    try {
-      const res = await fetch('http://127.0.0.1:8000/api/invitaciones/crear', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rol,
-          id_departamento: idDepartamento,
-          creado_por: 1,
-          max_usos: cantidad
-        }),
-      });
+    const [departamentos, setDepartamentos] = useState([]);
+    const [idDepartamento, setIdDepartamento] = useState('');
+    const [selectedDepText, setSelectedDepText] = useState("Selecciona un departamento");
+    const [isDepOpen, setIsDepOpen] = useState(false);
 
-      const data = await res.json();
+    const [cantidad, setCantidad] = useState(1);
+    const [link, setLink] = useState('');
+    
+    // ESTADOS DE ERROR LOCALIZADOS
+    const [errorRol, setErrorRol] = useState(''); 
+    const [errorDepartamento, setErrorDepartamento] = useState(''); 
+    const [errorCantidad, setErrorCantidad] = useState('');
+    
+    // Estado para mensajes de éxito (general)
+    const [mensajeExito, setMensajeExito] = useState('');
 
-      if (data.ok) {
-        setLink(data.link);
-        alert('Invitación generada correctamente');
-      } else {
-        alert('Error al generar invitación: ' + (data.error || ''));
-      }
-    } catch (err) {
-      console.error('Error de conexión:', err);
-      alert('Error de conexión al servidor');
-    }
-  };
+    const rolRef = useRef(null);
+    const depRef = useRef(null);
+    
+    // Función para limpiar todos los errores
+    const clearErrors = () => {
+        setErrorRol('');
+        setErrorDepartamento('');
+        setErrorCantidad('');
+    };
+    
+    // Función auxiliar para establecer errores con temporizador (6 segundos)
+    const setTimedError = (setter, message, duration = 2000) => {
+        setter(message);
+        setTimeout(() => setter(''), duration);
+    };
 
-  const handleCopiar = () => {
-    if (link) {
-      navigator.clipboard.writeText(link);
-      alert('Link copiado al portapapeles');
-    }
-  };
+    // Función para mostrar mensajes de éxito (como antes, global)
+    const mostrarExito = (msg, duration = 1000) => {
+        setMensajeExito(msg);
+        setTimeout(() => setMensajeExito(''), duration);
+    };
 
-  return (
-    <div className="generar-invitacion-wrapper">
-      <div className="generar-invitacion-container">
-        <h2>Generar Invitación</h2>
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (rolRef.current && !rolRef.current.contains(e.target)) setIsRolOpen(false);
+            if (depRef.current && !depRef.current.contains(e.target)) setIsDepOpen(false);
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-        {/* Rol */}
-        <label>Rol:</label>
-        <select value={rol} onChange={e => setRol(e.target.value)}>
-          <option value="Usuario">Usuario</option>
-          <option value="Administrador">Administrador</option>
-          <option value="Jefe">Jefe</option>
-          <option value="Superusuario">Superusuario</option>
-        </select>
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const headers = { Accept: "application/json" };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        {/* Departamento */}
-        <label>Departamento:</label>
-        {loading ? (
-          <p>Cargando departamentos...</p>
-        ) : error ? (
-          <p>{error}</p>
-        ) : (
-          <select value={idDepartamento} onChange={e => setIdDepartamento(e.target.value)}>
-            <option value="">Selecciona departamento</option>
-            {departamentos.map(dep => (
-              <option key={dep.id_departamento} value={dep.id_departamento}>
-                {dep.d_nombre}
-              </option>
-            ))}
-          </select>
-        )}
+                const res = await fetch("http://127.0.0.1:8000/api/departamentos", { headers });
 
-        {/* Cantidad máxima de registros */}
-        <label>Cantidad máxima de registros:</label>
-        <input
-          type="number"
-          value={cantidad}
-          min={1}
-          onChange={e => setCantidad(parseInt(e.target.value))}
-        />
+                if (res.status === 401) {
+                    localStorage.removeItem("jwt_token");
+                    navigate("/Login");
+                    return;
+                }
 
-        {/* Botones */}
-        <div className="botones-wrapper">
-          <button onClick={handleGenerar}>Generar Link</button>
-          {link && <button onClick={handleCopiar}>Copiar Link</button>}
-        </div>
+                const data = await res.json();
+                const allDeps = data.flatMap(a => a.departamentos);
+                setDepartamentos(allDeps);
 
-        {/* Link generado */}
-        {link && (
-          <div className="link-container">
-            <p>Link de invitación:</p>
-            <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+            } catch (err) {
+                console.error("Error cargando departamentos:", err);
+                // Error de conexión: Usar una alerta nativa o un sistema de alerta global
+            }
+        };
+        fetchData();
+    }, [navigate, token]);
+
+    const handleGenerar = async () => {
+        clearErrors(); // Limpiar errores previos localizados
+        setMensajeExito(''); // Limpiar mensaje de éxito
+
+        let hasError = false;
+
+        if (!rol) {
+            setTimedError(setErrorRol, "Por favor, selecciona un tipo de usuario (rol).");
+            hasError = true;
+        }
+        if (!idDepartamento) {
+            setTimedError(setErrorDepartamento, "Por favor, selecciona un departamento.");
+            hasError = true;
+        }
+        if (cantidad < 1) {
+             setTimedError(setErrorCantidad, "La cantidad mínima de registros es 1.");
+             hasError = true;
+        }
+
+        if (hasError) return; // Detener si hay errores de validación
+
+        try {
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const res = await fetch("http://127.0.0.1:8000/api/invitaciones/crear", {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                    rol,
+                    id_departamento: idDepartamento,
+                    creado_por: 1, 
+                    max_usos: cantidad
+                })
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem("jwt_token");
+                navigate("/Login");
+                return;
+            }
+
+            const data = await res.json();
+
+            if (data.ok) {
+                setLink(data.link);
+                mostrarExito("✅ Invitación generada con éxito.");
+            } else {
+                // Usar una alerta nativa para errores de API no esperados
+                alert("Error de API: " + (data.message || JSON.stringify(data)));
+            }
+
+        } catch (err) {
+            console.error(err);
+            alert("Error de conexión al intentar generar la invitación.");
+        }
+    };
+
+    const handleCopiar = () => {
+        if (!link) return;
+        navigator.clipboard.writeText(link);
+        mostrarExito("📋 Link copiado al portapapeles.", 1000); 
+    };
+
+    return (
+        <Layout titulo="Generar Invitación" sidebar={<MenuDinamico tipo="generar" />}>
+            <div className="geninv-wrapper">
+
+                <div className="geninv-card">
+                    <h2>Generar Invitación</h2>
+                    
+                    {/* SELECT DE ROL */}
+                    <label>Rol:</label>
+                    <div className="gi-select" ref={rolRef}>
+                        <button
+                            className={`gi-select-btn ${rol === '' ? "gi-placeholder" : ""}`}
+                            onClick={() => setIsRolOpen(!isRolOpen)}
+                        >
+                            {selectedRolText}
+                            <span className="gi-arrow">▼</span>
+                        </button>
+
+                        {isRolOpen && (
+                            <div className="gi-options">
+                                <div className="gi-options-scroll">
+                                    {ROLES.map(r => (
+                                        <div
+                                            key={r.value}
+                                            className={`gi-option ${r.value === rol ? "gi-option-active" : ""}`}
+                                            onClick={() => {
+                                                setRol(r.value);
+                                                setSelectedRolText(r.name);
+                                                setIsRolOpen(false);
+                                                setErrorRol(''); // Limpiar error al seleccionar
+                                            }}
+                                        >
+                                            {r.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    {/* MENSAJE DE ERROR PARA ROL (con temporizador) */}
+                    {errorRol && <div className="gi-field-error gi-alert-error">{errorRol}</div>}
+
+
+                    {/* SELECT DE DEPARTAMENTO */}
+                    <label>Departamento:</label>
+                    <div className="gi-select" ref={depRef}>
+                        <button
+                            className={`gi-select-btn ${idDepartamento === '' ? "gi-placeholder" : ""}`}
+                            onClick={() => setIsDepOpen(!isDepOpen)}
+                        >
+                            {selectedDepText}
+                            <span className="gi-arrow">▼</span>
+                        </button>
+
+                        {isDepOpen && (
+                            <div className="gi-options">
+                                <div className="gi-options-scroll">
+                                    {departamentos.map(dep => (
+                                        <div
+                                            key={dep.id_departamento}
+                                            className={`gi-option ${idDepartamento === dep.id_departamento ? "gi-option-active" : ""}`}
+                                            onClick={() => {
+                                                setIdDepartamento(dep.id_departamento);
+                                                setSelectedDepText(dep.d_nombre);
+                                                setIsDepOpen(false);
+                                                setErrorDepartamento(''); // Limpiar error al seleccionar
+                                            }}
+                                        >
+                                            {dep.d_nombre}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    {/* MENSAJE DE ERROR PARA DEPARTAMENTO (con temporizador) */}
+                    {errorDepartamento && <div className="gi-field-error gi-alert-error">{errorDepartamento}</div>}
+
+                    {/* CANTIDAD */}
+                    <label>Cantidad máxima de registros:</label>
+                    <input
+                        type="number"
+                        min="1"
+                        className="gi-input"
+                        value={cantidad}
+                        onChange={e => {
+                            setCantidad(parseInt(e.target.value) || 1);
+                            setErrorCantidad(''); // Limpiar error al cambiar
+                        }}
+                    />
+                    {/* MENSAJE DE ERROR PARA CANTIDAD (con temporizador) */}
+                    {errorCantidad && <div className="gi-field-error gi-alert-error">{errorCantidad}</div>}
+
+                    {/* Botón Generar */}
+                    <div className="gi-buttons-row">
+                        <button className="gi-btn" onClick={handleGenerar}>Generar Link</button>
+                    </div>
+
+                    {/* Alerta de Éxito (MOVIDO AQUÍ) */}
+                    {mensajeExito && (
+                        <div className={`gi-alert gi-alert-success`}>
+                            {mensajeExito}
+                        </div>
+                    )}
+
+                    {/* Link y Botón Copiar */}
+                    {link && (
+                        <div className="gi-link-box">
+                            <p>Link generado:</p>
+                            <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
+                            <button className="gi-btn gi-btn-copy" onClick={handleCopiar}>Copiar Link</button>
+                        </div>
+                    )}
+
+                </div>
+            </div>
+        </Layout>
+    );
 }
 
 export default GenerarInvitacion;

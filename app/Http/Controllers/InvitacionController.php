@@ -35,7 +35,7 @@ class InvitacionController extends Controller
                 'creado_por' => $request->creado_por,
                 'max_usuarios' => $request->max_usos,
                 'usuarios_registrados' => 0,
-                'expira_en' => now()->addDays(7),
+                'expira_en' => now()->addDays(1),
             ]);
         }
 

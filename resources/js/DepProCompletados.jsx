@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { FaCaretDown, FaSortAlphaDown, FaSortAlphaUp, FaSortNumericDown, FaSortNumericUp } from "react-icons/fa";
 
+// Asegúrate de que los estilos para las nuevas métricas estén aquí o en global.css
 import "../css/DepProSuperUsuario.css";
 import "../css/global.css";
 import "../css/useOrdenamiento.css";
@@ -105,6 +106,7 @@ export default function DepProCompletados() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             const proyectosFinalizados = data.filter(
+                // Filtro solo para proyectos Finalizados que tengan tareas (asumiendo 100% de progreso)
                 p => p.p_estatus === "Finalizado" && p.total_tareas > 0
             );
             setProyectos(proyectosFinalizados);
@@ -145,19 +147,34 @@ export default function DepProCompletados() {
                 />
             }
         >
-            {proyectos.length > 0 && (
-                <div className="sort-control-container">
-                    <div className="sort-button-wrapper">
-                        <button className="sort-button" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                            Ordenar por: {getSortButtonText()} <FaCaretDown />
-                        </button>
-                        {isMenuOpen && (
-                            <SortDropdown
-                                sortBy={sortBy}
-                                sortDirection={sortDirection}
-                                handleSelectSort={handleSelectSort}
-                            />
-                        )}
+            {/* 🆕 CONTENEDOR DE MÉTRICAS Y ORDENAMIENTO (Renderizado Condicional) */}
+            {proyectosOrdenados.length > 0 && (
+                <div className="resumen-metricas-container">
+                    
+                    {/* 1. Tarjeta de Conteo de Proyectos (order: -1 para ir a la izquierda) */}
+                    <div className="conteo-proyectos-card">
+                        <span className="conteo-valor">
+                            {proyectosOrdenados.length}
+                        </span>
+                        <span className="conteo-label">
+                            FINALIZADOS {/* 👈 Etiqueta cambiada */}
+                        </span>
+                    </div>
+
+                    {/* 2. Control de Ordenamiento (order: 1 para ir a la derecha) */}
+                    <div className="sort-control-container">
+                        <div className="sort-button-wrapper">
+                            <button className="sort-button" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                                Ordenar por: {getSortButtonText()} <FaCaretDown />
+                            </button>
+                            {isMenuOpen && (
+                                <SortDropdown
+                                    sortBy={sortBy}
+                                    sortDirection={sortDirection}
+                                    handleSelectSort={handleSelectSort}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -171,7 +188,23 @@ export default function DepProCompletados() {
                     proyectosOrdenados.map((proyecto) => {
                         const slugProyecto = slugify(proyecto.p_nombre);
                         return (
-                            <div key={slugProyecto} className="proyecto-linea-item completado">
+                            <div 
+                                key={slugProyecto} 
+                                className="proyecto-linea-item completado"
+                                onClick={() =>
+                                    navigate(`/proyecto/${slugProyecto}`, {
+                                        state: {
+                                            idProyecto: proyecto.id_proyecto,
+                                            nombreProyecto: proyecto.p_nombre,
+                                            descripcionProyecto: proyecto.descripcion,
+                                            porcentaje: proyecto.porcentaje,
+                                            totalTareas: proyecto.total_tareas,
+                                            tareasCompletadas: proyecto.tareas_completadas,
+                                        },
+                                    })
+                                }
+                                style={{ cursor: "pointer" }}
+                            >
                                 <div className="proyecto-nombre">
                                     <span className="proyecto-label">Nombre: </span>
                                     <span className="proyecto-valor">{proyecto.p_nombre}</span>
@@ -188,7 +221,8 @@ export default function DepProCompletados() {
                                     </div>
                                     <div className="proyecto-linea-columna">
                                         <span className="proyecto-label">Estatus:</span>
-                                        <span className="proyecto-valor">{proyecto.p_estatus}</span>
+                                        {/* El estatus "Finalizado" se verá bien con los estilos CSS existentes */}
+                                        <span className="proyecto-valor" style={{ color: '#28A745' }}>{proyecto.p_estatus}</span>
                                     </div>
                                     <div className="proyecto-linea-columna">
                                         <span className="proyecto-label">Responsable:</span>
@@ -197,22 +231,7 @@ export default function DepProCompletados() {
                                 </div>
 
                                 <div className="proyecto-linea-progreso-container">
-                                    <div
-                                        className="proyecto-linea-progreso"
-                                        onClick={() =>
-                                            navigate(`/proyecto/${slugProyecto}`, {
-                                                state: {
-                                                    idProyecto: proyecto.id_proyecto,
-                                                    nombreProyecto: proyecto.p_nombre,
-                                                    descripcionProyecto: proyecto.descripcion,
-                                                    porcentaje: proyecto.porcentaje,
-                                                    totalTareas: proyecto.total_tareas,
-                                                    tareasCompletadas: proyecto.tareas_completadas,
-                                                },
-                                            })
-                                        }
-                                        style={{ cursor: "pointer" }}
-                                    >
+                                    <div className="proyecto-linea-progreso">
                                         <ProgresoProyecto
                                             progresoInicial={proyecto.porcentaje}
                                             tareasTotales={proyecto.total_tareas}
