@@ -97,6 +97,22 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
         ],
+        
+        'pgsql_second' => [
+            'driver'   => 'pgsql',
+            'host'     => env('DB_HOST_SECOND', '127.0.0.1'),
+            'port'     => env('DB_PORT_SECOND', '5432'),
+            'database' => env('DB_DATABASE_SECOND', 'Proyecto360_copia'),
+            'username' => env('DB_USERNAME_SECOND', 'proyecto360_user'),
+            'password' => env('DB_PASSWORD_SECOND', '12345'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
+        
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',

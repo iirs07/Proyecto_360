@@ -7,7 +7,7 @@ class CUsuario extends Model
 {
     protected $table = 'c_usuario';
     protected $primaryKey = 'id_usuario';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'id_departamento',

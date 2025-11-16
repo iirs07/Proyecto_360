@@ -11,7 +11,7 @@ class Tarea extends Model
 
     protected $table = 'tareas';           // Nombre de la tabla
     protected $primaryKey = 'id_tarea';    // Llave primaria
-    public $timestamps = false;            // No hay created_at / updated_at
+    public $timestamps = true;            // No hay created_at / updated_at
 
     // Campos que se pueden asignar masivamente
     protected $fillable = [

@@ -18,7 +18,7 @@ class Proyecto extends Model
         'p_estatus'
     ];
 
-    public $timestamps = false; // desactiva created_at y updated_at
+    public $timestamps = true;
 
     // 🟢 RELACIÓN 1: Todas las tareas
     public function tareas()

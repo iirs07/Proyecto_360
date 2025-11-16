@@ -9,14 +9,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('c_areas', function (Blueprint $table) {
-            $table->id(); // id_area
+            // Clave primaria autoincremental
+            $table->increments('id');
+
+            // Nombre del área
             $table->string('nombre', 100);
-            $table->timestamps();
+
+            // Timestamps para control de creación y actualización
+            $table->timestamp('created_at', 0)->nullable();
+            $table->timestamp('updated_at', 0)->nullable();
         });
     }
 
     public function down(): void
     {
+        // Elimina la tabla si existe
         Schema::dropIfExists('c_areas');
     }
 };

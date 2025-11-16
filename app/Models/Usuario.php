@@ -9,7 +9,7 @@ class Usuario extends Authenticatable implements JWTSubject
 {
     protected $table = 'usuario';
     protected $primaryKey = 'id_usuario'; 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'id_usuario_login',
@@ -19,7 +19,7 @@ class Usuario extends Authenticatable implements JWTSubject
     ];
 
     protected $hidden = [
-        'contrasena', // para que no se muestre al retornar JSON
+        'contrasena', 
     ];
 
     // Métodos requeridos por JWT

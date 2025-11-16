@@ -10,11 +10,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invitaciones', function (Blueprint $table) {
-            $table->id('id_invitacion'); // BIGINT por defecto, si quieres SERIAL usar unsignedInteger
+            // Clave primaria autoincremental
+            $table->increments('id_invitacion');
+
+            // Datos de la invitación
             $table->string('token', 64)->unique();
             $table->string('rol', 50);
 
-            // Claves foráneas con INT para coincidir con SERIAL
+            // Relaciones con departamentos y usuarios
             $table->unsignedInteger('id_departamento');
             $table->unsignedInteger('creado_por');
 
@@ -28,11 +31,15 @@ return new class extends Migration
                   ->on('usuario')
                   ->onDelete('cascade');
 
+            // Control de usuarios y estado de la invitación
             $table->integer('max_usuarios')->default(1);
             $table->integer('usuarios_registrados')->default(0);
             $table->boolean('usado')->default(false);
+
+            // Fechas
             $table->timestamp('creado_en')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('expira_en')->nullable();
+
         });
     }
 
@@ -41,4 +48,3 @@ return new class extends Migration
         Schema::dropIfExists('invitaciones');
     }
 };
-

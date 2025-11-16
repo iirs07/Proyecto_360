@@ -11,5 +11,3 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 
-Schedule::command('tokens:clean')->everyMinute();
-Schedule::command('invitaciones:clean')->everyMinute();

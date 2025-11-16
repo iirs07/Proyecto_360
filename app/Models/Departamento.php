@@ -13,7 +13,7 @@ class Departamento extends Model
         'area_id'
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
     protected $primaryKey = 'id_departamento';
     public $incrementing = true;
     protected $keyType = 'int';

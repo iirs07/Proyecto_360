@@ -53,3 +53,21 @@ INSERT INTO Proyectos (id_departamento, p_nombre, pf_inicio, pf_fin, p_estatus, 
 VALUES (7, 'Digitalizacion de Procesos', '2025-11-01', '2026-02-01', 'En proceso', 'Proyecto para implementar herramientas digitales y mejorar la gestion documental en la regiduria');
 INSERT INTO Proyectos (id_departamento, p_nombre, pf_inicio, pf_fin, p_estatus, descripcion)
 VALUES (7, 'Mejora de Comunicacion Interna', '2025-11-15', '2026-03-15', 'En proceso', 'Proyecto para optimizar los canales de comunicacion interna y la colaboracion entre areas de la regiduria'); 
+
+
+
+
+-- 1️⃣ Insertar en c_usuario
+INSERT INTO c_usuario (id_departamento, u_nombre, a_paterno, a_materno, telefono, created_at, updated_at)
+VALUES (1, 'Itzel', 'Ramos', 'Santiago', '9222094573', NOW(), NOW())
+RETURNING id_usuario;
+
+-- Supongamos que devuelve id_usuario = 1
+
+-- 2️⃣ Insertar en usuario
+INSERT INTO usuario (id_usuario_login, rol, correo, contrasena, created_at, updated_at)
+VALUES (1, 'Superusuario', 'ramossantiagoitzelivonne@gmail.com', '$2y$12$bMpsNd977xM.R0rNKPXKdOC1RsYywq0OULNGIy1zF4u6R.4sRjy.e', NOW(), NOW());
+
+-- 3️⃣ Opcional: crear invitación para ese rol (aunque superusuario no suele necesitar)
+INSERT INTO invitaciones (token, rol, id_departamento, creado_por, max_usuarios, usuarios_registrados, usado, creado_en, expira_en)
+VALUES ('TOKEN_SUPERUSER', 'Superusuario', 1, 1, 1, 0, false, NOW(), NOW() + INTERVAL '7 days');
