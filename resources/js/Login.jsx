@@ -93,6 +93,7 @@ if (!username) {
       // ✅ Guardar token y rol
       localStorage.setItem("jwt_token", data.token);
       localStorage.setItem("rol", data.usuario.rol);
+      localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
       setPassword("");
 
@@ -110,7 +111,7 @@ if (!username) {
           navigate("/Principal"); // Página para Superusuario
           break;
         case "Usuario":
-          navigate("/Usuario"); // Página para Usuario normal
+          navigate("/GestionProyectosUsuario"); // Página para Usuario normal
           break;
         default:
           navigate("/"); // Página por defecto

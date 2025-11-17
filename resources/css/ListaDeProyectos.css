@@ -1,0 +1,439 @@
+/* =========================== Contenedor Principal ============================ */
+.ldp-container {
+  padding: 2rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+.ldp-content {
+  padding: 0 1rem;
+}
+
+/* =========================== Barra de Búsqueda ============================ */
+.ldp-search-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.ldp-search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.ldp-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.ldp-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 50px;
+  font-size: 1rem;
+  background: #ffffff;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ldp-search-input:focus {
+  outline: none;
+  border-color: #861542;
+  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.15);
+}
+
+/* =========================== Loader ============================ */
+.ldp-loader-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ldp-loader-logo img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.ldp-loader-text {
+  font-size: 1.1rem;
+  color: #495057;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.ldp-loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #861542;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* =========================== Empty State ============================ */
+.ldp-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6c757d;
+  background: #ffffff;
+  border-radius: 16px;
+  margin: 2rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 2;
+  position: relative;
+}
+
+.ldp-empty-icon {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.ldp-empty-title {
+  color: #495057;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.ldp-empty-message {
+  font-size: 1.1rem;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* =========================== Lista de proyectos ============================ */
+.ldp-proyectos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.ldp-proyecto-card-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* =========================== Tarjeta de proyecto ============================ */
+.ldp-proyecto-card-usuario {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.ldp-proyecto-card-usuario::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #861542, #a51e5c);
+}
+
+.ldp-proyecto-card-usuario:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  border-color: #861542;
+}
+
+/* =========================== Header de proyecto ============================ */
+.ldp-proyecto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.ldp-proyecto-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ldp-proyecto-nombre {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.ldp-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ldp-urgency-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.ldp-warning-icon {
+  color: #dc3545;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(220, 53, 69, 0.3));
+}
+
+/* =========================== Estadísticas mejoradas ============================ */
+.ldp-proyecto-stats {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ldp-stats-grid {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.ldp-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.ldp-stat-item div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ldp-stat-icon {
+  color: #861542;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.ldp-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #212529;
+  line-height: 1;
+}
+
+.ldp-stat-label {
+  color: #6c757d;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* =========================== Footer mejorado ============================ */
+.ldp-proyecto-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 2px solid #f1f3f4;
+}
+
+.ldp-fecha-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ldp-calendar-icon {
+  color: #6c757d;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.ldp-fecha-text {
+  font-size: 1rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.ldp-dias-restantes {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: block;
+}
+
+/* =========================== Botón ============================ */
+.ldp-btn-ver-tareas {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #861542 0%, #a51e5c 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ldp-btn-ver-tareas:hover {
+  background: linear-gradient(135deg, #6a1035 0%, #861542 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.4);
+}
+
+.ldp-btn-ver-tareas:active {
+  transform: translateY(-1px);
+}
+
+.ldp-btn-icon {
+  font-size: 0.9rem;
+}
+
+/* =========================== Resumen ============================ */
+.ldp-summary {
+  text-align: center;
+  padding: 1.5rem;
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 600;
+  border-top: 2px solid #e9ecef;
+  margin-top: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+/* =========================== Responsive mejorado ============================ */
+@media (max-width: 768px) {
+  .ldp-container {
+    padding: 1rem 0;
+  }
+  
+  .ldp-main-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ldp-proyecto-card-usuario {
+    padding: 1.5rem;
+    margin: 0 1rem;
+    border-radius: 12px;
+  }
+  
+  .ldp-proyecto-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .ldp-proyecto-nombre {
+    font-size: 1.2rem;
+  }
+  
+  .ldp-header-badges {
+    align-self: flex-start;
+  }
+  
+  .ldp-proyecto-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .ldp-fecha-info {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .ldp-btn-ver-tareas {
+    justify-content: center;
+    padding: 0.875rem 1.5rem;
+  }
+  
+  .ldp-stat-value {
+    font-size: 1.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ldp-main-title {
+    font-size: 1.7rem;
+  }
+  
+  .ldp-proyecto-card-usuario {
+    padding: 1.25rem;
+    margin: 0 0.5rem;
+  }
+  
+  .ldp-proyecto-nombre {
+    font-size: 1.1rem;
+  }
+  
+  .ldp-stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .ldp-btn-ver-tareas {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .ldp-search-input {
+    padding: 0.675rem 1rem 0.675rem 2.5rem;
+  }
+}

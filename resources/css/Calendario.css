@@ -1,0 +1,124 @@
+/* ===== ESTILOS DEL BOTÓN CALENDARIO EN NUEVOPROYECTO ===== */
+
+/* Botón principal del calendario */
+button.btn-calendario,
+.react-datepicker-wrapper .btn-calendario,
+.react-datepicker__input-container button.btn-calendario {
+  background-color: #ffffff !important;           /* FONDO BLANCO */
+  color: #222 !important;                         /* TEXTO NEGRO */
+  border: 1px solid #bdbdbd !important;           /* BORDE GRIS */
+  border-radius: 8px !important;                 
+  padding: 10px 12px !important;                 
+  font-size: 14px !important;                     
+  height: 50px !important;                       
+  width: 100% !important;                         
+  display: flex !important;                       
+  align-items: center !important;                 
+  justify-content: flex-start !important;        
+  gap: 8px !important;                            
+  box-sizing: border-box !important;             
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; 
+  transition: all 0.2s ease-in-out !important;    
+  z-index: 2;    
+  position: relative;     
+                              
+}
+
+/* Efecto hover del botón */
+button.btn-calendario:hover {
+  background-color: #ffffff !important;           /* MANTIENE BLANCO AL HOVER */
+  border-color: #a8a8a8 !important;               /* BORDE MÁS OSCURO */
+  color: #000 !important;                         /* TEXTO MÁS NEGRO */
+}
+
+/* Efecto focus del botón */
+button.btn-calendario:focus {
+  outline: none !important;                       /* QUITAR OUTLINE POR DEFECTO */
+  box-shadow: 0 0 0 3px rgba(170, 50, 90, 0.3) !important; /* SOMBRA ROSADA */
+}
+
+
+/* ===== ESTILOS DEL CALENDARIO (POPUP) ===== */
+.react-datepicker {
+  background-color: #fff;                       
+  border: 2px solid #861542;                      
+  border-radius: 8px;                             
+  padding: 8px;                                   
+  font-family: Arial;                            
+  color: #999;                                    
+}
+
+/* Días seleccionados en el calendario */
+.react-datepicker__day--selected {
+  background-color: #861542;                      /* COLOR PRINCIPAL */
+  color: #fff;                                    /* TEXTO BLANCO */
+}
+
+/* Día actual en el calendario */
+.react-datepicker__day--today {
+  background-color: #f8e6ef;                      /* FONDO ROSADO CLARO */
+  color: #861542;                                 /* TEXTO COLOR PRINCIPAL */
+  font-weight: bold;                              /* NEGRITA */
+}
+
+/* Estados de selección con teclado */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  outline: none !important;                      
+  box-shadow: none !important;                   
+  background-color: #861542 !important;           
+  color: #fff !important;                        
+}
+/* ===== CALENDARIO ===== */
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+/* Hoy */
+.react-datepicker__day--today {
+  background-color: #f8e6ef !important;
+  color: #861542 !important;
+}
+
+/* Flechas de navegación */
+.react-datepicker__navigation {
+  width: 24px !important;
+  height: 24px !important;
+  top: 8px !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #861542 !important;
+}
+.react-datepicker__navigation-icon::before {
+  border-color: #861542 !important;
+}
+
+/* AGREGA ESTO AL FINAL DE TU CSS */
+.fecha-selectores-container.tareas-completadas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.fecha-item {
+ min-width: 150px;
+  flex: 0 0 auto;
+}
+
+.btn-calendario {
+  min-width: 220px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

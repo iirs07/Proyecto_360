@@ -1,0 +1,116 @@
+
+   body {
+    font-family: Arial, sans-serif;
+    color: #000000;
+    margin: 0;
+    padding-bottom: 80px; 
+}
+
+    .header {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .header-center {
+        text-align: center;
+        margin-top: 5px;
+    }
+
+    .header-center .titulo {
+        font-size: 18px;
+        font-weight: bold;
+        color: #861542;
+        margin-bottom: 5px;
+    }
+
+    .header-center .subtitulo {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 2px 0;
+    }
+
+    .divider {
+        border-top: 3px solid #861542;
+        margin: 10px 0 0 0;
+    }
+
+    h2 {
+        text-align: center;
+        font-size: 20px;
+        color: #861542;
+        margin: 0 0 15px 0;
+    }
+
+    table {
+    width: 90%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+}
+
+.logo-table td,
+.logo-table tr {
+  border: none !important;
+}
+
+
+
+/* Anchos específicos para cada columna */
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* Proyecto */
+th:nth-child(2), td:nth-child(2) { width: 25%; } /* Tarea */
+th:nth-child(3), td:nth-child(3) { width: 15%; } /* Fecha Vencimiento */
+th:nth-child(4), td:nth-child(4) { width: 20%; } /* Usuario */
+th:nth-child(5), td:nth-child(5) { width: 20%; } /* Departamento */
+
+th {
+    background-color: #861542;
+    color: #fff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #fdf0f2;
+}
+
+
+    th, td {
+        border: 1px solid #861542;
+        padding: 6px;
+        text-align: center;
+        word-wrap: break-word;
+    }
+
+    th {
+        background-color: #861542;
+        color: #fff;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #fdf0f2;
+    }
+
+    .contenido-principal {
+        padding-bottom: 20px; 
+    }
+
+    .logo-table {
+  width: 100%;
+  table-layout: fixed;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+
+.logo-cell {
+  width: 33.33%;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0; /* evita que empuje los logos */
+}
+
+.logo-img {
+  max-height: 70px;   /* mantiene proporción uniforme */
+  max-width: 180px;   /* evita que uno se vea más grande */
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;     /* centra perfecto */
+}

@@ -11,6 +11,7 @@ use App\Http\Controllers\ProgresoController;
 use App\Http\Controllers\TareasController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\JefeController;
 
 
 /* 1. Rutas Públicas (Contenido sin necesidad de autenticación) */
@@ -33,5 +34,11 @@ Route::middleware(['jwt.auth'])->group(function () {
     // TAREAS
     Route::get('/proyectos/{idProyecto}/tareas', [TareasController::class, 'obtenerPorProyecto']);
     Route::get('/reporte', [ReporteController::class, 'generarPDF']);
+    //JEFE
+    Route::get('/proyectos/jefe', [JefeController::class, 'ProyectosDeUsuario']);
+Route::get('tareas/{idProyecto}/usuario/{idUsuario}', [JefeController::class, 'obtenerTareasPendientes']);
+Route::post('/evidencias', [JefeController::class, 'subirEvidencia']);
+Route::get('/usuario/tareas', [JefeController::class, 'tareasPorUsuario']);
+Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarReporteCompletadas']);
 
 });

@@ -22,4 +22,8 @@ class CUsuario extends Model
     {
         return $this->hasMany(\App\Models\Tarea::class, 'id_usuario', 'id_usuario');
     }
+    public function departamento()
+{
+    return $this->belongsTo(Departamento::class, 'id_departamento', 'id_departamento');
+}
 }

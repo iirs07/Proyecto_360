@@ -1,0 +1,11 @@
+.backup-container {
+  display: flex;
+  justify-content: center; /* centra horizontal */
+  align-items: center;     /* centra vertical */
+  min-height: 60vh;        /* altura mínima para centrar verticalmente */
+}
+
+.btn-backup {
+  display: inline-flex;
+  align-items: center;     /* alinea el spinner con el texto */
+}
