@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/formulario.css';
-import '../css/reporte.css'; 
+import '../css/Reporte.css'; 
 import "../css/global.css";
 import '../css/calendario.css';
 import PdfViewer from "./PdfViewer";
