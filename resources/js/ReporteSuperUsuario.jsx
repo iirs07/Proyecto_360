@@ -435,15 +435,16 @@ export default function ReporteSuperUsuario() {
                         {/* === 3. Tipo de Proyecto === */}
                         <div className="form-section tipo-proyecto-section">
                             <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
-                            <select 
-                                value={tipoProyecto} 
-                                onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
-                                className="input-estado"
-                            >
-                                <option value="Finalizados">Finalizados</option>
-                                <option value="EnProceso">En proceso</option>
-                                <option value="Ambos">Ambos</option>
-                            </select>
+                           <select 
+    value={tipoProyecto} 
+    onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}}
+    className="input-estado"
+>
+    <option value="Finalizados">Finalizados</option>
+    <option value="En proceso">En proceso</option>
+    <option value="Ambos">Ambos</option>
+</select>
+
                         </div>
                     </div>
 

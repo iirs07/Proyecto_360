@@ -11,131 +11,99 @@ class ProyectoSeeder extends Seeder
 {
     public function run(): void
     {
+        // SEGURIDAD: Solo permitir ejecutar este seeder en la BD copia
+        if (env('DB_DATABASE') !== 'Proyecto360_copia') {
+            $this->command->error("⚠️ Este seeder solo puede ejecutarse en la BD Proyecto360_copia");
+            return;
+        }
+
         $faker = Faker::create('es_MX');
 
-        // Obtener todos los JEFES correctamente usando id_usuario_login
-        $jefes = DB::table('usuario')
-            ->join('c_usuario', 'usuario.id_usuario_login', '=', 'c_usuario.id_usuario')
-            ->select(
-                'usuario.id_usuario_login as id_usuario_cu',
-                'c_usuario.id_departamento'
-            )
-            ->where('usuario.rol', 'Jefe')
-            ->get();
+        // Tomar todos los departamentos existentes
+        $departamentos = DB::table('c_departamento')->pluck('id_departamento')->toArray();
 
-        foreach ($jefes as $jefe) {
+        if (empty($departamentos)) {
+            $this->command->error("No existen departamentos para asignar proyectos.");
+            return;
+        }
 
-            // ----------------------------
-            // 1️⃣ Proyecto EN PROCESO
-            // ----------------------------
-            $inicioProceso = Carbon::now()->subDays(rand(5, 15));
-            $finProceso = Carbon::now()->addDays(rand(5, 15)); // Fecha de fin futura
+        for ($i = 1; $i <= 20; $i++) {
 
-            $proyectoProcesoId = DB::table('proyectos')->insertGetId([
-                'id_departamento' => $jefe->id_departamento,
-                'p_nombre' => "Proyecto en proceso - Dpto {$jefe->id_departamento}",
-                'pf_inicio' => $inicioProceso,
-                'pf_fin' => $finProceso,
-                'p_estatus' => 'En proceso',
-                'descripcion' => $faker->sentence(15),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ], 'id_proyecto');
+            $departamento = $faker->randomElement($departamentos);
 
-            DB::table('proyectos_departamentos')->insert([
-                'id_proyecto' => $proyectoProcesoId,
-                'id_departamento' => $jefe->id_departamento,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+            // Fechas antes de octubre 2025
+            $inicio = Carbon::parse(
+                $faker->dateTimeBetween('2025-01-01', '2025-09-20')
+            );
 
-            $this->crearTareas($proyectoProcesoId, $jefe->id_departamento, $faker, 'En proceso', $inicioProceso, $finProceso);
+            $fin = Carbon::parse(
+                $faker->dateTimeBetween('2025-02-01', '2025-09-30')
+            );
 
-            // ----------------------------
-            // 2️⃣ Proyecto FINALIZADO
-            // ----------------------------
+            // Garantizar inicio < fin
+            if ($inicio->greaterThan($fin)) {
+                $inicio = $fin->copy()->subDays(rand(1, 20));
+            }
 
-            // Definir rangos posibles de fechas para proyectos finalizados
-            $rangos = [
-                ['2025-05-01', '2025-05-31'],
-                ['2025-10-01', '2025-10-31'],
-                ['2025-11-01', '2025-11-30'],
-                ['2025-12-01', '2025-12-31'],
-                ['2026-01-01', '2026-01-31'],
-                ['2026-02-01', '2026-02-28'],
-            ];
-
-            // Elegir un rango aleatorio
-            $rangoElegido = $faker->randomElement($rangos);
-
-            // Generar fecha de inicio dentro del rango elegido
-            $inicioFinalizado = Carbon::parse($faker->dateTimeBetween($rangoElegido[0], $rangoElegido[1]));
-
-            // Generar fecha de fin 5-30 días después del inicio
-            $finFinalizado = Carbon::parse($faker->dateTimeBetween(
-                $inicioFinalizado->copy()->addDays(5),
-                $inicioFinalizado->copy()->addDays(30)
-            ));
-
-            $proyectoFinalizadoId = DB::table('proyectos')->insertGetId([
-                'id_departamento' => $jefe->id_departamento,
-                'p_nombre' => "Proyecto finalizado - Dpto {$jefe->id_departamento}",
-                'pf_inicio' => $inicioFinalizado,
-                'pf_fin' => $finFinalizado,
+            // Insertar proyecto
+            $proyectoId = DB::table('proyectos')->insertGetId([
+                'id_departamento' => $departamento,
+                'p_nombre' => "Proyecto Finalizado Falso #$i",
+                'pf_inicio' => $inicio,
+                'pf_fin' => $fin,
                 'p_estatus' => 'Finalizado',
                 'descripcion' => $faker->sentence(15),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ], 'id_proyecto');
 
+            // Insert en tabla pivote
             DB::table('proyectos_departamentos')->insert([
-                'id_proyecto' => $proyectoFinalizadoId,
-                'id_departamento' => $jefe->id_departamento,
+                'id_proyecto' => $proyectoId,
+                'id_departamento' => $departamento,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
 
-            $this->crearTareas($proyectoFinalizadoId, $jefe->id_departamento, $faker, 'Finalizado', $inicioFinalizado, $finFinalizado);
+            // Crear tareas
+            $this->crearTareasFalsas($proyectoId, $departamento, $faker, $inicio, $fin);
         }
+
+        $this->command->info("✔️ 20 proyectos finalizados falsos insertados correctamente.");
     }
 
-    // ===========================
-    // 🔧 FUNCIÓN para crear tareas
-    // ===========================
-    private function crearTareas($proyectoId, $departamentoId, $faker, $proyectoEstatus = 'En proceso', $pf_inicio = null, $pf_fin = null)
+    private function crearTareasFalsas($proyectoId, $departamentoId, $faker, $pf_inicio, $pf_fin)
     {
         $usuarios = DB::table('c_usuario')
             ->where('id_departamento', $departamentoId)
             ->pluck('id_usuario')
             ->toArray();
 
+        if (empty($usuarios)) {
+            return;
+        }
+
         $cantidad = rand(3, 5);
 
         for ($i = 0; $i < $cantidad; $i++) {
+
             $usuarioAsignado = $faker->randomElement($usuarios);
 
-            if ($proyectoEstatus === 'Finalizado') {
-                // Tareas completadas dentro del rango del proyecto
-                $tf_inicio = Carbon::parse($pf_inicio)->addDays(rand(0, 3));
-                $tf_fin = Carbon::parse($pf_fin)->subDays(rand(0, 2));
-                $t_estatus = 'Completada';
-                $tf_completada = $tf_fin;
-            } else {
-                // Proyecto en proceso: tareas dentro del rango de inicio-fin
-                $tf_inicio = Carbon::parse($pf_inicio)->addDays(rand(0, 3));
-                $tf_fin = Carbon::parse($pf_fin)->subDays(rand(0, 2));
-                $t_estatus = $faker->randomElement(['Pendiente', 'Completada']);
-                $tf_completada = $t_estatus === 'Completada' ? Carbon::now() : null;
+            $tf_inicio = Carbon::parse($pf_inicio)->addDays(rand(0, 5));
+            $tf_fin = Carbon::parse($pf_fin)->subDays(rand(0, 5));
+
+            if ($tf_inicio->greaterThan($tf_fin)) {
+                $tf_fin = $tf_inicio->copy()->addDays(rand(1, 4));
             }
 
             DB::table('tareas')->insert([
                 'id_proyecto' => $proyectoId,
                 'id_usuario' => $usuarioAsignado,
                 't_nombre' => $faker->sentence(4),
-                't_estatus' => $t_estatus,
+                't_estatus' => 'Completada',
                 'tf_inicio' => $tf_inicio,
                 'tf_fin' => $tf_fin,
-                'tf_completada' => $tf_completada,
+                'tf_completada' => $tf_fin->copy(),
                 'descripcion' => $faker->sentence(12),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

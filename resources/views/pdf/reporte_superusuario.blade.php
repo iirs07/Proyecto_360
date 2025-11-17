@@ -34,17 +34,28 @@ $meses = [
 @endphp
 
 <h2 class="reporte-titulo">
-    @if($filtros['fechaInicio'] && $filtros['fechaFin'])
-        Reporte de proyectos del {{ date('d/m/Y', strtotime($filtros['fechaInicio'])) }} al {{ date('d/m/Y', strtotime($filtros['fechaFin'])) }}
-    @elseif($filtros['anio'] && $filtros['mes'])
+    @if($filtros['anio'] && $filtros['mes'])
         @php $mesNumero = (int) substr($filtros['mes'], 0, 2); @endphp
         Reporte de proyectos del mes de {{ $meses[$mesNumero] }} del {{ $filtros['anio'] }}
+
     @elseif($filtros['anio'])
         Reporte de proyectos del año {{ $filtros['anio'] }}
+
+    @elseif($filtros['fechaInicio'] && $filtros['fechaFin'])
+        Reporte de proyectos del {{ date('d/m/Y', strtotime($filtros['fechaInicio'])) }}
+        al {{ date('d/m/Y', strtotime($filtros['fechaFin'])) }}
+
     @else
         REPORTE DETALLADO DE PROYECTOS
     @endif
 </h2>
+
+@if(isset($totalProyectos))
+    <div class="total-proyectos-info">
+        Total de Proyectos Encontrados: <strong>{{ $totalProyectos }}</strong>
+    </div>
+@endif
+
 
 <div class="tabla-proyectos-container">
     @if(empty($proyectosAgrupados))
@@ -71,7 +82,11 @@ $meses = [
                         @foreach($listaProyectos as $proyecto)
                         <tr>
                             <td>{{ $proyecto->p_nombre }}</td>
+                            
+                            {{-- 🛑 FIX CLAVE: USAR EL FALLBACK SEGURO EN EL CONTROLADOR 🛑 --}}
+                            {{-- Aquí asumimos que el controlador ya asignó 'Sin Área' si falló la relación. --}}
                             <td>{{ $proyecto->departamento->d_nombre ?? 'N/A' }}</td>
+                            
                             <td>{{ $proyecto->responsable ?? 'Sin Asignar' }}</td>
                             <td>{{ $proyecto->avance_porcentaje ?? 0 }}%</td>
                             <td>{{ date('d/m/Y', strtotime($proyecto->pf_inicio)) }}</td>
