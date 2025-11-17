@@ -30,4 +30,15 @@ class Usuario extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims() {
         return [];
     }
+     // Relación hacia c_usuario para obtener datos del usuario
+    public function cusuario()
+    {
+        return $this->hasOne(CUsuario::class, 'id_usuario', 'id_usuario_login');
+    }
+
+    // Para notificaciones por mail usar el campo 'correo'
+    public function routeNotificationForMail($notification)
+    {
+        return $this->correo;
+    }
 }

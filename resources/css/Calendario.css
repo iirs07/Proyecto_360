@@ -5,11 +5,14 @@ button.btn-calendario,
 .react-datepicker-wrapper .btn-calendario,
 .react-datepicker__input-container button.btn-calendario {
   background-color: #ffffff !important;           /* FONDO BLANCO */
-  color: #222 !important;                         /* TEXTO NEGRO */
+           /* TEXTO NEGRO */
   border: 1px solid #bdbdbd !important;           /* BORDE GRIS */
   border-radius: 8px !important;                 
   padding: 10px 12px !important;                 
-  font-size: 14px !important;                     
+  color: #333;                   /* Igual que tus inputs */
+  font-family: 'Arial', sans-serif; /* Igual que tus inputs */
+  font-size: 14px;               /* Igual que tus inputs */
+  font-weight: bold;                     
   height: 50px !important;                       
   width: 100% !important;                         
   display: flex !important;                       
@@ -41,7 +44,7 @@ button.btn-calendario:focus {
 /* ===== ESTILOS DEL CALENDARIO (POPUP) ===== */
 .react-datepicker {
   background-color: #fff;                       
-  border: 2px solid #861542;                      
+  border: 3px solid #861542;                      
   border-radius: 8px;                             
   padding: 8px;                                   
   font-family: Arial;                            

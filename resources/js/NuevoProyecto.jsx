@@ -9,22 +9,20 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/global.css';
 import '../css/formulario.css';
 import '../css/NuevoProyecto.css';
-import { FaExclamationTriangle, FaCalendarAlt, FaBars } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
-
-
 registerLocale("es", es);
 
 const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   <button
     type="button"
-    className="btn-calendario w-100 d-flex align-items-center gap-2"
+    className="btn-calendario nv-btn-calendario w-100 d-flex align-items-center gap-2"
     onClick={onClick}
     ref={ref}
   >
-    <FaCalendarAlt className={!value ? "text" : ""} /> 
-    <span className={!value ? "text" : ""}>
+    <FaCalendarAlt className={!value ? "nv-text" : ""} /> 
+    <span className={!value ? "nv-text" : ""}>
       {value || "Seleccionar fecha"}
     </span>
   </button>
@@ -182,19 +180,17 @@ function NuevoProyecto() {
        titulo="NUEVO PROYECTO"
        sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}
      >
-
-        {/* ===== CONTENIDO DE LA PÁGINA ===== */}
-        <div className="contenedor-nuevo-proyecto">
-          <div className="row justify-content-center">
-            <div className="col-12 col-md-8 col-lg-6 contenedor-nuevo-proyecto">
+        <div className="nv-contenedor">
+            <div className="row justify-content-center g-0">
+           <div className="col-12 col-md-8 col-lg-6">
               <h1 className="titulo-global">Nuevo Proyecto</h1>
                  </div>
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="nombreProyecto" className="form-label fw-bold form-label">Nombre del proyecto</label>
+              <label htmlFor="nombreProyecto" className="nv-form-label fw-bold form-label">Nombre del proyecto</label>
               <textarea
                 id="nombreProyecto"
                 ref={nombreProyectoRef}
-                className="form-control form-input"
+                className="form-control nv-form-input"
                 placeholder="Escribe el nombre del proyecto"
                 rows={1}
                 onInput={() => { ajustarAltura(nombreProyectoRef); handleInputChange("nombre"); }}
@@ -203,11 +199,11 @@ function NuevoProyecto() {
             </div>
 
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionProyecto" className="form-label fw-bold nuevoproyecto-label">Descripción del proyecto</label>
+              <label htmlFor="descripcionProyecto" className="nv-form-label fw-bold nuevoproyecto-label">Descripción del proyecto</label>
               <textarea
                 id="descripcionProyecto"
                 ref={descripcionProyectoRef}
-                className="form-control form-input"
+                className="form-control nv-form-input"
                 placeholder="Escribe la descripción del proyecto"
                 rows={3}
                 onInput={() => { ajustarAltura(descripcionProyectoRef); handleInputChange("descripcion"); }}
@@ -215,46 +211,45 @@ function NuevoProyecto() {
               <ErrorMensaje mensaje={errores.descripcion} />
             </div>
 
-            <div className="row mb-3">
-              <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="form-label fw-bold mb-1">Fecha de inicio</label>
-                <DatePicker
-                  selected={fechaInicio}
-                  onChange={(date) => { setFechaInicio(date); handleInputChange("inicio"); }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={new Date()}
-                  customInput={<CalendarButton />}
-                />
-               <ErrorMensaje mensaje={errores.inicio} />
-              </div>
+           <div className="row mb-3 g-0"> 
+  <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-0 pe-2"> {/* ps-0 pe-2 */}
+    <label className="nv-form-label fw-bold mb-1">Fecha de inicio</label>
+    <DatePicker
+      selected={fechaInicio}
+      onChange={(date) => { setFechaInicio(date); handleInputChange("inicio"); }}
+      dateFormat="dd/MM/yyyy"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      locale="es"
+      minDate={new Date()}
+      customInput={<CalendarButton />}
+    />
+    <ErrorMensaje mensaje={errores.inicio} />
+  </div>
 
-              <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="form-label fw-bold mb-1">Fecha de fin</label>
-                <DatePicker
-                  selected={fechaFin}
-                  onChange={(date) => { setFechaFin(date); handleInputChange("fin"); }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={fechaInicio || new Date()}
-                  customInput={<CalendarButton />}
-                />
-                <ErrorMensaje mensaje={errores.fin} />
-              </div>
-            </div>
-
+  <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-2 pe-0">
+    <label className="nv-form-label fw-bold mb-1">Fecha de fin</label>
+    <DatePicker
+      selected={fechaFin}
+      onChange={(date) => { setFechaFin(date); handleInputChange("fin"); }}
+      dateFormat="dd/MM/yyyy"
+      showMonthDropdown
+      showYearDropdown
+      dropdownMode="select"
+      locale="es"
+      minDate={fechaInicio || new Date()}
+      customInput={<CalendarButton />}
+    />
+    <ErrorMensaje mensaje={errores.fin} />
+  </div>
+</div>
             <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
               {mostrarExtras ? (
                 <>
                   <button 
                     type="button"
-                    className="btn-form w-100 w-md-auto"
+                    className="nv-btn-form w-100 w-md-auto"
                     onClick={handleCancelar}
                     disabled={loading} 
                   >
@@ -262,7 +257,7 @@ function NuevoProyecto() {
                   </button>
                   <button 
                     type="button"
-                    className="btn-form w-100 w-md-auto"
+                    className="nv-btn-form w-100 w-md-auto"
                     onClick={handleGuardar}
                     disabled={loading} 
                   >  {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
@@ -273,14 +268,14 @@ function NuevoProyecto() {
                 <>
                   <button 
                     type="button"
-                    className="btn-form w-100 w-md-auto"
+                    className="nv-btn-form w-100 w-md-auto"
                     onClick={handleNuevaTarea}
                   >
                     Nueva Tarea
                   </button>
                   <button 
                     type="button"
-                    className="btn-form w-100 w-md-auto"
+                    className="nv-btn-form w-100 w-md-auto"
                     onClick={() => navigate("/Vertareas")}
                   >
                     Ver Proyectos

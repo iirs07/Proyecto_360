@@ -40,4 +40,19 @@ class Tarea extends Model
     {
         return $this->hasMany(\App\Models\Evidencia::class, 'id_tarea', 'id_tarea');
     }
+      public function proyecto()
+    {
+        return $this->belongsTo(Proyecto::class, 'id_proyecto', 'id_proyecto');
+    }
+public function usuarioLogin()
+{
+    return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
+}
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class, 'id_departamento', 'id_departamento');
+    }
+
+    
 }

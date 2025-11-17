@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Proyecto;
+use App\Models\Tarea;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\DB; 
+use App\Notifications\TareaAsignada;
 
 
 class NuevoProyectoController extends Controller
@@ -84,7 +87,7 @@ public function fechasProyecto($id_proyecto)
     return response()->json($usuarios);
 }
  // Crear tarea
-    public function AgregarTareas(Request $request)
+   public function AgregarTareas(Request $request)
     {
         try {
             $tarea = Tarea::create([
@@ -96,16 +99,17 @@ public function fechasProyecto($id_proyecto)
                 'tf_fin'      => $request->tf_fin,
                 't_estatus'   => 'Pendiente',
             ]);
+            
             $usuario = Usuario::find($request->id_usuario);
 
             if ($usuario && $usuario->correo) {
                 try {
                     $usuario->notify(new TareaAsignada($tarea));
                 } catch (\Exception $e) {
-                    Log::error("Error al enviar notificación: " . $e->getMessage());
+                    // Se eliminó Log::error
                 }
             } else {
-                Log::warning("No se pudo enviar notificación. Usuario no encontrado o sin correo: ID " . $request->id_usuario);
+                // Se eliminó Log::warning
             }
 
             return response()->json([
@@ -121,4 +125,5 @@ public function fechasProyecto($id_proyecto)
             ], 500);
         }
     }
+
 }

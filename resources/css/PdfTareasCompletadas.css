@@ -6,30 +6,30 @@
     padding-bottom: 80px; 
 }
 
-    .header {
+    .rj-header {
         width: 100%;
         margin-bottom: 30px;
     }
 
-    .header-center {
+    .rj-header-center {
         text-align: center;
         margin-top: 5px;
     }
 
-    .header-center .titulo {
+    .rj-header-center .rj-titulo {
         font-size: 18px;
         font-weight: bold;
         color: #861542;
         margin-bottom: 5px;
     }
 
-    .header-center .subtitulo {
+    .rj-header-center .rj-subtitulo {
         font-size: 14px;
         font-weight: bold;
         margin: 2px 0;
     }
 
-    .divider {
+    .rj-divider {
         border-top: 3px solid #861542;
         margin: 10px 0 0 0;
     }
@@ -49,8 +49,8 @@
     table-layout: fixed;
 }
 
-.logo-table td,
-.logo-table tr {
+.rj-logo-table td,
+.rj-logo-table tr {
   border: none !important;
 }
 
@@ -89,25 +89,25 @@ tbody tr:nth-child(even) {
         background-color: #fdf0f2;
     }
 
-    .contenido-principal {
+    .rj-contenido-principal {
         padding-bottom: 20px; 
     }
 
-    .logo-table {
+    .rj-logo-table {
   width: 100%;
   table-layout: fixed;
   margin-bottom: 10px;
   border-collapse: collapse;
 }
 
-.logo-cell {
+.rj-logo-cell {
   width: 33.33%;
   text-align: center;
   vertical-align: middle;
   padding: 0; /* evita que empuje los logos */
 }
 
-.logo-img {
+.rj-logo-img {
   max-height: 70px;   /* mantiene proporción uniforme */
   max-width: 180px;   /* evita que uno se vea más grande */
   object-fit: contain;

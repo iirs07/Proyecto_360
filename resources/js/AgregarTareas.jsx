@@ -3,12 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
 import "../css/agregartareas.css";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
-import { FaExclamationTriangle, FaCalendarAlt } from "react-icons/fa";
-
+import ErrorMensaje from "../components/ErrorMensaje";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   <button
@@ -22,20 +21,10 @@ const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   </button>
 ));
 
-const ErrorMensaje = ({ mensaje }) => {
-  if (!mensaje) return null;
-  return (
-    <small className="error">
-      <FaExclamationTriangle className="error-icon" />
-      {mensaje}
-    </small>
-  );
-};
-
 function AgregarTareas() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id_usuario, id_proyecto, id_departamento_inicial } = location.state || {};
+  const { id_proyecto, id_departamento_inicial } = location.state || {};
 
   const nombreTareaRef = useRef(null);
   const descripcionTareaRef = useRef(null);
@@ -51,38 +40,10 @@ function AgregarTareas() {
   const [tareaGuardada, setTareaGuardada] = useState(false);
   const [loading, setLoading] = useState(false);
   const [idTareaRecienCreada, setIdTareaRecienCreada] = useState(null);
+  const [minFecha, setMinFecha] = useState(null);
+  const [maxFecha, setMaxFecha] = useState(null);
 
-  
-    const [minFecha, setMinFecha] = useState(null);
-const [maxFecha, setMaxFecha] = useState(null);
-  const getAuthHeaders = () => ({
-    Authorization: `Bearer ${localStorage.getItem("token")}`
-  });
-
-  useEffect(() => {
-  if (!id_proyecto) return;
-
-  axios.get(`/api/proyectos/${id_proyecto}/fechasProyecto`)
-    .then(res => {
-      if (res.data.success) {
-        const inicio = new Date(res.data.pf_inicio);
-        const fin = new Date(res.data.pf_fin);
-        const inicioMex = new Date(inicio);
-        inicioMex.setHours(inicioMex.getHours() + 6);
-
-        const finMex = new Date(fin);
-        finMex.setHours(finMex.getHours() + 6);
-
-        console.log("Fechas ajustadas a México:");
-        console.log("Inicio:", inicioMex);
-        console.log("Fin:", finMex);
-        setMinFecha(inicioMex);
-        setMaxFecha(finMex);
-      }
-    })
-    .catch(err => console.error(err));
-}, [id_proyecto]);
-
+  // Ajustar altura de textarea
   const ajustarAltura = (ref) => {
     if (ref.current) {
       ref.current.style.height = "auto";
@@ -90,42 +51,122 @@ const [maxFecha, setMaxFecha] = useState(null);
     }
   };
 
-  useEffect(() => {
-    axios
-      .get("/api/CatalogoDepartamentos", { headers: getAuthHeaders() })
-      .then(res => {
-        setDepartamentos(res.data);
-        if (id_departamento_inicial) {
-          setDepartamentoSeleccionado(parseInt(id_departamento_inicial));
-        } else if (res.data.length > 0) {
-          setDepartamentoSeleccionado(res.data[0].id_departamento);
-        }
-      })
-      .catch(err => console.error(err));
-  }, [id_departamento_inicial]);
+  // Función genérica para manejar token y 401
+  const getHeaders = () => {
+    const token = localStorage.getItem("jwt_token");
+    if (!token) {
+      localStorage.removeItem("jwt_token");
+      localStorage.removeItem("usuario");
+      navigate("/Login", { replace: true });
+      return null;
+    }
+    return { Authorization: `Bearer ${token}`, Accept: "application/json" };
+  };
 
+  // === Fechas del proyecto ===
+  useEffect(() => {
+    if (!id_proyecto) return;
+
+    const fetchFechasProyecto = async () => {
+      const headers = getHeaders();
+      if (!headers) return;
+
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/proyectos/${id_proyecto}/fechasProyecto`, { headers });
+        if (res.status === 401) {
+          localStorage.removeItem("jwt_token");
+          navigate("/Login", { replace: true });
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          const inicio = new Date(data.pf_inicio);
+          const fin = new Date(data.pf_fin);
+
+          const inicioMex = new Date(inicio); inicioMex.setHours(inicioMex.getHours() + 6);
+          const finMex = new Date(fin); finMex.setHours(finMex.getHours() + 6);
+
+          setMinFecha(inicioMex);
+          setMaxFecha(finMex);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFechasProyecto();
+  }, [id_proyecto, navigate]);
+
+  // === Departamentos ===
+  useEffect(() => {
+    const fetchDepartamentos = async () => {
+      const headers = getHeaders();
+      if (!headers) return;
+
+      try {
+        setLoading(true);
+        const res = await fetch("/api/CatalogoDepartamentos", { headers });
+        if (res.status === 401) {
+          localStorage.removeItem("jwt_token");
+          navigate("/Login", { replace: true });
+          return;
+        }
+
+        const data = await res.json();
+        setDepartamentos(data);
+        if (id_departamento_inicial) setDepartamentoSeleccionado(parseInt(id_departamento_inicial));
+        else if (data.length > 0) setDepartamentoSeleccionado(data[0].id_departamento);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDepartamentos();
+  }, [id_departamento_inicial, navigate]);
+
+  // === Usuarios según departamento ===
   useEffect(() => {
     if (!departamentoSeleccionado) return;
-    axios
-      .get(`/api/departamentos/${departamentoSeleccionado}/usuarios`, { headers: getAuthHeaders() })
-      .then(res => {
-        setUsuarios(res.data);
+
+    const fetchUsuarios = async () => {
+      const headers = getHeaders();
+      if (!headers) return;
+
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/departamentos/${departamentoSeleccionado}/usuarios`, { headers });
+        if (res.status === 401) {
+          localStorage.removeItem("jwt_token");
+          navigate("/Login", { replace: true });
+          return;
+        }
+
+        const data = await res.json();
+        setUsuarios(data);
         setUsuarioSeleccionado("");
-      })
-      .catch(err => {
+      } catch (err) {
         console.error(err);
         setUsuarios([]);
         setUsuarioSeleccionado("");
-      });
-  }, [departamentoSeleccionado]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleInputChange = campo => setErrores(prev => ({ ...prev, [campo]: null }));
+    fetchUsuarios();
+  }, [departamentoSeleccionado, navigate]);
 
+  // === Guardar tarea ===
   const handleGuardar = async () => {
     const nombre = nombreTareaRef.current.value.trim();
     const descripcion = descripcionTareaRef.current.value.trim();
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
 
     const nuevosErrores = {};
     if (!nombre) nuevosErrores.nombre = "El nombre de la tarea es obligatorio.";
@@ -149,39 +190,40 @@ const [maxFecha, setMaxFecha] = useState(null);
       id_departamento: parseInt(departamentoSeleccionado),
     };
 
-    try {
-      setLoading(true);
-      const res = await axios.post("/api/tareas", nuevaTarea, { headers: getAuthHeaders() });
-      if (res.data.success) {
-        setIdTareaRecienCreada(res.data.id);
-        nombreTareaRef.current.value = "";
-        descripcionTareaRef.current.value = "";
-        setFechaInicio(null);
-        setFechaFin(null);
-        setUsuarioSeleccionado("");
-        setErrores({});
-        setTareaGuardada(true);
-      } else {
-        console.error("Error al guardar la tarea");
-      }
-    } catch (err) {
-      console.error("Error al guardar la tarea", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const ErrorMensaje = ({ mensaje }) => {
-  if (!mensaje) return null;
-  return (
-    <small className="error">
-      <FaExclamationTriangle className="error-icon" />
-      {mensaje}
-    </small>
-  );
+    const headers = {
+  "Content-Type": "application/json",
+  "Authorization": `Bearer ${localStorage.getItem("jwt_token")}`
 };
 
+try {
+  setLoading(true);
+  const res = await fetch("http://127.0.0.1:8000/api/AgregarTareas", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(nuevaTarea),
+  });
 
-  // Cancelar tarea
+  if (res.status === 401) {
+    localStorage.removeItem("jwt_token");
+    localStorage.removeItem("usuario");
+    navigate("/Login", { replace: true });
+    return;
+  }
+
+  const data = await res.json();
+  if (data.success) {
+    console.log("Tarea creada", data.tarea);
+  } else {
+    console.error("Error al crear la tarea", data.message);
+  }
+} catch (err) {
+  console.error("Error al guardar la tarea", err);
+} finally {
+  setLoading(false);
+}
+
+  };
+
   const handleCancelar = () => {
     nombreTareaRef.current.value = "";
     descripcionTareaRef.current.value = "";
@@ -193,22 +235,22 @@ const [maxFecha, setMaxFecha] = useState(null);
     setIdTareaRecienCreada(null);
   };
 
+  const handleInputChange = campo => setErrores(prev => ({ ...prev, [campo]: null }));
+
   return (
-   <Layout
-          titulo="NUEVA TAREA"
-          sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}
-        >
-      <div className="contenedor-nuevo-proyecto">
+    <Layout titulo="NUEVA TAREA" sidebar={<MenuDinamico activeRoute="Nueva tarea" />}>
+      <div className="agregartareas-contenedor">
         <div className="row justify-content-center">
-         <div className="col-12 col-md-8 col-lg-6 contenedor-nuevo-proyecto">
+          <div className="col-12 col-md-8 col-lg-6 agregartareas-contenedor">
             <h1 className="titulo-global">Agregar nueva tarea</h1>
 
+            {/* Nombre */}
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="nombreTarea" className="form-label fw-bold">Nombre de la tarea</label>
+              <label htmlFor="nombreTarea" className="agregartareas-label fw-bold">Nombre de la tarea</label>
               <textarea
                 id="nombreTarea"
                 ref={nombreTareaRef}
-                className="form-control form-input"
+                className="form-control agregartareas-input"
                 placeholder="Escribe el nombre de la tarea"
                 rows={1}
                 onInput={() => { ajustarAltura(nombreTareaRef); handleInputChange("nombre"); }}
@@ -218,11 +260,11 @@ const [maxFecha, setMaxFecha] = useState(null);
 
             {/* Descripción */}
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionTarea" className="form-label fw-bold">Descripción</label>
+              <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">Descripción</label>
               <textarea
                 id="descripcionTarea"
                 ref={descripcionTareaRef}
-                className="form-control form-input"
+                className="form-control agregartareas-input"
                 placeholder="Escribe la descripción"
                 rows={2}
                 onInput={() => { ajustarAltura(descripcionTareaRef); handleInputChange("descripcion"); }}
@@ -232,7 +274,7 @@ const [maxFecha, setMaxFecha] = useState(null);
 
             {/* Departamento */}
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="departamento" className="form-label fw-bold">Departamento</label>
+              <label htmlFor="departamento" className="agregartareas-label fw-bold">Departamento</label>
               <select
                 id="departamento"
                 value={departamentoSeleccionado}
@@ -240,16 +282,14 @@ const [maxFecha, setMaxFecha] = useState(null);
                 className="form-select"
               >
                 {departamentos.map(d => (
-                  <option key={d.id_departamento} value={d.id_departamento}>
-                    {d.d_nombre}
-                  </option>
+                  <option key={d.id_departamento} value={d.id_departamento}>{d.d_nombre}</option>
                 ))}
               </select>
             </div>
 
             {/* Usuario */}
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="usuario" className="form-label fw-bold">Usuario</label>
+              <label htmlFor="usuario" className="agregartareas-label fw-bold">Usuario</label>
               <select
                 id="usuario"
                 value={usuarioSeleccionado}
@@ -265,13 +305,13 @@ const [maxFecha, setMaxFecha] = useState(null);
                   </option>
                 ))}
               </select>
-                 <ErrorMensaje mensaje={errores.usuario} />
+              <ErrorMensaje mensaje={errores.usuario} />
             </div>
 
             {/* Fechas */}
             <div className="row mb-3">
               <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="form-label fw-bold mb-1">Fecha de inicio</label>
+                <label className="agregartareas-label fw-bold mb-1">Fecha de inicio</label>
                 <DatePicker
                   selected={fechaInicio}
                   onChange={date => { setFechaInicio(date); handleInputChange("inicio"); }}
@@ -280,16 +320,14 @@ const [maxFecha, setMaxFecha] = useState(null);
                   showYearDropdown
                   dropdownMode="select"
                   locale="es"
-                 minDate={minFecha}      // no puede ser antes del inicio del proyecto
-  maxDate={fechaFin || maxFecha} // opcional: no más allá del fin del proyecto
-
+                  minDate={minFecha}
+                  maxDate={fechaFin || maxFecha}
                   customInput={<CalendarButton />}
                 />
-                 <ErrorMensaje mensaje={errores.inicio} />
-        
+                <ErrorMensaje mensaje={errores.inicio} />
               </div>
               <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="form-label fw-bold mb-1">Fecha de fin</label>
+                <label className="agregartareas-label fw-bold mb-1">Fecha de fin</label>
                 <DatePicker
                   selected={fechaFin}
                   onChange={date => { setFechaFin(date); handleInputChange("fin"); }}
@@ -298,42 +336,40 @@ const [maxFecha, setMaxFecha] = useState(null);
                   showYearDropdown
                   dropdownMode="select"
                   locale="es"
-                   minDate={fechaInicio || minFecha} 
-  maxDate={maxFecha} 
+                  minDate={fechaInicio || minFecha}
+                  maxDate={maxFecha}
                   customInput={<CalendarButton />}
                 />
-                 <ErrorMensaje mensaje={errores.fin} />
-        
+                <ErrorMensaje mensaje={errores.fin} />
               </div>
             </div>
 
-         <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
-  <button type="button" className="btn-form w-100 w-md-auto" onClick={handleCancelar} disabled={loading}>
-    Cancelar
-  </button>
-  <button type="button" className="btn-form w-100 w-md-auto" onClick={handleGuardar} disabled={loading}>
-    {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
-    {loading ? "Guardando…" : "Guardar Tarea"}
-  </button>
-</div>
-            {tareaGuardada && (
-           <div className="mt-3 d-flex justify-content-center">
-  <button
-    type="button"
-    className="btn-form"
-    style={{ width: "100%", maxWidth: "300px" }}
-    onClick={() => navigate("/Vertareasusuario", { state: { id_proyecto } })}
-  >
-    <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
-    Ver Tareas
-  </button>
-</div>
-            )}
+            <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
+              <button type="button" className="btn-agregartareas cancelar w-100 w-md-auto" onClick={handleCancelar} disabled={loading}>
+                Cancelar
+              </button>
+              <button type="button" className="btn-agregartareas guardar w-100 w-md-auto" onClick={handleGuardar} disabled={loading}>
+                {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
+                {loading ? "Guardando…" : "Guardar Tarea"}
+              </button>
+            </div>
 
+            {tareaGuardada && (
+              <div className="mt-3 d-flex justify-content-center">
+                <button
+                  type="button"
+                  className="btn-form"
+                  style={{ width: "100%", maxWidth: "300px" }}
+                  onClick={() => navigate("/Vertareasusuario", { state: { id_proyecto } })}
+                >
+                  <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
+                  Ver Tareas
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-   
     </Layout>
   );
 }

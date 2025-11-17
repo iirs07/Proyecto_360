@@ -24,6 +24,8 @@ Route::post('/RegistroPaso1/invitado', [RegistroPaso1Controller::class, 'validar
 Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']);
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
+Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);
+
 
 Route::get('/departamentos', [DepartamentoController::class, 'index']);
 Route::get('/login', function () { return response()->json(['error' => 'No autenticado'], 401); })->name('login');
@@ -46,9 +48,9 @@ Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarRepor
 Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
 Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
 Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
-Route::get('/CatalogoDepartamentos', [NuevoProyectoController::class, 'CatalogoDepartamentos']);
 Route::get('/departamentos/{id}/usuarios', [NuevoProyectoController::class, 'usuariosPorDepartamento']);
-Route::post('/AgregarTareas', [NuevoProyectoController::class, 'store']);
+Route::get('/CatalogoDepartamentos', [NuevoProyectoController::class, 'CatalogoDepartamentos']);
+
 Route::get('/proyectos/usuario', [DirectorController::class, 'proyectosDepartamento']);
 
 });

@@ -1,22 +1,22 @@
-<div class="header">
-   <table class="logo-table">
+<div class="rj-header">
+   <table class="rj-logo-table">
       <tr>
-         <td class="logo-cell left"><img src="{{ public_path('imagenes/logo1.png') }}" class="logo-img" /></td>
-         <td class="logo-cell center"><img src="{{ public_path('imagenes/logo2.png') }}" class="logo-img" /></td>
-         <td class="logo-cell right"><img src="{{ public_path('imagenes/logo3.png') }}" class="logo-img" /></td>
+         <td class="rj-logo-cell left"><img src="{{ public_path('imagenes/logo1.png') }}" class="rj-logo-img" /></td>
+         <td class="rj-logo-cell center"><img src="{{ public_path('imagenes/logo2.png') }}" class="rj-logo-img" /></td>
+         <td class="rj-logo-cell right"><img src="{{ public_path('imagenes/logo3.png') }}" class="rj-logo-img" /></td>
       </tr>
    </table>
 
-   <div class="header-center">
-      <div class="titulo">H. Ayuntamiento de Minatitlán, Ver.</div>
-      <div class="subtitulo">Sistema de Gestión de Proyectos</div>
-      <div class="subtitulo">
+   <div class="rj-header-center">
+      <div class="rj-titulo">H. Ayuntamiento de Minatitlán, Ver.</div>
+      <div class="rj-subtitulo">Sistema de Gestión de Proyectos</div>
+      <div class="rj-subtitulo">
          Departamento: {{ ucwords(strtolower($usuario['departamento'] ?? '')) }}
       </div>
 
-      <div class="subtitulo">Fecha: {!! $hoy ?? '' !!} | Hora: {!! $hora ?? '' !!}</div>
+      <div class="rj-subtitulo">Fecha: {!! $hoy ?? '' !!} | Hora: {!! $hora ?? '' !!}</div>
 
-      <div class="subtitulo">
+      <div class="rj-subtitulo">
          Reporte generado por:
          {{ ucwords(strtolower($usuario['nombre'] ?? '')) }}
          {{ ucwords(strtolower($usuario['a_paterno'] ?? '')) }}
@@ -24,11 +24,11 @@
       </div>
    </div>
 
-   <div class="divider"></div>
+   <div class="rj-divider"></div>
 </div>
 
 <!-- Contenido -->
-<div class="contenido-principal">
+<div class="rj-contenido-principal">
 
    <h2>
       Reporte de Tareas Completadas
