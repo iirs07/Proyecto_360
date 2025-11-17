@@ -11,77 +11,133 @@ class ProyectoSeeder extends Seeder
 {
     public function run(): void
     {
-        // SEGURIDAD: Solo permitir ejecutar este seeder en la BD copia
-        if (env('DB_DATABASE') !== 'Proyecto360_copia') {
-            $this->command->error("⚠️ Este seeder solo puede ejecutarse en la BD Proyecto360_copia");
-            return;
-        }
-
         $faker = Faker::create('es_MX');
 
-        // Tomar todos los departamentos existentes
-        $departamentos = DB::table('c_departamento')->pluck('id_departamento')->toArray();
+        // Obtener todos los JEFES correctamente usando id_usuario_login
+        $jefes = DB::table('usuario')
+            ->join('c_usuario', 'usuario.id_usuario_login', '=', 'c_usuario.id_usuario')
+            ->select(
+                'usuario.id_usuario_login as id_usuario_cu',
+                'c_usuario.id_departamento'
+            )
+            ->where('usuario.rol', 'Jefe')
+            ->get();
 
-        if (empty($departamentos)) {
-            $this->command->error("No existen departamentos para asignar proyectos.");
-            return;
-        }
+        foreach ($jefes as $jefe) {
 
-        for ($i = 1; $i <= 20; $i++) {
+            // ==================================================
+            // 1️⃣ PROYECTO EN PROCESO (Oct → Dic 2025, fin futuro)
+            // ==================================================
 
-            $departamento = $faker->randomElement($departamentos);
-
-            // Fechas antes de octubre 2025
-            $inicio = Carbon::parse(
-                $faker->dateTimeBetween('2025-01-01', '2025-09-20')
+            $inicioProceso = Carbon::parse(
+                $faker->dateTimeBetween('2025-10-01', '2025-12-15')
             );
 
-            $fin = Carbon::parse(
-                $faker->dateTimeBetween('2025-02-01', '2025-09-30')
+            // Fechas de fin garantizadas futuras
+            $finProcesoOpciones = [
+                '2025-12-30',
+                '2026-01-15',
+                '2026-02-10',
+                '2026-03-05',
+                '2026-04-01',
+                '2027-01-10'
+            ];
+
+            // 🔧 AQUÍ ESTABA EL ERROR → variable mal escrita
+            $finProceso = Carbon::parse($faker->randomElement($finProcesoOpciones));
+
+            $proyectoProcesoId = DB::table('proyectos')->insertGetId([
+                'id_departamento' => $jefe->id_departamento,
+                'p_nombre' => "Proyecto en proceso - Dpto {$jefe->id_departamento}",
+                'pf_inicio' => $inicioProceso,
+                'pf_fin' => $finProceso,
+                'p_estatus' => 'En proceso',
+                'descripcion' => $faker->sentence(15),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ], 'id_proyecto');
+
+            DB::table('proyectos_departamentos')->insert([
+                'id_proyecto' => $proyectoProcesoId,
+                'id_departamento' => $jefe->id_departamento,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            $this->crearTareas(
+                $proyectoProcesoId,
+                $jefe->id_departamento,
+                $faker,
+                'En proceso',
+                $inicioProceso,
+                $finProceso
             );
 
-            // Garantizar inicio < fin
-            if ($inicio->greaterThan($fin)) {
-                $inicio = $fin->copy()->subDays(rand(1, 20));
+            // ==================================================
+            // 2️⃣ PROYECTO FINALIZADO (FIN entre 1 OCT y 16 NOV 2025)
+            // ==================================================
+
+            $inicioFinalizado = Carbon::parse(
+                $faker->dateTimeBetween('2025-06-01', '2025-10-20')
+            );
+
+            // FIN debe estar SIEMPRE entre 1 OCT y 16 NOV 2025
+            $finFinalizado = Carbon::parse(
+                $faker->dateTimeBetween(
+                    '2025-10-01',
+                    '2025-11-16'
+                )
+            );
+
+            // Garantizar que inicio < fin
+            if ($inicioFinalizado->greaterThan($finFinalizado)) {
+                $inicioFinalizado = $finFinalizado->copy()->subDays(rand(5, 20));
             }
 
-            // Insertar proyecto
-            $proyectoId = DB::table('proyectos')->insertGetId([
-                'id_departamento' => $departamento,
-                'p_nombre' => "Proyecto Finalizado Falso #$i",
-                'pf_inicio' => $inicio,
-                'pf_fin' => $fin,
+            $proyectoFinalizadoId = DB::table('proyectos')->insertGetId([
+                'id_departamento' => $jefe->id_departamento,
+                'p_nombre' => "Proyecto finalizado - Dpto {$jefe->id_departamento}",
+                'pf_inicio' => $inicioFinalizado,
+                'pf_fin' => $finFinalizado,
                 'p_estatus' => 'Finalizado',
                 'descripcion' => $faker->sentence(15),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ], 'id_proyecto');
 
-            // Insert en tabla pivote
             DB::table('proyectos_departamentos')->insert([
-                'id_proyecto' => $proyectoId,
-                'id_departamento' => $departamento,
+                'id_proyecto' => $proyectoFinalizadoId,
+                'id_departamento' => $jefe->id_departamento,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
 
-            // Crear tareas
-            $this->crearTareasFalsas($proyectoId, $departamento, $faker, $inicio, $fin);
+            $this->crearTareas(
+                $proyectoFinalizadoId,
+                $jefe->id_departamento,
+                $faker,
+                'Finalizado',
+                $inicioFinalizado,
+                $finFinalizado
+            );
         }
-
-        $this->command->info("✔️ 20 proyectos finalizados falsos insertados correctamente.");
     }
 
-    private function crearTareasFalsas($proyectoId, $departamentoId, $faker, $pf_inicio, $pf_fin)
-    {
+    // ==========================================
+    // 🔧 FUNCIÓN DEFINITIVA PARA CREAR TAREAS
+    // ==========================================
+    private function crearTareas(
+        $proyectoId,
+        $departamentoId,
+        $faker,
+        $proyectoEstatus = 'En proceso',
+        $pf_inicio = null,
+        $pf_fin = null
+    ) {
         $usuarios = DB::table('c_usuario')
             ->where('id_departamento', $departamentoId)
             ->pluck('id_usuario')
             ->toArray();
-
-        if (empty($usuarios)) {
-            return;
-        }
 
         $cantidad = rand(3, 5);
 
@@ -89,21 +145,37 @@ class ProyectoSeeder extends Seeder
 
             $usuarioAsignado = $faker->randomElement($usuarios);
 
-            $tf_inicio = Carbon::parse($pf_inicio)->addDays(rand(0, 5));
-            $tf_fin = Carbon::parse($pf_fin)->subDays(rand(0, 5));
+            $inicio = Carbon::parse($pf_inicio);
+            $fin = Carbon::parse($pf_fin);
+
+            $tf_inicio = $inicio->copy()->addDays(rand(0, 5));
+            $tf_fin = $fin->copy()->subDays(rand(0, 5));
 
             if ($tf_inicio->greaterThan($tf_fin)) {
-                $tf_fin = $tf_inicio->copy()->addDays(rand(1, 4));
+                $tf_fin = $tf_inicio->copy()->addDays(rand(1, 3));
+            }
+
+            if ($proyectoEstatus === 'Finalizado') {
+
+                $t_estatus = 'Completada';
+                $tf_completada = $tf_fin->copy();
+
+            } else {
+
+                $t_estatus = $faker->randomElement(['Pendiente', 'Completada']);
+                $tf_completada = $t_estatus === 'Completada'
+                    ? $tf_inicio->copy()->addDays(rand(1, 3))
+                    : null;
             }
 
             DB::table('tareas')->insert([
                 'id_proyecto' => $proyectoId,
                 'id_usuario' => $usuarioAsignado,
                 't_nombre' => $faker->sentence(4),
-                't_estatus' => 'Completada',
+                't_estatus' => $t_estatus,
                 'tf_inicio' => $tf_inicio,
                 'tf_fin' => $tf_fin,
-                'tf_completada' => $tf_fin->copy(),
+                'tf_completada' => $tf_completada,
                 'descripcion' => $faker->sentence(12),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
