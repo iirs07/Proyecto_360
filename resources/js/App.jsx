@@ -13,6 +13,14 @@ import DepProProceso from "./DepProProceso";
 import TareasProgreso from './TareasProgreso';
 import DepProCompletados from './DepProCompletados';
 import ReporteSuperUsuario from './ReporteSuperUsuario';
+{/*USUARIO*/}
+
+import GestionProyectosUsuario from "./GestionProyectosUsuario";
+import ListaDeProyectos from './ListaDeProyectos';
+import TareasAsignadas from './TareasAsignadas';
+import ReportesTareasCompletadas from "./ReportesTareasCompletadas";
+
+
 
 function App() {
   return (
@@ -45,6 +53,15 @@ function App() {
           <Route path="/proyectosenproceso/:depNombreSlug" element={<DepProProceso />} />
           <Route path="/proyectoscompletados/:depNombreSlug" element={<DepProCompletados />} />
           <Route path="/proyecto/:depProyectoSlug" element={<TareasProgreso />} />
+
+         {/* INTERFACES PARA EL ROL DE UN JEFE*/}
+          <Route path="/GestionProyectosUsuario" element={<GestionProyectosUsuario />} />
+          <Route path="/ListaDeProyectos" element={<ListaDeProyectos />} />
+          <Route path="/TareasAsignadas" element={<TareasAsignadas />} />
+          <Route path="/ReportesTareasCompletadas" element={<ReportesTareasCompletadas />} />
+
+
+
 
         </Route>
 

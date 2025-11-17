@@ -23,4 +23,8 @@ class Departamento extends Model
     {
         return $this->belongsTo(Area::class, 'area_id', 'id');
     }
+    public function usuarios()
+    {
+        return $this->hasMany(CUsuario::class, 'id_departamento', 'id_departamento');
+    }
 }

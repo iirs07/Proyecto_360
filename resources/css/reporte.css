@@ -1,0 +1,139 @@
+/* ==========================
+   CONTENEDOR PRINCIPAL
+========================== */
+.reportes {
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
+  border-radius: 8px;
+  z-index: 1;
+  
+}
+
+@media (max-width: 576px) {
+  .reportes {
+    padding: 15px;
+  }
+}
+.reportes-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.25;
+  transition: color 0.2s ease;
+  z-index: 2;
+  position: relative;
+}
+
+/* ==========================
+   BARRA DE PROGRESO
+========================== */
+.reportes-progress-contenedor {
+  margin-top: 30px;
+  max-width: 500px;
+  height: 8px;
+}
+
+.reportes-progress {
+  height: 12px;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+.reportes-progress-bar {
+  background: linear-gradient(90deg, #861542, #a75877);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.reportes-progress-bar-mejorada::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-image: linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.2) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.2) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 20px 20px;
+  animation: move 1s linear infinite;
+}
+
+@keyframes move {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 0; }
+}
+
+.reportes-text {
+  color: #999;
+}
+.reportes-boton-wrapper {
+  margin-top: 30px; /* Ajusta la distancia que quieras */
+}
+/* ==========================
+   BOTON PRINCIPAL
+========================== */
+.reportes-boton-form {
+  width: auto;
+  max-width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: none;
+  margin-top: 40px; 
+  border-radius: 3px;
+  box-sizing: border-box;
+  color: #fff;
+  background-color: #861542;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.reportes-progress-contenedor{
+  margin-top: 30px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.reportes-progress {
+  height: 15px; 
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  overflow: hidden;
+  position: relative; 
+}
+
+.reportes-progress-bar {
+  background: linear-gradient(90deg, #861542, #a75877);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+  height: 100%; 
+  display: block;
+  position: absolute; 
+  top: 0;
+  left: 0;
+  z-index: 2; 
+}
+
+
+@keyframes move {
+  0% { background-position: 0 0; }
+  100% { background-position: 20px 0; }
+}
