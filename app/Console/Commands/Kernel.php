@@ -11,8 +11,10 @@ class Kernel extends ConsoleKernel
      * Comandos de Artisan registrados en el proyecto
      */
     protected $commands = [
-        // Registrar tu comando aquí
         \App\Console\Commands\MoverDatosTrimestrales::class,
+        \App\Console\Commands\CleanExpiredTokens::class,
+        \App\Console\Commands\CleanExpiredInvitaciones::class,
+        \App\Console\Commands\TestSchedule::class,
     ];
 
     /**
@@ -20,12 +22,17 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // Programar tu comando trimestralmente
-        $schedule->command('datos:mover-trimestral')->quarterly();
+        \Log::info('Schedule loaded'); // Para verificar que el scheduler se carga
 
-        // Otros comandos de limpieza si quieres
+        // Comando pesado: mover datos trimestrales, se asegura que no se solape
+        $schedule->command('datos:mover-trimestral')->quarterly()->withoutOverlapping();
+
+        // Comandos rápidos, pueden ejecutarse cada minuto
         $schedule->command('tokens:clean')->everyMinute();
         $schedule->command('invitaciones:clean')->everyMinute();
+
+        // Test, no crítico, se ejecuta cada minuto, no es necesario bloquear solapamiento
+        $schedule->command('test:schedule')->everyMinute();
     }
 
     /**

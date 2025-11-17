@@ -15,19 +15,15 @@ class MoverDatosTrimestrales extends Command
     {
         $this->info('Iniciando proceso de mover proyectos finalizados del trimestre...');
 
-        // Definir trimestre actual
         $fecha_inicio = Carbon::now()->firstOfQuarter()->startOfDay();
         $fecha_fin    = Carbon::now()->lastOfQuarter()->endOfDay();
 
-        // Conexiones
         $dbPrincipal = DB::connection('pgsql');
-        $dbCopia = DB::connection('pgsql_second');
+        $dbCopia    = DB::connection('pgsql_second');
 
         DB::transaction(function () use ($dbPrincipal, $dbCopia, $fecha_inicio, $fecha_fin) {
 
-            // -------------------------------
             // 1️⃣ Sincronizar tablas maestras
-            // -------------------------------
             $tablasMaestras = [
                 'c_areas' => 'id',
                 'c_departamento' => 'id_departamento',
@@ -43,9 +39,7 @@ class MoverDatosTrimestrales extends Command
                 }
             }
 
-            // -------------------------------
             // 2️⃣ Mover proyectos finalizados
-            // -------------------------------
             $proyectos = $dbPrincipal->table('proyectos')
                 ->where('p_estatus', 'Finalizado')
                 ->whereBetween('pf_fin', [$fecha_inicio, $fecha_fin])
@@ -56,34 +50,42 @@ class MoverDatosTrimestrales extends Command
                 return;
             }
 
-            $proyectosIds = $proyectos->pluck('id_proyecto')->toArray();
-
-            // a) Insertar proyectos en la copia
+            $idMap = [];
             foreach ($proyectos as $proyecto) {
-                $dbCopia->table('proyectos')->insert((array)$proyecto);
+                $originalId = $proyecto->id_proyecto;
+                $nuevoId = $dbCopia->table('proyectos')
+                    ->insertGetId(
+                        collect($proyecto)->except('id_proyecto')->toArray(),
+                        'id_proyecto' // <-- PK correcta
+                    );
+                $idMap[$originalId] = $nuevoId;
             }
 
-            // b) Insertar proyectos_departamentos relacionados
+            $proyectosIds = array_keys($idMap);
+
+            // Insertar proyectos_departamentos
             $proyectosDept = $dbPrincipal->table('proyectos_departamentos')
                 ->whereIn('id_proyecto', $proyectosIds)
                 ->get();
 
             foreach ($proyectosDept as $fila) {
-                $dbCopia->table('proyectos_departamentos')->insert((array)$fila);
+                $fila->id_proyecto = $idMap[$fila->id_proyecto];
+                $dbCopia->table('proyectos_departamentos')
+                    ->insert(collect($fila)->except('id_proyectos_departamentos')->toArray());
             }
 
-            // c) Insertar tareas relacionadas
+            // Insertar tareas
             $tareas = $dbPrincipal->table('tareas')
                 ->whereIn('id_proyecto', $proyectosIds)
                 ->get();
 
             foreach ($tareas as $fila) {
-                $dbCopia->table('tareas')->insert((array)$fila);
+                $fila->id_proyecto = $idMap[$fila->id_proyecto];
+                $dbCopia->table('tareas')
+                    ->insert(collect($fila)->except('id_tarea')->toArray());
             }
 
-            // -------------------------------
-            // 3️⃣ Eliminar datos movidos de la base original
-            // -------------------------------
+            // Eliminar datos movidos
             $dbPrincipal->table('tareas')->whereIn('id_proyecto', $proyectosIds)->delete();
             $dbPrincipal->table('proyectos_departamentos')->whereIn('id_proyecto', $proyectosIds)->delete();
             $dbPrincipal->table('proyectos')->whereIn('id_proyecto', $proyectosIds)->delete();
