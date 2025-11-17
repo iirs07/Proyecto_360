@@ -1,0 +1,237 @@
+.verproyectos-app {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.verproyectos-lista-proyectos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.verproyectos-card {
+  border: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 24px;
+  margin: 16px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.verproyectos-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #861542;
+}
+
+.verproyectos-card:hover::before {
+  width: 6px;
+}
+
+.verproyectos-card:hover {
+  transform: translateY(-4px);
+}
+
+.verproyecto-nombre {
+  font-weight: bold;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  color: #861542;
+  margin-bottom: 12px;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.verproyecto-nombre::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: #861542;
+}
+
+.verproyectos-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.verproyectos-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.verproyectos-info-icon {
+  color: #861542;
+  font-size: 1.1rem;
+}
+
+/* Estados de la tarjeta */
+.verproyectos-card.sin-tareas {
+  border-left-color: #ff6b6b;
+}
+
+.verproyectos-card.con-tareas {
+  border-left-color: #51cf66;
+}
+
+.verproyectos-card.proximo-vencimiento {
+  border-left-color: #ffd43b;
+}
+
+.estado-alerta {
+  color: #e03131 !important;
+  font-weight: 600;
+}
+
+.estado-advertencia {
+  color: #e67700 !important;
+  font-weight: 600;
+}
+
+.verproyectos-botones {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.verproyectos-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  min-width: 160px;
+  color: white;
+  background: #861542;
+}
+
+.verproyectos-btn:hover {
+  background: linear-gradient(135deg, #a52c5c, #861542);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(134, 21, 66, 0.35);
+}
+
+
+.custom-select-container-inline {
+  position: relative;
+  width: 220px;
+  margin: 0 auto 20px auto;
+  font-size: 0.95rem;
+  font-weight: 500;
+   z-index: 10px;
+}
+
+.custom-options-inline {
+  border-radius: 10px;
+  margin-top: 6px;
+  background: #fff;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+  z-index: 10px;
+}
+
+.custom-options-inline.open {
+  max-height: 300px; 
+}
+
+.custom-options-inline div {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.custom-options-inline div:hover {
+  background: linear-gradient(90deg, #ffd9d9, #ffc0c0);
+  color: #861542;
+}
+
+.custom-select {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  user-select: none;
+  text-align: center;
+}
+
+.custom-select:hover {
+  box-shadow: 0 6px 15px rgba(134, 21, 66, 0.2);
+}
+
+.dropdown-icon {
+  transition: transform 0.3s ease;
+  color: #861542;
+  font-size: 1rem;
+}
+
+.dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+.buscador-verproyectos-contenedor {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+  position: relative;
+}
+.buscador-verproyectos-resultados-info {
+  text-align: center;
+  color: #861542;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 10px auto 25px auto;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 8px 16px;
+  border-radius: 15px;
+  display: inline-block;
+  border: 1px solid rgba(134, 21, 66, 0.1);
+  z-index: 10;
+  position: relative;
+}
+
+
+
+
+
+
+
+
+
+
+

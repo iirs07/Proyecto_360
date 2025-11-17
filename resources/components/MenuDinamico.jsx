@@ -1,17 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 // Importamos los iconos que ya usas
-import { FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram } from "react-icons/fa";
-import {
- 
-    FaFolder,
-    FaPlus,
-    FaEye,
-    FaEdit,
-    FaToggleOn,
-    FaTrash,
-    FaSpinner,
-    FaHourglassHalf,
-    FaCheckCircle
+import { 
+  FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
+  FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
+  FaCheckCircle, FaChevronDown, FaChevronRight 
 } from "react-icons/fa";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -29,9 +21,11 @@ export default function MenuDinamico({
 }) {
     // 🚩 CORRECCIÓN CRUCIAL: Usamos 'rol' en lugar de 'user_role' (basado en Login.js)
     const rol = localStorage.getItem('rol') || 'Superusuario'; 
+
     
     const location = useLocation();
     const navigate = useNavigate();
+    const [subMenusAbiertos, setSubMenusAbiertos] = useState({});
 
     // Slug persistente
     const slug = departamentoSlug || (departamentoNombre ? slugify(departamentoNombre) : localStorage.getItem('last_depSlug') || '');
@@ -52,52 +46,51 @@ export default function MenuDinamico({
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
             ],
         },
-        Jefe: {
-        principal: [
-            {
-                key: 'GestionProyectos',
-                label: 'INICIO',
-                icon: FaHome,
-                path: '/GestionProyectos'
-            },
-            {
-                key: 'proyectos',
-                label: "PROYECTOS",
-                icon: FaFolder,
-                subMenu: [
-                    { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
-                    { key: 'ver', label: "Ver Proyectos", path: "/VerProyecto", icon: FaEye },
-                    { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosM", icon: FaEdit },
-                    { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
-                    { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
-                ],
-            },
-            {
-                key: 'tareas',
-                label: "TAREAS",
-                icon: FaTasks,
-                subMenu: [
-                    { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
-                    { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
-                    { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
-                    { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
-                    { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
-                    { key: 'eliminarT', label: "Eliminar tarea", path: "/InterfazEliminar", icon: FaTrash },
-                ],
-            },
-            { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
-            { key: 'logout', label: "CERRAR SESIÓN", icon: FaUsers, action: onLogout }
-        ]
+      Jefe: {
+  principal: [
+    {
+      key: 'GestionProyectos',
+      label: 'INICIO',
+      icon: FaHome,
+      path: '/GestionProyectos'
     },
-
-    Usuario: {
-        principal: [
-            { key: 'gestion-proyectosusuario', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
-            { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaHourglassHalf },
-            { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
-            { key: 'logout', label: "CERRAR SESIÓN", icon: FaUsers, action: onLogout },
-        ]
-    }
+    {
+      key: 'proyectos',
+      label: "PROYECTOS",
+      icon: FaFolder,
+      subMenu: [
+        { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
+        { key: 'ver', label: "Ver Proyectos", path: "/VerProyecto", icon: FaEye },
+        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosM", icon: FaEdit },
+        { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
+        { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
+      ],
+    },
+    {
+      key: 'tareas',
+      label: "TAREAS",
+      icon: FaTasks,
+      subMenu: [
+        { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
+        { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
+        { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
+        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
+        { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
+        { key: 'eliminarT', label: "Eliminar tarea", path: "/InterfazEliminar", icon: FaTrash },
+      ],
+    },
+    { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
+    { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaUsers, action: onLogout }
+  ]
+},
+Usuario: {
+  principal: [
+    { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
+    { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaHourglassHalf },
+    { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
+    { key: 'logout', label: "CERRAR SESIÓN", icon: FaUsers, action: onLogout },
+  ],
+},
     };
 
     // Detectar tipo de menú según URL
@@ -107,14 +100,27 @@ export default function MenuDinamico({
                      ? 'departamento'
                      : 'principal';
 
-    const menuItems = menus[rol]?.[tipoMenu] || [];
+     const menuItems = menus[rol]?.[tipoMenu] || [];
 
-    const handleClick = (item) => {
+    // 🆕 FUNCIÓN PARA TOGGLE SUBMENÚ
+    const toggleSubMenu = (itemKey, event) => {
+        event.stopPropagation();
+        setSubMenusAbiertos(prev => ({
+            ...prev,
+            [itemKey]: !prev[itemKey]
+        }));
+    };
+
+     const handleClick = (item) => {
+        // Si tiene submenú, solo expandir/contraer, no navegar
+        if (item.subMenu) {
+            return; // La navegación se maneja en los items del submenú
+        }
+
         if (item.key === 'logout') {
             if (typeof onLogout === 'function') {
-                onLogout(); // Llamamos directamente a la prop onLogout
+                onLogout();
             } else {
-                // Fallback si no se pasó onLogout (aunque Layout.js siempre la pasa)
                 localStorage.clear();
                 navigate("/login", { replace: true });
             }
@@ -123,7 +129,6 @@ export default function MenuDinamico({
 
         if (!item.path || item.path === '#') return;
 
-        // Mantener el state existente (depId, nombre, slug)
         const stateToSend = {
             ...location.state,
             depId: departamentoId,
@@ -134,54 +139,66 @@ export default function MenuDinamico({
         navigate(item.path, { state: stateToSend });
     };
 
-    return (
-    <ul className={`menu-dinamico-list ${collapsed ? 'collapsed' : ''}`}>
-        {menuItems.map(item => {
-            const IconComponent = item.icon;
+    // 🆕 FUNCIÓN PARA MANEJAR CLICK EN ITEM DE SUBMENÚ
+    const handleSubMenuItemClick = (subItem) => {
+        if (!subItem.path || subItem.path === '#') return;
 
-            // 🔹 Caso normal (sin submenú)
-            if (!item.subMenu) {
-                return (
+        const stateToSend = {
+            ...location.state,
+            depId: departamentoId,
+            nombre: departamentoNombre,
+            depSlug: slug
+        };
+
+        navigate(subItem.path, { state: stateToSend });
+    };
+
+    // 🆕 FUNCIÓN PARA RENDERIZAR ITEMS (PRINCIPALES Y SUBMENÚS)
+    const renderMenuItems = (items, nivel = 0) => {
+        return items.map(item => {
+            const IconComponent = item.icon;
+            const tieneSubMenu = item.subMenu && item.subMenu.length > 0;
+            const estaAbierto = subMenusAbiertos[item.key];
+            
+            return (
+                <React.Fragment key={item.key}>
                     <li 
-                        key={item.key}
-                        className={`menu-item ${activeRoute === item.key ? 'active' : ''}`}
-                        onClick={() => handleClick(item)}
+                        className={`menu-item ${activeRoute === item.key ? 'active' : ''} nivel-${nivel}`} 
+                        onClick={(e) => {
+                            if (tieneSubMenu) {
+                                toggleSubMenu(item.key, e);
+                            } else {
+                                handleClick(item);
+                            }
+                        }}
                     >
                         <IconComponent className="icon" />
-                        {!collapsed && <span className="label">{item.label}</span>}
+                        {!collapsed && (
+                            <>
+                                <span className="label">{item.label}</span>
+                                {tieneSubMenu && (
+                                    <span className="submenu-arrow">
+                                        {estaAbierto ? <FaChevronDown /> : <FaChevronRight />}
+                                    </span>
+                                )}
+                            </>
+                        )}
                     </li>
-                );
-            }
-
-            // 🔹 Caso con submenú
-            return (
-                <li key={item.key} className="menu-item submenu">
-                    <div className="submenu-header">
-                        <IconComponent className="icon" />
-                        {!collapsed && <span className="label">{item.label}</span>}
-                    </div>
-
-                    {!collapsed && (
-                        <ul className="submenu-list">
-                            {item.subMenu.map(sub => {
-                                const SubIcon = sub.icon;
-                                return (
-                                    <li 
-                                        key={sub.key}
-                                        className="submenu-item"
-                                        onClick={() => handleClick(sub)}
-                                    >
-                                        <SubIcon className="icon" />
-                                        <span className="label">{sub.label}</span>
-                                    </li>
-                                );
-                            })}
+                    
+                    {/* 🆕 RENDERIZAR SUBMENÚ SI ESTÁ ABIERTO */}
+                    {tieneSubMenu && estaAbierto && !collapsed && (
+                        <ul className="submenu">
+                            {renderMenuItems(item.subMenu, nivel + 1)}
                         </ul>
                     )}
-                </li>
+                </React.Fragment>
             );
-        })}
-    </ul>
-);
+        });
+    };
 
+    return (
+        <ul className={`menu-dinamico-list ${collapsed ? 'collapsed' : ''}`}>
+            {renderMenuItems(menuItems)}
+        </ul>
+    );
 }

@@ -1,0 +1,505 @@
+/* ======== DISEÑO GENERAL ======== */
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  color: #333;
+  overflow: hidden;
+}
+
+/* ======== FORM TITULO ======== */
+.tdj-form-titulo {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.tdj-form-titulo h1 {
+  font-size: 2rem;
+  color: #861542;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.tdj-form-titulo p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ======== MÉTRICAS ======== */
+.tdj-metrica-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.tdj-metrica-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.tdj-metrica-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.tdj-metrica-icono {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  background-color: rgba(134, 21, 66, 0.1);
+}
+
+.tdj-metrica-content {
+  flex: 1;
+}
+
+.tdj-metrica-numero {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+
+.tdj-metrica-label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.tdj-metrica-subtext {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.tdj-completeda {
+  border-left-color: #28a745;
+}
+
+.tdj-completeda .tdj-metrica-icono {
+  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.tdj-pendiente {
+  border-left-color: #ff0707;
+}
+.tdj-pendiente .tdj-metrica-icono {
+  color: #ff0707;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.tdj-progreso {
+  border-left-color: #ffc107;
+}
+
+.tdj-progreso .tdj-metrica-icono {
+  color: #ffc107;
+  background-color: rgba(23, 162, 184, 0.1);
+}
+
+/* ======== SECCIÓN DE PROYECTOS ======== */
+.tdj-seccion-proyectos {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.tdj-seccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #eee;
+}
+
+.tdj-seccion-header h2 {
+  font-size: 1.5rem;
+  color: #000;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tdj-header-accion {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tdj-proyecto-conteo {
+  background-color: #861542;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ======== GRID DE PROYECTOS MEJORADO ======== */
+.tdj-proyecto-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.tdj-proyecto-card-encabezado {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  border-left: 6px solid #861542;
+}
+
+.tdj-proyecto-card-encabezado:hover {
+  transform: translateY(-5px);
+  border-color: #861542;
+  box-shadow: 0 8px 15px rgba(134, 21, 66, 0.1);
+}
+
+/* Estados de la tarjeta */
+.tdj-proyecto-card-encabezado.completado {
+  border-left-color: #28a745;
+}
+
+.tdj-proyecto-card-encabezado.progreso {
+  border-left-color: #ffc107;
+}
+
+.tdj-proyecto-card-encabezado.pendiente {
+  border-left-color: #dc3545;
+}
+
+/* ======== ENCABEZADO MEJORADO ======== */
+.tdj-proyecto-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tdj-proyecto-titulo-seccion {
+  flex: 1;
+}
+
+.tdj-proyecto-titulo {
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.tdj-proyecto-descripcion {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.tdj-proyecto-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.tdj-total-tareas {
+  background-color: #f0f2f5;
+  color: #666;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tdj-prioridad-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.tdj-prioridad-badge.alta {
+  background: #ffe6e6;
+  color: #dc3545;
+}
+
+/* ======== GRÁFICA ======== */
+.tdj-proyecto-body {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tdj-seccion-graficos {
+  flex-shrink: 0;
+}
+
+.tdj-detalles-metricas{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.tdj-metrica-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  justify-content: space-between;
+}
+
+.tdj-metrica-item span {
+  flex: 1;
+  color: #666;
+}
+
+.tdj-metrica-item strong {
+  color: #000;
+  font-weight: 700;
+}
+
+.tdj-metrica-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tdj-metrica-dot.completeda { background: #28a745; }
+.tdj-metrica-dot.progreso { background: #ffc107; }
+.tdj-metrica-dot.pendiente { background: #dc3545; }
+
+/* ======== GRÁFICA CIRCULAR ======== */
+.tdj-grafica-circular {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6; /* color de fondo por defecto */
+  overflow: hidden;
+}
+
+.tdj-grafica-circular::before {
+  content: '';
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: #fff; 
+  z-index: 1;
+}
+
+.tdj-circular-center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #111827;
+}
+
+.tdj-grafica-circular.tdj-sin-tareas {
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+}
+
+.tdj-grafica-circular.tdj-sin-tareas .tdj-circular-center {
+  color: #6c757d;
+}
+
+
+
+/* ======== INFORMACIÓN ADICIONAL ======== */
+.tdj-proyecto-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+}
+
+.tdj-dias {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.tdj-dias-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+}
+
+.tdj-dias-item strong {
+  color: #000;
+  margin-left: 0.2rem;
+}
+
+.tdj-tiempo-restante {
+  background: #f8f9fa;
+  padding: 0.5rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #861542;
+  border: 1px solid #e9ecef;
+}
+
+/* ======== PIE DEL PROYECTO ======== */
+.tdj-proyecto-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.tdj-btn-primary {
+  background-color: #861542;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(134, 21, 66, 0.2);
+}
+
+.tdj-btn-primary:hover {
+  background-color: #6a1035;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(134, 21, 66, 0.3);
+}
+
+.tdj-btn-icon {
+  font-size: 0.9rem;
+}
+
+/* ======== ESTADO VACÍO ======== */
+.tdj-estado-vacio{
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+}
+
+.tdj-sin-icono {
+  color: #861542;
+  opacity: 0.3;
+  margin-bottom: 1.5rem;
+}
+
+.tdj-estado-vacio h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.tdj-estado-vacio p {
+  color: #777;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  .tdj-dashboard-content {
+    padding: 1rem;
+  }
+  
+  .tdj-metrica-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tdj-proyecto-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tdj-seccion-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+  
+  .header-global {
+    padding: 0.8rem 1rem;
+  }
+  
+  .tdj-form-titulo h1 {
+    font-size: 1.6rem;
+  }
+  
+  .tdj-proyecto-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .tdj-proyecto-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .tdj-proyecto-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .tdj-proyecto-meta {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

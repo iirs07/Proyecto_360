@@ -13,12 +13,17 @@ import DepProProceso from "./DepProProceso";
 import TareasProgreso from './TareasProgreso';
 import DepProCompletados from './DepProCompletados';
 import ReporteSuperUsuario from './ReporteSuperUsuario';
-{/*USUARIO*/}
-
+{/*JEFE*/}
 import GestionProyectosUsuario from "./GestionProyectosUsuario";
 import ListaDeProyectos from './ListaDeProyectos';
 import TareasAsignadas from './TareasAsignadas';
 import ReportesTareasCompletadas from "./ReportesTareasCompletadas";
+{/*DIRECTOR*/}
+import GestionProyectos from "./GestionProyectos";
+import NuevoProyecto from './NuevoProyecto';
+import AgregarTareas from './AgregarTareas';
+import VerProyecto from "./VerProyecto";
+
 
 
 
@@ -59,6 +64,12 @@ function App() {
           <Route path="/ListaDeProyectos" element={<ListaDeProyectos />} />
           <Route path="/TareasAsignadas" element={<TareasAsignadas />} />
           <Route path="/ReportesTareasCompletadas" element={<ReportesTareasCompletadas />} />
+          {/*DIRECTOR*/}
+           <Route path="/GestionProyectos" element={<GestionProyectos />} />
+           <Route path="/NuevoProyecto" element={<NuevoProyecto />} />
+           <Route path="/AgregarTareas" element={<AgregarTareas />} />
+          <Route path="/VerProyecto" element={<VerProyecto />} />
+
 
 
 

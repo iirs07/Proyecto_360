@@ -12,6 +12,8 @@ use App\Http\Controllers\TareasController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\JefeController;
+use App\Http\Controllers\NuevoProyectoController;
+use App\Http\Controllers\DirectorController;
 
 
 /* 1. Rutas Públicas (Contenido sin necesidad de autenticación) */
@@ -40,5 +42,13 @@ Route::get('tareas/{idProyecto}/usuario/{idUsuario}', [JefeController::class, 'o
 Route::post('/evidencias', [JefeController::class, 'subirEvidencia']);
 Route::get('/usuario/tareas', [JefeController::class, 'tareasPorUsuario']);
 Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarReporteCompletadas']);
+//DIRECTOR
+Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
+Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
+Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
+Route::get('/CatalogoDepartamentos', [NuevoProyectoController::class, 'CatalogoDepartamentos']);
+Route::get('/departamentos/{id}/usuarios', [NuevoProyectoController::class, 'usuariosPorDepartamento']);
+Route::post('/AgregarTareas', [NuevoProyectoController::class, 'store']);
+Route::get('/proyectos/usuario', [DirectorController::class, 'proyectosDepartamento']);
 
 });

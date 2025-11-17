@@ -240,18 +240,21 @@ function GestionProyectosUsuario() {
               </div>
             </div>
           </div>
-           <div className="barra-busqueda-global-container mb-4">
-            <div className="barra-busqueda-global-wrapper">
-              <FaSearch className="barra-busqueda-global-icon" />
-              <input
-                type="text"
-                placeholder="Buscar proyectos..."
-                className="barra-busqueda-global-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+           {proyectos.length > 0 && (
+  <div className="barra-busqueda-global-container mb-4">
+    <div className="barra-busqueda-global-wrapper">
+      <FaSearch className="barra-busqueda-global-icon" />
+      <input
+        type="text"
+        placeholder="Buscar proyectos..."
+        className="barra-busqueda-global-input"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
+  </div>
+)}
+
 
           {/* === Lista de proyectos  === */}
           <div className="tdu-mis-proyectos">
