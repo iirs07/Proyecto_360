@@ -201,6 +201,7 @@ try {
     method: "POST",
     headers,
     body: JSON.stringify(nuevaTarea),
+    
   });
 
   if (res.status === 401) {
@@ -212,8 +213,12 @@ try {
 
   const data = await res.json();
   if (data.success) {
-    console.log("Tarea creada", data.tarea);
-  } else {
+  console.log("Tarea creada", data.tarea);
+  setTareaGuardada(true);
+  setIdTareaRecienCreada(data.tarea.id_tarea);
+  limpiarCampos(true); // limpia todo menos el flag de tareaGuardada
+}
+ else {
     console.error("Error al crear la tarea", data.message);
   }
 } catch (err) {
@@ -224,16 +229,22 @@ try {
 
   };
 
-  const handleCancelar = () => {
-    nombreTareaRef.current.value = "";
-    descripcionTareaRef.current.value = "";
-    setFechaInicio(null);
-    setFechaFin(null);
-    setUsuarioSeleccionado("");
-    setErrores({});
-    setTareaGuardada(false);
-    setIdTareaRecienCreada(null);
-  };
+const limpiarCampos = (mantenerTareaGuardada = false) => {
+  nombreTareaRef.current.value = "";
+  descripcionTareaRef.current.value = "";
+  setFechaInicio(null);
+  setFechaFin(null);
+  setUsuarioSeleccionado("");
+  setErrores({});
+  if (!mantenerTareaGuardada) setTareaGuardada(false);
+  setIdTareaRecienCreada(null);
+};
+
+
+// === Cancelar ===
+const handleCancelar = () => {
+  limpiarCampos();
+};
 
   const handleInputChange = campo => setErrores(prev => ({ ...prev, [campo]: null }));
 
@@ -345,7 +356,8 @@ try {
             </div>
 
             <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
-              <button type="button" className="btn-agregartareas cancelar w-100 w-md-auto" onClick={handleCancelar} disabled={loading}>
+              <button type="button" className="btn-agregartareas cancelar w-100 w-md-auto" 
+              onClick={handleCancelar} disabled={loading}>
                 Cancelar
               </button>
               <button type="button" className="btn-agregartareas guardar w-100 w-md-auto" onClick={handleGuardar} disabled={loading}>
@@ -354,19 +366,19 @@ try {
               </button>
             </div>
 
-            {tareaGuardada && (
-              <div className="mt-3 d-flex justify-content-center">
-                <button
-                  type="button"
-                  className="btn-form"
-                  style={{ width: "100%", maxWidth: "300px" }}
-                  onClick={() => navigate("/Vertareasusuario", { state: { id_proyecto } })}
-                >
-                  <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
-                  Ver Tareas
-                </button>
-              </div>
-            )}
+            {tareaGuardada && !loading && (
+  <div className="mt-3 d-flex justify-content-center">
+    <button
+      type="button"
+      className="agregartareas-btn-vt"
+      onClick={() => navigate("/Vertareasusuario", { state: { id_proyecto } })}
+    >
+      <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
+      Ver Tareas
+    </button>
+  </div>
+)}
+
           </div>
         </div>
       </div>

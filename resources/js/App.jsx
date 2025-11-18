@@ -23,8 +23,11 @@ import GestionProyectos from "./GestionProyectos";
 import NuevoProyecto from './NuevoProyecto';
 import AgregarTareas from './AgregarTareas';
 import VerProyecto from "./VerProyecto";
-
-
+import VerTareasusuario from './Vertareasusuario';
+import ModificarProyecto from './ModificarProyecto';
+import ProyectosListaModificar from './ProyectosListaModificar';
+import DesbloquearProyectos from "./DesbloquearProyectos";
+import EliminarProyectos from "./EliminarProyectos";
 
 
 function App() {
@@ -69,6 +72,12 @@ function App() {
            <Route path="/NuevoProyecto" element={<NuevoProyecto />} />
            <Route path="/AgregarTareas" element={<AgregarTareas />} />
           <Route path="/VerProyecto" element={<VerProyecto />} />
+          <Route path="/Vertareasusuario" element={<VerTareasusuario />} />
+          <Route path="/ModificarProyecto" element={<ModificarProyecto />} />
+          <Route path="/ProyectosListaModificar" element={<ProyectosListaModificar />} />
+           <Route path="/DesbloquearProyectos" element={<DesbloquearProyectos />} />
+            <Route path="/EliminarProyectos" element={<EliminarProyectos />} />
+          
 
 
 

@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 
 class Usuario extends Authenticatable implements JWTSubject
 {
+    use Notifiable; 
     protected $table = 'usuario';
     protected $primaryKey = 'id_usuario'; 
     public $timestamps = true;
@@ -36,7 +38,7 @@ class Usuario extends Authenticatable implements JWTSubject
         return $this->hasOne(CUsuario::class, 'id_usuario', 'id_usuario_login');
     }
 
-    // Para notificaciones por mail usar el campo 'correo'
+     // Para notificaciones por mail usar el campo 'correo'
     public function routeNotificationForMail($notification)
     {
         return $this->correo;
