@@ -92,61 +92,82 @@ function GestionProyectos() {
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
   useEffect(() => {
-    // Leer usuario y guardarlo en estado para usar en el JSX
-    const user = JSON.parse(localStorage.getItem("usuario"));
-    setUsuario(user || null);
+  const user = JSON.parse(localStorage.getItem("usuario"));
+  setUsuario(user || null);
 
-    if (!user?.id_usuario) {
-      // Si no hay usuario, no hay datos que pedir; quitar loader
-      setLoading(false);
-      return;
-    }
+  if (!user?.id_usuario) {
+    setLoading(false);
+    return;
+  }
 
-    const obtenerDatos = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`http://127.0.0.1:8000/api/dashboard-departamento?usuario=${user.id_usuario}`);
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+  const obtenerDatos = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("jwt_token");
+
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/dashboard-departamento?usuario=${user.id_usuario}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
         }
-        const data = await res.json();
+      );
 
-        if (data) {
-          const completadas = (data.tareas || []).filter(t => (t.t_estatus || "").toLowerCase() === 'finalizada');
-          const pendientes = (data.tareas || []).filter(t => (t.t_estatus || "").toLowerCase() === 'pendiente');
-          const enProceso = (data.tareas || []).filter(t => (t.t_estatus || "").toLowerCase() === 'en proceso');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
-          setTareasCompletadas(completadas);
-          setTareasPendientes(pendientes);
-          setTareasEnProceso(enProceso);
+      if (data) {
+        const completadas = (data.tareas || []).filter(
+          (t) => (t.t_estatus || "").toLowerCase() === "finalizada"
+        );
+        const pendientes = (data.tareas || []).filter(
+          (t) => (t.t_estatus || "").toLowerCase() === "pendiente"
+        );
+        const enProceso = (data.tareas || []).filter(
+          (t) => (t.t_estatus || "").toLowerCase() === "en proceso"
+        );
 
-          const proyectosConMetricas = (data.proyectos || []).map(proyecto => {
-            const tareasDelProyecto = (data.tareas || []).filter(t => t.id_proyecto === proyecto.id_proyecto);
-            const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
+        setTareasCompletadas(completadas);
+        setTareasPendientes(pendientes);
+        setTareasEnProceso(enProceso);
 
-            return {
-              ...proyecto,
-              tareas_completadas: tareasDelProyecto.filter(t => (t.t_estatus || "").toLowerCase() === 'finalizada').length,
-              tareas_pendientes: tareasDelProyecto.filter(t => (t.t_estatus || "").toLowerCase() === 'pendiente').length,
-              tareas_en_progreso: tareasDelProyecto.filter(t => (t.t_estatus || "").toLowerCase() === 'en proceso').length,
-              total_tareas: tareasDelProyecto.length,
-              dias_restantes: diasRestantes,
-              prioridad: diasRestantes !== null && diasRestantes < 7 ? 'alta' : 'normal'
-            };
-          });
+        const proyectosConMetricas = (data.proyectos || []).map((proyecto) => {
+          const tareasDelProyecto = (data.tareas || []).filter(
+            (t) => t.id_proyecto === proyecto.id_proyecto
+          );
+          const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
 
-          setProyectos(proyectosConMetricas);
-        }
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-      } finally {
-        setLoading(false);
+          return {
+            ...proyecto,
+            tareas_completadas: tareasDelProyecto.filter(
+              (t) => (t.t_estatus || "").toLowerCase() === "finalizada"
+            ).length,
+            tareas_pendientes: tareasDelProyecto.filter(
+              (t) => (t.t_estatus || "").toLowerCase() === "pendiente"
+            ).length,
+            tareas_en_progreso: tareasDelProyecto.filter(
+              (t) => (t.t_estatus || "").toLowerCase() === "en proceso"
+            ).length,
+            total_tareas: tareasDelProyecto.length,
+            dias_restantes: diasRestantes,
+            prioridad:
+              diasRestantes !== null && diasRestantes < 7 ? "alta" : "normal",
+          };
+        });
+
+        setProyectos(proyectosConMetricas);
       }
-    };
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    obtenerDatos();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // <-- no dependencias; se ejecuta una vez al montar
+  obtenerDatos();
+}, []);
 
   const filteredProyectos = proyectos.filter(proyecto =>
     (proyecto.p_nombre || "").toLowerCase().includes(searchTerm.toLowerCase())

@@ -319,5 +319,54 @@ public function ProyectosSinTareas(Request $request)
         ], 500);
     }
 }
+ // Cambiar estatus de un proyecto a Finalizado
+    public function CambiarStatusProyecto($id)
+    {
+        $proyecto = Proyecto::find($id);
+
+        if (!$proyecto) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Proyecto no encontrado'
+            ], 404);
+        }
+
+        $proyecto->p_estatus = "Finalizado";
+        $proyecto->save();
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => 'Proyecto marcado como finalizado',
+            'proyecto' => $proyecto
+        ]);
+    }
+    //CAMBIAR ESTATUS DE PROYECTO
+public function completar($idProyecto)
+{
+    try {
+        $proyecto = Proyecto::find($idProyecto);
+
+        if (!$proyecto) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Proyecto no encontrado'
+            ], 404);
+        }
+
+        $proyecto->p_estatus = 'Completado';
+        $proyecto->save();
+
+        return response()->json([
+            'success' => true,
+            'proyecto' => $proyecto
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 }

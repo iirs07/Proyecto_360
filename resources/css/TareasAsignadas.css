@@ -434,6 +434,20 @@
   flex-wrap: wrap;
   
 }
+/* Bloquear botones cuando están disabled */
+.tu-modal-preview button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none; 
+  filter: grayscale(40%);
+}
+
+/* Quitar hover */
+.tu-modal-preview button:disabled:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+  transform: none !important;
+}
 
 .tu-btn-cancelar, .tu-btn-subir {
   width: 140px;            

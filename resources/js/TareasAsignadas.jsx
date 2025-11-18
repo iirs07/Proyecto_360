@@ -281,31 +281,67 @@ function TareasAsignadas() {
           </div>
         </div>
 
-        {archivoSeleccionado && tareaSeleccionada && (
-          <div className="tu-modal-preview">
-            <div className="tu-modal-content-preview">
-              <div className="tu-modal-header">
-                <h2>Evidencia de: {tareaSeleccionada.t_nombre}</h2> 
-                <button className="tu-modal-close" onClick={handleCancelar}>&times;</button>
-              </div>
-              <div className="tu-modal-body">
-                <img src={archivoSeleccionado.url} alt={`Evidencia de ${tareaSeleccionada.t_nombre}`} />
-              </div>
-              <div className="tu-modal-description">{archivoSeleccionado.file.name} - Vista previa del archivo seleccionado.</div>
-              <div className="tu-modal-footer">
-                <button className="tu-btn-cancelar" onClick={handleCancelar}>Cancelar</button>
-                <button className="tu-btn-subir" onClick={handleUpload} disabled={subiendo}>
-                  {subiendo ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Subiendo...
-                    </>
-                  ) : "Subir"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+       {archivoSeleccionado && tareaSeleccionada && (
+  <div className="tu-modal-preview">
+    <div className="tu-modal-content-preview">
+      <div className="tu-modal-header">
+        <h2>Evidencia de: {tareaSeleccionada.t_nombre}</h2> 
+
+        {/* BOTÓN CERRAR (X) BLOQUEADO DURANTE SUBIDA */}
+        <button 
+          className="tu-modal-close" 
+          onClick={!subiendo ? handleCancelar : undefined}
+          disabled={subiendo}
+        >
+          &times;
+        </button>
+      </div>
+
+      <div className="tu-modal-body">
+        <img 
+          src={archivoSeleccionado.url} 
+          alt={`Evidencia de ${tareaSeleccionada.t_nombre}`} 
+        />
+      </div>
+
+      <div className="tu-modal-description">
+        {archivoSeleccionado.file.name} - Vista previa del archivo seleccionado.
+      </div>
+
+      <div className="tu-modal-footer">
+
+        {/* BOTÓN CANCELAR BLOQUEADO DURANTE SUBIDA */}
+        <button 
+          className="tu-btn-cancelar" 
+          onClick={!subiendo ? handleCancelar : undefined}
+          disabled={subiendo}
+        >
+          Cancelar
+        </button>
+
+        {/* BOTÓN SUBIR */}
+        <button 
+          className="tu-btn-subir" 
+          onClick={handleUpload} 
+          disabled={subiendo}
+        >
+          {subiendo ? (
+            <>
+              <span 
+                className="spinner-border spinner-border-sm me-2" 
+                role="status" 
+                aria-hidden="true"
+              ></span>
+              Subiendo...
+            </>
+          ) : "Subir"}
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
+
     </Layout>  
   );
 }

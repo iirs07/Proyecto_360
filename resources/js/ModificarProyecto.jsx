@@ -35,8 +35,8 @@ const ModalConfirmacion = ({ mostrar, onConfirm, onCancel, titulo, mensaje, tipo
 
 // Estado guardado
 const EstadoGuardado = ({ tipo }) => (
-  <div className="estado-guardado-wrapper mb-3">
-    <div className={`estado-guardado ${tipo === 'guardado' ? 'guardado' : 'no-guardado'}`}>
+  <div className="mp-estado-guardado-wrapper mb-3">
+    <div className={`mp-estado-guardado ${tipo === 'guardado' ? 'guardado' : 'no-guardado'}`}>
       <span className="indicador"></span>
       {tipo === 'guardado' ? 'Todos los cambios guardados' : 'Cambios sin guardar'}
     </div>
@@ -327,7 +327,7 @@ function ModificarProyecto() {
                       <textarea
                         id="nombreProyecto"
                         ref={nombreProyectoRef}
-                        className="form-control nv-form-input"
+                        className="mp-form-control nv-form-input"
                         placeholder="Escribe el nombre del proyecto"
                         rows={1}
                         onInput={() => { ajustarAltura(nombreProyectoRef); handleInputChange("nombre"); }}
@@ -340,7 +340,7 @@ function ModificarProyecto() {
               <textarea
                 id="descripcionProyecto"
                 ref={descripcionProyectoRef}
-                className="form-control nv-form-input"
+                className="mp-form-control nv-form-input"
                 placeholder="Escribe la descripción del proyecto"
                 rows={3}
                 onInput={() => { ajustarAltura(descripcionProyectoRef); handleInputChange("descripcion"); }}
