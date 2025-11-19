@@ -34,6 +34,7 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   border-left: 4px solid #861542;
+  z-index: 3;
 }
 
 /* Nombre del proyecto */
@@ -167,13 +168,18 @@
 }
 
 .dp-tarea-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f7fafc;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    /* Esto es crucial para centrar verticalmente todos los elementos hijos (texto, checkbox, botón) */
+    align-items: center; 
+    background-color: #f7fafc;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease-in-out;
 }
 
 .dp-btn-evidencias {
@@ -314,31 +320,45 @@
 /* ==============================
    Checkbox de las tareas
 ============================== */
-.dp-tarea-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f7fafc;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  font-weight: 600;
-  text-transform: uppercase; /* Nombre de tarea en mayúsculas */
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease-in-out;
+/* ==============================
+    Checkbox de las tareas (AJUSTE FINO)
+============================== */
+.dp-tarea-item input[type="checkbox"] {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #861542;
+    border-radius: 6px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    margin-left: 12px;
+    /* --- CAMBIOS CLAVE --- */
+    /* Asegura que no sea un elemento en línea que se vea afectado por la línea base del texto */
+    display: inline-block; 
+    /* Reinicia cualquier margen vertical que pudiera existir */
+    margin-top: 0;
+    margin-bottom: 0;
+    /* Ajuste final para centrarlo verticalmente si está ligeramente desfasado. 
+       -1px o -2px suelen funcionar. */
+    transform: translateY(-1px); 
 }
 
-.dp-tarea-item input[type="checkbox"] {
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border: 2px solid #861542;
-  border-radius: 6px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background-color: #fff;
-  margin-left: 12px;
+/* Ajuste del tick interno */
+.dp-tarea-item input[type="checkbox"]:checked::after {
+    content: '✔';
+    position: absolute;
+    /* Lo centramos mejor dentro del cuadrado. 
+       Ajusta el 'top' si el símbolo sigue sin estar en el medio. */
+    top: 0px; 
+    left: 4px;
+    font-size: 14px;
+    color: #fff;
+}
+.dp-tarea-item input[type="checkbox"]:checked {
+    background-color: #861542;
+    border-color: #861542;
 }
 
 .dp-tarea-item input[type="checkbox"]:checked {
@@ -346,19 +366,9 @@
   border-color: #861542;
 }
 
-.dp-tarea-item input[type="checkbox"]:checked::after {
-  content: '✔';
-  position: absolute;
-  top: 0;
-  left: 4px;
-  font-size: 14px;
-  color: #fff;
-}
-
 .dp-tarea-item input[type="checkbox"]:hover {
-  border-color: #ff4d6d;
+    border-color: #ff4d6d;
 }
-
 /* Botón de evidencias */
 .dp-btn-evidencias {
   background: linear-gradient(135deg, #861542, #ff4d6d);

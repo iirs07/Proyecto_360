@@ -28,16 +28,36 @@ function DesbloquearProyectos() {
     if (!usuario?.id_usuario) return;
 
     const obtenerProyectosCompletados = async () => {
-      try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`);
-        const data = await res.json();
-        if (data.success) setProyectos(data.proyectos);
-      } catch (error) {
-        console.error("Error al obtener proyectos:", error);
-      } finally {
-        setLoading(false);
+  const token = localStorage.getItem("jwt_token");
+
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // Aquí agregamos el token
+        },
       }
-    };
+    );
+
+    if (res.status === 401) { // Token inválido o expirado
+      localStorage.removeItem("jwt_token");
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    const data = await res.json();
+    if (data.success) setProyectos(data.proyectos);
+  } catch (error) {
+    console.error("Error al obtener proyectos:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+obtenerProyectosCompletados();
 
     obtenerProyectosCompletados();
   }, []);
@@ -46,28 +66,42 @@ function DesbloquearProyectos() {
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const handleDesbloquearProyecto = async (idProyecto) => {
-    if (proyectosDesbloqueados.includes(idProyecto)) {
-      setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
-    } else {
-      try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
-          method: 'PUT',
-        });
-        const data = await res.json();
-        if (data.success) {
-          setProyectosDesbloqueados(prev => [...prev, idProyecto]);
-          setProyectos(prev =>
-            prev.map(p =>
-              p.id_proyecto === idProyecto ? { ...p, p_estatus: "En proceso" } : p
-            )
-          );
-        }
-      } catch (error) {
-        console.error("Error al desbloquear proyecto:", error);
+ const handleDesbloquearProyecto = async (idProyecto) => {
+  const token = localStorage.getItem("jwt_token");
+
+  if (proyectosDesbloqueados.includes(idProyecto)) {
+    setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
+  } else {
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // Aquí agregamos el token
+        },
+      });
+
+      if (res.status === 401) { // Si el token no es válido
+        localStorage.removeItem("jwt_token");
+        navigate("/Login", { replace: true });
+        return;
       }
+
+      const data = await res.json();
+      if (data.success) {
+        setProyectosDesbloqueados(prev => [...prev, idProyecto]);
+        setProyectos(prev =>
+          prev.map(p =>
+            p.id_proyecto === idProyecto ? { ...p, p_estatus: "En proceso" } : p
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error al desbloquear proyecto:", error);
     }
-  };
+  }
+};
+
 
   const handleCompletarTarea = async (id, idProyecto) => {
     try {

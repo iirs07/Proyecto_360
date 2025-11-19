@@ -41,6 +41,8 @@ function NuevoProyecto() {
   const [fechaFin, setFechaFin] = useState(null);
   const [errores, setErrores] = useState({});
   const [loading, setLoading] = useState(false); 
+  const [camposModificados, setCamposModificados] = useState({});
+
 
   const usuario = JSON.parse(localStorage.getItem("usuario"));
   const id_usuario = usuario?.id_usuario;
@@ -70,9 +72,13 @@ function NuevoProyecto() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+ 
+
   const handleInputChange = (campo) => {
-    setErrores((prev) => ({ ...prev, [campo]: null }));
-  };
+  setErrores((prev) => ({ ...prev, [campo]: null }));
+  setCamposModificados((prev) => ({ ...prev, [campo]: true }));
+};
+
 
   const handleNuevaTarea = () => console.log("Nueva Tarea");
 
@@ -173,6 +179,20 @@ function NuevoProyecto() {
         setLoading(false); 
     }
 };
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (Object.keys(camposModificados).length > 0) {
+      e.preventDefault();
+      e.returnValue = ""; // Necesario para mostrar el diálogo
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [camposModificados]);
 
 
   return (
@@ -212,7 +232,7 @@ function NuevoProyecto() {
             </div>
 
            <div className="row mb-3 g-0"> 
-  <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-0 pe-2"> {/* ps-0 pe-2 */}
+  <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-0 pe-2"> 
     <label className="nv-form-label fw-bold mb-1">Fecha de inicio</label>
     <DatePicker
       selected={fechaInicio}

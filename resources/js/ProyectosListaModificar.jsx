@@ -7,6 +7,8 @@ import { FaAngleDown, FaSearch, FaProjectDiagram } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import SelectDinamico from "../components/SelectDinamico";
+
 
 function ProyectosListaModificar() {
   const [busqueda, setBusqueda] = useState("");
@@ -126,37 +128,18 @@ function ProyectosListaModificar() {
               </div>
             </div>
 
-            {mostrarSelect && (
-              <div className="modificar-proyectos-custom-select-container-inline">
-                <div
-                  className="modificar-proyectos-custom-select"
-                  onClick={() => setOpen(!open)}
-                >
-                  {opciones.find((o) => o.value === filtro)?.label}
-                  <FaAngleDown className={`dropdown-icon ${open ? "open" : ""}`} />
-                </div>
+          {mostrarSelect && (
+  <SelectDinamico
+    opciones={opciones.map(o => o.label)} // pasamos solo los labels como opciones
+    valor={opciones.find(o => o.value === filtro)?.label} // valor seleccionado
+    setValor={(labelSeleccionado) => {
+      const opcion = opciones.find(o => o.label === labelSeleccionado);
+      if (opcion) setFiltro(opcion.value);
+    }}
+    placeholder="Selecciona un filtro"
+  />
+)}
 
-                {open && (
-                  <div
-                    className={`modificar-proyectos-custom-options-inline ${
-                      open ? "open" : ""
-                    }`}
-                  >
-                    {opciones.map((o) => (
-                      <div
-                        key={o.value}
-                        onClick={() => {
-                          setFiltro(o.value);
-                          setOpen(false);
-                        }}
-                      >
-                        {o.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
           </>
         )}
 

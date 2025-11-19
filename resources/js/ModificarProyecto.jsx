@@ -15,26 +15,10 @@ import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
 import ConfirmModal from "../components/ConfirmModal"; 
 
+
 registerLocale("es", es);
 
-// Modal de confirmación
-const ModalConfirmacion = ({ mostrar, onConfirm, onCancel, titulo, mensaje, tipo = "peligro" }) => (
-  mostrar && (
-    <div className="modal-overlay">
-      <div className="modal-confirmacion">
-        <div className="modal-header">
-          <FaExclamationTriangle className={`modal-icon ${tipo}`} />
-          <h5 className="modal-titulo">{titulo}</h5>
-        </div>
-        <p className="modal-mensaje">{mensaje}</p>
-        <div className="modal-botones">
-          <button className="btn btn-secondary" onClick={onCancel}>Cancelar</button>
-          <button className={`btn ${tipo === 'peligro' ? 'btn-danger' : 'btn-primary'}`} onClick={onConfirm}>Confirmar</button>
-        </div>
-      </div>
-    </div>
-  )
-);
+
 
 // Estado guardado
 const EstadoGuardado = ({ tipo }) => (
@@ -105,8 +89,10 @@ function ModificarProyecto() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const [mostrarConfirmarModificar, setMostrarConfirmarModificar] = useState(false);
-  const [loadingProyecto, setLoadingProyecto] = useState(false); // Para cargar datos
-const [loadingModificar, setLoadingModificar] = useState(false); // Para guardar cambios
+  const [loadingProyecto, setLoadingProyecto] = useState(false); 
+const [loadingModificar, setLoadingModificar] = useState(false);
+
+ 
 
 
 
@@ -282,6 +268,24 @@ const [loadingModificar, setLoadingModificar] = useState(false); // Para guardar
     setLoadingModificar(false);
   }
 };
+// CAMBIOS SIN GUARDARRRRR
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (Object.keys(camposModificados).length > 0) {
+      e.preventDefault();
+      e.returnValue = ""; // Necesario para mostrar el diálogo
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [camposModificados]);
+
+
+
 
   const handleCancelar = () => {
   console.log("Cancelar presionado, cambios:", camposModificados);
@@ -418,7 +422,7 @@ const [loadingModificar, setLoadingModificar] = useState(false); // Para guardar
         </div>
 
         <ConfirmModal
-  isOpen={mostrarConfirmacion}  // ✅ Cambiado de 'mostrar' a 'isOpen'
+  isOpen={mostrarConfirmacion}  
   onConfirm={confirmarCancelar}
   onCancel={cancelarCancelar}
   title="¿Descartar cambios?"
@@ -426,7 +430,8 @@ const [loadingModificar, setLoadingModificar] = useState(false); // Para guardar
 />
 
       </div>
-       
+      
+
         </div>
        
        </Layout>

@@ -146,7 +146,7 @@
 }
 
 .modificar-proyectos-custom-select {
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1px solid #ccc;
   padding: 10px 15px;
   text-align: left;
@@ -172,23 +172,27 @@
 }
 
 .modificar-proyectos-custom-options-inline {
-  border-radius: 10px;
+  border-radius: 5px;
   margin-top: 6px;
   background: #fff;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.3s ease;
   z-index: 10px;
+  border: 1px solid #ccc;
 }
 
 .modificar-proyectos-custom-options-inline.open {
   max-height: 300px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 .modificar-proyectos-custom-options-inline div {
   padding: 12px 15px;
+  border: 1px solid #ccc;
   cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
+
 }
 
 .modificar-proyectos-custom-options-inline div:last-child {

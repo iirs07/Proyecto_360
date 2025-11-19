@@ -205,4 +205,80 @@ public function cambiarStatusTareaEnProceso($idTarea)
         ], 500);
     }
 }
+public function completarTarea($id)
+    {
+        try {
+            \Log::info('Solicitud recibida para completar tarea:', ['id' => $id]);
+            
+            // Buscar la tarea
+            $tarea = Tarea::find($id);
+            
+            if (!$tarea) {
+                \Log::warning('Tarea no encontrada:', ['id' => $id]);
+                return response()->json(['success' => false, 'mensaje' => 'Tarea no encontrada'], 404);
+            }
+
+            \Log::info('Tarea encontrada:', ['tarea' => $tarea]);
+
+            // Actualizar el estado
+            $tarea->update([
+                't_estatus' => 'Finalizada',
+                'tf_completada' => now()
+            ]);
+
+            \Log::info('Tarea actualizada exitosamente');
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Tarea marcada como Finalizada',
+                'tarea' => $tarea
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en completarTarea:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function obtenerProyectosCompletados(Request $request)
+{
+    try {
+        $usuarioId = $request->query('usuario_id'); 
+        $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
+
+        if (!$usuario) {
+            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
+        }
+
+        $idDepartamento = $usuario->id_departamento;
+
+        $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
+            ->where('p_estatus', 'ILIKE', 'Finalizado') 
+            ->whereHas('tareas', function($q) {
+                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['finalizada']);
+            })
+            ->with(['tareas' => function($q) {
+                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['finalizada'])
+                  ->with('evidencias');
+            }])
+            ->get()
+            ->map(function($proyecto) {
+                $proyecto->total_tareas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)->count();
+                $proyecto->tareas_completadas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)
+                    ->whereHas('evidencias')
+                    ->count();
+                return $proyecto;
+            });
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectos
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+}
 }

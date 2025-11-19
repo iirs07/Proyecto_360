@@ -114,8 +114,7 @@ const tareasFiltradas = proyecto?.tareas
   try {
     setCargando(true);
 
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/proyectos/${proyecto.id_proyecto}/finalizar`,
+     const response = await fetch(`http://127.0.0.1:8000/api/tareas/${idTarea}/completar`, 
       {
         method: 'PUT',
         headers: { 
