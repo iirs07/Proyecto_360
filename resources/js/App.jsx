@@ -8,7 +8,7 @@ import RegistroPaso2 from './RegistroPaso2';
 import GenerarInvitacion from './GenerarInvitacion';
 import RegistroPaso1 from './RegistroPaso1';
 // Componentes Protegidos
-import Principal from './Principal';
+import PrincipalSuperusuario from './PrincipalSuperusuario';
 import DepProProceso from "./DepProProceso";
 import TareasProgreso from './TareasProgreso';
 import DepProCompletados from './DepProCompletados';
@@ -51,7 +51,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           
           {/* Dashboard y Reportes */}
-          <Route path="/Principal" element={<Principal />} />
+          <Route path="/PrincipalSuperusuario" element={<PrincipalSuperusuario />} />
           <Route path="/ReporteSuperUsuario" element={<ReporteSuperUsuario />} />
 
           {/* Vistas de Proyectos y Tareas */}
