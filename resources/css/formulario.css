@@ -104,74 +104,119 @@
   position: relative;
   z-index: 10;
 }
-/*======== SELECT DINAMICO ========*/
+/*======== SELECT DINÁMICO ESTILO NATIVO FINAL - SIN ARTEFACTOS (VERSIÓN 3) ========*/
 .select-global-container-inline {
-  position: relative;
-  width: 100%;        
-  max-width: 250px;   
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-   z-index: 3;
-  position: relative;
-}
-.select-global-options-inline {
-  top: 100%;           
-  left: 0;
   width: 100%;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  margin-top: 0.25rem;
-  z-index: 10;
-  overflow: hidden;   
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  max-width: 250px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: #444;
+  position: relative;
+  z-index: 1;
 }
+
+/* Botón principal */
 .select-global-custom {
   cursor: pointer;
-  padding: 0.35rem 0.75rem;      
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  font-size: 0.875rem;            
-  font-weight: 500;
+  padding: 6px 32px 6px 8px;
+  border: 1px solid #ccc; 
+  outline: none;
+  border-radius: 4px;
+  background-color: #fff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  transition: border 0.2s, box-shadow 0.2s;
-  z-index: 3;
+  justify-content: flex-start;
+  font-weight: 400;
+  line-height: 1.4;
   position: relative;
+  user-select: none;
+  box-shadow: none; /* Asegura la eliminación de sombras/líneas */
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+
 .select-global-custom:hover {
-  border-color: #888;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-color: #a0a0a0;
+  outline: none;
 }
 
-.select-global-container-inline .dropdown {
-  position: absolute; 
-  top: 100%;         
-  left: 0;
-  width: 100%;
-  z-index: 10;       
+.select-global-custom:focus {
+  outline: none;
+  border-color: #861542; 
+  box-shadow: 0 0 0 3px rgba(136, 24, 24, 0.342);
 }
 
-.select-global-options-inline div {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+/* ESTADO ABIERTO: Unión con el menú */
+.select-global-custom.open {
+  border-radius: 4px 4px 0 0; 
+  border-color: #ccc;
+  box-shadow: none;
 }
 
-.select-global-options-inline div:hover {
-  background: #fddae8; 
-  color: #861542; 
-}
-.select-global-dropdown-icon {
-  margin-left: 0.5rem;
+/* Flecha: Sin cambios */
+.select-global-custom::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #333; 
+  transform: translateY(-50%);
   transition: transform 0.3s ease;
 }
 
-.select-global-dropdown-icon.open {
-  transform: rotate(180deg);
+.select-global-custom.open::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Contenedor de opciones (Menú) */
+.select-global-options-inline {
+  width: 100%;
+  border: none;
+  border-radius: 0 0 4px 4px; 
+  margin-top: 0; 
+  background: #fff;
+  overflow-y: auto; 
+  max-height: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  transition: max-height 0.25s ease-in-out;
+}
+
+/* Dropdown abierto: Agrega bordes solo al abrir */
+.select-global-options-inline.open {
+  max-height: 400px; 
+  border: 1px solid #ccc; 
+  margin-top: 0; 
+}
+
+/* Opciones individuales */
+.select-global-options-inline div {
+  padding: 6px 8px; 
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: #444;
+  transition: background 0.15s ease, color 0.15s ease;
+  line-height: 1.4;
+  border-bottom: 1px solid #eee;
+}
+
+.select-global-options-inline div:hover,
+.select-global-options-inline div.selected {
+  background-color: #f0f0f0; 
+  color: #111;
+}
+
+/* Solución de Scrollbar */
+.select-global-options-inline::-webkit-scrollbar {
+  width: 0px; 
+}
+.select-global-options-inline {
+  scrollbar-width: none;
 }
 /*======== TITULO GLOBAL ========*/
 .titulo-global {

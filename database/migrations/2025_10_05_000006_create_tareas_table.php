@@ -27,7 +27,7 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             // Datos de la tarea
-            $table->string('t_nombre', 100);
+            $table->string('t_nombre', 300);
             $table->string('t_estatus', 50)->default('PENDIENTE');
             $table->date('tf_inicio')->nullable();
             $table->date('tf_completada')->nullable();

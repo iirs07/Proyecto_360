@@ -90,7 +90,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
   
 
   return (
-    <Layout titulo="PROYECTOS" sidebar={<MenuDinamico activeRoute="Ver Proyectos" />}>
+    <Layout titulo="PROYECTOS DEL DEPARTAMENTO" sidebar={<MenuDinamico activeRoute="Ver Proyectos" />}>
       <div className="container my-4">
         <div className="row justify-content-center">
           <h1 className="titulo-global">Proyectos</h1>
