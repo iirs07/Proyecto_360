@@ -1,209 +1,596 @@
 /* ================================
-   Contenedor principal
+   Contenedor principal mejorado
 ================================= */
 .departamentos-app {
-  width: 90%;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+  padding: 0;
   position: relative;
+  overflow-x: hidden;
 }
 
 /* ================================
-   Grid de áreas (botones)
+   Hero section mejorada y más arriba
 ================================= */
+.areas-hero {
+  text-align: center;
+  padding: 25px 20px 20px;
+  position: relative;
+  z-index: 1;
+  margin-top: 5px;
+}
+
+.areas-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.2;
+}
+
+.areas-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  font-weight: 500;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+/* ================================
+   Contenedor del grid más arriba
+================================= */
+.areas-grid-container {
+  position: relative;
+  z-index: 1;
+  padding: 0 15px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  margin-top: 10px;
+}
+
 .areas-grid-departamentos {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* siempre 2 columnas en escritorio */
-  gap: 10px;
-  justify-items: center;
-  padding: 20px 0;
-  margin-top: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  align-items: start;
   position: relative;
-  z-index: 10;
+  z-index: 1;
+  animation: fadeInUp 0.5s ease-out;
 }
 
-.area-item-departamentos {
+/* ================================
+   Tarjetas con diseño mejorado
+================================= */
+.area-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  border-radius: 16px;
+  box-shadow: 
+    0 2px 12px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(134, 21, 66, 0.1);
+  overflow: visible;
+  position: relative;
+  min-height: 90px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  width: 80%;
-  max-width: 600px;
-  position: relative; /* necesario para dropdown */
-  margin-bottom: 10px;
+  z-index: 1;
+  animation: fadeInUp 0.3s ease-out both;
 }
 
-/* Botón de cada área */
-.dropdown-btn-departamentos {
-  width: 90%;
-  padding: 13px 30px; 
-  border-radius: 20px;
-  border: 1px solid #ddd;
-  background-color: #f0f0f0;
-  font-weight: 600;
+.area-card:nth-child(odd) {
+  animation-delay: 0.08s;
+}
+
+.area-card:nth-child(even) {
+  animation-delay: 0.16s;
+}
+
+/* Cuando el dropdown está activo, la tarjeta sube de nivel */
+.area-card.active {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 30px rgba(134, 21, 66, 0.15),
+    0 4px 12px rgba(134, 21, 66, 0.1);
+  z-index: 100;
+  border-color: rgba(134, 21, 66, 0.2);
+}
+
+.area-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+  z-index: 2;
+  border-radius: 16px 16px 0 0;
+}
+
+.area-card:hover::before,
+.area-card.active::before {
+  transform: scaleX(1);
+}
+
+.area-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 10px 35px rgba(134, 21, 66, 0.18),
+    0 6px 15px rgba(134, 21, 66, 0.12);
+  border-color: rgba(134, 21, 66, 0.25);
+}
+
+/* ================================
+   Botones de área - DISEÑO MEJORADO
+================================= */
+.area-card-btn {
+  width: 100%;
+  padding: 20px 24px;
+  border: none;
+  background: transparent;
   cursor: pointer;
-  font-size: 1rem;
   text-align: left;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1;
   position: relative;
-  z-index: 1;
-  overflow: hidden;
-  line-height: 1.3em;
-  word-break: break-word;
+  z-index: 10;
+  border-radius: 16px;
 }
 
-.dropdown-btn-departamentos::after {
-  content: '▼';
-  font-size: 10px;
-  color: #861542;
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
+.area-card-btn:hover {
+  background: linear-gradient(135deg, rgba(134, 21, 66, 0.03) 0%, rgba(178, 35, 78, 0.03) 100%);
 }
 
-.dropdown-btn-departamentos:hover {
-  background-color: rgba(178,35,78,0.1);
+.area-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
 }
 
-/* Icono del área */
-.area-icono {
-  font-size: 30px;
-  color: #861542;
-  flex-shrink: 0;
+.area-icon-container {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  font-size: 1.3rem;
+  box-shadow: 
+    0 4px 15px rgba(134, 21, 66, 0.35),
+    0 2px 6px rgba(134, 21, 66, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
 }
 
-/* Dropdown con scroll */
-.dropdown-options-departamentos {
-  display: grid;
-  grid-template-columns: 1fr; /* por defecto 1 columna */
-  gap: 8px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+/* Efecto de brillo en movimiento mejorado */
+.area-icon-container::before {
+  content: '';
   position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
+  top: 0;
+  left: -100%;
   width: 100%;
-  max-height: 280px;
-  overflow-y: auto;
-  box-sizing: border-box;
-  z-index: 9999;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.6), 
+    transparent);
+  transition: left 0.8s ease;
 }
 
-@media (min-width: 992px) {
-  .dropdown-options-departamentos {
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas en escritorio */
-  }
+.area-card:hover .area-icon-container::before {
+  left: 100%;
 }
 
-/* Scroll personalizado */
-.dropdown-options-departamentos::-webkit-scrollbar {
-  width: 12px;
+.area-card:hover .area-icon-container {
+  transform: scale(1.15) rotate(8deg);
+  box-shadow: 
+    0 6px 20px rgba(134, 21, 66, 0.5),
+    0 3px 10px rgba(134, 21, 66, 0.3);
 }
 
-.dropdown-options-departamentos::-webkit-scrollbar-thumb {
-  background-color: #861542;
-  border-radius: 8px;
-  border: 2px solid #fff;
+.area-text-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
 }
 
-.dropdown-options-departamentos::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 8px;
+.area-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2d3748;
+  line-height: 1.3;
+  text-align: left;
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
-.dropdown-options-departamentos {
-  scrollbar-width: thin;
-  scrollbar-color: #861542 #f0f0f0;
-}
-
-/* Items del dropdown */
-.option-item-departamentos {
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 8px;
-  border: 1px solid #eee;
-  background-color: #fafafa;
-  text-align: center;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.option-item-departamentos:hover {
-  background-color: rgba(178,35,78,0.15);
-  color: #861542;
+.area-department-count {
+  font-size: 0.85rem;
+  color: #718096;
   font-weight: 600;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  padding: 4px 12px;
+  border-radius: 10px;
+  align-self: flex-start;
+  border: 1px solid #e2e8f0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Efecto hover mejorado para el contador */
+.area-card:hover .area-department-count {
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+  color: white;
+  border-color: transparent;
+  transform: scale(1.08) translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(134, 21, 66, 0.3),
+    0 2px 6px rgba(134, 21, 66, 0.2);
+}
+
+.area-chevron {
+  color: #861542;
+  font-size: 1rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.8;
+  flex-shrink: 0;
+  margin-left: 10px;
+  background: rgba(134, 21, 66, 0.1);
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.area-card:hover .area-chevron {
+  opacity: 1;
+  transform: scale(1.3);
+  background: rgba(134, 21, 66, 0.15);
 }
 
 /* ================================
-   Responsive tablet y móvil
+   Dropdown con diseño mejorado
 ================================= */
-/* Tablet mediana */
-@media (max-width: 992px) {
-  .areas-grid-departamentos {
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-  }
+.departments-dropdown {
+  background: linear-gradient(135deg, #ffffff 0%, #fcfdfe 100%);
+  border-top: 1px solid rgba(134, 21, 66, 0.1);
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.25),
+    0 8px 20px rgba(134, 21, 66, 0.15);
+  border-radius: 0 0 16px 16px;
+  border: 1px solid rgba(134, 21, 66, 0.15);
+  border-top: none;
+  backdrop-filter: blur(10px);
 }
 
-/* Tablets pequeñas */
-@media (max-width: 768px) {
-  .areas-grid-departamentos {
-    grid-template-columns: 1fr; /* 1 columna */
-    padding: 10px;
-  }
-
-  .dropdown-btn-departamentos {
-    padding: 12px 20px;
-  }
-
-  .dropdown-options-departamentos {
-    grid-template-columns: 1fr;
-  }
+.departments-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  padding: 16px 20px;
+  max-height: 240px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1001;
 }
 
-/* Móviles */
-@media (max-width: 576px) {
-  .areas-grid-departamentos {
-    padding: 5px;
-  }
-
-  .dropdown-btn-departamentos {
-    font-size: 1rem;
-    padding: 10px 15px;
-  }
-
-  .option-item-departamentos {
-    font-size: 1rem;
-  }
+/* Scroll personalizado mejorado */
+.departments-grid::-webkit-scrollbar {
+  width: 6px;
 }
 
+.departments-grid::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.departments-grid::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 4px;
+}
 
 /* ================================
-   Efecto de aparición suave
+   Items de departamento mejorados
 ================================= */
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.8s ease-in forwards;
+.department-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 1002;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-@keyframes fadeIn {
+.department-item:hover {
+  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+  transform: translateX(5px) scale(1.02);
+  box-shadow: 
+    0 6px 20px rgba(134, 21, 66, 0.25),
+    0 3px 10px rgba(134, 21, 66, 0.15);
+  border-color: transparent;
+}
+
+.department-name {
+  font-weight: 600;
+  color: #4a5568;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.department-item:hover .department-name {
+  color: white;
+  font-weight: 700;
+  transform: translateX(3px);
+}
+
+/* ================================
+   Animaciones mejoradas
+================================= */
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    max-height: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    max-height: 280px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% { 
+    transform: scale(1.15) rotate(8deg); 
+    box-shadow: 
+      0 6px 20px rgba(134, 21, 66, 0.5),
+      0 3px 10px rgba(134, 21, 66, 0.3);
+  }
+  50% { 
+    transform: scale(1.2) rotate(10deg); 
+    box-shadow: 
+      0 8px 25px rgba(134, 21, 66, 0.6),
+      0 4px 12px rgba(134, 21, 66, 0.4);
+  }
+}
+
+.area-card:hover .area-icon-container {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+/* ================================
+   Loader mejorado
+================================= */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 15px;
+}
+
+.loader-logo img {
+  width: 80px;
+  height: auto;
+  animation: pulse 2s infinite;
+}
+
+.loader-texto {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  animation: pulse 2s infinite;
+}
+
+.loader-spinner {
+  width: 35px;
+  height: 35px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #861542;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ================================
+   Responsive Design Mejorado
+================================= */
+@media (max-width: 1200px) {
+  .areas-grid-container {
+    max-width: 900px;
+  }
+}
+
+@media (max-width: 992px) {
+  .areas-grid-departamentos {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .areas-hero {
+    padding: 15px 20px 10px;
+  }
+  
+  .areas-title {
+    font-size: 1.8rem;
+  }
+  
+  .area-card.active {
+    z-index: 100;
+  }
+}
+
+@media (max-width: 768px) {
+  .departamentos-app {
+    padding: 0;
+  }
+  
+  .areas-hero {
+    padding: 12px 15px 8px;
+  }
+  
+  .areas-title {
+    font-size: 1.5rem;
+  }
+  
+  .areas-subtitle {
+    font-size: 0.95rem;
+  }
+  
+  .areas-grid-container {
+    padding: 0 12px 15px;
+  }
+  
+  .area-card-btn {
+    padding: 18px 20px;
+  }
+  
+  .area-card-header {
+    gap: 12px;
+  }
+  
+  .area-icon-container {
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+  
+  .area-name {
+    font-size: 1rem;
+  }
+  
+  .departments-grid {
+    padding: 14px 16px;
+  }
+  
+  .area-card.active {
+    z-index: 100;
+  }
+  
+  .departments-dropdown {
+    z-index: 1000;
+  }
+}
+
+@media (max-width: 480px) {
+  .areas-hero {
+    padding: 10px 10px 5px;
+  }
+  
+  .areas-title {
+    font-size: 1.4rem;
+  }
+  
+  .areas-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .areas-grid-container {
+    padding: 0 10px 12px;
+  }
+  
+  .area-card-btn {
+    padding: 16px 18px;
+  }
+  
+  .area-card-header {
+    gap: 10px;
+  }
+  
+  .area-icon-container {
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+  
+  .area-name {
+    font-size: 0.95rem;
+  }
+  
+  .area-department-count {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+  }
+  
+  .departments-grid {
+    padding: 12px 14px;
+    max-height: 200px;
+  }
+  
+  .department-item {
+    padding: 10px 12px;
+  }
+  
+  .department-name {
+    font-size: 0.9rem;
+  }
+  
+  .area-chevron {
+    font-size: 0.9rem;
+  }
+  
+  .area-card.active {
+    z-index: 100;
+  }
+  
+  .departments-dropdown {
+    z-index: 1000;
   }
 }

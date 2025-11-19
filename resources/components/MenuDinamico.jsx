@@ -35,12 +35,12 @@ export default function MenuDinamico({
     const menus = {
         Superusuario: {
             principal: [
-                { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/Principal' },
+                { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'reportes', label: 'Reportes', icon: FaFileAlt, path: '/ReporteSuperUsuario' },
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
             ],
             departamento: [
-                { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/Principal' },
+                { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'proceso', label: 'Proyectos en proceso', icon: FaTasks, path: slug ? `/proyectosenproceso/${slug}` : '#' },
                 { key: 'finalizados', label: 'Proyectos finalizados', icon: FaProjectDiagram, path: slug ? `/proyectoscompletados/${slug}` : '#' },
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
