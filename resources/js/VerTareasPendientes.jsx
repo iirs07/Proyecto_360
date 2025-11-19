@@ -24,51 +24,63 @@ function VerTareasPendientes() {
   const navigate = useNavigate();
 
   const obtenerProyectoActualizado = async () => {
-    const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const token = localStorage.getItem("jwt_token"); // <-- obtenemos el token
 
-    if (!proyectoGuardado || !usuario?.id_usuario) {
-      return navigate("/tareas-en-proceso");
-    }
+  if (!proyectoGuardado || !usuario?.id_usuario) {
+    return navigate("/tareas-en-proceso");
+  }
 
-    try {
-      setCargandoProyecto(true);
-      const response = await fetch(`http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`);
+  if (!token) {
+    return alert("No hay token de autenticación, inicia sesión.");
+  }
 
-      const data = await response.json();
-      console.log("Datos recibidos del backend:", data);
-      
-      if (data.success) {
-        const proyectoSeleccionado = JSON.parse(proyectoGuardado);
-        const proyectoCompleto = data.proyectos.find(
-          p => p.id_proyecto === proyectoSeleccionado.id_proyecto
-        );
-        
-        if (proyectoCompleto) {
-          setProyecto(proyectoCompleto);
-   
-          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoCompleto));
-        } else {
-         
-          const proyectoActualizado = {
-            ...proyectoSeleccionado,
-            tareas: (proyectoSeleccionado.tareas || []).map(t => ({
-              ...t,
-              t_estatus: "Finalizada"
-            }))
-          };
-          setProyecto(proyectoActualizado);
-          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
-        }
+  try {
+    setCargandoProyecto(true);
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, 
+        },
       }
-    } catch (error) {
-      console.error("Error al obtener tareas:", error);
+    );
+
+    const data = await response.json();
+    console.log("Datos recibidos del backend:", data);
+
+    if (data.success) {
       const proyectoSeleccionado = JSON.parse(proyectoGuardado);
-      setProyecto(proyectoSeleccionado);
-    } finally {
-      setCargandoProyecto(false);
+      const proyectoCompleto = data.proyectos.find(
+        p => p.id_proyecto === proyectoSeleccionado.id_proyecto
+      );
+
+      if (proyectoCompleto) {
+        setProyecto(proyectoCompleto);
+        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoCompleto));
+      } else {
+        const proyectoActualizado = {
+          ...proyectoSeleccionado,
+          tareas: (proyectoSeleccionado.tareas || []).map(t => ({
+            ...t,
+            t_estatus: "Finalizada",
+          })),
+        };
+        setProyecto(proyectoActualizado);
+        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
+      }
     }
-  };
+  } catch (error) {
+    console.error("Error al obtener tareas:", error);
+    const proyectoSeleccionado = JSON.parse(proyectoGuardado);
+    setProyecto(proyectoSeleccionado);
+  } finally {
+    setCargandoProyecto(false);
+  }
+};
+
 
   useEffect(() => {
     obtenerProyectoActualizado();
@@ -93,51 +105,59 @@ const tareasFiltradas = proyecto?.tareas
   ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
 
-  const handleCompletarTarea = async (idTarea) => {
-    if (!idTarea) return;
+ const handleCompletarTarea = async (idTarea) => {
+  if (!idTarea) return;
 
-    try {
-      setCargando(true);
-      const response = await fetch(`http://127.0.0.1:8000/api/tareas/${idTarea}/completar`, {
+  const token = localStorage.getItem("jwt_token");
+  if (!token) return alert("No hay token de autenticación, inicia sesión.");
+
+  try {
+    setCargando(true);
+
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/proyectos/${proyecto.id_proyecto}/finalizar`,
+      {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json', 
-          'Accept': 'application/json' 
+          'Accept': 'application/json',
+          Authorization: `Bearer ${token}`
         }
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.success || response.ok) {
+      setProyecto(prevProyecto => {
+        if (!prevProyecto?.tareas) return prevProyecto;
+        
+        const tareasActualizadas = prevProyecto.tareas.map(tarea =>
+          tarea.id_tarea === idTarea 
+            ? { ...tarea, t_estatus: "Finalizada" }
+            : tarea
+        );
+        
+        const proyectoActualizado = { ...prevProyecto, tareas: tareasActualizadas };
+        
+        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
+        
+        return proyectoActualizado;
       });
       
-      const data = await response.json();
-
-      if (data.success || response.ok) {
-    
-        setProyecto(prevProyecto => {
-          if (!prevProyecto?.tareas) return prevProyecto;
-          
-          const tareasActualizadas = prevProyecto.tareas.map(tarea =>
-            tarea.id_tarea === idTarea 
-              ? { ...tarea, t_estatus: "Finalizada" }
-              : tarea
-          );
-          
-          const proyectoActualizado = { ...prevProyecto, tareas: tareasActualizadas };
-          
-          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
-          
-          return proyectoActualizado;
-        });
-        
-        handleCerrarModal();
-        
-      } else {
-        alert(`Error: ${data.mensaje || 'No se pudo completar la tarea'}`);
-      }
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
-      alert('Error de conexión');
-    } finally {
-      setCargando(false);
+      handleCerrarModal();
+      
+    } else {
+      alert(`Error: ${data.mensaje || 'No se pudo completar la tarea'}`);
     }
-  };
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    alert('Error de conexión');
+  } finally {
+    setCargando(false);
+  }
+};
+
 
 
   const handleVerEvidencias = (tarea) => {
@@ -268,14 +288,16 @@ const tareasFiltradas = proyecto?.tareas
                   <div className="vtp-evidencias-navegacion">
                     <div className="vtp-imagen-container">
                       {imagenCargando && <div className="vtp-imagen-cargando"></div>}
+                      {console.log("URL de la evidencia:", evidencias[indiceActual].archivo_url)}
                       <img
-                        src={`http://127.0.0.1:8000/storage/${evidencias[indiceActual].ruta_archivo}`}
-                        alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
-                        className="vtp-imagen-evidencia"
-                        onLoad={handleImageLoad}
-                        onError={handleImageError}
-                        style={{ display: imagenCargando ? 'none' : 'block' }}
-                      />
+  src={evidencias[indiceActual].archivo_url}
+  alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
+  className="vtp-imagen-evidencia"
+  onLoad={handleImageLoad}
+  onError={handleImageError}
+  style={{ display: imagenCargando ? 'none' : 'block' }}
+/>
+
                     </div>
 
                     {evidencias.length > 1 && (

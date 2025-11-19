@@ -154,4 +154,55 @@ public function obtenerTareasProyectosJefe(Request $request)
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 }
+public function CambiarStatusTareaFinalizada($idTarea)
+{
+    $tarea = Tarea::find($idTarea);
+
+    if (!$tarea) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'Tarea no encontrada'
+        ], 404);
+    }
+
+    $tarea->t_estatus = "Finalizada";
+    $tarea->save();
+
+    return response()->json([
+        'success' => true,
+        'mensaje' => 'Tarea marcada como finalizada',
+        'tarea' => $tarea
+    ]);
+}
+//METODO QUE PERMITE MODIFICAR EL ESTATUS DE UNA TAREA A FINALIZADAS
+public function cambiarStatusTareaEnProceso($idTarea)
+{
+
+    $tarea = Tarea::find($idTarea);
+
+    if (!$tarea) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'Tarea no encontrada'
+        ], 404);
+    }
+
+    try {
+        $tarea->t_estatus = "En proceso";
+        $tarea->save();
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => 'Tarea marcada como en proceso',
+            'tarea' => $tarea
+        ]);
+    } catch (\Exception $e) {
+        
+
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'Ocurrió un error al actualizar la tarea'
+        ], 500);
+    }
+}
 }
