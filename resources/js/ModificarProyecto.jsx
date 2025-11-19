@@ -9,9 +9,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/global.css';
 import '../css/NuevoProyecto.css';
 import '../css/ModificarProyecto.css';
+import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
+import ConfirmModal from "../components/ConfirmModal"; 
+
 registerLocale("es", es);
 
 // Modal de confirmación
@@ -101,6 +104,11 @@ function ModificarProyecto() {
   const [mostrarEstado, setMostrarEstado] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const [mostrarConfirmarModificar, setMostrarConfirmarModificar] = useState(false);
+  const [loadingProyecto, setLoadingProyecto] = useState(false); // Para cargar datos
+const [loadingModificar, setLoadingModificar] = useState(false); // Para guardar cambios
+
+
 
   const [touched, setTouched] = useState({
     fechaInicio: false,
@@ -121,58 +129,37 @@ function ModificarProyecto() {
   }, []);
 
   // Carga del proyecto
-  useEffect(() => {
+ useEffect(() => {
   if (idProyecto && !proyectoCargado) {
-    setLoading(true);
+    setLoadingProyecto(true); // 🔹 Solo carga de datos
     const token = localStorage.getItem("jwt_token");
     
     if (!token) {
-      console.error("No hay token JWT");
       setErrorServidor("No autenticado");
-      setLoading(false);
+      setLoadingProyecto(false);
       return;
     }
 
     fetch(`http://127.0.0.1:8000/api/proyecto/${idProyecto}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
-      }
+      headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
     })
-      .then(res => {
-        if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
-          localStorage.removeItem("usuario");
-          navigate("/Login", { replace: true });
-          return Promise.reject("No autorizado");
-        }
-        return res.ok ? res.json() : Promise.reject("Error al cargar");
-      })
+      .then(res => res.ok ? res.json() : Promise.reject("Error al cargar"))
       .then(data => {
-        if (!data.success) {
-          setErrorServidor(data.message || "No se pudo cargar el proyecto");
-          return;
-        }
-
         const proyecto = data.proyecto;
         setDatosOriginales(proyecto);
-
         if (nombreProyectoRef.current) nombreProyectoRef.current.value = proyecto.p_nombre || '';
         if (descripcionProyectoRef.current) descripcionProyectoRef.current.value = proyecto.descripcion || '';
         if (proyecto.pf_inicio) setFechaInicio(new Date(proyecto.pf_inicio));
         if (proyecto.pf_fin) setFechaFin(new Date(proyecto.pf_fin));
-
         ajustarAltura(nombreProyectoRef);
         ajustarAltura(descripcionProyectoRef);
         setProyectoCargado(true);
       })
-      .catch(err => {
-        console.error(err);
-        setErrorServidor("Error al cargar los datos del proyecto");
-      })
-      .finally(() => setLoading(false));
+      .catch(err => setErrorServidor("Error al cargar los datos del proyecto"))
+      .finally(() => setLoadingProyecto(false));
   }
-}, [idProyecto, proyectoCargado, navigate]);
+}, [idProyecto, proyectoCargado]);
+
 
   // Verifica cambios
   const verificarCambios = () => {
@@ -247,7 +234,7 @@ function ModificarProyecto() {
   const handleModificar = async () => {
   if (!validarFormulario()) return;
   try {
-    setLoading(true); 
+     setLoadingModificar(true); // 🔹 Solo al guardar cambios
     setErrorServidor(null);
 
     const token = localStorage.getItem("jwt_token");
@@ -290,19 +277,22 @@ function ModificarProyecto() {
     }, 2000);
 
   } catch (error) {
-    console.error("Error al modificar:", error);
-    setErrorServidor(error.message);
+     setErrorServidor(error.message);
   } finally {
-    setLoading(false);
+    setLoadingModificar(false);
   }
 };
 
   const handleCancelar = () => {
-    if (Object.keys(camposModificados).length > 0) setMostrarConfirmacion(true);
-    else navigate("/ProyectosM");
-  };
+  console.log("Cancelar presionado, cambios:", camposModificados);
+  if (Object.keys(camposModificados).length > 0) 
+    setMostrarConfirmacion(true);
+  else 
+    navigate("/ProyectosListaModificar");
+};
 
-  const confirmarCancelar = () => navigate("/Proyectos");
+
+  const confirmarCancelar = () => navigate("/ProyectosListaModificar");
   const cancelarCancelar = () => setMostrarConfirmacion(false);
 
   return (
@@ -310,7 +300,15 @@ function ModificarProyecto() {
             titulo="MODIFICAR PROYECTO"
             sidebar={<MenuDinamico activeRoute="modificar" />}
           >
-
+{loadingProyecto && (
+      <div className="loader-container">
+        <div className="loader-logo">
+          <img src={logo3} alt="Cargando proyectos" />
+        </div>
+        <div className="loader-texto">CARGANDO...</div>
+        <div className="loader-spinner"></div>
+      </div>
+    )}
      <div className="nv-contenedor">
             <div className="row justify-content-center g-0">
           <div className="col-12 col-md-8 col-lg-10">
@@ -382,30 +380,51 @@ function ModificarProyecto() {
               type="button"
                     className="nv-btn-form w-100 w-md-auto"
               onClick={handleCancelar}
-              disabled={loading}
+              disabled={loadingProyecto || loadingModificar}
+
             >
               Cancelar
             </button>
 
-            <button 
-              type="button"
-                    className="nv-btn-form w-100 w-md-auto"
-              onClick={handleModificar}
-              disabled={loading || Object.keys(camposModificados).length === 0} 
-            >
-              {loading ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando…</> : "Guardar Cambios"}
-            </button>
+       <button
+  type="button"
+  className="nv-btn-form w-100 w-md-auto"
+  onClick={() => setMostrarConfirmarModificar(true)}
+  disabled={loadingModificar || Object.keys(camposModificados).length === 0} 
+>
+  {loadingModificar ? (
+    <>
+      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      Guardando…
+    </>
+  ) : "Guardar Cambios"}
+</button>
+
+
+{/* Modal de confirmación antes de modificar */}
+<ConfirmModal
+  isOpen={mostrarConfirmarModificar}
+  title="¿Modificar proyecto?"
+  message="¿Estás seguro de que deseas modificar este proyecto? Los cambios se guardarán."
+  onConfirm={() => { 
+    handleModificar(); 
+    setMostrarConfirmarModificar(false); 
+  }}
+  onCancel={() => setMostrarConfirmarModificar(false)}
+/>
+
+
           </div>
         </div>
 
-        <ModalConfirmacion
-          mostrar={mostrarConfirmacion}
-          onConfirm={confirmarCancelar}
-          onCancel={cancelarCancelar}
-          titulo="¿Descartar cambios?"
-          mensaje="Tienes cambios sin guardar. Si cancelas, perderás todos los cambios realizados."
-          tipo="peligro"
-        />
+        <ConfirmModal
+  isOpen={mostrarConfirmacion}  // ✅ Cambiado de 'mostrar' a 'isOpen'
+  onConfirm={confirmarCancelar}
+  onCancel={cancelarCancelar}
+  title="¿Descartar cambios?"
+  message="Tienes cambios sin guardar. Si cancelas, perderás todos los cambios realizados."
+/>
+
       </div>
        
         </div>

@@ -20,7 +20,7 @@ return new class extends Migration
                   ->onDelete('cascade');
 
             // Datos del proyecto
-            $table->string('p_nombre', 100)->nullable();
+            $table->string('p_nombre', 300)->nullable();
             $table->date('pf_inicio')->nullable();
             $table->date('pf_fin')->nullable();
             $table->string('p_estatus', 50)->default('EN PROCESO');

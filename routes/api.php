@@ -25,7 +25,7 @@ Route::post('/RegistroPaso1/invitado', [RegistroPaso1Controller::class, 'validar
 Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']);
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
-Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);
+
 Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
 
 
@@ -51,6 +51,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/dashboard-departamento', [TareasDirectorController::class, 'dashboardDepartamento']);
     Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
     Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
+    Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);
     Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
     Route::get('/departamentos/{id}/usuarios', [NuevoProyectoController::class, 'usuariosPorDepartamento']);
     Route::get('/CatalogoDepartamentos', [NuevoProyectoController::class, 'CatalogoDepartamentos']);
