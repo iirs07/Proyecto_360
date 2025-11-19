@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.app-global {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+.tareaspendientesj-contenedor-buscador-y-tarjetas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.tareaspendientesj-proyectos-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: none;
+  border-radius: 20px;
+  padding: 25px;
+  margin: 20px auto;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(134, 21, 66, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(134, 21, 66, 0.1);
+  z-index: 10;
+}
+
+.tareaspendientesj-proyectos-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #861542, #a83267);
+}
+
+.tareaspendientesj-proyectos-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(134, 21, 66, 0.15);
+}
+
+.tareaspendientesj-nombre-proyecto {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #861542;
+  padding: 10px;
+  position: relative;
+  text-transform: uppercase;
+}
+
+.tareaspendientesj-nombre-proyecto::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #861542, transparent);
+}
+
+.tareaspendientesj-lista-tareas-TP {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tareaspendientesj-item-tarea-pendiente {
+  background: linear-gradient(135deg, #fff5f5, #fed7d7);
+  border: 2px solid #fc8181;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.tareaspendientesj-item-tarea-pendiente:hover {
+  transform: translateX(10px);
+  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.1);
+}
+
+.tareaspendientesj-info-tarea-TP {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+
+.tareaspendientesj-tarea-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.tareaspendientesj-icono-pendiente {
+  font-size: 1.6rem;
+  color: #e53e3e;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+
+.tareaspendientesj-tarea-nombre-TP {
+  font-weight: 600;
+  font-size: 18px;
+  color: #000;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.tareaspendientesj-tarea-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tareaspendientesj-tarea-estatus-Pendiente {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tareaspendientesj-tarea-fecha-TP {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Mensaje de no tareas */
+.tareaspendientesj-no-tareas-mensaje {
+  background: linear-gradient(135deg, #fff5f5, #fed7d7);
+  color: #2d3748;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  padding: 40px 30px;
+  margin: 30px auto;
+  min-height: 200px;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(134, 21, 66, 0.1);
+  border: 2px dashed #861542;
+  transition: all 0.3s ease;
+}
+
+.tareaspendientesj-no-tareas-mensaje:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(134, 21, 66, 0.15);
+}
+
+.tareaspendientesj-no-tareas-mensaje svg {
+  color: #861542;
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+}
+
+.tareaspendientesj-no-tareas-mensaje span {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #861542;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tareaspendientesj-proyectos-card {
+    margin: 15px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+  
+  .tareaspendientesj-nombre-proyecto {
+    font-size: 20px;
+  }
+  
+  .vstarea-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .tareaspendientesj-tarea-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .tareaspendientesj-item-tarea-pendiente {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tareaspendientesj-nombre-proyecto {
+    font-size: 18px;
+  }
+  
+  .tareaspendientesj-tarea-nombre-TP {
+    font-size: 16px;
+  }
+  
+}
+
+.tareas-pendientes-filtros{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+
+
+

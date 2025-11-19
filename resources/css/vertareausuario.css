@@ -1,0 +1,443 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.app-global {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.ver-tarea-proyectos-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: none;
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px auto;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(134, 21, 66, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(134, 21, 66, 0.1);
+  z-index: 2;
+}
+
+.ver-tarea-proyectos-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #861542, #a83267);
+}
+
+.ver-tarea-proyectos-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(134, 21, 66, 0.15);
+}
+
+.vertarea-nombre-proyecto {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #861542;
+  padding: 10px;
+  position: relative;
+  text-transform: uppercase;
+}
+
+.vertarea-nombre-proyecto::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #861542, transparent);
+}
+
+/* Lista de tareas mejorada */
+.vertarea-lista-tareas-TP {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Items de tareas mejorados */
+.vertarea-item-tarea-pendiente,
+.vertarea-item-tarea-finalizado,
+.vertarea-item-tarea-proceso {
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.vertarea-item-tarea-pendiente {
+  background: linear-gradient(135deg, #fff5f5, #fed7d7);
+  border-color: #fc8181;
+}
+
+.vertarea-item-tarea-finalizado {
+  background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+  border-color: #48bb78;
+}
+
+.vertarea-item-tarea-proceso {
+  background: linear-gradient(135deg, #fffaf0, #feebc8);
+  border-color: #ed8936;
+}
+
+.vertarea-item-tarea-pendiente:hover,
+.vertarea-item-tarea-finalizado:hover,
+.vertarea-item-tarea-proceso:hover {
+  transform: translateX(10px);
+  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.1);
+}
+
+/* Información de tarea mejorada */
+.vertarea-info-tarea-TP {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+
+.vertarea-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+/* Iconos mejorados */
+.vertarea-icono-estado {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.vertarea-icono-estado.en-proceso { 
+  color: #d69e2e; 
+  animation: pulse 2s infinite;
+}
+.vertarea-icono-estado.finalizada { 
+  color: #38a169; 
+}
+.vertarea-icono-estado.pendiente { 
+  color: #e53e3e; 
+  animation: bounce 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.vertarea-tarea-nombre-TP {
+  font-weight: 600;
+  font-size: 18px;
+  color: #2d3748;
+  margin: 0;
+}
+
+/* Footer de tarea mejorado */
+.vertarea-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Estados mejorados */
+.vertarea-estatus-Pendiente,
+.tarea-estatus-Finalizado,
+.tarea-estatus-proceso {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vertarea-estatus-Pendiente {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.tarea-estatus-Finalizado {
+  background: #c6f6d5;
+  color: #276749;
+}
+
+.tarea-estatus-proceso {
+  background: #feebc8;
+  color: #d69e2e;
+}
+
+.vertarea-fecha-TP {
+  font-size: 14px;
+  color: #4a5568;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+/* Mensaje de no tareas mejorado */
+.vertarea-no-tareas-mensaje {
+  background: linear-gradient(135deg, #fff5f5, #fed7d7);
+  color: #2d3748;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: center;
+  padding: 40px 30px;
+  margin: 30px auto;
+  min-height: 200px;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(134, 21, 66, 0.1);
+  border: 2px dashed #861542;
+  transition: all 0.3s ease;
+}
+
+.vertarea-no-tareas-mensaje:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(134, 21, 66, 0.15);
+}
+
+.vertarea-no-tareas-mensaje svg {
+  color: #861542;
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+}
+
+.vertarea-no-tareas-mensaje span {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #861542;
+}
+
+/* Buscador mejorado */
+/* Buscador mejorado con iconos */
+.vertarea-buscador {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 30px auto;
+  position: relative;
+}
+
+.vertarea-buscador-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.vertarea-buscador-input {
+  width: 100%;
+  padding: 15px 50px 15px 50px;
+  border: 2px solid rgba(134, 21, 66, 0.1);
+  border-radius: 50px;
+  background: #ffffff;
+  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.08);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  color: #2d3748;
+  font-family: 'Poppins', sans-serif;
+}
+
+.vertarea-buscador-input:focus {
+  outline: none;
+  box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
+  transform: translateY(-2px);
+  border-color: #861542;
+}
+
+.vertarea-buscador-input::placeholder {
+  color: #a0a0a0;
+  font-weight: 400;
+}
+
+.vertarea-buscador-icono {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vertarea-buscador-clear {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.vertarea-buscador-clear:hover {
+  color: #861542;
+  background: rgba(134, 21, 66, 0.1);
+}
+
+/* Información de resultados de búsqueda */
+.vertarea-buscador-resultados-info {
+  display: block;       /* ahora sí se centra con margin auto */
+  width: fit-content;   /* ajusta al contenido */
+  text-align: center;
+  color: #861542;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: -20px auto 25px auto;
+  background: rgba(134, 21, 66, 0.05);
+  padding: 8px 16px;
+  border-radius: 15px;
+  border: 1px solid rgba(134, 21, 66, 0.1);
+}
+
+
+/* Contador de tareas */
+.vertarea-contador {
+  text-align: center;
+  color: #861542;
+  font-size: 14px;
+  margin-bottom: 20px;
+  background: rgba(134, 21, 66, 0.05);
+  padding: 10px 20px;
+  border-radius: 20px;
+  display: inline-block;
+  margin: 0 auto 20px auto;
+  border: 1px solid rgba(134, 21, 66, 0.1);
+  font-weight: 500;
+}
+
+.vertarea-contador svg {
+  margin-right: 8px;
+  color: #861542;
+}
+
+/* Botón personalizado */
+.btn-primary-custom {
+  background: linear-gradient(135deg, #861542, #a83267);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(134, 21, 66, 0.3);
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(134, 21, 66, 0.4);
+  background: linear-gradient(135deg, #75123a, #861542);
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ver-tarea-proyectos-card {
+    margin: 20px 15px;
+    padding: 20px;
+    border-radius: 15px;
+  }
+  
+  .vertarea-nombre-proyecto {
+    font-size: 24px;
+  }
+  
+  .vertarea-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .vertarea-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+  
+  .vertarea-item-tarea-pendiente,
+  .vertarea-item-tarea-finalizado,
+  .vertarea-item-tarea-proceso {
+    padding: 15px;
+  }
+  
+  .vertarea-no-tareas-mensaje {
+    padding: 30px 20px;
+    min-height: 150px;
+  }
+  
+  .vertarea-no-tareas-mensaje svg {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .vertarea-no-tareas-mensaje span {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vertarea-nombre-proyecto {
+    font-size: 20px;
+  }
+  
+  .tarea-nombre-TP {
+    font-size: 16px;
+  }
+  
+  .vertarea-buscador input {
+    padding: 12px 15px 12px 45px;
+    font-size: 14px;
+  }
+  
+  .vertarea-footer {
+    align-items: center;
+  }
+}
+
+
+
+

@@ -61,7 +61,7 @@ export default function MenuDinamico({
       subMenu: [
         { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
         { key: 'ver', label: "Ver Proyectos", path: "/VerProyecto", icon: FaEye },
-        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosM", icon: FaEdit },
+        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosListaModificar", icon: FaEdit },
         { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
         { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
       ],

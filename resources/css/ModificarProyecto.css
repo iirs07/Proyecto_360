@@ -1,0 +1,99 @@
+
+.mp-form-control {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  font-family: 'Poppins', sans-serif; 
+}
+
+.mp-form-control::placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #6c757d;
+  font-weight: 400;
+}
+.mp-form-control:focus {
+  border-color: #861542;
+  box-shadow: 0 0 0 0.2rem rgba(134, 21, 66, 0.15);
+  background-color: #fff;
+}
+
+.mp-form-control.is-invalid {
+  border-color: #dc3545;
+  background-image: none;
+}
+
+/* Estado guardado mejorado */
+.mp-estado-guardado {
+  font-size: 15px;
+  margin-bottom: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #e9ecef;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+/* Contenedor para centrar el EstadoGuardado */
+.mp-estado-guardado-wrapper {
+  display: flex;
+  justify-content: center; /* Centrado horizontal */
+  align-items: center;     /* Centrado vertical si hace falta */
+  margin-bottom: 15px;     /* separación debajo */
+  width: 100%;             /* ocupa todo el ancho disponible */
+}
+
+
+.mp-estado-guardado .indicador {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.mp-estado-guardado.guardado .indicador {
+  background: linear-gradient(135deg, #198754 0%, #2ecc71 100%);
+  box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
+}
+
+.mp-estado-guardado.no-guardado .indicador {
+  background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
