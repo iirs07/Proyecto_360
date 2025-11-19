@@ -255,13 +255,13 @@
 .vtp-btn-navegacion:hover { background: #ffec3f; transform: translateY(-50%) scale(1.1); }
 
 /* ===== Clases de estado ===== */
-.en-proceso {
+.vtp-en-proceso {
   color: #b56a00;
 }
-.finalizada {
+.vtp-finalizada {
   color: #2d7730;
 }
-.pendiente {
+.vtp-pendiente {
   color: #c53030;
 }
 

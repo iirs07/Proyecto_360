@@ -124,19 +124,19 @@
 }
 
 /* Iconos mejorados */
-.icono-estado {
+.vertarea-icono-estado {
   font-size: 1.6rem;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
-.icono-estado.en-proceso { 
+.vertarea-icono-estado.en-proceso { 
   color: #d69e2e; 
   animation: pulse 2s infinite;
 }
-.icono-estado.finalizada { 
+.vertarea-icono-estado.finalizada { 
   color: #38a169; 
 }
-.icono-estado.pendiente { 
+.vertarea-icono-estado.pendiente { 
   color: #e53e3e; 
   animation: bounce 2s infinite;
 }
@@ -151,7 +151,7 @@
   50% { transform: translateY(-3px); }
 }
 
-.tarea-nombre-TP {
+.vertarea-tarea-nombre-TP {
   font-weight: 600;
   font-size: 18px;
   color: #2d3748;

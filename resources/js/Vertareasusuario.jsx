@@ -75,12 +75,12 @@ useEffect(() => {
   const getStatusIcon = (estatus) => {
     switch (estatus?.trim().toLowerCase()) {
       case "en proceso":
-        return <FaClock className="icono-estado en-proceso" />;
+        return <FaClock className="vertarea-icono-estado en-proceso" />;
       case "finalizado":
-        return <FaCheckCircle className="icono-estado finalizada" />;
+        return <FaCheckCircle className="vertarea-icono-estado finalizada" />;
       case "pendiente":
       default:
-        return <FaExclamationCircle className="icono-estado pendiente" />;
+        return <FaExclamationCircle className="vertarea-icono-estado pendiente" />;
     }
   };
 
@@ -91,9 +91,9 @@ useEffect(() => {
       case "pendiente":
         return "vertarea-estatus-Pendiente";
       case "finalizado":
-        return "tarea-estatus-Finalizado";
+        return "vertarea-tarea-estatus-Finalizado";
       case "en proceso":
-        return "tarea-estatus-proceso";
+        return "vertarea-tarea-estatus-proceso";
       default:
         return "";
     }
