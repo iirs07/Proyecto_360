@@ -458,7 +458,7 @@ export default function ReporteSuperUsuario() {
                                 </div>
                                 <div className="progress-bar-wrapper">
                                     <div 
-                                        className="progress-bar" 
+                                        className="progress-ba" 
                                         style={{ width: `${generationProgress}%` }}
                                     ></div>
                                 </div>

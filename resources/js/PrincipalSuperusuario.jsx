@@ -132,7 +132,7 @@ export default function PrincipalSuperusuario() {
 
   return (
     <Layout 
-      titulo="Gestión de Departamentos" 
+      titulo="Sistema de gestión de departamentos" 
       sidebar={<MenuDinamico tipo="principal" />}
     >
       <div className="departamentos-app">
@@ -140,9 +140,6 @@ export default function PrincipalSuperusuario() {
           <h1 className="areas-title">
             {userName ? `¡Hola! ${userName}` : "¡Hola! Bienvenido"}
           </h1>
-          <p className="areas-subtitle">
-            Bienvenido al sistema de gestión de departamentos
-          </p>
         </div>
         
         <div className="areas-grid-container">
