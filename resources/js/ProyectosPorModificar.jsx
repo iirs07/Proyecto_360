@@ -3,18 +3,21 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/ProyectosM.css";
-import { FaAngleDown, FaSearch, FaProjectDiagram } from "react-icons/fa";
+import { FaCalendarAlt, FaTasks, FaExclamationTriangle, FaSearch, FaEdit } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import SelectDinamico from "../components/SelectDinamico";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 
 function ProyectosListaModificar() {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { volverSegunRol } = useRolNavigation();
 
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -22,7 +25,6 @@ function ProyectosListaModificar() {
     const token = localStorage.getItem("jwt_token");
 
     if (!idUsuario || !token) {
-      console.error("❌ No se encontró id_usuario o token JWT");
       setLoading(false);
       return;
     }
@@ -101,10 +103,8 @@ function ProyectosListaModificar() {
   const mostrarSelect = hayProyectos && proyectosFiltrados.length > 0;
 
   return (
-    <Layout titulo="LISTA DE PROYECTOS" sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}>
+    <Layout titulo="MODIFICAR PROYECTOS" sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}>
       <div className="container my-4">
-        <h1 className="titulo-global">Proyectos</h1>
-
         {/* Barra de búsqueda y select */}
         {hayProyectos && (
           <>
@@ -124,83 +124,87 @@ function ProyectosListaModificar() {
                   </button>
                 )}
               </div>
+              {mostrarSelect && (
+  <div style={{ marginTop: '10px' }}>
+    <SelectDinamico
+      opciones={opciones.map((o) => o.label)}
+      valor={opciones.find((o) => o.value === filtro)?.label}
+      setValor={(labelSeleccionado) => {
+        const opcion = opciones.find((o) => o.label === labelSeleccionado);
+        if (opcion) setFiltro(opcion.value);
+      }}
+      placeholder="Selecciona un filtro"
+    />
+  </div>
+)}
+
             </div>
-
-            {mostrarSelect && (
-              <div className="modificar-proyectos-custom-select-container-inline">
-                <div
-                  className="modificar-proyectos-custom-select"
-                  onClick={() => setOpen(!open)}
-                >
-                  {opciones.find((o) => o.value === filtro)?.label}
-                  <FaAngleDown className={`dropdown-icon ${open ? "open" : ""}`} />
-                </div>
-
-                {open && (
-                  <div
-                    className={`modificar-proyectos-custom-options-inline ${
-                      open ? "open" : ""
-                    }`}
-                  >
-                    {opciones.map((o) => (
-                      <div
-                        key={o.value}
-                        onClick={() => {
-                          setFiltro(o.value);
-                          setOpen(false);
-                        }}
-                      >
-                        {o.label}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
           </>
         )}
 
-        {/* Lista de proyectos / estados vacíos */}
+        {/* Lista de proyectos */}
         <div className="modificar-proyectos-lista">
           {loading ? (
             <div className="loader-container">
               <div className="loader-logo">
                 <img src={logo3} alt="Cargando" />
               </div>
-              <div className="loader-texto">CARGANDO...</div>
+              <div className="loader-texto">CARGANDO PROYECTOS...</div>
               <div className="loader-spinner"></div>
             </div>
-          ) : proyectos.length === 0 ? (
-            <div className="empty-state-global">
-              <FaProjectDiagram className="empty-icon-global" size={48} />
-              <h3 className="empty-title-global">No tienes proyectos activos</h3>
-              <p className="empty-text-global">
-                Cuando se te asignen proyectos, aparecerán aquí
-              </p>
-            </div>
           ) : proyectosFiltrados.length === 0 ? (
-            <div className="empty-state-global">
-              <FaProjectDiagram className="empty-icon-global" size={48} />
-              <h3 className="empty-title-global">No se encontraron proyectos</h3>
-              <p className="empty-text-global">Intenta con otros términos de búsqueda</p>
-            </div>
+            <EmptyState
+              titulo="MODIFICAR PROYECTOS"
+              mensaje="No hay proyectos disponibles."
+              botonTexto="Volver al Tablero"
+              onVolver={volverSegunRol}
+              icono={logo3}
+            />
           ) : (
-            proyectosFiltrados.map((p) => (
-              <div key={p.id_proyecto} className="modificar-proyectos-card">
-                <h5 className="modificar-proyectos-nombre">{p.p_nombre}</h5>
-                <div className="modificar-proyectos-fp">
-                  <div>Fin: {p.pf_fin}</div>
+            proyectosFiltrados.map((p) => {
+              const fechaFin = new Date(p.pf_fin);
+              const hoy = new Date();
+              fechaFin.setHours(0, 0, 0, 0);
+              hoy.setHours(0, 0, 0, 0);
+
+              const estaVencido = fechaFin < hoy;
+
+              return (
+                <div key={p.id_proyecto} className="modificar-proyectos-card">
+                  <h5 className="modificar-proyectos-nombre">{p.p_nombre}</h5>
+
+                   <div className="modificar-proyectos-info">
+                                         <div className="modificar-proyectos-info-item">
+                                           <FaCalendarAlt className="modificar-proyectos-info-icon" />
+                                           <span>
+                                             <strong>Fecha fin:</strong> {fechaFin.toLocaleDateString()}
+                                           </span>
+                                         </div>
+                     <div className="modificar-proyectos-info-item">
+                                            <FaTasks className="modificar-proyectos-info-icon" />
+                                            <span>
+                                              <strong>Tareas:</strong> {p.total_tareas || 0}
+                                            </span>
+                                          </div>
+                    {estaVencido && (
+                      <div className="modificar-proyectos-alerta">
+                        <FaExclamationTriangle /> <strong>¡Vencido!</strong>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="modificar-proyectos-botones">
+                    <button
+    className="modificar-proyectos-btn"
+    onClick={() => modificar(p.id_proyecto)}
+  >
+    <FaEdit style={{ marginRight: "8px" }} /> 
+    Modificar proyecto
+  </button>
+                  </div>
                 </div>
-                <div className="modificar-proyectos-botones">
-                  <button
-                    className="modificar-proyectos-btn"
-                    onClick={() => modificar(p.id_proyecto)}
-                  >
-                    Modificar proyecto
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
@@ -209,5 +213,6 @@ function ProyectosListaModificar() {
 }
 
 export default ProyectosListaModificar;
+
 
 

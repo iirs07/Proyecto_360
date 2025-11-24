@@ -1,43 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-.modificar-proyectos-info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.modificar-proyectos-info-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-}
-
-.modificar-proyectos-info-icon {
-  color: #861542;
-  font-size: 1.1rem;
-}
-
-.modificar-proyectos-alerta {
-  color: #e03131 !important;
-  font-weight: 600;
-}
-
-/* LISTA DE PROYECTOS */
-.modificar-proyectos-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 0 16px;
-}
-
-/* TARJETA */
-.modificar-proyectos-card {
+.agregar-tareas-card {
   border: 1px solid #e0e0e0;
   background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
   padding: 24px;
@@ -51,8 +13,43 @@
   box-shadow: 0 4px 15px rgba(134, 21, 66, 0.1);
   z-index: 3;
 }
+.agregar-tareas-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+.agregar-tareas-info-icon {
+  color: #861542;
+  font-size: 1.1rem;
+}
+/* LISTA DE PROYECTOS */
+.agregar-tareas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
-.modificar-proyectos-card::before {
+/* TARJETA */
+.agregar-tareas-card {
+  border: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 24px;
+  margin: 16px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(134, 21, 66, 0.1);
+}
+
+.agregar-tareas-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -63,17 +60,17 @@
   transition: all 0.3s ease;
 }
 
-.modificar-proyectos-card:hover::before {
+.agregar-tareas-card:hover::before {
   width: 6px;
 }
 
-.modificar-proyectos-card:hover {
+.agregar-tareas-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
 }
 
 /* NOMBRE DEL PROYECTO */
-.modificar-proyectos-nombre {
+.agregar-tareas-nombre {
   font-weight: bold;
   font-size: 1.4rem;
   text-transform: uppercase;
@@ -83,7 +80,7 @@
   padding-bottom: 8px;
 }
 
-.modificar-proyectos-nombre::after {
+.agregar-tareas-nombre::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -94,19 +91,36 @@
   transition: width 0.3s ease;
 }
 
-.modificar-proyectos-card:hover .modificar-proyectos-nombre::after {
+.agregar-tareas-card:hover .modificar-proyectos-nombre::after {
   width: 80px;
 }
 
+/* INFORMACIÓN DEL PROYECTO */
+.proyectos-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.proyectos-info div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
 /* BOTONES */
-.modificar-proyectos-botones {
+.agregar-tareas-botones {
   display: flex;
   gap: 12px;
   margin-top: 16px;
   justify-content: center;
 }
 
-.modificar-proyectos-btn {
+.agregar-tareas-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -119,22 +133,55 @@
   font-size: 0.9rem;
   min-width: 180px;
   color: white;
-  background: #861542;
+  background: linear-gradient(135deg, #861542, #a52c5c);
   box-shadow: 0 4px 12px rgba(134, 21, 66, 0.25);
 }
 
-.modificar-proyectos-btn:hover {
-  background: #661133;
+.agregar-tareas-btn:hover {
+  background: linear-gradient(135deg, #a52c5c, #c2185b);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(134, 21, 66, 0.35);
 }
 
-.modificar-proyectos-btn:active {
+.agregar-tareas-btn:active {
   transform: translateY(0);
 }
 
+/* BUSCADOR */
+.agregar-tareas-buscador {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px auto;
+  position: relative;
+}
+
+.agregar-tareas-input-buscar {
+  width: 100%;
+  padding: 15px 50px 15px 50px;
+  border: 2px solid rgba(134, 21, 66, 0.1);
+  border-radius: 50px;
+  background: #ffffff;
+  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.08);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  color: #2d3748;
+  font-family: 'Poppins', sans-serif;
+}
+
+.agregar-tareas-input-buscar:focus {
+  outline: none;
+  box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
+  transform: translateY(-2px);
+  border-color: #861542;
+}
+
+.agregar-tareas-input-buscar::placeholder {
+  color: #a0a0a0;
+  font-weight: 400;
+}
+
 /* SELECT PERSONALIZADO */
-.modificar-proyectos-custom-select-container-inline {
+.agregar-tareas-custom-select-container-inline {
   position: relative;
   width: 220px;
   margin: 0 auto 20px auto;
@@ -143,8 +190,8 @@
   z-index: 10;
 }
 
-.modificar-proyectos-custom-select {
-  border-radius: 5px;
+.agregar-tareas-custom-select {
+  border-radius: 10px;
   border: 1px solid #ccc;
   padding: 10px 15px;
   text-align: left;
@@ -158,6 +205,7 @@
   user-select: none;
 }
 
+
 .dropdown-icon {
   transition: transform 0.3s ease;
   color: #861542;
@@ -168,30 +216,35 @@
   transform: rotate(180deg);
 }
 
-.modificar-proyectos-custom-options-inline {
-  border-radius: 5px;
+.agregar-tareas-custom-options-inline {
+  border-radius: 10px;
   margin-top: 6px;
   background: #fff;
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.3s ease;
-  border: 1px solid #ccc;
+  z-index: 10px;
 }
 
-.modificar-proyectos-custom-options-inline.open {
+.agregar-tareas-custom-options-inline.open {
   max-height: 300px;
 }
 
-.modificar-proyectos-custom-options-inline div {
+.agregar-tareas-custom-options-inline div {
   padding: 12px 15px;
-  border: 1px solid #ccc;
   cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.modificar-proyectos-custom-options-inline div:hover {
+.agregar-tareas-custom-options-inline div:last-child {
+  border-bottom: none;
+}
+
+.agregar-tareas-custom-options-inline div:hover {
   background: linear-gradient(90deg, #ffd9d9, #ffc0c0);
   color: #861542;
 }
+
 
 /* ANIMACIONES */
 @keyframes spin {
@@ -206,87 +259,56 @@
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  .modificar-proyectos-lista {
+  .agregar-tareas-lista {
     padding: 0 12px;
     max-width: 100%;
   }
 
-  .modificar-proyectos-card {
+  .agregar-tareas-card {
     padding: 20px;
     margin: 12px 0;
   }
 
-  .modificar-proyectos-nombre {
+  .agregar-tareas-nombre {
     font-size: 1.2rem;
   }
 
-  .modificar-proyectos-btn {
+  .agregar-tareas-btn {
     min-width: 140px;
     padding: 10px 20px;
     font-size: 0.85rem;
   }
 
-  .modificar-proyectos-custom-select-container-inline {
+  .agregar-tareas-input-buscar {
+    padding: 12px 15px 12px 45px;
+    font-size: 14px;
+  }
+
+  .agregar-tareas-custom-select-container-inline {
     width: 200px;
   }
 }
 
 @media (max-width: 480px) {
-  .modificar-proyectos-card {
+  .agregar-tareas-card {
     padding: 16px;
   }
 
-  .modificar-proyectos-nombre {
+  .agregar-tareas-nombre {
     font-size: 1.1rem;
   }
 
-  .modificar-proyectos-botones {
+  .agregar-tareas-botones {
     flex-direction: column;
     gap: 8px;
   }
 
-  .modificar-proyectos-btn {
+  .agregar-tareas-btn {
     width: 100%;
     min-width: auto;
   }
+
+  .agregar-tareas-info {
+    font-size: 0.9rem;
+  }
 }
-
-/* === Empty State === */
-.tdu-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 50px 20px;
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  background-color: #f9f9f9;
-  color: #555;
-  text-align: center;
-  gap: 15px;
-  transition: background-color 0.3s ease;
-}
-
-.tdu-empty-state:hover {
-  background-color: #f0f0f0;
-}
-
-.tdu-empty-icon {
-  color: #bbb;
-  margin-bottom: 10px;
-}
-
-.tdu-empty-state h3 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.tdu-empty-state p {
-  font-size: 1rem;
-  color: #666;
-  max-width: 300px;
-}
-
-
-

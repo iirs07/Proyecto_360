@@ -1,35 +1,54 @@
 import React, { useState, useEffect } from "react";
 import "../css/DesbloquearProyectos.css"; 
 import "../css/formulario.css"; 
-import { FiX, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { FaCheckCircle, FaSearch } from "react-icons/fa";
-import { LuClock3 } from "react-icons/lu";
+import { FiX, FiChevronLeft, FiChevronRight, FiArchive, FiUnlock } from "react-icons/fi";
+import { FaCheckCircle, FaSearch, FaTasks } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 
 function DesbloquearProyectos() {
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [proyectosDesbloqueados, setProyectosDesbloqueados] = useState([]);
+  const [proyectosDesbloqueados, setProyectosDesbloqueados] = useState([]); 
   const navigate = useNavigate();
 
-  // Modal de evidencias
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaActual, setTareaActual] = useState(null);
   const [evidencias, setEvidencias] = useState([]);
   const [indiceActual, setIndiceActual] = useState(0);
   const [imagenCargando, setImagenCargando] = useState(true);
+  const { volverSegunRol } = useRolNavigation();
 
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario?.id_usuario) return;
 
     const obtenerProyectosCompletados = async () => {
+      const token = localStorage.getItem("jwt_token");
+
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`);
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+          }
+        );
+
+        if (res.status === 401) {
+          localStorage.removeItem("jwt_token");
+          navigate("/Login", { replace: true });
+          return;
+        }
+
         const data = await res.json();
         if (data.success) setProyectos(data.proyectos);
       } catch (error) {
@@ -40,42 +59,118 @@ function DesbloquearProyectos() {
     };
 
     obtenerProyectosCompletados();
-  }, []);
+  }, [navigate]);
 
   const proyectosFiltrados = proyectos.filter(p =>
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   const handleDesbloquearProyecto = async (idProyecto) => {
-    if (proyectosDesbloqueados.includes(idProyecto)) {
-      setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
-    } else {
-      try {
+    const token = localStorage.getItem("jwt_token");
+    const estaDesbloqueado = proyectosDesbloqueados.includes(idProyecto);
+
+    if (estaDesbloqueado) {
+        const exitoBloqueo = await handleBloquearProyecto(idProyecto); 
+        if (exitoBloqueo) {
+            setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
+        }
+        return; 
+    } 
+    
+    try {
         const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
-          method: 'PUT',
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
         });
+
+        if (res.status === 401) {
+            localStorage.removeItem("jwt_token");
+            navigate("/Login", { replace: true });
+            return;
+        }
+
         const data = await res.json();
         if (data.success) {
-          setProyectosDesbloqueados(prev => [...prev, idProyecto]);
-          setProyectos(prev =>
-            prev.map(p =>
-              p.id_proyecto === idProyecto ? { ...p, p_estatus: "En proceso" } : p
-            )
-          );
+            setProyectosDesbloqueados(prev => [...prev, idProyecto]); 
+            setProyectos(prev =>
+                prev.map(p =>
+                    p.id_proyecto === idProyecto ? { ...p, p_estatus: "En proceso" } : p
+                )
+            );
         }
-      } catch (error) {
+    } catch (error) {
         console.error("Error al desbloquear proyecto:", error);
-      }
+    }
+  };
+
+  const handleBloquearProyecto = async (idProyecto) => {
+    const token = localStorage.getItem("jwt_token");
+    
+    if (!token) {
+        navigate("/Login", { replace: true });
+        return false;
+    }
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/finalizar`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                Authorization: `Bearer ${token}` 
+            },
+        });
+
+        if (res.status === 401) {
+            localStorage.removeItem("jwt_token");
+            navigate("/Login", { replace: true });
+            return false;
+        }
+        
+        if (!res.ok) {
+            console.error("Error al archivar proyecto:", await res.json());
+            return false;
+        }
+
+        const data = await res.json();
+
+        if (data.success) {
+            setProyectos(prev =>
+                prev.map(p =>
+                    p.id_proyecto === idProyecto ? { ...p, p_estatus: "Finalizado" } : p
+                )
+            );
+            return true;
+        } else {
+            console.error(data.mensaje || "No se pudo archivar el proyecto");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error de red al archivar proyecto:", error);
+        return false;
     }
   };
 
   const handleCompletarTarea = async (id, idProyecto) => {
+    const token = localStorage.getItem("jwt_token");
     try {
       const res = await fetch(`http://127.0.0.1:8000/api/tareas/${id}/cambiar-estatus-enproceso`, {
         method: 'PUT',
-        headers: { 'Accept': 'application/json' },
+        headers: { 
+          'Accept': 'application/json',
+          "Authorization": `Bearer ${token}` 
+        },
       });
-
+      
+      if (res.status === 401) {
+        localStorage.removeItem("jwt_token");
+        navigate("/Login", { replace: true });
+        return;
+      }
+      
       if (!res.ok) {
         let errorMsg = `HTTP error! status: ${res.status}`;
         try {
@@ -153,17 +248,16 @@ function DesbloquearProyectos() {
       titulo="PROYECTOS FINALIZADOS"
       sidebar={<MenuDinamico activeRoute="modificar" />}
     >
-      <div className="container my-4">
-
-        <h1 className="titulo-global">Proyectos finalizados</h1>
+      <div className="contenedor-global">
 
         {proyectosFiltrados.length > 0 && (
           <div className="barra-busqueda-global-container mb-4">
+             <p className="subtitulo-global">Gestiona y reactiva proyectos finalizados</p>
             <div className="barra-busqueda-global-wrapper">
               <FaSearch className="barra-busqueda-global-icon" />
               <input
                 type="text"
-                placeholder="Buscar proyectos por nombre..."
+                placeholder="Buscar proyectos..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 className="barra-busqueda-global-input"
@@ -187,84 +281,129 @@ function DesbloquearProyectos() {
             </div>
           ) : proyectosFiltrados.length > 0 ? (
             proyectosFiltrados.map(p => {
-              const porcentajeCompletado = Math.round(((p.tareas_completadas || 0) / (p.total_tareas || 1)) * 100);
-              const tareasPendientes = (p.total_tareas || 0) - (p.tareas_completadas || 0);
+              const estaDesbloqueado = proyectosDesbloqueados.includes(p.id_proyecto);
 
               return (
-                <div key={p.id_proyecto} className="dp-card mb-4">
-
-                  {/* Header con ícono, estatus y checkbox de proyecto */}
+                <div key={p.id_proyecto} className={`dp-card ${estaDesbloqueado ? 'dp-card-desbloqueado' : ''}`}>
+                  
+                  {/* Header del proyecto */}
                   <div className="dp-card-header">
-                    <div className="dp-estado-container">
-                      <FaCheckCircle className="dp-icono-estado en-proceso" />
-                      <span className={`dp-estatus-badge ${p.p_estatus?.toLowerCase().replace(' ', '-')}`}>
-                        {p.p_estatus}
-                      </span>
-                    </div>
-
-                    <div className="dp-checkbox-completar">
-                      <input
-                        type="checkbox"
-                        id={`check-${p.id_proyecto}`}
-                        checked={proyectosDesbloqueados.includes(p.id_proyecto)}
-                        onChange={() => handleDesbloquearProyecto(p.id_proyecto)}
-                      />
-                      <label htmlFor={`check-${p.id_proyecto}`}>Desbloquear Proyecto</label>
-                    </div>
-                  </div>
-
-                  <div className="dp-proyecto-nombre">{p.p_nombre}</div>
-
-                  {/* Barra de progreso */}
-                  <div className="dp-progress-container">
-                    <div className="dp-progress-header">
-                      <span>Progreso del proyecto</span>
-                      <span className="porcentaje">{porcentajeCompletado}%</span>
-                    </div>
-                    <div className="dp-progress-bar">
-                      <div className="dp-progress-fill" style={{ width: `${porcentajeCompletado}%` }}></div>
-                    </div>
-                    <div className="dp-progress-stats">
-                      <span>{p.tareas_completadas || 0} completadas</span>
-                      <span>{tareasPendientes} pendientes</span>
-                    </div>
-                  </div>
-
-                  {/* Tareas: se muestran solo si el proyecto está desbloqueado */}
-                  {proyectosDesbloqueados.includes(p.id_proyecto) && (
-                    <div className="dp-tareas-lista mt-3">
-                      {p.tareas.map(t => (
-                        <div key={t.id_tarea} className="dp-tarea-item">
-                          <span>{t.t_nombre}</span>
-                          <input
-                            type="checkbox"
-                            checked={t.t_estatus === "En proceso"}
-                            onChange={() => handleCompletarTarea(t.id_tarea, p.id_proyecto)}
-                          />
-
-                          {t.evidencias?.length > 0 && (
-                            <button className="dp-btn-evidencias" onClick={() => handleVerEvidencias(t)}>
-                              Ver Evidencias ({t.evidencias.length})
-                            </button>
-                          )}
+                    <div className="dp-proyecto-info">
+                      <h3 className="dp-proyecto-nombre">{p.p_nombre}</h3>
+                      <div className="dp-proyecto-meta">
+                       
+                        <div className="dp-tareas-count">
+                          <FaTasks className="dp-tareas-icon" />
+                          {p.tareas_completadas || 0} / {p.total_tareas || 0} tareas
                         </div>
-                      ))}
+                      </div>
                     </div>
-                  )}
+                    
+                    {/* Estado del proyecto */}
+                    <div className="dp-estado-container">
+                      <div className={`dp-status-badge ${estaDesbloqueado ? 'dp-status-desbloqueado' : 'dp-status-bloqueado'}`}>
+                        {estaDesbloqueado ? (
+                          <>
+                            <FiUnlock className="dp-status-icon" />
+                            <span>REABIERTO</span>
+                          </>
+                        ) : (
+                          <>
+                            <FiArchive className="dp-status-icon" />
+                            <span>ARCHIVADO</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                 {/* Tareas: se muestran solo si el proyecto está desbloqueado */}
+{estaDesbloqueado && (
+  <div className="dp-tareas-section">
+    <div className="dp-tareas-header">
+      <h4 className="dp-tareas-titulo">Tareas para reabrir</h4>
+      <span className="dp-tareas-subtitulo">Marca las tareas que deseas reactivar</span>
+    </div>
+    
+    <div className="dp-tareas-lista">
+      {p.tareas.map(t => (
+        <div key={t.id_tarea} className="dp-tarea-item">
+          <div className="dp-tarea-content">
+            <div className="dp-tarea-info">
+              <span className="dp-tarea-nombre">{t.t_nombre}</span>
+            </div>
+            
+            <div className="dp-tarea-actions">
+              {t.evidencias?.length > 0 && (
+                <button className="dp-btn-evidencias" onClick={() => handleVerEvidencias(t)}>
+                  Ver Evidencias ({t.evidencias.length})
+                </button>
+              )}
+              
+              <label className="dp-checkbox-container">
+                <input
+                  type="checkbox"
+                  checked={t.t_estatus === "En proceso"}
+                  onChange={() => handleCompletarTarea(t.id_tarea, p.id_proyecto)}
+                />
+                <span className="dp-checkbox-checkmark"></span>
+                <span className="dp-checkbox-label">
+                  {t.t_estatus === "En proceso" ? "En Proceso" : "Marcar"}
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+                  
+
+                  {/* Botón de acción principal */}
+                  <div className="dp-accion-container">
+                    <button 
+                      className={`dp-btn-accion-principal ${estaDesbloqueado ? 'dp-btn-bloqueado' : 'dp-btn-desbloqueado'}`}
+                      onClick={() => handleDesbloquearProyecto(p.id_proyecto)}
+                    >
+                      {estaDesbloqueado ? (
+                        <>
+                          <FiArchive className="dp-btn-icon" />
+                          ARCHIVAR PROYECTO
+                        </>
+                      ) : (
+                        <>
+                          <FiUnlock className="dp-btn-icon" />
+                          REABRIR PROYECTO
+                        </>
+                      )}
+                    </button>
+                    
+                    {estaDesbloqueado && (
+                      <p className="dp-accion-nota">
+                        Al archivar el proyecto, las tareas marcadas como "En proceso" permanecerán activas
+                      </p>
+                    )}
+                  </div>
+
                 </div>
               );
             })
           ) : (
             <div className="empty-state-global">
-  <LuClock3 className="empty-icon-global" />
-  <h3 className="empty-title-global">No hay proyectos finalizados</h3>
-  <p className="empty-text-global">
-    {busqueda
-      ? "No se encontraron proyectos que coincidan con tu búsqueda."
-      : "Actualmente no tienes proyectos finalizados o disponibles para desbloquear."}
-  </p>
-</div>
-
+               <EmptyState
+    titulo="LISTA DE PROYECTOS"
+    mensaje="Actualmente no tienes proyectos finalizados o disponibles para desbloquear."
+    botonTexto="Volver al Tablero"
+    onVolver={volverSegunRol} 
+    icono={logo3}
+  />
+              <p className="empty-text-global">
+                {busqueda
+                  ? "No se encontraron proyectos que coincidan con tu búsqueda."
+                  : "Actualmente no tienes proyectos finalizados o disponibles para desbloquear."}
+              </p>
+            </div>
           )}
         </div>
       </div>

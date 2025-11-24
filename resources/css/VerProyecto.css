@@ -1,10 +1,3 @@
-.verproyectos-app {
-  font-family: 'Poppins', sans-serif;
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
 
 .verproyectos-lista-proyectos {
   display: flex;
@@ -101,12 +94,12 @@
   border-left-color: #ffd43b;
 }
 
-.estado-alerta {
+.verproyectos-alerta {
   color: #e03131 !important;
   font-weight: 600;
 }
 
-.estado-advertencia {
+.verproyectos-advertencia {
   color: #e67700 !important;
   font-weight: 600;
 }
@@ -139,12 +132,7 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(134, 21, 66, 0.35);
 }
-.buscador-verproyectos-contenedor {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto 30px auto;
-  position: relative;
-}
+
 .buscador-verproyectos-resultados-info {
   text-align: center;
   color: #861542;

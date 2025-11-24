@@ -47,6 +47,7 @@ function AgregarTareas() {
   const [idTareaRecienCreada, setIdTareaRecienCreada] = useState(null);
   const [minFecha, setMinFecha] = useState(null);
   const [maxFecha, setMaxFecha] = useState(null);
+  const [camposModificados, setCamposModificados] = useState({});
 
 
   const ajustarAltura = (ref) => {
@@ -266,8 +267,26 @@ function AgregarTareas() {
 
   const handleCancelar = () => limpiarCampos();
 
-  const handleInputChange = campo =>
-    setErrores(prev => ({ ...prev, [campo]: null }));
+  const handleInputChange = (campo) => {
+  setErrores(prev => ({ ...prev, [campo]: null }));
+  setCamposModificados(prev => ({ ...prev, [campo]: true }));
+};
+
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (Object.keys(camposModificados).length > 0) {
+      e.preventDefault();
+      e.returnValue = ""; 
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [camposModificados]);
+
 
 
   if (loadingInicial) {
@@ -306,21 +325,25 @@ function AgregarTareas() {
             </div>
 
             {/* Descripción */}
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">Descripción</label>
-              <textarea
-                id="descripcionTarea"
-                ref={descripcionTareaRef}
-                className="form-control agregartareas-input"
-                placeholder="Escribe la descripción"
-                rows={2}
-                onInput={() => {
-                  ajustarAltura(descripcionTareaRef);
-                  handleInputChange("descripcion");
-                }}
-              />
-              <ErrorMensaje mensaje={errores.descripcion} />
-            </div>
+<div className="mb-3 d-flex flex-column">
+  <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">
+    Descripción
+  </label>
+  <textarea
+    id="descripcionTarea"
+    ref={descripcionTareaRef}
+    className="form-control agregartareas-input"
+    placeholder="Escribe la descripción"
+    rows={2}
+    style={{ overflow: "hidden" }}
+    onInput={() => {
+      ajustarAltura(descripcionTareaRef);
+      handleInputChange("descripcion");
+    }}
+  />
+  <ErrorMensaje mensaje={errores.descripcion} />
+</div>
+
 
             {/* Departamento */}
             <div className="mb-3 d-flex flex-column">
@@ -328,7 +351,11 @@ function AgregarTareas() {
               <select
                 id="departamento"
                 value={departamentoSeleccionado}
-                onChange={(e) => setDepartamentoSeleccionado(parseInt(e.target.value))}
+                onChange={(e) => {
+  setDepartamentoSeleccionado(parseInt(e.target.value));
+  handleInputChange("departamento");
+}}
+
                 className="form-select"
               >
                 {departamentos.map(d => (

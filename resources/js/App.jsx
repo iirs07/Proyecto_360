@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute'; // Importa tu componente de protección
+import ProtectedRoute from './ProtectedRoute'; 
 // Componentes Públicos
 import Login from './Login';
 import ChangePassword from './ChangePassword';
@@ -22,16 +22,21 @@ import ReportesTareasCompletadas from "./ReportesTareasCompletadas";
 import GestionProyectos from "./GestionProyectos";
 import NuevoProyecto from './NuevoProyecto';
 import AgregarTareas from './AgregarTareas';
-import VerProyecto from "./VerProyecto";
-import VerTareasusuario from './Vertareasusuario';
+import ListaProyectos from "./ListaProyectos";
+import ListaDeTareas from './ListaDeTareas';
 import ModificarProyecto from './ModificarProyecto';
-import ProyectosListaModificar from './ProyectosListaModificar';
+import ProyectosPorModificar from './ProyectosPorModificar';
 import DesbloquearProyectos from "./DesbloquearProyectos";
 import EliminarProyectos from "./EliminarProyectos";
 import TareasenProceso from "./TareasenProceso";
 import TareasPendientes from "./TareasPendientes";
 import VerTareasPendientes from "./VerTareasPendientes";
-
+import TareasCompletadasDepartamento from "./TareasCompletadasDepartamento";
+import AgregarT from "./AgregarT";
+import ModificarTareas from "./ModificarTareas";
+import EliminarTareas from "./EliminarTareas";
+import EditarTareas from "./EditarTareas";
+import Reporte from "./Reporte";
 
 function App() {
   return (
@@ -74,20 +79,21 @@ function App() {
            <Route path="/GestionProyectos" element={<GestionProyectos />} />
            <Route path="/NuevoProyecto" element={<NuevoProyecto />} />
            <Route path="/AgregarTareas" element={<AgregarTareas />} />
-           <Route path="/VerProyecto" element={<VerProyecto />} />
-           <Route path="/Vertareasusuario" element={<VerTareasusuario />} />
+           <Route path="/ListaProyectos" element={<ListaProyectos />} />
+           <Route path="/ListaDeTareas" element={<ListaDeTareas />} />
            <Route path="/ModificarProyecto" element={<ModificarProyecto />} />
-           <Route path="/ProyectosListaModificar" element={<ProyectosListaModificar />} />
+           <Route path="/ProyectosPorModificar" element={<ProyectosPorModificar />} />
            <Route path="/DesbloquearProyectos" element={<DesbloquearProyectos />} />
            <Route path="/EliminarProyectos" element={<EliminarProyectos />} />
            <Route path="/TareasenProceso" element={<TareasenProceso />} />
            <Route path="/TareasPendientes" element={<TareasPendientes />} />
            <Route path="/VerTareasPendientes" element={<VerTareasPendientes />} />
-          
-
-
-
-
+           <Route path="/TareasCompletadasDepartamento" element={<TareasCompletadasDepartamento />} />
+           <Route path="/AgregarT" element={<AgregarT />} />
+           <Route path="/ModificarTareas" element={<ModificarTareas />} />
+           <Route path="/EliminarTareas" element={<EliminarTareas />} />
+           <Route path="/EditarTareas" element={<EditarTareas />} />
+           <Route path="/Reporte" element={<Reporte />} />
 
         </Route>
 

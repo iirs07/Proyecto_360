@@ -65,8 +65,8 @@ public function ObtenerTareasCompletadasDepartamento(Request $request)
         ], 500);
     }
 }
-//PROYECTOSVER, TODOS LOS PROYECTOS DE UN DEPARTAMENTO
-public function proyectosDepartamento(Request $request)
+//ESTE METODO DEVUELVE TODOS LOS PROYECTOS DE UN DEPARTAMENTO
+public function MostrarProyectos(Request $request)
 {
     try {
         $idUsuario = $request->query('usuario');
@@ -95,10 +95,11 @@ public function proyectosDepartamento(Request $request)
         'p.*',
         DB::raw('COUNT(t.id_tarea) as total_tareas'),
         DB::raw("SUM(CASE WHEN t.t_estatus = 'En proceso' THEN 1 ELSE 0 END) as tareas_en_proceso"),
-        DB::raw("SUM(CASE WHEN t.t_estatus = 'Completado' THEN 1 ELSE 0 END) as tareas_completadas")
+        DB::raw("SUM(CASE WHEN t.t_estatus = 'Finalizado' THEN 1 ELSE 0 END) as tareas_completadas")
+
     )
     ->where('p.id_departamento', $idDepartamento)
-    ->where('p.p_estatus', 'EN PROCESO')
+    ->where('p.p_estatus', 'En proceso')
     ->groupBy('p.id_proyecto')
     ->get();
         return response()->json([

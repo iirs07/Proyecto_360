@@ -205,4 +205,462 @@ public function cambiarStatusTareaEnProceso($idTarea)
         ], 500);
     }
 }
+public function completarTarea($id)
+    {
+        try {
+            \Log::info('Solicitud recibida para completar tarea:', ['id' => $id]);
+            
+            // Buscar la tarea
+            $tarea = Tarea::find($id);
+            
+            if (!$tarea) {
+                \Log::warning('Tarea no encontrada:', ['id' => $id]);
+                return response()->json(['success' => false, 'mensaje' => 'Tarea no encontrada'], 404);
+            }
+
+            \Log::info('Tarea encontrada:', ['tarea' => $tarea]);
+
+            // Actualizar el estado
+            $tarea->update([
+                't_estatus' => 'Finalizada',
+                'tf_completada' => now()
+            ]);
+
+            \Log::info('Tarea actualizada exitosamente');
+
+            return response()->json([
+                'success' => true,
+                'mensaje' => 'Tarea marcada como Finalizada',
+                'tarea' => $tarea
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error en completarTarea:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+    public function obtenerProyectosCompletados(Request $request)
+{
+    try {
+        $usuarioId = $request->query('usuario_id'); 
+        $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
+
+        if (!$usuario) {
+            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
+        }
+
+        $idDepartamento = $usuario->id_departamento;
+
+        $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
+            // 🛑 GRUPO DE CONDICIONES para visibilidad del proyecto
+            ->where(function ($query) {
+                // 1. Condición: El proyecto está en estatus 'Finalizada' (estado archivado).
+                $query->where('p_estatus', 'ILIKE', 'Finalizado')
+                      
+                      // 2. Condición: El proyecto está en estatus 'En proceso' (estado desbloqueado), 
+                      //    PERO todavía tiene tareas que requieren la acción de 'Finalizada'.
+                      ->orWhere(function ($q) {
+                          // Usamos 'En proceso' con el espacio.
+                          $q->where('p_estatus', 'ILIKE', 'En proceso')
+                            ->whereHas('tareas', function($tq) {
+                                // Mantenemos visible el proyecto si, aun estando en 'En proceso',
+                                // tiene al menos una tarea que sigue 'Finalizada'.
+                                $tq->where('t_estatus', 'ILIKE', 'Finalizada'); 
+                            });
+                      });
+            })
+            // 🛑 FIN DEL GRUPO DE CONDICIONES
+            
+            // whereHas: Nos aseguramos de cargar proyectos que tengan tareas en estado Finalizada O En proceso.
+            ->whereHas('tareas', function($q) {
+                // Usamos LOWER para asegurar que no haya problemas de mayúsculas/minúsculas al buscar las tareas.
+                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['finalizada', 'En proceso']); 
+            })
+            
+            // with: Cargamos las tareas para el frontend
+            ->with(['tareas' => function($q) {
+                // Excluimos 'pendiente', solo cargamos 'Finalizada' y 'En proceso'.
+                $q->where(DB::raw('LOWER(t_estatus)'), '!=', 'pendiente')
+                  ->with('evidencias');
+            }])
+
+            ->get()
+            ->map(function($proyecto) {
+                // Mantenemos la lógica de contadores
+                $proyecto->total_tareas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)->count();
+                $proyecto->tareas_completadas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)
+                    ->whereHas('evidencias') 
+                    ->count();
+                return $proyecto;
+            });
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectos
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+}
+public function tareasPendientesUsuario(Request $request)
+{
+    try {
+        $idUsuario = $request->query('usuario');
+        if (!$idUsuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se recibió el ID de usuario'
+            ], 400);
+        }
+        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Usuario no encontrado'
+            ], 404);
+        }
+        $idDepartamento = $usuario->id_departamento;
+        $proyectos = DB::table('proyectos as p')
+            ->join('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
+            ->select(
+                'p.*',
+                DB::raw('COUNT(t.id_tarea) as total_tareas')
+            )
+            ->where('p.id_departamento', $idDepartamento)
+            ->where('p.p_estatus', 'En proceso')
+           ->whereRaw("TRIM(t_estatus) = ?", ['Pendiente'])
+            ->groupBy('p.id_proyecto')
+            ->get();
+
+        $proyectosConTareas = [];
+        foreach ($proyectos as $proyecto) {
+            $tareas = DB::table('tareas')
+                ->where('id_proyecto', $proyecto->id_proyecto)
+                ->whereRaw("TRIM(t_estatus) = ?", ['Pendiente'])
+                ->get();
+
+            $proyectosConTareas[] = [
+                'proyecto' => $proyecto,
+                'tareas' => $tareas
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectosConTareas
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function tareasCompletadasDepartamento(Request $request)
+{
+    $idUsuario = $request->query('usuario');
+
+    if (!$idUsuario) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'No se recibió el ID de usuario'
+        ], 400);
+    }
+
+    $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+    if (!$usuario) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'Usuario no encontrado'
+        ], 404);
+    }
+
+    $idDepartamento = $usuario->id_departamento;
+    $tareas = DB::table('tareas as t')
+        ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
+        ->where('p.id_departamento', $idDepartamento)
+        ->whereRaw("UPPER(TRIM(t.t_estatus)) = ?", ['FINALIZADA'])
+        ->select('t.*', 'p.p_nombre', 'p.pf_inicio', 'p.pf_fin', 'p.p_estatus')
+        ->get();
+
+    if ($tareas->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'mensaje' => 'No hay tareas finalizadas para este departamento'
+        ]);
+    }
+
+    $proyectosConTareas = $tareas
+        ->groupBy('id_proyecto')
+        ->map(function ($tareasProyecto, $idProyecto) {
+            $proyecto = $tareasProyecto->first();
+            return [
+                'proyecto' => [
+                    'id_proyecto' => $idProyecto,
+                    'p_nombre' => $proyecto->p_nombre,
+                    'pf_inicio' => $proyecto->pf_inicio,
+                    'pf_fin' => $proyecto->pf_fin,
+                    'p_estatus' => $proyecto->p_estatus,
+                    'total_tareas' => $tareasProyecto->count(),
+                ],
+                'tareas' => $tareasProyecto
+            ];
+        })
+        ->values(); 
+
+    return response()->json([
+        'success' => true,
+        'proyectos' => $proyectosConTareas
+    ]);
+}
+
+public function EliminarTareasPorDepartamento(Request $request)
+{
+    try {
+        $idUsuario = $request->query('usuario');
+        if (!$idUsuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se recibió el ID de usuario'
+            ], 400);
+        }
+
+        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Usuario no encontrado'
+            ], 404);
+        }
+
+        $idDepartamento = $usuario->id_departamento;
+
+        $tareas = DB::table('tareas as t')
+            ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
+            ->leftJoin('evidencias as e', function($join) {
+                $join->on('t.id_tarea', '=', 'e.id_tarea')
+                     ->on('t.id_proyecto', '=', 'e.id_proyecto');
+            })
+            ->where('p.id_departamento', $idDepartamento)
+            ->where(function($query) {
+                $query->where('t.t_estatus', 'En proceso') // Incluye todas en proceso
+                      ->orWhere(function($q){
+                          $q->where('t.t_estatus', 'Pendiente')
+                            ->whereNull('e.id_evidencia'); // Pendientes sin evidencia
+                      });
+            })
+            ->select(
+                't.*',
+                'p.p_nombre',
+                'p.pf_inicio',
+                'p.pf_fin',
+                'p.p_estatus'
+            )
+            ->get();
+
+        if ($tareas->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No hay tareas para este departamento'
+            ]);
+        }
+
+        $proyectosConTareas = $tareas
+            ->groupBy('id_proyecto')
+            ->map(function ($tareasProyecto, $idProyecto) {
+                $proyecto = $tareasProyecto->first();
+                return [
+                    'proyecto' => [
+                        'id_proyecto' => $idProyecto,
+                        'p_nombre' => $proyecto->p_nombre,
+                        'pf_inicio' => $proyecto->pf_inicio,
+                        'pf_fin' => $proyecto->pf_fin,
+                        'p_estatus' => $proyecto->p_estatus,
+                        'total_tareas' => $tareasProyecto->count(),
+                    ],
+                    'tareas' => $tareasProyecto
+                ];
+            })
+            ->values(); 
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectosConTareas
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+//TAREAS POR DEPARTAMENTO PARA MODIFICAR
+public function tareasPorDepartamento(Request $request)
+{
+    try {
+        $idUsuario = $request->query('usuario');
+        if (!$idUsuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se recibió el ID de usuario'
+            ], 400);
+        }
+        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Usuario no encontrado'
+            ], 404);
+        }
+        $idDepartamento = $usuario->id_departamento;
+       $tareas = DB::table('tareas as t')
+    ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
+    ->leftJoin('evidencias as e', function($join) {
+        $join->on('t.id_tarea', '=', 'e.id_tarea')
+             ->on('t.id_proyecto', '=', 'e.id_proyecto');
+    })
+    ->where('p.id_departamento', $idDepartamento)
+    ->where(function($query) {
+        $query->where('t.t_estatus', 'En proceso')
+              ->orWhere(function($q){
+                  $q->where('t.t_estatus', 'Pendiente')
+                    ->whereNull('e.id_evidencia'); 
+              });
+    })
+    ->select(
+        't.*',
+        'p.p_nombre',
+        'p.pf_inicio',
+        'p.pf_fin',
+        'p.p_estatus'
+    )
+    ->get();
+
+        if ($tareas->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No hay tareas para este departamento'
+            ]);
+        }
+
+        $proyectosConTareas = $tareas
+            ->groupBy('id_proyecto')
+            ->map(function ($tareasProyecto, $idProyecto) {
+                $proyecto = $tareasProyecto->first();
+                return [
+                    'proyecto' => [
+                        'id_proyecto' => $idProyecto,
+                        'p_nombre' => $proyecto->p_nombre,
+                        'pf_inicio' => $proyecto->pf_inicio,
+                        'pf_fin' => $proyecto->pf_fin,
+                        'p_estatus' => $proyecto->p_estatus,
+                        'total_tareas' => $tareasProyecto->count(),
+                    ],
+                    'tareas' => $tareasProyecto
+                ];
+            })
+            ->values(); 
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectosConTareas
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+// OBTENER UNA TAREA POR ID
+public function show($idTarea)
+{
+    try {
+        $tarea = Tarea::with(['usuario', 'usuario.departamento', 'proyecto'])->find($idTarea);
+
+        if (!$tarea) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tarea no encontrada'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'tarea' => $tarea
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+// ELIMINAR UNA TAREA POR ID
+public function eliminarTarea($idTarea)
+{
+    try {
+        $tarea = Tarea::find($idTarea);
+
+        if (!$tarea) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tarea no encontrada'
+            ], 404);
+        }
+
+        $tarea->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tarea eliminada correctamente'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function update(Request $request, $idTarea)
+{
+    try {
+        $tarea = Tarea::find($idTarea);
+
+        if (!$tarea) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tarea no encontrada'
+            ], 404);
+        }
+        $tarea->t_nombre   = $request->t_nombre ?? $tarea->t_nombre;
+        $tarea->descripcion = $request->descripcion ?? $tarea->descripcion;
+        $tarea->tf_inicio  = $request->tf_inicio ?? $tarea->tf_inicio;
+        $tarea->tf_fin     = $request->tf_fin ?? $tarea->tf_fin;
+        $tarea->id_usuario = $request->id_usuario ?? $tarea->id_usuario;
+
+        $tarea->save();
+
+        return response()->json([
+            'success' => true,
+            'tarea' => $tarea
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
 }
