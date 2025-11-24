@@ -1,0 +1,153 @@
+
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   background-color: #ffffff;
+  min-height: calc(100vh - 70px); 
+  z-index: 100;
+  position: relative;
+}
+
+
+
+
+/* La barra superior color vino */
+
+.header-bar {
+
+  background-color: #881C34; /* Color vino institucional */
+
+  color: white;
+
+  padding: 1rem;
+
+  text-align: center;
+
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+}
+
+
+
+.header-title {
+
+  margin: 0;
+
+  font-size: 1.1rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  font-weight: 700;
+
+}
+
+
+
+/* El contenedor del "Estado Vacío" centrado */
+
+.empty-state-container {
+
+  flex: 1; /* Ocupa el resto de la altura disponible */
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center; /* Centra horizontalmente */
+
+  justify-content: center; /* Centra verticalmente */
+
+  padding: 2rem;
+
+  text-align: center;
+
+}
+
+
+
+.escudo-icon {
+
+  width: 120px;     /* Tamaño pequeño/mediano */
+
+  height: auto;
+
+  margin-bottom: 1.5rem;
+
+
+
+  user-select: none;
+
+}
+
+
+
+/* Tipografía */
+
+.empty-title {
+
+  font-size: 1.5rem;
+
+  color: #374151; /* Gris oscuro */
+
+  font-weight: 700;
+
+  margin-bottom: 0.5rem;
+
+}
+
+
+
+.empty-description {
+
+  color: #6b7280; /* Gris medio */
+
+  max-width: 400px;
+
+  margin-bottom: 2rem;
+
+  line-height: 1.5;
+
+}
+
+
+
+/* Botón */
+
+.btn-volver {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.5rem; /* Espacio entre icono y texto */
+
+  background-color: #881C34;
+
+  color: white;
+
+  border: none;
+
+  padding: 10px 24px;
+
+  border-radius: 6px;
+
+  font-size: 1rem;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: background-color 0.3s ease;
+
+}
+
+
+
+.btn-volver:hover {
+
+  background-color: #6a1628; /* Un poco más oscuro al pasar el mouse */
+
+}

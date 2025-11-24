@@ -181,7 +181,7 @@ function ReportesTareasCompletadas() {
 
         <div className="reportes mt-4 mx-auto p-3">
           <div className="fecha-selectores-container tareas-completadas d-flex justify-content-center gap-3 mb-3">
-            <div className="fecha-item">
+            <div className="reportes-fecha-item">
               <label className="reportes-form-label fw-bold">Fecha de inicio:</label>
               <DatePicker
                 selected={fechaInicio}
@@ -200,7 +200,7 @@ function ReportesTareasCompletadas() {
               <ErrorMensaje mensaje={errores.fechaInicio} />
             </div>
 
-            <div className="fecha-item">
+            <div className="reportes-fecha-item">
               <label className="reportes-form-label fw-bold">Fecha de fin:</label>
               <DatePicker
                 selected={fechaFin}

@@ -3,18 +3,21 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/VerProyecto.css";
-import { FaAngleDown, FaCalendarAlt, FaTasks, FaExclamationTriangle, FaSearch } from "react-icons/fa";
+import { FaCalendarAlt, FaTasks, FaExclamationTriangle, FaSearch } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import SelectDinamico from "../components/SelectDinamico";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 
-function Proyectos() {
+function ListaProyectos() {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { volverSegunRol } = useRolNavigation();
 
   const opciones = [
     { value: "alfabetico", label: "Nombre (A-Z)" },
@@ -46,7 +49,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
 
   const verTareas = (idProyecto) => {
     sessionStorage.setItem("id_proyecto", idProyecto);
-    navigate("/vertareasusuario", { state: { id_proyecto: idProyecto } });
+    navigate("/ListaDeTareas", { state: { id_proyecto: idProyecto } });
   };
 
   useEffect(() => {
@@ -90,14 +93,13 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
   
 
   return (
-    <Layout titulo="PROYECTOS DEL DEPARTAMENTO" sidebar={<MenuDinamico activeRoute="Ver Proyectos" />}>
+    <Layout titulo="PROYECTOS" 
+    sidebar={<MenuDinamico activeRoute="ver" />}>
       <div className="container my-4">
         <div className="row justify-content-center">
-          <h1 className="titulo-global">Proyectos</h1>
 
           {proyectos.length > 0 && (
             <div className="barra-busqueda-global-container mb-4">
-              {/* Barra de búsqueda */}
               <div className="barra-busqueda-global-wrapper">
                 <FaSearch className="barra-busqueda-global-icon" />
                 <input
@@ -149,7 +151,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                 <div className="loader-logo">
                   <img src={logo3} alt="Cargando proyectos" />
                 </div>
-                <div className="loader-texto">CARGANDO...</div>
+                <div className="loader-texto">CARGANDO PROYECTOS...</div>
                 <div className="loader-spinner"></div>
               </div>
             ) : proyectosFiltrados.length > 0 ? (
@@ -167,7 +169,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                   <div key={p.id_proyecto} className="verproyectos-card">
                     <h5 className="verproyecto-nombre">{p.p_nombre}</h5>
 
-                    <div className="proyectos-info">
+                    <div className="verproyectos-info">
                       <div className="verproyectos-info-item">
                         <FaCalendarAlt className="verproyectos-info-icon" />
                         <span>
@@ -183,14 +185,14 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                       </div>
 
                       {estaVencido && (
-                        <div className="verproyectos-info-item estado-alerta">
+                        <div className="verproyectos-info-item verproyectos-alerta">
                           <FaExclamationTriangle />
                           <span><strong>¡Vencido!</strong></span>
                         </div>
                       )}
 
                       {esProximo && !estaVencido && (
-                        <div className="verproyectos-info-item estado-advertencia">
+                        <div className="verproyectos-info-item verproyectos-advertencia">
                           <FaExclamationTriangle />
                           <span>
                             <strong>
@@ -226,7 +228,13 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                 );
               })
             ) : busqueda.length === 0 ? (
-              <p className="form-titulo">No hay proyectos disponibles</p>
+             <EmptyState
+                 titulo="PROYECTOS"
+                 mensaje="No hay proyectos disponibles."
+                 botonTexto="Volver al Tablero"
+                 onVolver={volverSegunRol} 
+                 icono={logo3}
+               />
             ) : null}
           </div>
         </div>
@@ -235,7 +243,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
   );
 }
 
-export default Proyectos;
+export default ListaProyectos;
 
 
 

@@ -104,7 +104,7 @@ button.btn-calendario:focus {
   gap: 1rem;
 }
 
-.fecha-item {
+.reportes-fecha-item {
  min-width: 150px;
   flex: 0 0 auto;
 }

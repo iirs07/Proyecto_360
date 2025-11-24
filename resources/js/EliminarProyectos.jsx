@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
-import "../css/ProyectosM.css";
-import { FaSearch, FaProjectDiagram } from "react-icons/fa";
+import "../css/EliminarProyectos.css";
+import { FaSearch, FaTrash, FaCalendarAlt } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 import ConfirmModal from "../components/ConfirmModal";
 
 function EliminarProyectos() {
@@ -16,6 +18,8 @@ function EliminarProyectos() {
   const [modalOpen, setModalOpen] = useState(false);
   const [proyectoAEliminar, setProyectoAEliminar] = useState(null);
   const navigate = useNavigate();
+  const { volverSegunRol } = useRolNavigation();
+
 
   // Cargar proyectos sin tareas
   useEffect(() => {
@@ -24,7 +28,6 @@ function EliminarProyectos() {
     const token = localStorage.getItem("jwt_token");
 
     if (!idUsuario || !token) {
-      console.error("❌ No se encontró id_usuario o token JWT");
       setLoading(false);
       return;
     }
@@ -58,14 +61,10 @@ function EliminarProyectos() {
       })
       .finally(() => setLoading(false));
   }, [navigate]);
-
-  // Abrir modal de confirmación
   const confirmarEliminar = (proyecto) => {
     setProyectoAEliminar(proyecto);
     setModalOpen(true);
   };
-
-  // Función para eliminar un proyecto
   const eliminarProyecto = () => {
     if (!proyectoAEliminar) return;
     const token = localStorage.getItem("jwt_token");
@@ -98,79 +97,102 @@ function EliminarProyectos() {
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  return (
-    <Layout titulo="ELIMINAR PROYECTOS" sidebar={<MenuDinamico activeRoute="Eliminar proyecto" />}>
-      <div className="container my-4">
-        <h1 className="titulo-global">Proyectos</h1>
+ return (
+  <Layout titulo="ELIMINAR PROYECTOS" sidebar={<MenuDinamico activeRoute="Eliminar proyecto" />}>
+    <div className="container my-4">
 
-        {/* Barra de búsqueda */}
-        {proyectos.length > 0 && (
-          <div className="barra-busqueda-global-container mb-4">
-            <div className="barra-busqueda-global-wrapper">
-              <FaSearch className="barra-busqueda-global-icon" />
-              <input
-                type="text"
-                placeholder="Buscar proyectos por nombre..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="barra-busqueda-global-input"
-              />
-              {busqueda && (
-                <button className="buscador-clear-global" onClick={() => setBusqueda("")}>
-                  <FiX />
-                </button>
-              )}
-            </div>
+      {/* Barra de búsqueda */}
+      {proyectos.length > 0 && (
+        <div className="barra-busqueda-global-container mb-4">
+          <div className="barra-busqueda-global-wrapper">
+            <FaSearch className="barra-busqueda-global-icon" />
+            <input
+              type="text"
+              placeholder="Buscar proyectos por nombre..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="barra-busqueda-global-input"
+            />
+            {busqueda && (
+              <button className="buscador-clear-global" onClick={() => setBusqueda("")}>
+                <FiX />
+              </button>
+            )}
           </div>
-        )}
-
-        {/* Lista de proyectos */}
-        <div className="modificar-proyectos-lista">
-          {loading ? (
-            <div className="loader-container">
-              <div className="loader-logo">
-                <img src={logo3} alt="Cargando" />
-              </div>
-              <div className="loader-texto">CARGANDO...</div>
-              <div className="loader-spinner"></div>
-            </div>
-          ) : proyectosFiltrados.length === 0 ? (
-            <div className="empty-state-global">
-              <FaProjectDiagram className="empty-icon-global" size={48} />
-              <h3 className="empty-title-global">No se encontraron proyectos</h3>
-              <p className="empty-text-global">Intenta con otros términos de búsqueda</p>
-            </div>
-          ) : (
-            proyectosFiltrados.map((p) => (
-              <div key={p.id_proyecto} className="modificar-proyectos-card">
-                <h5 className="modificar-proyectos-nombre">{p.p_nombre}</h5>
-                <div className="modificar-proyectos-fp">
-                  <div>Fin: {p.pf_fin}</div>
-                </div>
-                <div className="modificar-proyectos-botones">
-                  <button
-                    className="modificar-proyectos-btn eliminar"
-                    onClick={() => confirmarEliminar(p)}
-                  >
-                    Eliminar proyecto
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
         </div>
+      )}
 
-        {/* Modal de confirmación */}
-        <ConfirmModal
-          isOpen={modalOpen}
-          title="Confirmar eliminación"
-          message={`¿Estás seguro que deseas eliminar el proyecto "${proyectoAEliminar?.p_nombre}"?`}
-          onConfirm={eliminarProyecto}
-          onCancel={() => setModalOpen(false)}
-        />
+      {/* Lista de proyectos */}
+      <div className="eliminar-proyectos-lista">
+        {loading ? (
+          <div className="loader-container">
+            <div className="loader-logo">
+              <img src={logo3} alt="Cargando" />
+            </div>
+            <div className="loader-texto">CARGANDO...</div>
+            <div className="loader-spinner"></div>
+          </div>
+        ) : proyectosFiltrados.length === 0 ? (
+          <EmptyState
+            titulo="ELIMINAR PROYECTOS"
+            mensaje="No hay proyectos disponibles."
+            botonTexto="Volver al Tablero"
+            onVolver={volverSegunRol}
+            icono={logo3}
+          />
+        ) : (
+          proyectosFiltrados.map((p) => {
+            const fechaFin = new Date(p.pf_fin);
+            const hoy = new Date();
+            fechaFin.setHours(0, 0, 0, 0);
+            hoy.setHours(0, 0, 0, 0);
+
+            const estaVencido = fechaFin < hoy;
+
+            return (
+              <div key={p.id_proyecto} className="eliminar-proyectos-card">
+                <h5 className="eliminar-proyectos-nombre">{p.p_nombre}</h5>
+
+                <div className="eliminar-proyectos-fp">
+                  <div className="eliminar-info-item">
+                                          <FaCalendarAlt className="eliminar-info-icon" />
+                                          <span>
+                                            <strong>Finaliza:</strong> {fechaFin.toLocaleDateString()}
+                                          </span>
+                                        </div>
+                  {estaVencido && (
+                    <div className="eliminar-alerta">
+                      <FaExclamationTriangle /> <strong>¡Vencido!</strong>
+                    </div>
+                  )}
+                </div>
+
+                <div className="eliminar-proyectos-botones">
+                  <button
+  className="eliminar-proyectos-btn eliminar"
+  onClick={() => confirmarEliminar(p)}
+>
+  <FaTrash style={{ marginRight: "8px" }} /> Eliminar proyecto
+</button>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
-    </Layout>
-  );
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={modalOpen}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro que deseas eliminar el proyecto "${proyectoAEliminar?.p_nombre}"?`}
+        onConfirm={eliminarProyecto}
+        onCancel={() => setModalOpen(false)}
+      />
+    </div>
+  </Layout>
+);
+
 }
 
 export default EliminarProyectos;

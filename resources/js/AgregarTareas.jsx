@@ -276,7 +276,7 @@ useEffect(() => {
   const handleBeforeUnload = (e) => {
     if (Object.keys(camposModificados).length > 0) {
       e.preventDefault();
-      e.returnValue = ""; // Necesario para mostrar el diálogo
+      e.returnValue = ""; 
     }
   };
 
@@ -325,21 +325,25 @@ useEffect(() => {
             </div>
 
             {/* Descripción */}
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">Descripción</label>
-              <textarea
-                id="descripcionTarea"
-                ref={descripcionTareaRef}
-                className="form-control agregartareas-input"
-                placeholder="Escribe la descripción"
-                rows={2}
-                onInput={() => {
-                  ajustarAltura(descripcionTareaRef);
-                  handleInputChange("descripcion");
-                }}
-              />
-              <ErrorMensaje mensaje={errores.descripcion} />
-            </div>
+<div className="mb-3 d-flex flex-column">
+  <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">
+    Descripción
+  </label>
+  <textarea
+    id="descripcionTarea"
+    ref={descripcionTareaRef}
+    className="form-control agregartareas-input"
+    placeholder="Escribe la descripción"
+    rows={2}
+    style={{ overflow: "hidden" }}
+    onInput={() => {
+      ajustarAltura(descripcionTareaRef);
+      handleInputChange("descripcion");
+    }}
+  />
+  <ErrorMensaje mensaje={errores.descripcion} />
+</div>
+
 
             {/* Departamento */}
             <div className="mb-3 d-flex flex-column">

@@ -1,13 +1,15 @@
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiX } from "react-icons/fi";
 import { LuClock3 } from "react-icons/lu";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import "../css/formulario.css";
 import "../css/VerTareasPendientes.css";
 import logo3 from "../imagenes/logo3.png"; 
-import { FiCheck } from "react-icons/fi";
+import { FiX, FiCheck, FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+
 
 function VerTareasPendientes() {
   const [tareaCompletada, setTareaCompletada] = useState(false);
@@ -22,11 +24,11 @@ function VerTareasPendientes() {
   const [imagenCargando, setImagenCargando] = useState(true);
   const [cargandoProyecto, setCargandoProyecto] = useState(true);
   const navigate = useNavigate();
-
+   const { volverSegunRol } = useRolNavigation();
   const obtenerProyectoActualizado = async () => {
   const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
   const usuario = JSON.parse(localStorage.getItem("usuario"));
-  const token = localStorage.getItem("jwt_token"); // <-- obtenemos el token
+  const token = localStorage.getItem("jwt_token"); 
 
   if (!proyectoGuardado || !usuario?.id_usuario) {
     return navigate("/tareas-en-proceso");
@@ -202,71 +204,96 @@ const tareasFiltradas = proyecto?.tareas
 
   if (!proyecto) return null;
 
-  return (
-   
-<Layout
-          titulo="TAREAS POR REVISAR"
-          sidebar={<MenuDinamico activeRoute="enproceso" />}
-        >
-      <div className="contenedor-global">
-        <h1 className="titulo-global">
-          Tareas del proyecto: <span >{proyecto.p_nombre}</span>
-        </h1>
-
-        <div className="vtp-contenedor-buscador-y-tarjetas">
-          <div className="vtp-lista-tareas">
-            {tareasFiltradas?.length > 0 ? (
-              tareasFiltradas.map(t => (
-                <div key={t.id_tarea} className="vtp-item-tarea">
-  {/* HEADER */}
-  <div className="vtp-tarea-header">
-    <div className="vtp-tarea-header-left">
-      <LuClock3 className="vtp-icono-pendiente" />
-      <span className="vtp-tarea-nombre">{t.t_nombre}</span>
-    </div>
-    {t.t_estatus !== "Finalizada" && (
-      <label className="vtp-checkbox-completar">
-        <input
-          type="checkbox"
-          onChange={() => handleCompletarTarea(t.id_tarea)}
-          disabled={cargando}
-        />
-        Marcar como Finalizada
-      </label>
-    )}
-  </div>
-
-  {/* FOOTER */}
-  <div className="vtp-tarea-footer">
-    <span className={`vtp-tarea-estatus ${getStatusClass(t.t_estatus)}`}>
-      {t.t_estatus}
-    </span>
-    <span className="vtp-tarea-fecha">Vence: {t.tf_fin || t.fechaVencimiento}</span>
-    <button
-      className="vtp-btn-evidencias"
-      onClick={() => handleVerEvidencias(t)}
+   return (
+   <Layout
+      titulo="TAREAS POR REVISAR"
+      sidebar={<MenuDinamico activeRoute="enproceso" />}
     >
-      Ver Evidencias ({t.evidencias?.length || 0})
-    </button>
-  </div>
-</div>
-
-              ))
-            ) : (
-              <div className="vtp-no-tareas-mensaje">
-                <LuClock3 style={{ fontSize: '3rem', color: '#861542', marginBottom: '15px' }} />
-                <h3 style={{ color: '#861542', marginBottom: '10px' }}>
-                  {busqueda ? 'No hay tareas que coincidan con la búsqueda' : 'No hay tareas pendientes'}
-                </h3>
-                <p style={{ color: '#6c757d' }}>
-                  {busqueda
-                    ? 'Intenta con otros términos de búsqueda'
-                    : 'Todas las tareas están completadas o no hay tareas asignadas'}
-                </p>
-              </div>
-            )}
-          </div>
+      <div className="contenedor-global">
+        {/* TÍTULO DEL PROYECTO SOLO UNA VEZ */}
+        <div className="vtp-titulo-proyecto">
+          <span className="vtp-label-proyecto">Proyecto</span> 
+          <h1 className="vtp-nombre-proyecto">{proyecto?.p_nombre}</h1>
         </div>
+        
+        <div className="vtp-lista-tareas">
+          {tareasFiltradas?.length > 0 ? (
+            tareasFiltradas.map(t => (
+              <div key={t.id_tarea} className="vtp-item-tarea">
+                {/* HEADER SIMPLE */}
+                <div className="vtp-tarea-header">
+                  <h3 className="vtp-tarea-nombre">{t.t_nombre}</h3>
+                  <p className="vtp-tarea-descripcion">
+                    {t.descripcion || "Sin descripción detallada para esta tarea."}
+                  </p>
+                </div>
+
+                {/* ACCIONES */}
+                <div className="vtp-acciones-tarea">
+                  {t.t_estatus !== "Finalizada" && (
+                    <div className="vtp-accion-finalizar">
+                      <input
+                        type="checkbox"
+                        id={`check-${t.id_tarea}`}
+                        onChange={() => handleCompletarTarea(t.id_tarea)}
+                        disabled={cargando}
+                      />
+                      <label htmlFor={`check-${t.id_tarea}`}>
+                        Marcar como finalizada
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+
+                {/* FOOTER REDISEÑADO */}
+                <div className="vtp-tarea-footer">
+                  <div className="vtp-info-adicional">
+                    <span className={`vtp-badge-estatus ${getStatusClass(t.t_estatus)}`}>
+                      {t.t_estatus}
+                    </span>
+
+                    <span className="vtp-fecha-limpia">
+                      <FiCalendar className="vtp-icono-fecha" /> 
+                      Vence: {t.tf_fin || t.fechaVencimiento}
+                    </span>
+                  </div>
+
+                  <button
+                    className="vtp-btn-evidencias"
+                    onClick={() => handleVerEvidencias(t)}
+                  >
+                    Ver Evidencias
+                    <span className="vtp-contador-evidencias">
+                      {t.evidencias?.length || 0}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : busqueda ? (
+            <div className="vtp-no-tareas-mensaje">
+              <LuClock3
+                style={{ fontSize: '3rem', color: '#861542', marginBottom: '15px' }}
+              />
+              <h3 style={{ color: '#861542', marginBottom: '10px' }}>
+                No hay tareas que coincidan con la búsqueda
+              </h3>
+              <p style={{ color: '#6c757d' }}>
+                Intenta con otros términos de búsqueda
+              </p>
+            </div>
+          ) : (
+            <EmptyState
+              titulo="TAREAS POR REVISAR"
+              mensaje="No hay tareas por revisar."
+              botonTexto="Volver al Tablero"
+              onVolver={volverSegunRol}
+              icono={logo3}
+            />
+          )}
+        </div>
+      </div>
 
         {modalVisible && tareaActual && (
           <div className="vtp-modal">
@@ -336,8 +363,6 @@ const tareasFiltradas = proyecto?.tareas
   </div>
 )}
 
-
-      </div>
   </Layout>
   );
 }

@@ -206,7 +206,7 @@ useEffect(() => {
               <h1 className="titulo-global">Nuevo Proyecto</h1>
                  </div>
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="nombreProyecto" className="nv-form-label fw-bold form-label">Nombre del proyecto</label>
+              <label htmlFor="nombreProyecto" className="nv-form-label fw-bold nv-label">Nombre del proyecto</label>
               <textarea
                 id="nombreProyecto"
                 ref={nombreProyectoRef}
@@ -219,7 +219,7 @@ useEffect(() => {
             </div>
 
             <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionProyecto" className="nv-form-label fw-bold nuevoproyecto-label">Descripción del proyecto</label>
+              <label htmlFor="descripcionProyecto" className="nv-form-label fw-bold nv-label">Descripción del proyecto</label>
               <textarea
                 id="descripcionProyecto"
                 ref={descripcionProyectoRef}
@@ -264,7 +264,7 @@ useEffect(() => {
     <ErrorMensaje mensaje={errores.fin} />
   </div>
 </div>
-            <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
+            <div className="d-flex flex-column flex-md-row gap-3 justify-content-center">
               {mostrarExtras ? (
                 <>
                   <button 

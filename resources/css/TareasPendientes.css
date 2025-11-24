@@ -38,7 +38,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #861542, #a83267);
+  background: linear-gradient(90deg, #e53e3e, #e53e3a);
 }
 
 .tareaspendientesj-proyectos-card:hover {
@@ -47,11 +47,11 @@
 }
 
 .tareaspendientesj-nombre-proyecto {
-  font-size: 24px;
+  font-size: 21px;
   font-weight: 700;
   text-align: center;
   margin-bottom: 25px;
-  color: #861542;
+  color: #0B0C10;
   padding: 10px;
   position: relative;
   text-transform: uppercase;
@@ -64,7 +64,7 @@
   left: 25%;
   width: 50%;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #861542, transparent);
+  background: linear-gradient(90deg, transparent, #e53e3e, transparent);
 }
 
 .tareaspendientesj-lista-tareas-TP {
@@ -117,9 +117,10 @@
 
 
 .tareaspendientesj-tarea-nombre-TP {
-  font-weight: 600;
-  font-size: 18px;
-  color: #000;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #475569;
   margin: 0;
   text-transform: uppercase;
 }
@@ -137,8 +138,8 @@
   color: #c53030;
   padding: 6px 16px;
   border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -236,6 +237,16 @@
   }
   
 }
+.tareaspendientesj-item-tarea-pendiente {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  margin-bottom: 15px;
+}
 
 .tareas-pendientes-filtros{
   display: flex;
@@ -243,7 +254,41 @@
   gap: 10px;
   margin-bottom: 1.5rem;
 }
+/* Tarea vencida */
+.tareaspendientesj-item-tarea-pendiente.vencida {
+  background: linear-gradient(135deg, #fff5f5, #fed7d7); /* rojo suave */
+  border: 2px solid #fc8181;
+}
 
+/* Etiqueta de estatus cuando está vencida */
+.tareaspendientesj-item-tarea-pendiente.vencida 
+.tareaspendientesj-tarea-estatus-Pendiente {
+  background: #fed7d7;
+  color: #c53030;
+}
+/* Ícono cuando NO está vencida */
+.tareaspendientesj-icono-pendiente {
+  font-size: 1.6rem;
+  color: #64748b;  /* gris-azul suave */
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+/* Ícono cuando está vencida */
+.tareaspendientesj-icono-pendiente.vencida {
+  color: #e53e3e;  /* rojo fuerte */
+}
+
+/* Estatus normal (no vencida) */
+.tareaspendientesj-tarea-estatus-Pendiente {
+  background: #e2e8f0;   /* gris suave */
+  color: #475569;        /* gris-azul */
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
 
 
 

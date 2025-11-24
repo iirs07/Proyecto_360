@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaExclamationCircle, FaCheckCircle, FaClock, FaTasks, FaBars  } from "react-icons/fa";
 import "../css/global.css";
-import "../css/vertareausuario.css";
+import "../css/ListaDeTareas.css";
 import logo3 from "../imagenes/logo3.png";
 import { useLocation } from "react-router-dom";
 import Layout from "../components/Layout";
@@ -111,7 +111,7 @@ useEffect(() => {
         titulo="TAREAS DE UN PROYECTO"
         sidebar={<MenuDinamico activeRoute="Vertareas" />}
       >
-      <div className="container my-4">
+      <div className="contenedor-global">
         {loading ? (
           <div className="loader-container">
             <div className="loader-logo">
@@ -121,7 +121,7 @@ useEffect(() => {
             <div className="loader-spinner"></div>
           </div>
         ) : (
-          <div className="ver-tarea-proyectos-card">
+          <div className="vertarea-proyectos-card">
             <h3 className="vertarea-nombre-proyecto">{nombreProyecto}</h3>
             
             {tareasFiltradas.length > 0 && !busqueda && (
@@ -138,10 +138,10 @@ useEffect(() => {
                     <div className="vertarea-info-tarea-TP">
                       <div className="vertarea-header">
                         {getStatusIcon(tarea.t_estatus)}
-                        <label className="tarea-nombre-TP">{tarea.t_nombre}</label>
+                        <label className="vertarea-nombre">{tarea.t_nombre}</label>
                       </div>
                       <div className="vertarea-footer">
-                        <span className={`tarea-estatus-TP ${getEstatusClass(tarea.t_estatus)}`}>
+                        <span className={`vertarea-estatus-TP ${getEstatusClass(tarea.t_estatus)}`}>
                           {tarea.t_estatus}
                         </span>
                         <span className="vertarea-fecha-TP">

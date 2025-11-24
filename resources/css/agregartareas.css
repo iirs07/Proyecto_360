@@ -1,6 +1,6 @@
 .agregartareas-contenedor{
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   margin: 0.3rem auto; 
 }
 
@@ -17,18 +17,39 @@
 }
 
 .agregartareas-input {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+  font-weight: 600;
+  overflow: hidden; /* evita scroll interno */
+  resize: none;     /* evita que el usuario cambie tamaño manualmente; opcional */
+  box-sizing: border-box; /* importante para que height = scrollHeight funcione bien */
+  min-height: 40px; /* asegura altura base */
+  line-height: 1.4;
+  z-index: 3;
+}
+
+
+.mt-input {
    width: 100%;
   padding: 15px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 3px;
   outline: none;
-  resize: none;
   color: #333;
-  box-sizing: border-box;
   z-index: 1;
   font-family: 'Arial', sans-serif;
   font-weight: bold; 
+  
+  overflow: hidden; /* evita scroll interno */
+  resize: none;     /* opcional: evita que el usuario cambie tamaño manualmente */
+  box-sizing: content-box;
 }
 
 .btn-agregartareas {

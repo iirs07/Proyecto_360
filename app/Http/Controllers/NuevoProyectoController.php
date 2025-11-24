@@ -125,7 +125,7 @@ public function fechasProyecto($id_proyecto)
         }
     }
 
-    //METODO QUE MUESTRA TODOS LOS PROYECTOS DE UN DEPARTAMENTO
+    //METODO QUE MUESTRA TODOS LOS PROYECTOS DE UN DEPARTAMENTO PARA MODIFICARLOS
 public function ListaProyectosModificar(Request $request)
 {
     try {
@@ -155,10 +155,10 @@ public function ListaProyectosModificar(Request $request)
         'p.*',
         DB::raw('COUNT(t.id_tarea) as total_tareas'),
         DB::raw("SUM(CASE WHEN t.t_estatus = 'En proceso' THEN 1 ELSE 0 END) as tareas_en_proceso"),
-        DB::raw("SUM(CASE WHEN t.t_estatus = 'Completado' THEN 1 ELSE 0 END) as tareas_completadas")
+        DB::raw("SUM(CASE WHEN t.t_estatus = 'Finalizado' THEN 1 ELSE 0 END) as tareas_completadas")
     )
     ->where('p.id_departamento', $idDepartamento)
-    ->where('p.p_estatus', 'EN PROCESO')
+     ->where('p.p_estatus', 'En proceso')
     ->groupBy('p.id_proyecto')
     ->get();
         return response()->json([
@@ -275,7 +275,7 @@ public function ProyectosSinTareas(Request $request)
                 ->leftJoin('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
                 ->select('p.*')
                 ->where('p.id_departamento', $idDepartamento)
-                ->where('p.p_estatus', 'EN PROCESO')
+                ->where('p.p_estatus', 'En proceso')
                 ->groupBy('p.id_proyecto')
                 ->havingRaw('COUNT(t.id_tarea) = 0')
                 ->get();
@@ -368,5 +368,25 @@ public function completar($idProyecto)
         ], 500);
     }
 }
+//METODO QUE PERMITE CAMBIAR EL STATUS DE PROYECTO FINALIZADO A EN PROCESO 
+public function CambiarStatusProyectoTerminado($id)
+    {
+        $proyecto = Proyecto::find($id);
 
+        if (!$proyecto) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Proyecto no encontrado'
+            ], 404);
+        }
+
+        $proyecto->p_estatus = "En proceso";
+        $proyecto->save();
+
+        return response()->json([
+            'success' => true,
+            'mensaje' => 'Proyecto marcado como ',
+            'proyecto' => $proyecto
+        ]);
+    }
 }
