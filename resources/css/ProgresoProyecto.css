@@ -1,149 +1,640 @@
-/* =========================================================================
-   CONTENEDOR Y BARRA DE PROGRESO (DISEÑO ELEGANTE Y COHERENTE)
-   ========================================================================= */
-.contenedor-progreso-chart {
-  width: 100%;
-  max-width: 850px;
-  margin: 20px auto;
-  padding: 15px;
-  border-radius: 18px;
-  font-family: "Poppins", "Segoe UI", sans-serif;
-  color: #000000;
+/* ProgresoProyecto.css */
+
+/* Contenedor principal - CENTRADO */
+.prog-proy-contenedor-progreso-moderno {
+  background: transparent;
+  position: relative;
+  overflow: visible;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
-  box-sizing: border-box;
-  transition: background-color 0.3s ease;
+  justify-content: center;
+  width: 100%;
 }
 
-.contenedor-progreso-chart:hover {
-  background-color: rgba(134, 21, 66, 0.1);
+/* Layout horizontal para gráfica circular - INVERTIDO */
+.prog-proy-contenedor-progreso-moderno.circular {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
 }
 
-/* ================================
-   Fondo de la barra
-================================ */
-.barra-fondo {
-  width: 90%;
+/* Gráfica a la IZQUIERDA (primero) */
+.prog-proy-contenedor-progreso-moderno.circular .prog-proy-contenedor-circular-mejorado {
+  order: 1;
+}
+
+/* Estadísticas a la DERECHA (después) */
+.prog-proy-contenedor-progreso-moderno.circular .prog-proy-estadisticas-modernas {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-self: center;
+}
+
+/* Barra centrada y más ancha */
+.prog-proy-contenedor-progreso-moderno.barra {
+  align-items: center;
+}
+
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
   max-width: 600px;
-  height: 24px;
-  background: #e0e0e0;
-  border-radius: 12px;
-  overflow: hidden;
-  margin: 1px auto;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
-  position: relative;
+  margin: 0 auto;
 }
 
-/* ================================
-   Barra de progreso
-================================ */
-.barra-progreso {
-  height: 100%;
+/* ===== GRÁFICA CIRCULAR MEJORADA ===== */
+.prog-proy-contenedor-circular-mejorado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* MARCO CIRCULAR - ELIMINADA LA SOMBRA EXTERIOR */
+.prog-proy-marco-circular {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 12px;
-  transition: width 0.8s ease-in-out;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(134, 21, 66, 0.4);
+  border-radius: 50%;
+  background: transparent; /* FONDO TRANSPARENTE */
+  /* ELIMINADO: box-shadow externa */
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03); /* SOLO SOMBRA INTERIOR */
 }
 
-.barra-progreso::after {
-  content: '';
+/* Efectos de destello para el círculo - MÁS SUTILES */
+.prog-proy-destello-circular {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+  opacity: 0.3;
+  z-index: 1;
+  pointer-events: none;
+  animation: prog-proy-destello-rotacion 8s linear infinite;
+}
+
+.prog-proy-destello-trazo {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  opacity: 0.15;
+  z-index: 1;
+  pointer-events: none;
+  animation: prog-proy-destello-rotacion 6s linear infinite reverse;
+}
+
+@keyframes prog-proy-destello-rotacion {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* SVG de la gráfica circular - BARRA MÁS GRUESA */
+.prog-proy-grafica-circular-mejorada {
+  transform: rotate(0.1deg);
+  /* ELIMINADO: filter: drop-shadow - esta era la sombra exterior */
+}
+
+/* CÍRCULOS MÁS GRUESOS - AUMENTADO EL GROSOR */
+.prog-proy-circulo-fondo {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-width: 14px; /* AUMENTADO de ~8-10px a 14px */
+}
+
+.prog-proy-circulo-progreso-mejorado {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: prog-proy-ligero-pulso 3s ease-in-out infinite;
+  stroke-width: 14px; /* AUMENTADO de ~8-10px a 14px */
+}
+
+/* Aseguramos que el círculo de progreso sea visible incluso en 0% */
+.prog-proy-circulo-progreso-mejorado[stroke-dashoffset="100%"] {
+  opacity: 0.3;
+}
+
+@keyframes prog-proy-ligero-pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+/* Punto indicador animado - VISIBLE INCLUSO EN 0% */
+.prog-proy-punto-indicador {
+  animation: prog-proy-punto-latido 2s ease-in-out infinite;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+  opacity: 0.5;
+}
+
+@keyframes prog-proy-punto-latido {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Texto central mejorado - SIEMPRE VISIBLE */
+.prog-proy-texto-circular-mejorado {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.prog-proy-porcentaje-circular-mejorado {
+  font-weight: 700;
+  background: linear-gradient(135deg, #2c3e50, #4a6572);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Badge de estado */
+.prog-proy-estado-contenedor {
+  margin-top: 2px;
+}
+
+.prog-proy-badge-estado {
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  font-size: 0.6rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.prog-proy-badge-estado.prog-proy-sin-progreso {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  color: white;
+}
+
+.prog-proy-badge-estado.prog-proy-inicio {
+  background: linear-gradient(135deg, #ffa500, #ffb733);
+  color: white;
+}
+
+.prog-proy-badge-estado.prog-proy-progreso {
+  background: linear-gradient(135deg, #ffb733, #ffc04d);
+  color: white;
+}
+
+.prog-proy-badge-estado.prog-proy-casi-listo {
+  background: linear-gradient(135deg, #32cd32, #5cd65c);
+  color: white;
+}
+
+.prog-proy-badge-estado.prog-proy-completado {
+  background: linear-gradient(135deg, #28a428, #3cb43c);
+  color: white;
+}
+
+/* ===== BARRA DE PROGRESO MODERNA - CON PROFUNDIDAD ===== */
+.prog-proy-contenedor-barra-moderna {
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+.prog-proy-barra-contenedor-moderno {
+  width: 100%;
+  position: relative;
+}
+
+/* Barra de fondo - CON SOMBRA INTERIOR PARA PROFUNDIDAD */
+.prog-proy-barra-fondo-moderna {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e9ecef;
+}
+
+/* Barra de progreso con efectos de luz */
+.prog-proy-barra-progreso-moderna {
+  position: relative;
+  border-radius: 50px;
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  width: 0%;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* EFECTO ESPECIAL PARA 0% - BARRA COMPLETAMENTE VACÍA */
+.prog-proy-barra-progreso-moderna[style*="width: 0%"],
+.prog-proy-barra-progreso-moderna[style*="width: 0%;"] {
+  min-width: 0 !important;
+  width: 0% !important;
+  opacity: 0;
+}
+
+/* Efectos de luz agregados */
+.prog-proy-luz-corrediza {
   position: absolute;
   top: 0;
   left: -100%;
-  width: 40%;
+  width: 50%;
   height: 100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: destello 2.2s linear infinite;
-}
-
-@keyframes destello {
-  0% { left: -100%; }
-  100% { left: 150%; }
-}
-
-.porcentaje-en-barra {
-  position: relative;
-  z-index: 1;
-  font-size: 14px;
-  text-align: center;
-  width: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+  animation: prog-proy-luz-deslizante 3s ease-in-out infinite;
   pointer-events: none;
-  color: #ffffff;
 }
 
-/* ================================
-   BURBUJAS DE INFORMACIÓN
-================================ */
-.info-burbujas {
+.prog-proy-luz-secundaria {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 100%);
+  pointer-events: none;
+}
+
+@keyframes prog-proy-luz-deslizante {
+  0% { left: -100%; opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { left: 150%; opacity: 0; }
+}
+
+/* Punto de progreso moderno - OCULTO EN 0% */
+.prog-proy-punto-progreso-moderno {
+  position: absolute;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  animation: prog-proy-punto-brillante 2s ease-in-out infinite;
+  z-index: 2;
+  opacity: 0;
+}
+
+.prog-proy-barra-progreso-moderna[style*="width: 0%"] .prog-proy-punto-progreso-moderno,
+.prog-proy-barra-progreso-moderna[style*="width: 0%;"] .prog-proy-punto-progreso-moderno {
+  display: none;
+}
+
+@keyframes prog-proy-punto-brillante {
+  0%, 100% { 
+    transform: scale(1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  50% { 
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* Indicador de porcentaje - OCULTO EN 0% */
+.prog-proy-indicador-porcentaje {
+  position: absolute;
+  right: 20px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+  animation: prog-proy-texto-flotante 3s ease-in-out infinite;
+  opacity: 0;
+}
+
+.prog-proy-barra-progreso-moderna[style*="width: 0%"] .prog-proy-indicador-porcentaje,
+.prog-proy-barra-progreso-moderna[style*="width: 0%;"] .prog-proy-indicador-porcentaje {
+  display: none;
+}
+
+@keyframes prog-proy-texto-flotante {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+/* Marcadores de progreso */
+.prog-proy-marcadores-progreso {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 0 2px;
+}
+
+.prog-proy-marcador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.prog-proy-punto-marcador {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #e9ecef;
+  background: #e9ecef;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.prog-proy-punto-marcador:hover {
+  transform: scale(1.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.prog-proy-porcentaje-marcador {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #8d9aa6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.prog-proy-marcador:hover .prog-proy-porcentaje-marcador {
+  color: #6c757d;
+  transform: translateY(-1px);
+}
+
+/* ===== ESTADÍSTICAS MODERNAS ===== */
+.prog-proy-estadisticas-modernas {
+  padding: 0;
+  width: auto;
+}
+
+/* Para barra: estadísticas en línea horizontal centradas */
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-estadisticas-modernas {
+  margin-top: 15px;
+  width: 100%;
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
 }
 
-.chip {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: inline-flex;
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Para circular: estadísticas en vertical a la DERECHA */
+.prog-proy-contenedor-progreso-moderno.circular .prog-proy-grid-estadisticas {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Tarjetas de estadística compactas - SIN BORDE SUPERIOR */
+.prog-proy-tarjeta-estadistica {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
   align-items: center;
-  gap: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e9ecef;
+  position: relative;
+  min-width: 110px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.chip:hover {
-  transform: scale(1.05);
-  box-shadow: 0 3px 6px rgba(134, 21, 66, 0.3);
+.prog-proy-tarjeta-estadistica:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
-.completadas {
-  background-color: #e8f5e9;
-  color: #256029;
+.prog-proy-tarjeta-estadistica.prog-proy-completada {
+  color: #28a428;
 }
 
-.pendientes {
-  background-color: #fdecea;
-  color: #8a1c1c;
+.prog-proy-tarjeta-estadistica.prog-proy-pendiente {
+  color: #ff6b6b;
 }
 
-.porcentaje {
-  background-color: #f4ecf7;
-  color: #4a148c;
+.prog-proy-tarjeta-estadistica.prog-proy-total {
+  color: #495057;
 }
 
-/* ================================
-   Responsive móvil
-================================ */
-@media (max-width: 576px) {
-  .barra-fondo {
-    width: 95%;
-    height: 20px;
+.prog-proy-icono-estadistica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.prog-proy-contenido-estadistica {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.prog-proy-valor {
+  font-weight: 700;
+  line-height: 1;
+  color: #2c3e50;
+  font-size: 0.95rem;
+}
+
+.prog-proy-etiqueta {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  color: #6c757d;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
+/* Estado sin datos */
+.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 20px;
+  color: #6c757d;
+  background: #ffffff;
+  border: 1px dashed #e0e0e0;
+  border-radius: 12px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.prog-proy-icono-sin-datos {
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos p {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos small {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .prog-proy-contenedor-progreso-moderno.circular {
+    flex-direction: column;
+    gap: 25px;
   }
-  .barra-progreso {
-    font-size: 11px;
+  
+  .prog-proy-contenedor-progreso-moderno.circular .prog-proy-grid-estadisticas {
+    flex-direction: row;
+    gap: 12px;
   }
-  .porcentaje-en-barra {
-    font-size: 11px;
+  
+  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  .chip {
-    font-size: 0.8rem;
-    padding: 5px 10px;
+  
+  .prog-proy-tarjeta-estadistica {
+    min-width: 100px;
+    padding: 10px 12px;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
+    max-width: 100%;
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .prog-proy-contenedor-barra-moderna {
+    max-width: 100%;
+    padding: 0 10px;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
+    gap: 10px;
+  }
+  
+  .prog-proy-tarjeta-estadistica {
+    min-width: 90px;
+    padding: 8px 10px;
+  }
+  
+  .prog-proy-valor {
+    font-size: 0.85rem;
+  }
+  
+  .prog-proy-etiqueta {
+    font-size: 0.7rem;
+  }
+}
+
+/* ===== ANIMACIONES DE ENTRADA ===== */
+.prog-proy-contenedor-progreso-moderno {
+  animation: prog-proy-entrada-suave 0.4s ease-out;
+}
+
+@keyframes prog-proy-entrada-suave {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== MEJORAS DE ACCESIBILIDAD ===== */
+@media (prefers-reduced-motion: reduce) {
+  .prog-proy-contenedor-progreso-moderno,
+  .prog-proy-tarjeta-estadistica,
+  .prog-proy-barra-progreso-moderna,
+  .prog-proy-circulo-progreso-mejorado,
+  .prog-proy-punto-indicador,
+  .prog-proy-punto-progreso-moderno,
+  .prog-proy-indicador-porcentaje,
+  .prog-proy-punto-marcador,
+  .prog-proy-porcentaje-marcador {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Modo oscuro opcional */
+@media (prefers-color-scheme: dark) {
+  .prog-proy-tarjeta-estadistica {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .prog-proy-tarjeta-estadistica.prog-proy-completada {
+    background: #1f3a1f;
+  }
+  
+  .prog-proy-tarjeta-estadistica.prog-proy-pendiente {
+    background: #3a1f1f;
+  }
+  
+  .prog-proy-tarjeta-estadistica.prog-proy-total {
+    background: #374151;
+  }
+  
+  .prog-proy-valor {
+    color: #f9fafb;
+  }
+  
+  .prog-proy-barra-fondo-moderna {
+    background: #374151;
+    border-color: #4b5563;
+    box-shadow: 
+      inset 0 3px 6px rgba(0, 0, 0, 0.2),
+      inset 0 1px 2px rgba(0, 0, 0, 0.25),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .prog-proy-marco-circular {
+    background: transparent; /* MANTENER TRANSPARENTE EN MODO OSCURO TAMBIÉN */
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos {
+    background: #374151;
+    border-color: #4b5563;
   }
 }
