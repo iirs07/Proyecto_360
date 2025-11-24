@@ -471,6 +471,7 @@ export default function ReporteSuperUsuario() {
                                 </button>
                             </div>
                         ) : (
+
                             // BOTÓN DE GENERAR (visible cuando no se está generando)
                             <>
                                 <button
@@ -481,7 +482,7 @@ export default function ReporteSuperUsuario() {
                                 >
                                     Generar Reporte
                                 </button>
-                                {/* 🟢 MOSTRAR MENSAJE DE ERROR/ADVERTENCIA FIJO */}
+                                {/* MOSTRAR MENSAJE DE ERROR/ADVERTENCIA FIJO */}
                                 {(seleccionados.length === 0 || errorMessage) && (
                                     <p className="alerta-seleccion">
                                         {/* Muestra el error específico O la advertencia inicial */}
