@@ -1,0 +1,100 @@
+.eliminarusuario-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.eliminarusuario-usuarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.eliminarusuario-usuario-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  background-color: #fff;
+  transition: transform 0.2s;
+  z-index: 3;
+}
+
+.eliminarusuario-usuario-card:hover {
+  transform: translateY(-2px);
+}
+
+.eliminarusuario-usuario-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.eliminarusuario-usuario-nombre {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.eliminarusuario-btn-eliminar {
+  background-color: #861542;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.eliminarusuario-btn-eliminar:hover {
+  background-color: #861542;
+}
+
+.eliminarusuario-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.eliminarusuario-loader-logo img {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+.eliminarusuario-loader-texto {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.eliminarusuario-loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top: 4px solid #861542;
+  border-radius: 50%;
+  animation: eliminarusuario-spin 1s linear infinite;
+}
+
+@keyframes eliminarusuario-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .eliminarusuario-usuario-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .eliminarusuario-btn-eliminar {
+    width: 100%;
+    text-align: center;
+  }
+}
+

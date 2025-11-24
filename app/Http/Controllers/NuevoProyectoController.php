@@ -63,29 +63,7 @@ public function fechasProyecto($id_proyecto)
             'pf_fin' => $proyecto->pf_fin
         ]);
     }
-     //METODO PARA OBTENER LOS DEPARTAMENTOS
-    public function CatalogoDepartamentos()
-    {
-        $departamentos = DB::table('c_departamento')->get();
-        return response()->json($departamentos);
-    }
-    public function usuariosPorDepartamento($id_departamento)
-{
-    $usuarios = \DB::table('c_usuario')
-        ->join('usuario', 'c_usuario.id_usuario', '=', 'usuario.id_usuario')
-        ->where('c_usuario.id_departamento', $id_departamento)
-        ->where('usuario.rol', 'Usuario')
-        ->select(
-    'usuario.id_usuario', 
-    'c_usuario.u_nombre as nombre',
-    'c_usuario.a_paterno as apaterno',
-    'c_usuario.a_materno as amaterno',
-    'usuario.rol'
-)
-        ->get();
-
-    return response()->json($usuarios);
-}
+ 
  // Crear tarea
    public function AgregarTareas(Request $request)
     {

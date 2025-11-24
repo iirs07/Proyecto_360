@@ -37,6 +37,7 @@ import ModificarTareas from "./ModificarTareas";
 import EliminarTareas from "./EliminarTareas";
 import EditarTareas from "./EditarTareas";
 import Reporte from "./Reporte";
+import EliminarUsuario from "./EliminarUsuario";
 
 function App() {
   return (
@@ -94,6 +95,7 @@ function App() {
            <Route path="/EliminarTareas" element={<EliminarTareas />} />
            <Route path="/EditarTareas" element={<EditarTareas />} />
            <Route path="/Reporte" element={<Reporte />} />
+           <Route path="/EliminarUsuario" element={<EliminarUsuario />} />
 
         </Route>
 

@@ -53,7 +53,7 @@ const [mostrarEstado, setMostrarEstado] = useState(false);
   const ajustarAltura = (ref) => {
   if (ref.current) {
     ref.current.style.height = "auto";
-    ref.current.style.height = ref.current.scrollHeight + "px"; // +2 por margen/padding
+    ref.current.style.height = ref.current.scrollHeight + "px";
   }
 };
 
@@ -165,7 +165,7 @@ useEffect(() => {
   fetchTarea();
 }, [tareaId, token, navigate]);
 
- // ===== FETCH USUARIOS SEGÚN DEPARTAMENTO (para cambios posteriores) =====
+ // ===== FETCH USUARIOS SEGÚN DEPARTAMENTO=====
 useEffect(() => {
   if (!departamentoSeleccionado) return;
 

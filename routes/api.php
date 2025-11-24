@@ -15,7 +15,7 @@ use App\Http\Controllers\JefeController;
 use App\Http\Controllers\NuevoProyectoController;
 use App\Http\Controllers\DirectorController;
 use App\Http\Controllers\TareasDirectorController;
-
+use App\Http\Controllers\DepartamentoDirectorController;
 
 /* 1. Rutas Públicas (Contenido sin necesidad de autenticación) */
 // Invitaciones y Registro
@@ -50,8 +50,9 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
     Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
     Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
-    Route::get('/departamentos/{id}/usuarios', [NuevoProyectoController::class, 'usuariosPorDepartamento']);
-    Route::get('/CatalogoDepartamentos', [NuevoProyectoController::class, 'CatalogoDepartamentos']);
+    Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
+
+    Route::get('/CatalogoDepartamentos', [DepartamentoDirectorController::class, 'CatalogoDepartamentos']);
     Route::get('/proyectos/usuario', [DirectorController::class, 'MostrarProyectos']);
     Route::get('/proyectos/{idProyecto}/tareas-activas', [TareasDirectorController::class, 'tareasActivasPorProyecto']);
     Route::get('/proyectos/lista/modificar', [NuevoProyectoController::class, 'ListaProyectosModificar']);
@@ -74,5 +75,8 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::delete('EliminarTarea/{idTarea}', [TareasDirectorController::class, 'eliminarTarea']);
     Route::get('/tareas/{idTarea}', [TareasDirectorController::class, 'show']);
     Route::put('/tareas/{id}', [TareasDirectorController::class, 'update']);
+    Route::delete('/usuarios/{id_usuario}', [DepartamentoDirectorController::class, 'eliminarUsuario']);
+    Route::get('/usuarios/departamento/{id_usuario}', [DepartamentoDirectorController::class, 'usuariosDeDepartamento']);
+
 
 });

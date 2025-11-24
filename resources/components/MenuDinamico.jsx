@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
-  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaRegUserCircle
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus
 } from "react-icons/fa";
 import { 
   FiUsers
@@ -88,6 +88,7 @@ export default function MenuDinamico({
       icon: FiUsers,
       subMenu: [
         { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
+         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
       ],
     },
     { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
