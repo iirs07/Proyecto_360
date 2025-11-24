@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { FaCaretDown, FaSortAlphaDown, FaSortAlphaUp, FaSortNumericDown, FaSortNumericUp } from "react-icons/fa";
+import { 
+    FaCaretDown, 
+    FaSortAlphaDown, 
+    FaSortAlphaUp, 
+    FaSortNumericDown, 
+    FaSortNumericUp,
+    FaChartPie,
+    FaChartBar,
+    FaCalendarAlt,
+    FaFlagCheckered,
+    FaUser,
+    FaChartLine,
+    FaTasks
+} from "react-icons/fa";
 
-// Asegúrate de que los estilos para las nuevas métricas estén aquí o en global.css
 import "../css/DepProSuperUsuario.css";
 import "../css/global.css";
 import "../css/useOrdenamiento.css";
@@ -15,29 +27,31 @@ import { slugify } from "./utils/slugify";
 import { useProyectosOrdenados } from '../hooks/useProyectosOrdenados';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 
-
-// --- Dropdown de Ordenamiento ---
-const SortDropdown = ({ sortBy, sortDirection, handleSelectSort }) => {
+// --- Dropdown de Ordenamiento Mejorado ---
+const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) => {
     const sortOptions = [
         ["Nombre (A-Z)", "nombre", "asc", FaSortAlphaDown],
         ["Nombre (Z-A)", "nombre", "desc", FaSortAlphaUp],
-        ["Fecha Fin (Más Antiguo)", "fechaFin", "asc", FaSortNumericUp],
-        ["Fecha Fin (Más Reciente)", "fechaFin", "desc", FaSortNumericDown],
-        ["Fecha Inicio (Más Antiguo)", "fechaInicio", "asc", FaSortNumericUp],
-        ["Fecha Inicio (Más Reciente)", "fechaInicio", "desc", FaSortNumericDown],
-        ["Progreso (Mayor %)", "porcentaje", "desc", FaSortNumericDown],
         ["Progreso (Menor %)", "porcentaje", "asc", FaSortNumericUp],
+        ["Progreso (Mayor %)", "porcentaje", "desc", FaSortNumericDown],
+        ["Inicio (Más Antiguo)", "fechaInicio", "asc", FaSortNumericUp],
+        ["Inicio (Más Reciente)", "fechaInicio", "desc", FaSortNumericDown],
+        ["Fin (Más Antiguo)", "fechaFin", "asc", FaSortNumericUp],
+        ["Fin (Más Reciente)", "fechaFin", "desc", FaSortNumericDown],
     ];
 
+    if (!isMenuOpen) return null;
+
     return (
-        <div className="dropdown-menu-sort">
+        <div className="procom-dropdown-menu-sort" style={{ zIndex: 1000 }}>
             {sortOptions.map(([text, newSortBy, newSortDirection, Icon]) => (
                 <button
                     key={`${newSortBy}-${newSortDirection}`}
-                    className={`dropdown-item-sort ${sortBy === newSortBy && sortDirection === newSortDirection ? 'active' : ''}`}
+                    className={`procom-dropdown-item-sort ${sortBy === newSortBy && sortDirection === newSortDirection ? 'procom-active' : ''}`}
                     onClick={() => handleSelectSort(newSortBy, newSortDirection)}
+                    style={{ zIndex: 1001 }}
                 >
-                    <Icon className="icon" />
+                    <Icon className="procom-sort-icon" />
                     {text}
                 </button>
             ))}
@@ -69,6 +83,8 @@ export default function DepProCompletados() {
 
     const [proyectos, setProyectos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [tipoVisualizacionGlobal, setTipoVisualizacionGlobal] = useState("barra");
+    const [showVisualizacionDropdown, setShowVisualizacionDropdown] = useState(false);
 
     // --- Hook de ordenamiento ---
     const {
@@ -80,6 +96,21 @@ export default function DepProCompletados() {
         handleSelectSort,
         getSortButtonText,
     } = useProyectosOrdenados(proyectos);
+
+    // --- Cerrar dropdown al hacer clic fuera ---
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isMenuOpen && !event.target.closest('.procom-sort-button-wrapper')) {
+                setIsMenuOpen(false);
+            }
+            if (showVisualizacionDropdown && !event.target.closest('.visualizacion-control-container')) {
+                setShowVisualizacionDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMenuOpen, showVisualizacionDropdown]);
 
     // --- Función para obtener proyectos ---
     const fetchDatos = async (initialLoad = false) => {
@@ -106,7 +137,6 @@ export default function DepProCompletados() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             const proyectosFinalizados = data.filter(
-                // Filtro solo para proyectos Finalizados que tengan tareas (asumiendo 100% de progreso)
                 p => p.p_estatus === "Finalizado" && p.total_tareas > 0
             );
             setProyectos(proyectosFinalizados);
@@ -118,16 +148,17 @@ export default function DepProCompletados() {
         }
     };
 
-    // --- Carga inicial + actualización automática cada 5s ---
+    // --- Carga inicial ---
     useEffect(() => {
-        fetchDatos(true); // carga inicial
+        fetchDatos(true);
     }, [depId, navigate]);
 
+    // --- Actualización automática cada 5s ---
     useAutoRefresh(() => fetchDatos(false), 5000);
 
     if (loading) {
         return (
-            <div className="loader-container">
+            <div className="loader-container" style={{ zIndex: 50 }}>
                 <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
                 <div className="loader-texto">CARGANDO PROYECTOS FINALIZADOS...</div>
                 <div className="loader-spinner"></div>
@@ -137,7 +168,7 @@ export default function DepProCompletados() {
 
     return (
         <Layout
-            titulo={`PROYECTOS FINALIZADOS DE ${departamentoNombre}`}
+            titulo={`PROYECTOS FINALIZADOS - ${departamentoNombre.toUpperCase()}`}
             sidebar={
                 <MenuDinamico
                     departamentoId={depId}
@@ -147,103 +178,210 @@ export default function DepProCompletados() {
                 />
             }
         >
-            {/* 🆕 CONTENEDOR DE MÉTRICAS Y ORDENAMIENTO (Renderizado Condicional) */}
-            {proyectosOrdenados.length > 0 && (
-                <div className="resumen-metricas-container">
-                    
-                    {/* 1. Tarjeta de Conteo de Proyectos (order: -1 para ir a la izquierda) */}
-                    <div className="conteo-proyectos-card">
-                        <span className="conteo-valor">
-                            {proyectosOrdenados.length}
-                        </span>
-                        <span className="conteo-label">
-                            FINALIZADOS {/* 👈 Etiqueta cambiada */}
-                        </span>
-                    </div>
-
-                    {/* 2. Control de Ordenamiento (order: 1 para ir a la derecha) */}
-                    <div className="sort-control-container">
-                        <div className="sort-button-wrapper">
-                            <button className="sort-button" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                                Ordenar por: {getSortButtonText()} <FaCaretDown />
-                            </button>
-                            {isMenuOpen && (
-                                <SortDropdown
-                                    sortBy={sortBy}
-                                    sortDirection={sortDirection}
-                                    handleSelectSort={handleSelectSort}
-                                />
-                            )}
+            <div className="procom-proceso-container" style={{ zIndex: 1 }}>
+                {/* HEADER CON CONTROLES EN LÍNEA HORIZONTAL */}
+                {proyectosOrdenados.length > 0 && (
+                    <div className="resumen-metricas-container" style={{ zIndex: 10 }}>
+                        {/* IZQUIERDA - Solo contador */}
+                        <div className="controles-izquierdo">
+                            <div className="conteo-proyectos-card" style={{ zIndex: 15 }}>
+                                <span className="conteo-valor">
+                                    {proyectosOrdenados.length}
+                                </span>
+                                <span className="conteo-label">
+                                    FINALIZADOS
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
 
-            <div className="proyectos-linea">
-                {proyectosOrdenados.length === 0 ? (
-                    <p className="proyecto-sin-tareas">
-                        No hay proyectos finalizados en este departamento.
-                    </p>
-                ) : (
-                    proyectosOrdenados.map((proyecto) => {
-                        const slugProyecto = slugify(proyecto.p_nombre);
-                        return (
+                        {/* DERECHA - Visualización + Ordenar (pegados) */}
+                        <div className="controles-derecho">
+                            {/* SELECTOR DE VISUALIZACIÓN - UN SOLO BOTÓN DESPLEGABLE */}
                             <div 
-                                key={slugProyecto} 
-                                className="proyecto-linea-item completado"
-                                onClick={() =>
-                                    navigate(`/proyecto/${slugProyecto}`, {
-                                        state: {
-                                            idProyecto: proyecto.id_proyecto,
-                                            nombreProyecto: proyecto.p_nombre,
-                                            descripcionProyecto: proyecto.descripcion,
-                                            porcentaje: proyecto.porcentaje,
-                                            totalTareas: proyecto.total_tareas,
-                                            tareasCompletadas: proyecto.tareas_completadas,
-                                        },
-                                    })
-                                }
-                                style={{ cursor: "pointer" }}
+                                className={`visualizacion-control-container ${showVisualizacionDropdown ? 'dropdown-open' : ''}`}
+                                onClick={() => setShowVisualizacionDropdown(!showVisualizacionDropdown)}
+                                style={{ zIndex: 20, position: 'relative' }}
                             >
-                                <div className="proyecto-nombre">
-                                    <span className="proyecto-label">Nombre: </span>
-                                    <span className="proyecto-valor">{proyecto.p_nombre}</span>
+                                {/* CONTENIDO PRINCIPAL DEL BOTÓN */}
+                                <div className="visualizacion-contenido">
+                                    <div className="visualizacion-icon-texto">
+                                        {/* ICONO DINÁMICO - MANTIENE TAMAÑO CONSISTENTE */}
+                                        <div className="visualizacion-icon-wrapper">
+                                            {tipoVisualizacionGlobal === 'barra' ? 
+                                                <FaChartBar className="visualizacion-icon fa-chart-bar" /> : 
+                                                <FaChartPie className="visualizacion-icon fa-chart-pie" />
+                                            }
+                                        </div>
+                                        <span className="visualizacion-texto">
+                                            {tipoVisualizacionGlobal === 'barra' ? 'Barra' : 'Circular'}
+                                        </span>
+                                    </div>
+                                    <FaCaretDown className="visualizacion-caret" />
                                 </div>
 
-                                <div className="proyecto-columnas">
-                                    <div className="proyecto-linea-columna">
-                                        <span className="proyecto-label">Fecha inicio:</span>
-                                        <span className="proyecto-valor">{proyecto.pf_inicio}</span>
+                                {/* DROPDOWN PERSONALIZADO */}
+                                {showVisualizacionDropdown && (
+                                    <div className="visualizacion-dropdown-menu">
+                                        <div 
+                                            className={`visualizacion-dropdown-item ${tipoVisualizacionGlobal === 'barra' ? 'visualizacion-active' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTipoVisualizacionGlobal('barra');
+                                                setShowVisualizacionDropdown(false);
+                                            }}
+                                        >
+                                            <div className="visualizacion-dropdown-icon-container">
+                                                <FaChartBar className="visualizacion-dropdown-icon fa-chart-bar" />
+                                            </div>
+                                            <span className="visualizacion-dropdown-texto">Barra</span>
+                                        </div>
+                                        <div 
+                                            className={`visualizacion-dropdown-item ${tipoVisualizacionGlobal === 'circular' ? 'visualizacion-active' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setTipoVisualizacionGlobal('circular');
+                                                setShowVisualizacionDropdown(false);
+                                            }}
+                                        >
+                                            <div className="visualizacion-dropdown-icon-container">
+                                                <FaChartPie className="visualizacion-dropdown-icon fa-chart-pie" />
+                                            </div>
+                                            <span className="visualizacion-dropdown-texto">Circular</span>
+                                        </div>
                                     </div>
-                                    <div className="proyecto-linea-columna">
-                                        <span className="proyecto-label">Fecha fin:</span>
-                                        <span className="proyecto-valor">{proyecto.pf_fin}</span>
-                                    </div>
-                                    <div className="proyecto-linea-columna">
-                                        <span className="proyecto-label">Estatus:</span>
-                                        {/* El estatus "Finalizado" se verá bien con los estilos CSS existentes */}
-                                        <span className="proyecto-valor" style={{ color: '#28A745' }}>{proyecto.p_estatus}</span>
-                                    </div>
-                                    <div className="proyecto-linea-columna">
-                                        <span className="proyecto-label">Responsable:</span>
-                                        <span className="proyecto-valor">{proyecto.responsable}</span>
-                                    </div>
-                                </div>
+                                )}
+                            </div>
 
-                                <div className="proyecto-linea-progreso-container">
-                                    <div className="proyecto-linea-progreso">
-                                        <ProgresoProyecto
-                                            progresoInicial={proyecto.porcentaje}
-                                            tareasTotales={proyecto.total_tareas}
-                                            tareasCompletadas={proyecto.tareas_completadas}
-                                            descripcion={proyecto.descripcion}
-                                        />
-                                    </div>
+                            {/* CONTROL DE ORDENAMIENTO */}
+                            <div className="procom-sort-control-container">
+                                <div className="procom-sort-button-wrapper" style={{ zIndex: 100 }}>
+                                    <button 
+                                        className="procom-sort-button" 
+                                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                        style={{ zIndex: 101 }}
+                                    >
+                                        <FaSortAlphaDown className="procom-sort-button-icon" />
+                                        {getSortButtonText()} 
+                                        <FaCaretDown className={`procom-caret-icon ${isMenuOpen ? 'procom-rotate' : ''}`} />
+                                    </button>
+                                    
+                                    <SortDropdown
+                                        sortBy={sortBy}
+                                        sortDirection={sortDirection}
+                                        handleSelectSort={handleSelectSort}
+                                        isMenuOpen={isMenuOpen}
+                                    />
                                 </div>
                             </div>
-                        );
-                    })
+                        </div>
+                    </div>
                 )}
+                
+                {/* LISTA DE PROYECTOS */}
+                <div className="proyectos-linea" style={{ zIndex: 5 }}>
+                    {proyectosOrdenados.length === 0 ? (
+                        <div className="proyecto-sin-tareas" style={{ zIndex: 6 }}>
+                            <div className="sin-tareas-icon">
+                                <FaChartLine className="no-data-icon" />
+                            </div>
+                            <p>No hay proyectos finalizados en este departamento</p>
+                            <small>Todos los proyectos están en proceso o no han sido completados</small>
+                        </div>
+                    ) : (
+                        proyectosOrdenados.map((proyecto, index) => {
+                            const slugProyecto = slugify(proyecto.p_nombre);
+                            
+                            return (
+                                <div 
+                                    key={proyecto.id_proyecto} 
+                                    className="proyecto-linea-item completado"
+                                    style={{ 
+                                        zIndex: 10 + index,
+                                        animationDelay: `${index * 0.1}s` 
+                                    }}
+                                    onClick={() =>
+                                        navigate(`/proyecto/${slugProyecto}`, {
+                                            state: {
+                                                idProyecto: proyecto.id_proyecto,
+                                                nombreProyecto: proyecto.p_nombre,
+                                                descripcionProyecto: proyecto.descripcion,
+                                                porcentaje: proyecto.porcentaje,
+                                                totalTareas: proyecto.total_tareas,
+                                                tareasCompletadas: proyecto.tareas_completadas,
+                                            },
+                                        })
+                                    }
+                                >
+                                    {/* HEADER DEL PROYECTO */}
+                                    <div className="proyecto-header">
+                                        <div className="proyecto-nombre">
+                                            <span className="proyecto-valor">{proyecto.p_nombre}</span>
+                                        </div>
+                                        <div className="proyecto-badges">
+                                            <span className="badge-estado completado" data-estado={proyecto.p_estatus}>
+                                                {proyecto.p_estatus}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* INFORMACIÓN DEL PROYECTO */}
+                                    <div className="proyecto-columnas">
+                                        <div className="proyecto-linea-columna">
+                                            <span className="proyecto-label">
+                                                <FaCalendarAlt className="proyecto-icon" />
+                                                Inicio
+                                            </span>
+                                            <span className="proyecto-valor">{proyecto.pf_inicio}</span>
+                                        </div>
+                                        <div className="proyecto-linea-columna">
+                                            <span className="proyecto-label">
+                                                <FaFlagCheckered className="proyecto-icon" />
+                                                Fin
+                                            </span>
+                                            <span className="proyecto-valor">{proyecto.pf_fin}</span>
+                                        </div>
+                                        <div className="proyecto-linea-columna">
+                                            <span className="proyecto-label">
+                                                <FaUser className="proyecto-icon" />
+                                                Encargado
+                                            </span>
+                                            <span className="proyecto-valor">{proyecto.responsable}</span>
+                                        </div>
+                                        <div className="proyecto-linea-columna">
+                                            <span className="proyecto-label">
+                                                <FaChartLine className="proyecto-icon" />
+                                                Progreso
+                                            </span>
+                                            <span className="proyecto-valor" style={{ color: '#28A745', fontWeight: 'bold' }}>
+                                                {proyecto.porcentaje || 0}%
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* COMPONENTE DE PROGRESO - USANDO LAS MISMAS PROPS QUE EL OTRO COMPONENTE */}
+                                    <div className="proyecto-linea-progreso-container">
+                                        {proyecto.total_tareas > 0 ? (
+                                            <div className="proyecto-linea-progreso">
+                                                <ProgresoProyecto
+                                                    progresoInicial={proyecto.porcentaje}
+                                                    tareasTotales={proyecto.total_tareas}
+                                                    tareasCompletadas={proyecto.tareas_completadas}
+                                                    tipo={tipoVisualizacionGlobal}
+                                                    tamaño="medio"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="proyecto-sin-tareas-mini">
+                                                <FaTasks className="sin-tareas-mini-icon" />
+                                                <span>Sin tareas asignadas</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
             </div>
         </Layout>
     );

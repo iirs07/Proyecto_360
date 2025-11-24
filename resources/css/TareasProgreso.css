@@ -17,27 +17,41 @@
     z-index: 2; 
 }
 
-/* ==== DESCRIPCIÓN DEL PROYECTO (DOBLE BORDE) ==== */
+/* ==== DESCRIPCIÓN DEL PROYECTO (ESTILO MODERNO IGUAL A TARJETAS) ==== */
 .proyecto-descripcion-contenedor {
     width: 100%;
     max-width: 1000px;
-    padding: 16px 20px;
+    padding: 18px 22px;
     margin: 30px auto 15px auto;
-    border-radius: 12px;
-    border: 1px solid #861542;
-    border-left: 8px solid #861542; 
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    cursor: default;
+    transition: all 0.35s ease;
+
+    background: linear-gradient(145deg, #ffffff, #f3f3f3);
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+    border-left: 8px solid #861542;
+    border-top: 1px solid #86154230;
+    border-right: 1px solid #86154230;
+    border-bottom: 1px solid #86154230;
+
     font-size: 15px;
     line-height: 1.5;
-    color: #000000;
-    background-color: #ffffff;
+    color: #1a1a1a;
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
-    box-sizing: border-box;
     overflow: hidden;
-    transition: all 0.3s ease;
     font-family: "Poppins", "Segoe UI", sans-serif;
+}
 
+.proyecto-descripcion-contenedor:hover {
+    transform: translateY(-3px) scale(1.005);
+    box-shadow:
+        0 16px 35px rgba(0, 0, 0, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .proyecto-descripcion-contenedor strong {
@@ -48,32 +62,48 @@
     margin-bottom: 6px;
 }
 
-/* ==== TARJETA DE TAREA (ESTILO CLÁSICO + BORDE DE ESTADO) ==== */
+/* ==== TARJETA DE TAREA ==== */
 .tarea-item {
     width: 100%;
     max-width: 1000px;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
-    background-color: #ffffff; 
+    transition: all 0.35s ease;
+
+    background: linear-gradient(145deg, #ffffff, #f3f3f3);
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
     box-sizing: border-box;
+    border: 1px solid transparent;
 }
 
-/* ==== COLORES POR ESTATUS: BORDE GRUESO IZQUIERDO Y BORDE DELGADO COMPLETO ==== */
-.tarea-item.completada { 
-    border: 1px solid #28A745; 
-    border-left-width: 9px; 
+/* ==== ESTILO POR ESTATUS ==== */
+.tarea-item.completada {
+    border-left: 8px solid #28A745;
+    border-top: 1px solid #28A74530;
+    border-right: 1px solid #28A74530;
+    border-bottom: 1px solid #28A74530;
 }
 
-.tarea-item.pendiente { 
-    border: 1px solid #DC3545; 
-    border-left-width: 9px; 
+.tarea-item.pendiente {
+    border-left: 8px solid #DC3545;
+    border-top: 1px solid #DC354530;
+    border-right: 1px solid #DC354530;
+    border-bottom: 1px solid #DC354530;
 }
 
-/* Fondo de hover y abierto - OPACIDAD SÓLIDA ORIGINAL */
+/* Hover tarjeta */
+.tarea-item:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ==== FONDO DE HOVER Y ABIERTO ==== */
 .tarea-item.completada .tarea-titulo:hover,
 .tarea-item.completada.tarea-abierta .tarea-titulo {
     background-color: #E3F9E7; 
@@ -84,13 +114,7 @@
     background-color: #FDE2E2; 
 }
 
-/* Efecto hover tarjeta - Movimiento sutil */
-.tarea-item:hover {
-    transform: translateY(-3px); 
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-}
-
-/* ==== CABECERA / TÍTULO (Refinado y Compactado) ==== */
+/* ==== CABECERA / TÍTULO ==== */
 .tarea-titulo {
     padding: 14px 20px;
     font-weight: 700; 
@@ -138,7 +162,7 @@
     color: #861542;
 }
 
-/* ==== CONTENIDO / DETALLES (MÁS COMPACTO Y HORIZONTAL) ==== */
+/* ==== CONTENIDO / DETALLES ==== */
 .tarea-detalle {
     max-height: 0;
     overflow: hidden;
@@ -156,19 +180,12 @@
     padding-bottom: 10px; 
 }
 
-/* ✅ ESTÉTICA: Asegura que la descripción tenga un margen */
-.detalle-descripcion {
-    margin-bottom: 10px; 
-    padding-bottom: 5px;
-}
-
-/* ✅ Estilo base para que cada detalle ocupe su propia línea */
+/* Columnas */
 .detalle-columna {
     margin-bottom: 0; 
     display: block; 
 }
 
-/* ✅ JERARQUÍA TIPOGRÁFICA REFINADA */
 .detalle-label {
     display: block; 
     font-weight: 700; 
@@ -184,7 +201,7 @@
     word-break: break-word;
 }
 
-/* 🌟 CLASE: Contenedor Grid (4 COLUMNAS HORIZONTALES) 🌟 */
+/* ==== GRID DE DATOS ==== */
 .tarea-datos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr; 
@@ -196,12 +213,7 @@
     padding-top: 15px; 
 }
 
-/* Asegura que la descripción use todo el ancho */
-.detalle-descripcion {
-    grid-column: 1 / -1; 
-}
-
-/* Ajuste específico para el contenedor de Evidencia */
+/* Evidencias */
 .detalle-evidencia-seccion {
     grid-column: auto; 
     display: flex; 
@@ -210,13 +222,13 @@
     justify-content: flex-start; 
 }
 
-/* Contenedor del ícono de Evidencia */
 .detalle-Evidencia-galeria {
     display: flex;
     align-items: center;
     cursor: pointer;
     transition: transform 0.2s;
 }
+
 .detalle-Evidencia-galeria:hover {
     transform: scale(1.05);
 }
@@ -228,8 +240,12 @@
     margin-right: 5px;
 }
 
+.detalle-descripcion {
+    grid-column: 1 / -1; 
+}
+
 /* =========================================================================
-   MODAL Y CARRUSEL DE EVIDENCIAS
+   MODAL Y CARRUSEL
    ========================================================================= */
 
 .modal-overlay {
@@ -276,7 +292,6 @@
     position: fixed; 
     top: 20px;       
     right: 20px;     
-    left: auto;      
     background: #DC3545; 
     color: white;
     border: 3px solid white; 
@@ -292,10 +307,12 @@
     justify-content: center;
     transition: background-color 0.2s, transform 0.2s;
 }
+
 .modal-close:hover {
     background-color: #861542; 
     transform: rotate(90deg);
 }
+
 .modal-nav-btn {
     position: fixed; 
     top: 50%;
@@ -315,16 +332,15 @@
     transition: all 0.3s ease;
     user-select: none;
 }
+
 .modal-nav-btn:hover {
     background-color: #861542; 
     transform: translateY(-50%) scale(1.1);
 }
-.modal-nav-btn.prev {
-    left: 20px; 
-}
-.modal-nav-btn.next {
-    right: 20px; 
-}
+
+.modal-nav-btn.prev { left: 20px; }
+.modal-nav-btn.next { right: 20px; }
+
 .carrusel-index {
     position: absolute;
     bottom: 0;
@@ -339,13 +355,13 @@
     z-index: 1005;
 }
 
-
 /* =========================================================================
    MEDIA QUERIES
    ========================================================================= */
 
 @media (max-width: 768px) {
     .proyecto-descripcion-contenedor { padding: 15px 20px; }
+
     .tarea-titulo { 
         padding: 14px 20px; 
         font-size: 0.95rem; 
@@ -353,13 +369,16 @@
         align-items: flex-start;
         gap: 5px;
     }
+
     .tarea-titulo-derecha {
         margin-top: 5px;
     }
+
     .tarea-detalle.abierta { 
         padding-top: 10px; 
         padding-bottom: 10px; 
     }
+
     .tarea-datos-grid {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -367,15 +386,23 @@
         margin-bottom: 15px;
         padding-top: 15px;
     }
-    
-    /* Modal Mobile */
+
     .modal-content-carrusel { max-width: 95vw; max-height: 85vh; padding: 10px; }
-    /* Botón de Cerrar (X) */
-    .modal-close { top: 10px; right: 10px; width: 32px; height: 32px; font-size: 14px; border: 2px solid white; }
-    /* Flechas de Navegación */
+
+    .modal-close { 
+        top: 10px; 
+        right: 10px; 
+        width: 32px; 
+        height: 32px; 
+        font-size: 14px; 
+        border: 2px solid white; 
+    }
+
     .modal-nav-btn { width: 38px; height: 38px; font-size: 22px; }
+
     .modal-nav-btn.prev { left: 5px; } 
     .modal-nav-btn.next { right: 5px; } 
+
     .carrusel-index { font-size: 13px; padding: 6px 0; }
 }
 
@@ -384,6 +411,7 @@
     .tarea-item {
         padding: 10px 12px;
     }
+
     .tarea-titulo { font-size: 0.9rem; padding: 12px; }
     .detalle-label, .detalle-valor { font-size: 13px; }
     .tarea-estatus { font-size: 10px; padding: 1px 5px; }

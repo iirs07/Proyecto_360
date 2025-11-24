@@ -1,243 +1,955 @@
-/* =========================================================================
-   CONTENEDOR Y TARJETA DE PROYECTOS (ESTÉTICA COMPACTADA ORIGINAL)
-   ========================================================================= */
-
-/* Contenedor general de proyectos */
-.proyectos-linea {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 15px;
-    background-color: #f8f8f8;
-    border-radius: 12px;
+/* ==================== HEADER PRINCIPAL ==================== */
+.procom-proceso-container .resumen-metricas-container,
+.procom-completados-container .resumen-metricas-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 250, 0.98) 100%);
+  border-radius: 10px;
+  box-shadow: 
+    0 3px 10px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  min-height: auto;
+  flex-wrap: nowrap;
 }
 
-/* =========================================================================
-   TARJETA DE PROYECTO (ESTILO ORIGINAL RESTAURADO - FONDO BLANCO)
-   ========================================================================= */
+/* ==================== CONTENEDOR IZQUIERDO (SOLO CONTADOR) ==================== */
+.controles-izquierdo {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
 
+/* ==================== CONTENEDOR DERECHO (VISUALIZACIÓN + ORDENAR) ==================== */
+.controles-derecho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* ==================== BOTÓN DE VISUALIZACIÓN ==================== */
+.visualizacion-control-container {
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  min-width: 120px !important;
+  padding: 0 12px !important;
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 50%, #b32152 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 8px;
+  box-shadow: 
+    0 2px 6px rgba(134, 21, 66, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.visualizacion-control-container:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 3px 10px rgba(134, 21, 66, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  background: linear-gradient(135deg, #9a1c4a 0%, #b32152 50%, #c4275a 100%) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.visualizacion-control-container:active {
+  transform: translateY(0);
+}
+
+.visualizacion-control-container.dropdown-open {
+  box-shadow: 
+    0 3px 12px rgba(134, 21, 66, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+/* CONTENIDO DEL BOTÓN */
+.visualizacion-contenido {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100%;
+  gap: 8px !important;
+}
+
+/* GRUPO ICONO + TEXTO */
+.visualizacion-icon-texto {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 1;
+  min-width: 0;
+}
+
+/* CONTENEDOR DEL ICONO - TAMAÑO FIJO */
+.visualizacion-icon-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+.visualizacion-icon {
+  font-size: 13px !important;
+  color: #ffffff !important;
+  opacity: 0.95;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* TEXTO */
+.visualizacion-texto {
+  font-size: 0.75rem !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin: 0 !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+/* CARET */
+.visualizacion-caret {
+  font-size: 10px !important;
+  color: #ffffff !important;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+  flex-shrink: 0 !important;
+  margin-left: 2px !important;
+}
+
+.visualizacion-control-container:hover .visualizacion-caret {
+  opacity: 1;
+}
+
+.visualizacion-control-container.dropdown-open .visualizacion-caret {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+/* ==================== DROPDOWN DE VISUALIZACIÓN ==================== */
+.visualizacion-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 6px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 8px !important;
+  z-index: 1001;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.visualizacion-dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
+  padding: 12px 14px !important;
+  border: none;
+  background: none;
+  border-radius: 5px;
+  font-size: 0.75rem !important;
+  color: #495057 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 600;
+  line-height: 1.2;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  margin-bottom: 2px !important;
+}
+
+.visualizacion-dropdown-item:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* CONTENEDOR PARA ICONOS - ESPACIO EXACTO */
+.visualizacion-dropdown-icon-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important; /* MÁS ANCHO PARA COMPENSAR DIFERENCIAS */
+  height: 18px !important; /* MÁS ALTO */
+  flex-shrink: 0 !important;
+  margin-right: 10px !important;
+}
+
+/* FORZAR TAMAÑO IDÉNTICO PARA AMBOS ICONOS */
+.visualizacion-dropdown-icon {
+  font-size: 9px !important; /* TAMAÑO IDÉNTICO */
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 0.9;
+  color: #495057;
+  transition: all 0.15s ease;
+  flex-shrink: 0 !important;
+}
+
+.visualizacion-dropdown-icon.fa-chart-pie {
+  transform: scale(0.95) !important; /* AJUSTE ESPECÍFICO PARA ChartPie */
+}
+
+/* CONTENEDOR DE TEXTO */
+.visualizacion-dropdown-texto {
+  flex: 1;
+  text-align: left;
+  font-size: 0.75rem !important;
+  font-weight: 600;
+  line-height: .5;
+  white-space: nowrap;
+}
+
+.visualizacion-dropdown-item:hover {
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 100%) !important;
+  color: #ffffff !important;
+  transform: translateX(1px);
+}
+
+.visualizacion-dropdown-item.visualizacion-active {
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(134, 21, 66, 0.1);
+}
+
+.visualizacion-dropdown-item:hover .visualizacion-dropdown-icon,
+.visualizacion-dropdown-item.visualizacion-active .visualizacion-dropdown-icon {
+  color: #ffffff !important;
+  opacity: 1;
+  transform: none !important; /* REMOVER TRANSFORM EN HOVER PARA MANTENER CONSISTENCIA */
+}
+
+.visualizacion-dropdown-item:hover .visualizacion-dropdown-icon.fa-chart-bar,
+.visualizacion-dropdown-item.visualizacion-active .visualizacion-dropdown-icon.fa-chart-bar {
+  transform: scale(1.1) !important; /* MANTENER AJUSTE ESPECÍFICO */
+}
+
+.visualizacion-dropdown-item:hover .visualizacion-dropdown-icon.fa-chart-pie,
+.visualizacion-dropdown-item.visualizacion-active .visualizacion-dropdown-icon.fa-chart-pie {
+  transform: scale(0.95) !important; /* MANTENER AJUSTE ESPECÍFICO */
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+/* ==================== CONTADOR DE PROYECTOS (IZQUIERDA) - VERTICAL ==================== */
+.conteo-proyectos-card {
+  height: 60px !important;
+  min-height: 60px !important;
+  max-height: 60px !important;
+  min-width: 80px !important;
+  padding: 8px 12px !important;
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 50%, #b32152 100%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  box-shadow: 
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px;
+}
+
+.conteo-proyectos-card .conteo-valor {
+  font-size: 1.4rem !important; /* MÁS GRANDE */
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  margin: 0 !important;
+}
+
+.conteo-proyectos-card .conteo-label {
+  font-size: 0.7rem !important;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+
+
+/* ==================== ORDENAMIENTO ==================== */
+.procom-sort-control-container {
+  min-width: 130px !important;
+  height: 40px !important;
+}
+
+.procom-sort-button-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.procom-sort-button {
+  width: 100% !important;
+  height: 40px !important;
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 100%) !important;
+  border: 1px solid #861542 !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  box-shadow: 
+    0 2px 6px rgba(134, 21, 66, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.procom-sort-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 3px 8px rgba(134, 21, 66, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.procom-sort-button-icon {
+  font-size: 10px !important;
+  color: #ffffff !important;
+  opacity: 0.9;
+}
+
+.procom-caret-icon {
+  font-size: 8px !important;
+  color: #ffffff !important;
+  transition: transform 0.2s ease;
+}
+
+.procom-caret-icon.procom-rotate {
+  transform: rotate(180deg);
+}
+
+/* ==================== DROPDOWN DE ORDENAMIENTO ==================== */
+.procom-dropdown-menu-sort {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  width: 100% !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 6px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 4px;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.procom-dropdown-item-sort {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  font-size: 0.7rem !important;
+  color: #495057 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.procom-dropdown-item-sort:hover {
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 100%) !important;
+  color: #ffffff !important;
+}
+
+.procom-dropdown-item-sort.procom-active {
+  background: linear-gradient(135deg, #861542 0%, #9a1c4a 100%) !important;
+  color: #ffffff !important;
+}
+
+.procom-sort-icon {
+  font-size: 9px;
+  opacity: 0.8;
+  color: #495057;
+}
+
+.procom-dropdown-item-sort:hover .procom-sort-icon,
+.procom-dropdown-item-sort.procom-active .procom-sort-icon {
+  color: #ffffff !important;
+  opacity: 1;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==================== TARJETAS DE PROYECTO ==================== */
 .proyecto-linea-item {
-    display: flex;
-    flex-direction: column;
-    gap: 10px; 
-    background-color: #ffffff; 
-    padding: 18px 20px 18px 30px; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    z-index: 2;
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease; 
-    border: 1px solid #f0f0f0; 
-    border-left: 10px solid #861542; 
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 251, 252, 0.98) 100%);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 
+    0 4px 16px rgba(134, 21, 66, 0.15), /* SOMBRA ROJA */
+    0 2px 8px rgba(134, 21, 66, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-left: 10px solid #861542; /* SOLO BORDE IZQUIERDO ROJO MUY GRUESO */
+  position: relative;
+  z-index: 10;
+  animation: slideInUp 0.3s ease-out both;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
 }
 
-.proyecto-linea-item:hover {
-    transform: translateY(-4px); 
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); 
-    border-color: #dddddd; 
-    border-left-color: #600d2a; 
+.proyecto-linea-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(134, 21, 66, 0.15), /* EFECTO ROJO */
+    transparent
+  );
+  transition: left 0.6s ease;
 }
 
+
+
+
+/* ==================== HEADER DEL PROYECTO ==================== */
+.proyecto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(241, 243, 244, 0.8);
+  position: relative;
+  z-index: 11;
+  gap: 12px;
+}
+
+/* ==================== TÍTULO DEL PROYECTO ==================== */
 .proyecto-nombre {
-    margin-bottom: 5px;
-    padding-bottom: 5px; 
-    border-bottom: 1px solid #f5f5f5; 
-}
-
-.proyecto-nombre .proyecto-label {
-    font-size: 0.8rem; 
-    margin-bottom: 2px;
-    color: #600d2a;
+  flex: 1;
+  min-width: 0;
 }
 
 .proyecto-nombre .proyecto-valor {
-    font-size: 1rem; 
-    font-weight: 1000; 
-    color: #000000; 
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #861542 !important;
+  line-height: 1.2;
+  display: block;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: 0 1px 2px rgba(134, 21, 66, 0.15);
+  transition: all 0.2s ease;
+  animation: none !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
-/* Fila 2: Contenedor de datos cortos - ESTRUCTURA PROTEGIDA */
-.proyecto-columnas {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap; 
-    justify-content: flex-start; 
-    gap: 10px 25px; 
-    margin-bottom: 5px; 
-    padding-bottom: 0;
+.proyecto-nombre .proyecto-valor.texto-largo {
+  white-space: normal;
+  line-height: 1.3;
+  max-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-.proyecto-linea-columna {
-    flex: 0 0 auto; 
-    min-width: 140px; 
-    display: flex;
-    flex-direction: column; 
-    gap: 1px; 
-    padding-right: 10px;
+/* ==================== BADGES DE ESTADO MEJORADOS ==================== */
+.proyecto-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 12;
+  align-items: flex-start;
 }
 
-/* Fila 3: Barra de progreso */
-.proyecto-linea-progreso-container {
-    width: 100%;
-    padding-top: 10px; 
-    border-top: 1px solid #f0f0f0; 
+.badge-estado {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(12px);
+  border: 1.5px solid;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
 
-/* Etiquetas y valores - RESTAURADO A OSCURO */
-.proyecto-label {
-    font-family: 'Poppins', sans-serif; 
-    font-weight: 600; 
-    color: #600d2a; 
-    font-size: 0.75rem; 
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+/* Efecto de brillo al hover */
+.badge-estado::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.6s ease;
 }
 
-.proyecto-valor {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    color: #000000; 
-    font-size: 0.9rem; 
-    line-height: 1.3;
+.badge-estado:hover::before {
+  left: 100%;
 }
 
-/* Estilo específico para el valor de estatus */
-.proyecto-valor[style*="Finalizado"] {
-    font-weight: 700;
-    color: #28A745; 
+.badge-estado:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Mensaje si no hay proyectos */
-.proyecto-sin-tareas {
-    display: block;
-    font-style: italic;
-    color: #555;
-    margin-top: 10px;
-    text-align: center;
-    font-size: 0.9rem;
+.badge-estado:active {
+  transform: translateY(0) scale(1);
+  transition: all 0.1s ease;
+}
+/* Estados con gradientes más elaborados - Versión Roja */
+.badge-estado[data-estado="En proceso"] {
+  background: linear-gradient(
+    135deg, 
+    rgba(198, 40, 40, 0.18) 0%, 
+    rgba(220, 53, 69, 0.12) 50%,
+    rgba(178, 34, 34, 0.08) 100%
+  ) !important;
+  color: #c62828 !important;
+  border-color: rgba(198, 40, 40, 0.45) !important;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+  position: relative;
 }
 
-/* =========================================================================
-   ✅ ESTILOS PARA MÉTRICAS Y ORDENAMIENTO (ROJO/BLANCO, COMPARTEN FILA)
-   ========================================================================= */
-
-/* Contenedor principal para el ordenamiento y el conteo */
-.resumen-metricas-container {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 0 15px;
-    margin-bottom: 20px; 
-}
-
-/* Contenedor del botón de Ordenar (Va a la derecha, orden: 1) */
-.sort-control-container {
-    min-height: auto; 
-    padding: 0; 
-    order: 1; 
-}
-
-/* Tarjeta de Conteo (Métrica) - ROJO/BLANCO (Va a la izquierda, order: -1) */
-.conteo-proyectos-card {
-    position: static; 
-    order: -1;  
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; 
-    padding: 10px 15px;     
-    border-radius: 8px;
-    background-color: #861542; 
-    border: 1px solid #c9a4b3; 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    border-left: 5px solid #ffffff; 
-}
-
-.conteo-valor {
-    font-size: 1.8rem; 
-    font-weight: 800;
-    color: #ffffff; 
-    line-height: 1; 
-}
-
-.conteo-label {
-    font-size: 0.75rem; 
-    font-weight: 600;
-    color: #f9e2e9; 
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 2px;
+.badge-estado[data-estado="Finalizado"] {
+  background: linear-gradient(
+    135deg, 
+    rgba(40, 167, 69, 0.15) 0%, 
+    rgba(40, 167, 69, 0.08) 100%
+  );
+  color: #28a745;
+  border-color: rgba(40, 167, 69, 0.4);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 
-/* =========================================================================
-   MEDIA QUERIES (RESPONSIVIDAD COMPACTA)
-   ========================================================================= */
+/* Efecto de pulso para estados importantes */
+.badge-estado[data-estado="Urgente"] {
+  animation: pulse 2s infinite;
+  background: linear-gradient(
+    135deg, 
+    rgba(220, 53, 69, 0.2) 0%, 
+    rgba(220, 53, 69, 0.1) 100%
+  );
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.5);
+}
 
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+/* Versión minimalista alternativa */
+.badge-estado.minimal {
+  backdrop-filter: none;
+  border: 1px solid;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.badge-estado.minimal:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    /* REORGANIZACIÓN PARA MÓVIL/TABLET */
-    .resumen-metricas-container {
-        flex-direction: column; 
-        align-items: flex-start;
-        padding: 0 15px;
-    }
-    
-    /* El CONTEO se mantiene arriba (order: -1) y toma el ancho completo */
-    .conteo-proyectos-card {
-        width: 100%;
-        order: -1; 
-        margin-bottom: 15px; 
-        
-        /* ✅ AJUSTE TAMAÑO TABLET */
-        padding: 10px 15px; /* Más compacto en tablet */
-    }
-
-    /* El ORDENAMIENTO va debajo y toma el ancho completo */
-    .sort-control-container {
-        width: 100%;
-        order: 0; 
-        margin-bottom: 15px;
-    }
-    
-    .conteo-valor {
-        font-size: 1.6rem; /* Ajuste más pequeño para tablet */
-    }
-
-    /* Ajustes de tarjeta en tablet */
-    .proyecto-linea-item {
-        padding: 10px 15px 10px 25px; 
-        border-left: 8px solid #861542; 
-    }
-    
-    .proyecto-columnas {
-        gap: 10px 15px; 
-    }
-    
-    .proyecto-linea-columna {
-        flex: 1 1 calc(50% - 10px); 
-        min-width: 130px;
-    }
+  .proyecto-badges {
+    gap: 6px;
+  }
+  
+  .badge-estado {
+    padding: 5px 12px;
+    font-size: 0.7rem;
+  }
 }
 
 @media (max-width: 480px) {
-    /* AJUSTES PARA MÓVIL ESTRECHO */
-    
-    .conteo-valor {
-        font-size: 1.5rem; /* Aún más pequeño en móvil */
-    }
-    
-    .conteo-proyectos-card {
-        padding: 8px 12px; /* Aún más compacto en móvil */
-    }
-    
-    .proyecto-linea-item {
-        padding: 10px 12px 10px 20px; 
-        border-left: 6px solid #861542; 
-    }
-    
-    .proyecto-nombre .proyecto-valor {
-        font-size: 1.05rem;
-    }
-    
-    .sort-control-container .sort-button {
-        width: 100%;
-    }
+  .badge-estado {
+    padding: 4px 10px;
+    font-size: 0.65rem;
+  }
+}
+
+/* ==================== GRID DE INFORMACIÓN ==================== */
+.proyecto-columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 11;
+}
+
+.proyecto-linea-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(248, 249, 250, 0.8) 0%, rgba(233, 236, 239, 0.8) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 12;
+  backdrop-filter: blur(10px);
+}
+
+.proyecto-linea-columna:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 3px 10px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+}
+
+.proyecto-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.proyecto-icon {
+  font-size: 10px;
+  opacity: 0.9;
+  color: #861542;
+}
+
+.proyecto-valor {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.2;
+  display: block;
+}
+
+.porcentaje-proyecto {
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* ==================== CONTENEDOR DE PROGRESO ==================== */
+.proyecto-linea-progreso-container {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(241, 243, 244, 0.8);
+  position: relative;
+  z-index: 11;
+}
+
+.proyecto-linea-progreso {
+  width: 100%;
+}
+
+/* ==================== MENSAJES Y ESTADOS VACÍOS ==================== */
+.proyecto-sin-tareas {
+  text-align: center;
+  padding: 40px 24px;
+  color: #6c757d;
+  font-size: 0.9rem;
+  font-style: italic;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+  border-radius: 12px;
+  margin: 16px 0;
+  border: 1.5px dashed #dee2e6;
+  position: relative;
+  z-index: 6;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.sin-tareas-icon {
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.no-data-icon {
+  font-size: 36px;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+.proyecto-sin-tareas-mini {
+  text-align: center;
+  padding: 10px;
+  color: #6c757d;
+  font-size: 0.8rem;
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 6px;
+  border: 1px dashed #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+}
+
+.sin-tareas-mini-icon {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1200px) {
+  .resumen-metricas-container {
+    gap: 8px;
+  }
+  
+  .controles-izquierdo,
+  .controles-derecho {
+    height: 40px;
+  }
+  
+  .conteo-proyectos-card,
+  .visualizacion-control-container,
+  .sort-control-container {
+    height: 40px !important;
+    line-height: 40px !important;
+  }
+  
+  .sort-button {
+    height: 40px !important;
+    line-height: 40px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .procom-proceso-container,
+  .procom-completados-container {
+    padding: 12px;
+  }
+  
+  .resumen-metricas-container {
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    gap: 8px;
+    min-height: 48px;
+    flex-wrap: wrap;
+  }
+  
+  .controles-izquierdo,
+  .controles-derecho {
+    gap: 6px;
+    width: 100%;
+    height: 38px;
+  }
+  
+  .conteo-proyectos-card,
+  .visualizacion-control-container,
+  .sort-control-container {
+    height: 38px !important;
+    line-height: 38px !important;
+    min-width: auto;
+    flex: 1;
+  }
+  
+  .conteo-proyectos-card {
+    padding: 0 10px !important;
+    min-width: 70px;
+  }
+  
+  .visualizacion-control-container {
+    padding: 0 8px !important;
+    min-width: 100px;
+  }
+  
+  .sort-control-container {
+    min-width: 120px;
+  }
+  
+  .conteo-valor {
+    font-size: 1.1rem;
+  }
+  
+  .sort-button {
+    padding: 0 10px !important;
+    font-size: 0.65rem !important;
+    height: 38px !important;
+    line-height: 38px !important;
+  }
+  
+  .proyecto-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .proyecto-badges {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .proyecto-columnas {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .proyecto-linea-item {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .procom-proceso-container,
+  .procom-completados-container {
+    padding: 8px;
+  }
+  
+  .controles-izquierdo,
+  .controles-derecho {
+    height: 36px;
+  }
+  
+  .conteo-proyectos-card,
+  .visualizacion-control-container,
+  .sort-control-container {
+    height: 36px !important;
+    line-height: 36px !important;
+  }
+  
+  .sort-button {
+    height: 36px !important;
+    line-height: 36px !important;
+  }
+  
+  .conteo-valor {
+    font-size: 1rem;
+  }
+  
+  .proyecto-linea-item {
+    padding: 12px;
+  }
+  
+  .proyecto-nombre .proyecto-valor {
+    font-size: 1rem;
+  }
+  
+  .visualizacion-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* ==================== UTILIDADES Y ESTADOS ==================== */
+.procom-proceso-container * {
+  background-color: transparent;
+}
+
+.procom-proceso-container .resumen-metricas-container,
+.procom-completados-container .resumen-metricas-container,
+.conteo-proyectos-card,
+.proyecto-linea-item,
+.proyecto-linea-columna,
+.sort-button,
+.dropdown-menu-sort,
+.visualizacion-control-container,
+.visualizacion-select,
+.proyecto-sin-tareas {
+  background-color: initial;
+}
+
+.procom-proceso-container.procom-cargando,
+.procom-completados-container.procom-cargando {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.procom-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

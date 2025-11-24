@@ -108,7 +108,7 @@ if (!username) {
           navigate("/GestionProyectos"); // Página para Jefe
           break;
         case "Superusuario":
-          navigate("/Principal"); // Página para Superusuario
+          navigate("/PrincipalSuperusuario"); // Página para Superusuario
           break;
         case "Usuario":
           navigate("/GestionProyectosUsuario"); // Página para Usuario normal
