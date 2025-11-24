@@ -1,7 +1,7 @@
 /* ==========================
    CONTENEDOR PRINCIPAL
 ========================== */
-.reportes-d {
+.reportes-tc {
   padding: 20px;
   text-align: center;
   width: 100%;
@@ -12,11 +12,11 @@
 }
 
 @media (max-width: 576px) {
-  .reportes-d {
+  .reportes-tc {
     padding: 15px;
   }
 }
-.reportes-d-form-label {
+.reportes-tc-form-label {
   display: block;
   margin-bottom: 8px;
   font-size: 1rem;
@@ -32,20 +32,20 @@
 /* ==========================
    BARRA DE PROGRESO
 ========================== */
-.reportes-d-progress-contenedor {
+.reportes-tc-progress-contenedor {
   margin-top: 30px;
   max-width: 500px;
   height: 8px;
 }
 
-.reportes-d-progress {
+.reportes-tc-progress {
   height: 12px;
   border-radius: 10px;
   background-color: #f0f0f0;
   overflow: hidden;
 }
 
-.reportes-d-progress-bar {
+.reportes-tc-progress-bar {
   background: linear-gradient(90deg, #861542, #a75877);
   border-radius: 10px;
   transition: width 0.3s ease;
@@ -53,7 +53,7 @@
   z-index: 2;
 }
 
-.reportes-d-progress-bar-mejorada::after {
+.reportes-tc-progress-bar-mejorada::after {
   content: '';
   position: absolute;
   top: 0;
@@ -79,16 +79,16 @@
   100% { background-position: 20px 0; }
 }
 
-.reportes-d-text {
+.reportes-tc-text {
   color: #999;
 }
-.reportes-d-boton-wrapper {
+.reportes-tc-boton-wrapper {
   margin-top: 30px; /* Ajusta la distancia que quieras */
 }
 /* ==========================
    BOTON PRINCIPAL
 ========================== */
-.reportes-d-boton-form {
+.reportes-tc-boton-form {
   width: auto;
   max-width: 100%;
   padding: 15px;
@@ -106,13 +106,13 @@
   z-index: 1;
 }
 
-.reportes-d-progress-contenedor{
+.reportes-tc-progress-contenedor{
   margin-top: 30px;
   max-width: 500px;
   width: 100%;
 }
 
-.reportes-d-progress {
+.reportes-tc-progress {
   height: 15px; 
   border-radius: 10px;
   background-color: #f0f0f0;
@@ -120,7 +120,7 @@
   position: relative; 
 }
 
-.reportes-d-progress-bar {
+.reportes-tc-progress-bar {
   background: linear-gradient(90deg, #861542, #a75877);
   border-radius: 10px;
   transition: width 0.3s ease;

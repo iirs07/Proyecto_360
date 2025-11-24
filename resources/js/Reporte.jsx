@@ -13,6 +13,7 @@ import PdfViewer from "./PdfViewer";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import SelectDinamico from "../components/SelectDinamico";
+import ErrorMensaje from "../components/ErrorMensaje";
 
 function Reporte() {
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -32,7 +33,7 @@ function Reporte() {
   
   const opcionesReporte = [
     { value: "vencidas", label: "Tareas Vencidas" },
-    { value: "proximas", label: "Tareas Próximas a Vencer" },
+    { value: "proximas", label: "Próximas a Vencer" },
     { value: "completadas", label: "Tareas Completadas" }
   ];
 
@@ -49,8 +50,6 @@ function Reporte() {
       </span>
     </button>
   ));
-
-  // Cerrar el select cuando se hace click fuera de él
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (selectRef.current && !selectRef.current.contains(event.target)) {
@@ -187,12 +186,13 @@ function Reporte() {
 
   return (
     <Layout titulo="GENERAR REPORTES" sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}>
-   <div className="reportes container my-4">
-            <div className="reportes mt-4 mx-auto p-3">
-        <div className="reportes-container">
+   <div className="reportes-d container my-4">
+    <h1 className="titulo-global">Reporte</h1>
+            <div className="reportes-d mt-4 mx-auto p-3">
+        <div className="reportes-d-container">
           <div className="d-flex justify-content-center mb-4">
             <div className="position-relative" ref={selectRef}>
-              <label className="form-label fw-bold mb-2">Tipo de reporte</label>
+              <label className="reportes-d-form-label fw-bold">Tipo de reporte:</label>
               <SelectDinamico
       opciones={opcionesReporte.map(o => o.label)}
       valor={opcionesReporte.find(o => o.value === tipoReporte)?.label}
@@ -215,7 +215,7 @@ function Reporte() {
             {tipoReporte === 'vencidas' && (
               <div className="d-flex flex-md-row justify-content-center gap-3 mb-3">
                 <div className="reportes-fecha-item">
-                  <label className="reportes-form-label fw-bold">Fecha de inicio:</label>
+                  <label className="reportes-d-form-label fw-bold">Fecha de inicio:</label>
                   <DatePicker
                     selected={fechaInicio}
                     onChange={(date) => {
@@ -230,10 +230,10 @@ function Reporte() {
                     maxDate={fechaFin || null}
                     customInput={<CalendarButton />}
                   />
-                  {errores.fechaInicio && <small className="text-danger mt-1">{errores.fechaInicio}</small>}
+                   <ErrorMensaje mensaje={errores.fechaInicio} />
                 </div>
                 <div className="reportes-fecha-item">
-                   <label className="reportes-form-label fw-bold">Fecha de fin:</label>
+                   <label className="reportes-d-form-label fw-bold">Fecha de fin:</label>
                   <DatePicker
                     selected={fechaFin}
                     onChange={(date) => {
@@ -248,14 +248,14 @@ function Reporte() {
                     minDate={fechaInicio || null}
                     customInput={<CalendarButton />}
                   />
-                  {errores.fechaFin && <small className="text-danger mt-1">{errores.fechaFin}</small>}
+                  <ErrorMensaje mensaje={errores.fechaFin} />
                 </div>
               </div>
             )}
 {tipoReporte === 'proximas' && (
   <div className="d-flex justify-content-center mb-3">
     <div className="fecha-item">
-      <label className="form-label fw-bold">Hasta qué fecha:</label>
+      <label className="reportes-d-form-label fw-bold">Hasta qué fecha:</label>
       <DatePicker
         selected={fechaFin}
         onChange={(date) => {
@@ -270,14 +270,14 @@ function Reporte() {
         minDate={new Date()}
         customInput={<CalendarButton />}
       />
-      {errores.fechaFin && <small className="text-danger mt-1">{errores.fechaFin}</small>}
+      <ErrorMensaje mensaje={errores.fechaFin} />
     </div>
   </div>
 )}
             {tipoReporte === 'completadas' && (
               <div className="d-flex flex-md-row justify-content-center gap-3 mb-3">
                 <div className="fecha-item">
-                  <label className="form-label fw-bold">Fecha inicio:</label>
+                  <label className="reportes-d-form-label fw-bold">Fecha inicio:</label>
                   <DatePicker
                     selected={fechaInicio}
                     onChange={(date) => {
@@ -292,10 +292,10 @@ function Reporte() {
                     maxDate={fechaFin || null}
                     customInput={<CalendarButton />}
                   />
-                  {errores.fechaInicio && <small className="text-danger mt-1">{errores.fechaInicio}</small>}
+                  <ErrorMensaje mensaje={errores.fechaInicio} />
                 </div>
                 <div className="fecha-item">
-                  <label className="form-label fw-bold">Fecha fin:</label>
+                  <label className="reportes-d-form-label fw-bold">Fecha fin:</label>
                   <DatePicker
                     selected={fechaFin}
                     onChange={(date) => {
@@ -310,7 +310,7 @@ function Reporte() {
                     minDate={fechaInicio || null}
                     customInput={<CalendarButton />}
                   />
-                  {errores.fechaFin && <small className="text-danger mt-1">{errores.fechaFin}</small>}
+                  <ErrorMensaje mensaje={errores.fechaFin} />
                 </div>
               </div>
             )}
@@ -318,14 +318,14 @@ function Reporte() {
 
           <div className="d-flex flex-column align-items-center gap-2">
             {cargando && (
-   <div className="progress-contenedor-mejorado w-100 mt-4">
+  <div className="reportes-d-progress-contenedor mt-4">
     <div className="d-flex justify-content-between mb-2">
-      <small className="text-muted">Generando PDF...</small>
-      <small className="text-muted fw-bold">{progreso}%</small>
+      <small className="reportes-d-text">Generando PDF...</small>
+      <small className="reportes-d-text fw-bold">{progreso}%</small>
     </div>
-    <div className="progress progress-grueso">
+    <div className="reportes-d-progress">
       <div
-        className="progress-bar progress-bar-mejorada"
+         className="reportes-d-progress-bar"
         role="progressbar"
         style={{ width: `${progreso}%` }}
         aria-valuenow={progreso}
@@ -342,7 +342,7 @@ function Reporte() {
             <div className="mt-3">
                   <button 
                     type="button"
-                     className="reportes-boton-form"
+                     className="reportes-d-boton-form"
                     onClick={generarPDF}
                     disabled={cargando}
                     onMouseEnter={() => setBotonHover(true)}

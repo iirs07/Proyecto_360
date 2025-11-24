@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/formulario.css';
-import '../css/Reporte.css'; 
+import '../css/ReportesTareasCompletadas.css'; 
 import "../css/global.css";
 import '../css/calendario.css';
 import PdfViewer from "./PdfViewer";
@@ -153,8 +153,6 @@ function ReportesTareasCompletadas() {
 
     // Ejecutar inmediatamente
     forceDatePickerZIndex();
-    
-    // Configurar un observer para cuando se agreguen nuevos poppers
     const observer = new MutationObserver(forceDatePickerZIndex);
     observer.observe(document.body, {
       childList: true,
@@ -176,13 +174,13 @@ function ReportesTareasCompletadas() {
         />
       }
     >
-      <div className="reportes container my-4">
+      <div className="reportes-tc container my-4">
         <h1 className="titulo-global">Reporte de Tareas Completadas</h1>
 
-        <div className="reportes mt-4 mx-auto p-3">
+        <div className="reportes-tc mt-4 mx-auto p-3">
           <div className="fecha-selectores-container tareas-completadas d-flex justify-content-center gap-3 mb-3">
-            <div className="reportes-fecha-item">
-              <label className="reportes-form-label fw-bold">Fecha de inicio:</label>
+            <div className="reportes-tc-fecha-item">
+              <label className="reportes-tc-form-label fw-bold">Fecha de inicio:</label>
               <DatePicker
                 selected={fechaInicio}
                 onChange={(date) => {
@@ -200,8 +198,8 @@ function ReportesTareasCompletadas() {
               <ErrorMensaje mensaje={errores.fechaInicio} />
             </div>
 
-            <div className="reportes-fecha-item">
-              <label className="reportes-form-label fw-bold">Fecha de fin:</label>
+            <div className="reportes-tc-fecha-item">
+              <label className="reportes-tc-form-label fw-bold">Fecha de fin:</label>
               <DatePicker
                 selected={fechaFin}
                 onChange={(date) => {
@@ -222,14 +220,14 @@ function ReportesTareasCompletadas() {
 
           <div className="d-flex flex-column align-items-center gap-2">
             {cargando && (
-  <div className="reportes-progress-contenedor mt-4">
+  <div className="reportes-tc-progress-contenedor mt-4">
     <div className="d-flex justify-content-between mb-2">
-      <small className="reportes-text">Generando PDF...</small>
-      <small className="reportes-text fw-bold">{progreso}%</small>
+      <small className="reportes-tc-text">Generando PDF...</small>
+      <small className="reportes-tc-text fw-bold">{progreso}%</small>
     </div>
-    <div className="reportes-progress">
+    <div className="reportes-tc-progress">
       <div
-        className="reportes-progress-bar"
+        className="reportes-tc-progress-bar"
         role="progressbar"
         style={{ width: `${progreso}%` }}
         aria-valuenow={progreso}
@@ -242,10 +240,10 @@ function ReportesTareasCompletadas() {
 
           </div>
 
-          <div className="reportes-boton-wrapper w-100 d-flex justify-content-center">
+          <div className="reportes-tc-boton-wrapper w-100 d-flex justify-content-center">
   <button 
     type="button"
-    className="reportes-boton-form"
+    className="reportes-tc-boton-form"
     onClick={generarPDF}
     disabled={cargando}
   >

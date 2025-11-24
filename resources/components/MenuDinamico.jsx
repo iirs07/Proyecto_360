@@ -3,8 +3,11 @@ import React, { useState } from "react";
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
-  FaCheckCircle, FaChevronDown, FaChevronRight 
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaRegUserCircle
 } from "react-icons/fa";
+import { 
+  FiUsers
+} from "react-icons/fi";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "../css/global.css";
@@ -77,6 +80,14 @@ export default function MenuDinamico({
         { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
         { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
         { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
+      ],
+    },
+    {
+      key: 'usuarios',
+      label: "Usuarios",
+      icon: FiUsers,
+      subMenu: [
+        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
       ],
     },
     { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },

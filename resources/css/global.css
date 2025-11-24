@@ -123,11 +123,13 @@ body {
     top: var(--header-height);
     left: 0;
     width: var(--sidebar-width);
-    height: 100vh; /* Se extiende hasta el final de la ventana */
+    height: calc(100vh - var(--header-height)); /* altura exacta debajo del header */
     padding-top: 20px;
+    padding-bottom: 20px; /* espacio para que se vea el último item */
     background-color: var(--primary-color);
     color: var(--secondary-color);
     overflow-y: auto;
+    box-sizing: border-box; /* asegura que padding no rompa el scroll */
     transition: width 0.3s, transform 0.3s; 
     z-index: 150;
     display: flex;
@@ -135,6 +137,7 @@ body {
     align-items: center;
     box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
 }
+
 
 .sidebar.collapsed {
     width: var(--sidebar-collapsed);
@@ -182,9 +185,12 @@ body {
     font-weight: 500;
     transition: opacity 0.3s, visibility 0.3s, width 0.3s;
     white-space: nowrap;
-    overflow: hidden;
+    white-space: normal;    /* Permite saltos de línea */
+    word-break: break-word; /* Rompe palabras largas si es necesario */
+    overflow: visible;  
     text-overflow: ellipsis;
 }
+
 
 .submenu {
     list-style: none;
