@@ -7,154 +7,175 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import "../css/Login.css";
 
 function Login() {
+  /* Estados */
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [domain, setDomain] = useState("gmail.com");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [errorUsername, setErrorUsername] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
   const [errorGeneral, setErrorGeneral] = useState("");
 
   const navigate = useNavigate();
-  const domains = ["gmail.com", "outlook.com", "hotmail.com", "minatitlan.gob.mx"];
-
-  // 1. Crear referencia para el input de la contraseña
   const passwordInputRef = useRef(null);
 
+  /* Dominios disponibles */
+  const domains = [
+    "gmail.com", "outlook.com", "hotmail.com", "minatitlan.gob.mx"
+  ];
+
+  /* URL del backend desde .env */
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  /* Duración de mensajes de error */
+  const clearErrorsWithDelay = () => {
+    setTimeout(() => {
+      setErrorUsername("");
+      setErrorPassword("");
+      setErrorGeneral("");
+    }, 3000);
+  };
+
+  /* Login */
   const handleLogin = async () => {
-    // Es buena práctica agregar un chequeo de 'loading' aquí para evitar clics dobles, aunque el botón esté deshabilitado.
     if (loading) return;
-    
-    let hasError = false;
+
+    // Reset de errores
     setErrorUsername("");
     setErrorPassword("");
     setErrorGeneral("");
 
-    // Validación usuario
-if (!username) {
-  setErrorUsername("❌ Ingresa usuario");
-  hasError = true;
-  setTimeout(() => setErrorUsername(""), 3000);
-} else if (!/^[a-zA-Z0-9._]+$/.test(username)) {
-  setErrorUsername("❌ Usuario no válido");
-  hasError = true;
-  setTimeout(() => setErrorUsername(""), 3000);
-}
+    let hasError = false;
 
-
-    // Validaciones contraseña
-    if (!password) {
-      setErrorPassword("❌ Ingresa contraseña");
+    /* Validación de usuario */
+    if (!username) {
+      setErrorUsername("Ingresa usuario");
       hasError = true;
-      setTimeout(() => setErrorPassword(""), 3000);
-    } else if (password.length < 8) {
-      setErrorPassword("❌ Mínimo 8 caracteres");
+    } else if (!/^[a-zA-Z0-9._]+$/.test(username)) {
+      setErrorUsername("Usuario no válido");
       hasError = true;
-      setTimeout(() => setErrorPassword(""), 3000);
     }
 
-    if (hasError) return;
+    /* Validación de contraseña */
+    if (!password) {
+      setErrorPassword("Ingresa contraseña");
+      hasError = true;
+    } else if (password.length < 8) {
+      setErrorPassword("Mínimo 8 caracteres");
+      hasError = true;
+    }
+
+    if (hasError) {
+      clearErrorsWithDelay();
+      return;
+    }
 
     const fullEmail = `${username}@${domain}`;
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login", {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ correo: fullEmail, password }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          correo: fullEmail,
+          password
+        }),
       });
 
       const text = await res.text();
       let data = {};
-      try { data = text ? JSON.parse(text) : {}; } catch {}
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {}
 
       if (!res.ok) {
         if (res.status === 404) {
-          setErrorUsername(data.error || "❌ Correo no registrado");
-        } else if (res.status === 401) {
-          setErrorPassword(data.error || "❌ Contraseña incorrecta");
-        } else {
-          setErrorGeneral(data.error || "❌ Error de conexión o servidor");
+          setErrorUsername(data.error || "Correo no registrado");
+        } 
+        else if (res.status === 401) {
+          setErrorPassword(data.error || "Contraseña incorrecta");
+        } 
+        else {
+          setErrorGeneral(data.error || "Error de conexión o servidor");
         }
 
-        setTimeout(() => {
-          setErrorUsername("");
-          setErrorPassword("");
-          setErrorGeneral("");
-        }, 3000);
-
+        clearErrorsWithDelay();
         setLoading(false);
         return;
       }
 
-      // ✅ Guardar token y rol
+      /* Guardar datos de sesión */
       localStorage.setItem("jwt_token", data.token);
       localStorage.setItem("rol", data.usuario.rol);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
       setPassword("");
 
-      // ✅ Redirigir según el rol
+      /* Redirección según rol */
       const rol = data.usuario.rol;
-
       switch (rol) {
         case "Administrador":
-          navigate("/admin"); // Página para Administrador
+          navigate("/admin");
           break;
         case "Jefe":
-          navigate("/GestionProyectos"); // Página para Jefe
+          navigate("/GestionProyectos");
           break;
         case "Superusuario":
-          navigate("/PrincipalSuperusuario"); // Página para Superusuario
+          navigate("/PrincipalSuperusuario");
           break;
         case "Usuario":
-          navigate("/GestionProyectosUsuario"); // Página para Usuario normal
+          navigate("/GestionProyectosUsuario");
           break;
         default:
-          navigate("/"); // Página por defecto
+          navigate("/");
       }
 
-    } catch (error) {
-      console.error(error);
-      setErrorGeneral("❌ Error de conexión con el servidor");
-      setTimeout(() => setErrorGeneral(""), 3000);
+    } catch {
+      setErrorGeneral("Error de conexión con el servidor");
+      clearErrorsWithDelay();
     } finally {
       setLoading(false);
     }
   };
 
-  // 2. Manejador para la tecla Enter
+  /* Manejo de Enter */
   const handleKeyDown = (event, nextAction) => {
     if (event.key === "Enter") {
-      event.preventDefault(); 
-      
-      if (typeof nextAction === 'function') {
-        // Si es una función (ej: handleLogin), la ejecuta
+      event.preventDefault();
+
+      if (typeof nextAction === "function") {
         nextAction();
-      } else if (nextAction && nextAction.current) {
-        // Si es una referencia, mueve el foco
+      } else if (nextAction?.current) {
         nextAction.current.focus();
       }
     }
   };
 
+  /* Render */
   return (
-    <div className="login-body">
+    <div className="login-body">      
       <div className="login-container">
+
+        {/* Logos */}
         <div className="login-logos">
-          <img src={logo3} alt="Logo3" className="login-logo3" />
-          <img src={logo1} alt="Logo1" className="login-logo1" />
-          <img src={logo2} alt="Logo2" className="login-logo2" />
+          <img src={logo3} alt="Logo Gobierno" className="login-logo3" />
+          <img src={logo1} alt="Logo Ministerio" className="login-logo1" />
+          <img src={logo2} alt="Logo Ayuntamiento" className="login-logo2" />
         </div>
 
+        {/* Título */}
         <h1 className="login-title">INICIAR SESIÓN</h1>
 
-        {/* Usuario */}
+        {/* Usuario / Correo */}
         <div className="login-campo">
           <label htmlFor="usuario">Correo:</label>
+
           <div className="login-input-contenedor correo-linea">
             <input
               type="text"
@@ -163,18 +184,18 @@ if (!username) {
               className="login-input usuario-input"
               value={username}
               onChange={(e) => {
-                const valorFiltrado = e.target.value.replace(/[^a-zA-Z0-9._]/g, '');
+                const valorFiltrado = e.target.value.replace(/[^a-zA-Z0-9._]/g, "");
                 setUsername(valorFiltrado);
               }}
-              // 3. Enter salta a Contraseña
               onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             />
+
             <span className="login-at">@</span>
+
             <select
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               className="login-select dominio-select"
-              // Enter salta a Contraseña
               onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
             >
               {domains.map((d) => (
@@ -182,12 +203,18 @@ if (!username) {
               ))}
             </select>
           </div>
-          {errorUsername && <div className="login-error-msg">{errorUsername}</div>}
+
+          {errorUsername && (
+            <div className="login-error-msg">
+              {errorUsername}
+            </div>
+          )}
         </div>
 
         {/* Contraseña */}
         <div className="login-campo">
           <label htmlFor="contrasena">Contraseña:</label>
+
           <div className="login-input-contenedor">
             <input
               type={showPassword ? "text" : "password"}
@@ -196,33 +223,48 @@ if (!username) {
               className="login-input"
               value={password}
               onChange={(e) => {
-                const valorSinEspacios = e.target.value.replace(/\s/g, '');
+                const valorSinEspacios = e.target.value.replace(/\s/g, "");
                 setPassword(valorSinEspacios);
               }}
-              ref={passwordInputRef} // 4. Asignar referencia
-              // 5. Enter ejecuta handleLogin
+              ref={passwordInputRef}
               onKeyDown={(e) => handleKeyDown(e, handleLogin)}
             />
+
             {password.length > 0 && (
               <span
                 className="login-password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+                {showPassword
+                  ? <AiOutlineEyeInvisible size={20} />
+                  : <AiOutlineEye size={20} />
+                }
               </span>
             )}
           </div>
-          {errorPassword && <div className="login-error-msg">{errorPassword}</div>}
+
+          {errorPassword && (
+            <div className="login-error-msg">
+              {errorPassword}
+            </div>
+          )}
         </div>
 
-        {errorGeneral && <div className="login-error-general">{errorGeneral}</div>}
+        {/* Error general */}
+        {errorGeneral && (
+          <div className="login-error-general">
+            {errorGeneral}
+          </div>
+        )}
 
+        {/* Olvidar contraseña */}
         <h2 className="login-campo">
           <Link to="/ChangePassword" className="login-olvidaste">
             ¿Olvidaste tu contraseña?
           </Link>
         </h2>
 
+        {/* Botón */}
         <button
           type="button"
           className="login-button"
@@ -231,6 +273,7 @@ if (!username) {
         >
           {loading ? <span className="spinner"></span> : "INICIAR"}
         </button>
+
       </div>
     </div>
   );

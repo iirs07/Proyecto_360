@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   FaHome, FaUsers, FaBuilding, FaWallet, FaTree, 
   FaCog, FaGavel, FaHandsHelping, FaWater, FaFileAlt,
-  FaChevronDown, FaChevronUp
+  FaChevronDown, FaChevronUp, FaUser
 } from "react-icons/fa";
 import { slugify } from "./utils/slugify";
 
@@ -20,6 +20,9 @@ export default function PrincipalSuperusuario() {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("jwt_token"); 
+  
+  // ✅ OBTENER URL DESDE .env
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!token) {
@@ -56,7 +59,8 @@ export default function PrincipalSuperusuario() {
     // Obtener departamentos
     const fetchDepartamentos = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/departamentos", {
+        // ✅ USAR API_URL DESDE .env
+        const res = await fetch(`${API_URL}/api/departamentos`, {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
@@ -67,7 +71,7 @@ export default function PrincipalSuperusuario() {
           localStorage.removeItem("jwt_token");
           localStorage.removeItem("rol");
           localStorage.removeItem("usuario");
-          navigate("/Login", { replace: true });
+          navigate("/", { replace: true });
           return;
         }
 
@@ -89,7 +93,7 @@ export default function PrincipalSuperusuario() {
     };
 
     fetchDepartamentos();
-  }, [navigate, token]);
+  }, [navigate, token, API_URL]); // ✅ AGREGAR API_URL A LAS DEPENDENCIAS
 
   const handleSelect = (depId, depNombre) => {
     const departamentoSlug = slugify(depNombre);
@@ -136,10 +140,19 @@ export default function PrincipalSuperusuario() {
       sidebar={<MenuDinamico tipo="principal" />}
     >
       <div className="departamentos-app">
+        {/* CONTENEDOR DEL SALUDO Y NOMBRE DEL USUARIO */}
+        <div className="user-header-container">
+          <div className="user-greeting">
+            <FaUser className="user-icon" />
+            <h1>¡Hola!</h1>
+            <div className="user-name">{userName}</div>
+          </div>
+        </div>
+        
         <div className="areas-hero">
-          <h1 className="areas-title">
-            {userName ? `¡Hola! ${userName}` : "¡Hola! Bienvenido"}
-          </h1>
+          <p className="areas-subtitle">
+            Selecciona un departamento para gestionar sus proyectos
+          </p>
         </div>
         
         <div className="areas-grid-container">
