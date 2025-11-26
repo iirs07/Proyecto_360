@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Tarea;
+use App\Models\HistorialModificacion;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Mpdf\Mpdf;
@@ -36,34 +37,101 @@ class ReporteDirectorController extends Controller
             'departamento' => $departamentoNombre
         ];
 
+        // 🔹 Determinar trimestre actual
+        $hoyCarbon = Carbon::now();
+        $mesActual = $hoyCarbon->month;
+        $trimestreActual = ceil($mesActual / 3);
+        $inicioTrimestreActual = Carbon::create($hoyCarbon->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
+
+        $tareas = collect();
+        
+        // CORRECCIÓN 1: Inicializar variables por defecto
+        $movimientos = collect(); 
+        $vistaPDF = 'pdf.ReportesDirector'; // Vista por defecto (para tareas)
+
         switch ($tipo) {
+            case 'modificaciones':
+                $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->startOfDay() : Carbon::now()->startOfDay();
+                $fin = $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : Carbon::now()->endOfDay();
+
+                $query = HistorialModificacion::join('proyectos', 'historial_modificaciones.id_proyecto', '=', 'proyectos.id_proyecto')
+                    ->join('c_usuario', 'historial_modificaciones.id_usuario', '=', 'c_usuario.id_usuario')
+                    ->leftJoin('tareas', 'historial_modificaciones.id_tarea', '=', 'tareas.id_tarea')
+                    ->select(
+                        'historial_modificaciones.*',
+                        'proyectos.p_nombre as proyecto',
+                        'c_usuario.u_nombre as usuario_nombre',
+                        'c_usuario.a_paterno',
+                        'c_usuario.a_materno',
+                        'tareas.t_nombre as tarea'
+                    )
+                    ->whereBetween('historial_modificaciones.created_at', [$inicio, $fin]);
+
+                // Filtrar por departamento si existe
+                if ($idDepartamento) {
+                    $query->where('proyectos.id_departamento', $idDepartamento);
+                }
+
+                $movimientos = $query->orderBy('historial_modificaciones.created_at', 'DESC')->get();
+                
+                $nombreArchivo = 'Reporte_Historial_Modificaciones.pdf';
+                
+                // CORRECCIÓN 2: Cambiar la vista a usar
+                $vistaPDF = 'pdf.ReporteModificaciones'; 
+                break;
+
             case 'proximas':
                 $inicio = $fechaInicio ?? $hoy;
                 $fin = $fechaFin ?? date('Y-m-d', strtotime('+7 days'));
-                $tareas = Tarea::with('proyecto', 'usuario.departamento')
-                               ->whereBetween('tf_fin', [$inicio, $fin])
-                               ->get();
+
+                if ($fin >= $inicioTrimestreActual->toDateString()) {
+                    $inicioPrincipal = max($inicio, $inicioTrimestreActual->toDateString());
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin])
+                                 ->get()
+                    );
+                }
+                if ($inicio < $inicioTrimestreActual->toDateString()) {
+                    $finHistorico = min($fin, $inicioTrimestreActual->copy()->subSecond()->toDateString());
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql_second')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->whereBetween('tf_fin', [$inicio, $finHistorico])
+                                 ->get()
+                    );
+                }
+
                 $nombreArchivo = 'Reporte_tareas_proximas_a_vencer.pdf';
                 break;
 
             case 'completadas':
-                // AGREGAR FILTRO POR FECHAS PARA TAREAS COMPLETADAS
                 $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->toDateString() : null;
                 $fin = $fechaFin ? Carbon::parse($fechaFin)->toDateString() : null;
 
-                $query = Tarea::with('proyecto', 'usuario.departamento')
-                               ->where('t_estatus', 'Completado');
-
-                // Filtrar por rango de fechas si se proporcionan
-                if ($inicio && $fin) {
-                    $query->whereBetween('tf_fin', [$inicio, $fin]);
-                } elseif ($inicio) {
-                    $query->whereDate('tf_fin', '>=', $inicio);
-                } elseif ($fin) {
-                    $query->whereDate('tf_fin', '<=', $fin);
+                if ($fin && $fin >= $inicioTrimestreActual->toDateString()) {
+                    $inicioPrincipal = $inicio && $inicio >= $inicioTrimestreActual->toDateString() ? $inicio : $inicioTrimestreActual->toDateString();
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->where('t_estatus', 'Completado')
+                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin])
+                                 ->get()
+                    );
+                }
+                if ($inicio && $inicio < $inicioTrimestreActual->toDateString()) {
+                    $finHistorico = $fin && $fin < $inicioTrimestreActual->toDateString() ? $fin : $inicioTrimestreActual->copy()->subSecond()->toDateString();
+                    $inicioHistorico = $inicio;
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql_second')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->where('t_estatus', 'Completado')
+                                 ->whereBetween('tf_fin', [$inicioHistorico, $finHistorico])
+                                 ->get()
+                    );
                 }
 
-                $tareas = $query->get();
                 $nombreArchivo = 'Reporte_tareas_completadas.pdf';
                 break;
 
@@ -72,18 +140,32 @@ class ReporteDirectorController extends Controller
                 $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->toDateString() : null;
                 $fin = $fechaFin ? Carbon::parse($fechaFin)->toDateString() : Carbon::now()->toDateString();
 
-                $query = Tarea::with('proyecto', 'usuario.departamento');
-                if ($inicio) {
-                    $query->whereDate('tf_fin', '>=', $inicio)
-                          ->whereDate('tf_fin', '<=', $fin);
-                } else {
-                    $query->whereDate('tf_fin', '<=', $fin);
+                if ($fin >= $inicioTrimestreActual->toDateString()) {
+                    $inicioPrincipal = $inicio && $inicio >= $inicioTrimestreActual->toDateString() ? $inicio : $inicioTrimestreActual->toDateString();
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->whereDate('tf_fin', '<=', $fin)
+                                 ->when($inicioPrincipal, fn($q) => $q->whereDate('tf_fin', '>=', $inicioPrincipal))
+                                 ->get()
+                    );
+                }
+                if ($inicio && $inicio < $inicioTrimestreActual->toDateString()) {
+                    $finHistorico = min($fin, $inicioTrimestreActual->copy()->subSecond()->toDateString());
+                    $tareas = $tareas->merge(
+                        Tarea::on('pgsql_second')
+                                 ->with('proyecto', 'usuario.departamento')
+                                 ->whereDate('tf_fin', '<=', $finHistorico)
+                                 ->whereDate('tf_fin', '>=', $inicio)
+                                 ->get()
+                    );
                 }
 
-                $tareas = $query->get();
                 $nombreArchivo = 'Reporte_tareas_vencidas.pdf';
                 break;
         }
+
+        // 🔹 Generación de PDF
         $mpdf = new Mpdf([
             'format' => 'Letter',
             'margin_top' => 20,
@@ -95,13 +177,17 @@ class ReporteDirectorController extends Controller
         $mpdf->showImageErrors = true;
         $mpdf->SetWatermarkImage(public_path('imagenes/logo2.png'), 0.1, [150, 200], 'C');
         $mpdf->showWatermarkImage = true;
+
         $cssPath = resource_path('css/PdfDirector.css');
         if (file_exists($cssPath)) {
             $css = file_get_contents($cssPath);
             $mpdf->WriteHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
         }
-        $html = view('pdf.ReportesDirector', [
+
+        // CORRECCIÓN 3: Usar la variable $vistaPDF en lugar del string fijo
+        $html = view($vistaPDF, [
             'tareas' => $tareas,
+            'movimientos' => $movimientos, // CORRECCIÓN 4: Pasar los movimientos a la vista
             'hoy' => $hoy,
             'hora' => $hora,
             'usuario' => $usuario,
@@ -109,6 +195,7 @@ class ReporteDirectorController extends Controller
             'inicio' => $inicio,
             'fin' => $fin
         ])->render();
+
         $mpdf->SetHTMLFooter(
             '<div style="text-align:center; font-size:11px; color:#666;">
                 Sistema de Gestión de Proyectos - H. Ayuntamiento de Minatitlán
@@ -133,6 +220,5 @@ class ReporteDirectorController extends Controller
             ->header('Expires', '0');
     }
 }
-
 
 

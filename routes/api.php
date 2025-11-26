@@ -39,12 +39,14 @@ Route::middleware(['jwt.auth'])->group(function () {
     // TAREAS
     Route::get('/proyectos/{idProyecto}/tareas', [TareasController::class, 'obtenerPorProyecto']);
     Route::get('/reporte', [ReporteController::class, 'generarPDF']);
+
     //JEFE
     Route::get('/proyectos/jefe', [JefeController::class, 'ProyectosDeUsuario']);
     Route::get('tareas/{idProyecto}/usuario/{idUsuario}', [JefeController::class, 'obtenerTareasPendientes']);
     Route::post('/evidencias', [JefeController::class, 'subirEvidencia']);
     Route::get('/usuario/tareas', [JefeController::class, 'tareasPorUsuario']);
     Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarReporteCompletadas']);
+    
     //DIRECTOR
     Route::get('/dashboard-departamento', [TareasDirectorController::class, 'dashboardDepartamento']);
     Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);

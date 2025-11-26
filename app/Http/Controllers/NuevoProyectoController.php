@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Proyecto;
 use App\Models\Tarea;
+use App\Models\HistorialModificacion;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\DB; 
 use App\Notifications\TareaAsignada;
@@ -346,9 +347,12 @@ public function completar($idProyecto)
         ], 500);
     }
 }
-//METODO QUE PERMITE CAMBIAR EL STATUS DE PROYECTO FINALIZADO A EN PROCESO 
-public function CambiarStatusProyectoTerminado($id)
-    {
+public function CambiarStatusProyectoTerminado(Request $request, $id)
+{
+    // Iniciamos una transacción para asegurar que ambos cambios se guarden o ninguno
+    DB::beginTransaction();
+
+    try {
         $proyecto = Proyecto::find($id);
 
         if (!$proyecto) {
@@ -358,13 +362,38 @@ public function CambiarStatusProyectoTerminado($id)
             ], 404);
         }
 
+        // 1. Cambiamos el estatus del proyecto
         $proyecto->p_estatus = "En proceso";
         $proyecto->save();
 
+        // 2. Guardamos en el historial (Bitácora)
+        // Obtenemos el ID del usuario desde la petición del Frontend
+        $usuarioId = $request->input('usuario_id'); 
+
+        HistorialModificacion::create([
+            'id_proyecto' => $id,
+            'id_tarea'    => null, // Es NULL porque modificamos el PROYECTO, no una tarea específica
+            'id_usuario'  => $usuarioId,
+            'accion'      => 'REAPERTURA PROYECTO',
+            'detalles'    => 'El proyecto fue cambiado de estatus Finalizado a En Proceso.'
+        ]);
+
+        // Confirmamos los cambios en la BD
+        DB::commit();
+
         return response()->json([
             'success' => true,
-            'mensaje' => 'Proyecto marcado como ',
+            'mensaje' => 'Proyecto marcado como En Proceso y movimiento registrado',
             'proyecto' => $proyecto
         ]);
+
+    } catch (\Exception $e) {
+        // Si algo falla, deshacemos los cambios
+        DB::rollBack();
+        return response()->json([
+            'success' => false, 
+            'error' => 'Error al actualizar: ' . $e->getMessage()
+        ], 500);
     }
+}
 }

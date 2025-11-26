@@ -66,27 +66,35 @@ function DesbloquearProyectos() {
   );
 
   const handleDesbloquearProyecto = async (idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    const estaDesbloqueado = proyectosDesbloqueados.includes(idProyecto);
+    const token = localStorage.getItem("jwt_token");
+    // 1. OBTENER EL USUARIO PARA MANDAR SU ID
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    if (estaDesbloqueado) {
-        const exitoBloqueo = await handleBloquearProyecto(idProyecto); 
-        if (exitoBloqueo) {
-            setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
-        }
-        return; 
-    } 
-    
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
-            method: 'PUT',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-        });
+    const estaDesbloqueado = proyectosDesbloqueados.includes(idProyecto);
 
-        if (res.status === 401) {
+    if (estaDesbloqueado) {
+        // Nota: Aquí también pasamos el usuario a la función de bloquear
+        const exitoBloqueo = await handleBloquearProyecto(idProyecto); 
+        if (exitoBloqueo) {
+            setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
+        }
+        return; 
+    } 
+    
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            // 2. AGREGAR EL BODY CON EL ID
+            body: JSON.stringify({
+                usuario_id: usuario.id_usuario
+            })
+        });
+
+        if (res.status === 401) {
             localStorage.removeItem("jwt_token");
             navigate("/Login", { replace: true });
             return;
@@ -107,22 +115,28 @@ function DesbloquearProyectos() {
   };
 
   const handleBloquearProyecto = async (idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    
-    if (!token) {
-        navigate("/Login", { replace: true });
-        return false;
-    }
+    const token = localStorage.getItem("jwt_token");
+    // 1. OBTENER EL USUARIO
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    
+    if (!token) {
+        navigate("/Login", { replace: true });
+        return false;
+    }
 
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/finalizar`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                Authorization: `Bearer ${token}` 
-            },
-        });
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/finalizar`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                Authorization: `Bearer ${token}` 
+            },
+            // 2. AGREGAR EL BODY
+            body: JSON.stringify({
+                usuario_id: usuario.id_usuario
+            })
+        });
 
         if (res.status === 401) {
             localStorage.removeItem("jwt_token");
@@ -155,15 +169,23 @@ function DesbloquearProyectos() {
   };
 
   const handleCompletarTarea = async (id, idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/tareas/${id}/cambiar-estatus-enproceso`, {
-        method: 'PUT',
-        headers: { 
-          'Accept': 'application/json',
-          "Authorization": `Bearer ${token}` 
-        },
-      });
+    const token = localStorage.getItem("jwt_token");
+    // 1. OBTENER EL USUARIO
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/tareas/${id}/cambiar-estatus-enproceso`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json', // <--- IMPORTANTE: Asegúrate que esté esta línea
+          'Accept': 'application/json',
+          "Authorization": `Bearer ${token}` 
+        },
+        // 2. AGREGAR EL BODY
+        body: JSON.stringify({
+            usuario_id: usuario.id_usuario
+        })
+      });
       
       if (res.status === 401) {
         localStorage.removeItem("jwt_token");
@@ -390,20 +412,13 @@ function DesbloquearProyectos() {
               );
             })
           ) : (
-            <div className="empty-state-global">
                <EmptyState
     titulo="LISTA DE PROYECTOS"
-    mensaje="Actualmente no tienes proyectos finalizados o disponibles para desbloquear."
+    mensaje="Actualmente no tienes proyectos finalizados para modificar su estatus"
     botonTexto="Volver al Tablero"
     onVolver={volverSegunRol} 
     icono={logo3}
-  />
-              <p className="empty-text-global">
-                {busqueda
-                  ? "No se encontraron proyectos que coincidan con tu búsqueda."
-                  : "Actualmente no tienes proyectos finalizados o disponibles para desbloquear."}
-              </p>
-            </div>
+  />         
           )}
         </div>
       </div>

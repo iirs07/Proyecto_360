@@ -9,80 +9,85 @@ import "../css/formulario.css";
 import "../css/VerTareasPendientes.css";
 import logo3 from "../imagenes/logo3.png"; 
 import { FiX, FiCheck, FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-
+import ConfirmModal from "../components/ConfirmModal"; 
 
 function VerTareasPendientes() {
   const [tareaCompletada, setTareaCompletada] = useState(false);
 
   const [proyecto, setProyecto] = useState(null);
-  const [tareaActual, setTareaActual] = useState(null);
+  const [tareaActual, setTareaActual] = useState(null); // Para el modal de evidencias
   const [evidencias, setEvidencias] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false); // Para el modal de evidencias
+  
+  // 2. Estados para el Modal de Confirmación
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [tareaAFinalizar, setTareaAFinalizar] = useState(null); // Tarea seleccionada para borrar/finalizar
+
   const [indiceActual, setIndiceActual] = useState(0);
   const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(false);
   const [imagenCargando, setImagenCargando] = useState(true);
   const [cargandoProyecto, setCargandoProyecto] = useState(true);
   const navigate = useNavigate();
-   const { volverSegunRol } = useRolNavigation();
+  const { volverSegunRol } = useRolNavigation();
+
   const obtenerProyectoActualizado = async () => {
-  const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  const token = localStorage.getItem("jwt_token"); 
+    const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const token = localStorage.getItem("jwt_token"); 
 
-  if (!proyectoGuardado || !usuario?.id_usuario) {
-    return navigate("/tareas-en-proceso");
-  }
+    if (!proyectoGuardado || !usuario?.id_usuario) {
+      return navigate("/tareas-en-proceso");
+    }
 
-  if (!token) {
-    return alert("No hay token de autenticación, inicia sesión.");
-  }
+    if (!token) {
+      return alert("No hay token de autenticación, inicia sesión.");
+    }
 
-  try {
-    setCargandoProyecto(true);
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, 
-        },
-      }
-    );
-
-    const data = await response.json();
-    console.log("Datos recibidos del backend:", data);
-
-    if (data.success) {
-      const proyectoSeleccionado = JSON.parse(proyectoGuardado);
-      const proyectoCompleto = data.proyectos.find(
-        p => p.id_proyecto === proyectoSeleccionado.id_proyecto
+    try {
+      setCargandoProyecto(true);
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        }
       );
 
-      if (proyectoCompleto) {
-        setProyecto(proyectoCompleto);
-        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoCompleto));
-      } else {
-        const proyectoActualizado = {
-          ...proyectoSeleccionado,
-          tareas: (proyectoSeleccionado.tareas || []).map(t => ({
-            ...t,
-            t_estatus: "Finalizada",
-          })),
-        };
-        setProyecto(proyectoActualizado);
-        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
-      }
-    }
-  } catch (error) {
-    console.error("Error al obtener tareas:", error);
-    const proyectoSeleccionado = JSON.parse(proyectoGuardado);
-    setProyecto(proyectoSeleccionado);
-  } finally {
-    setCargandoProyecto(false);
-  }
-};
+      const data = await response.json();
+      console.log("Datos recibidos del backend:", data);
 
+      if (data.success) {
+        const proyectoSeleccionado = JSON.parse(proyectoGuardado);
+        const proyectoCompleto = data.proyectos.find(
+          p => p.id_proyecto === proyectoSeleccionado.id_proyecto
+        );
+
+        if (proyectoCompleto) {
+          setProyecto(proyectoCompleto);
+          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoCompleto));
+        } else {
+          const proyectoActualizado = {
+            ...proyectoSeleccionado,
+            tareas: (proyectoSeleccionado.tareas || []).map(t => ({
+              ...t,
+              t_estatus: "Finalizada",
+            })),
+          };
+          setProyecto(proyectoActualizado);
+          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
+        }
+      }
+    } catch (error) {
+      console.error("Error al obtener tareas:", error);
+      const proyectoSeleccionado = JSON.parse(proyectoGuardado);
+      setProyecto(proyectoSeleccionado);
+    } finally {
+      setCargandoProyecto(false);
+    }
+  };
 
   useEffect(() => {
     obtenerProyectoActualizado();
@@ -102,64 +107,75 @@ function VerTareasPendientes() {
     );
   }
 
-const tareasFiltradas = proyecto?.tareas
-  ?.filter(t => t.t_estatus.toLowerCase() !== "finalizada")
-  ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
+  const tareasFiltradas = proyecto?.tareas
+    ?.filter(t => t.t_estatus.toLowerCase() !== "finalizada")
+    ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
 
- const handleCompletarTarea = async (idTarea) => {
-  if (!idTarea) return;
+  // 3. Función lógica que ejecuta la API (se llama DESPUÉS de confirmar)
+  const ejecutarFinalizacionTarea = async () => {
+    // Usamos la tarea guardada en el estado temporal
+    const idTarea = tareaAFinalizar?.id_tarea; 
+    if (!idTarea) return;
 
-  const token = localStorage.getItem("jwt_token");
-  if (!token) return alert("No hay token de autenticación, inicia sesión.");
+    const token = localStorage.getItem("jwt_token");
+    if (!token) return alert("No hay token de autenticación, inicia sesión.");
 
-  try {
-    setCargando(true);
+    try {
+      setCargando(true);
 
-     const response = await fetch(`http://127.0.0.1:8000/api/tareas/${idTarea}/completar`, 
-      {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json', 
-          'Accept': 'application/json',
-          Authorization: `Bearer ${token}`
+      const response = await fetch(`http://127.0.0.1:8000/api/tareas/${idTarea}/completar`, 
+        {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json', 
+            'Accept': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
         }
+      );
+
+      const data = await response.json();
+
+      if (data.success || response.ok) {
+        setProyecto(prevProyecto => {
+          if (!prevProyecto?.tareas) return prevProyecto;
+          
+          const tareasActualizadas = prevProyecto.tareas.map(tarea =>
+            tarea.id_tarea === idTarea 
+              ? { ...tarea, t_estatus: "Finalizada" }
+              : tarea
+          );
+          
+          const proyectoActualizado = { ...prevProyecto, tareas: tareasActualizadas };
+          
+          sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
+          
+          return proyectoActualizado;
+        });
+        
+        // Cerramos el modal de confirmación y limpiamos
+        setConfirmModalOpen(false);
+        setTareaAFinalizar(null);
+        setTareaCompletada(true); // Mostrar toast de éxito
+        setTimeout(() => setTareaCompletada(false), 3000); // Ocultar toast después
+        
+      } else {
+        alert(`Error: ${data.mensaje || 'No se pudo completar la tarea'}`);
       }
-    );
-
-    const data = await response.json();
-
-    if (data.success || response.ok) {
-      setProyecto(prevProyecto => {
-        if (!prevProyecto?.tareas) return prevProyecto;
-        
-        const tareasActualizadas = prevProyecto.tareas.map(tarea =>
-          tarea.id_tarea === idTarea 
-            ? { ...tarea, t_estatus: "Finalizada" }
-            : tarea
-        );
-        
-        const proyectoActualizado = { ...prevProyecto, tareas: tareasActualizadas };
-        
-        sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
-        
-        return proyectoActualizado;
-      });
-      
-      handleCerrarModal();
-      
-    } else {
-      alert(`Error: ${data.mensaje || 'No se pudo completar la tarea'}`);
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+      alert('Error de conexión');
+    } finally {
+      setCargando(false);
     }
-  } catch (error) {
-    console.error('Error en la solicitud:', error);
-    alert('Error de conexión');
-  } finally {
-    setCargando(false);
-  }
-};
+  };
 
-
+  // 4. Función para abrir el modal (se llama al dar click en el checkbox)
+  const abrirModalConfirmacion = (tarea) => {
+    setTareaAFinalizar(tarea);
+    setConfirmModalOpen(true);
+  };
 
   const handleVerEvidencias = (tarea) => {
     setTareaActual(tarea);
@@ -204,18 +220,20 @@ const tareasFiltradas = proyecto?.tareas
 
   if (!proyecto) return null;
 
-   return (
-   <Layout
+  return (
+    <Layout
       titulo="TAREAS POR REVISAR"
       sidebar={<MenuDinamico activeRoute="enproceso" />}
     >
       <div className="contenedor-global">
-        {/* TÍTULO DEL PROYECTO SOLO UNA VEZ */}
-        <div className="vtp-titulo-proyecto">
-          <span className="vtp-label-proyecto">Proyecto</span> 
-          <h1 className="vtp-nombre-proyecto">{proyecto?.p_nombre}</h1>
-        </div>
-        
+        {/* TÍTULO DEL PROYECTO SOLO SI HAY TAREAS */}
+        {tareasFiltradas?.length > 0 && (
+          <div className="vtp-titulo-proyecto">
+            <span className="vtp-label-proyecto">Proyecto</span>
+            <h1 className="vtp-nombre-proyecto">{proyecto?.p_nombre}</h1>
+          </div>
+        )}
+
         <div className="vtp-lista-tareas">
           {tareasFiltradas?.length > 0 ? (
             tareasFiltradas.map(t => (
@@ -235,7 +253,9 @@ const tareasFiltradas = proyecto?.tareas
                       <input
                         type="checkbox"
                         id={`check-${t.id_tarea}`}
-                        onChange={() => handleCompletarTarea(t.id_tarea)}
+                        // 5. CAMBIO: En lugar de llamar directo a completar, abrimos modal
+                        onChange={() => abrirModalConfirmacion(t)}
+                        checked={false} // Mantener desmarcado visualmente hasta que se confirme y desaparezca de la lista
                         disabled={cargando}
                       />
                       <label htmlFor={`check-${t.id_tarea}`}>
@@ -244,7 +264,6 @@ const tareasFiltradas = proyecto?.tareas
                     </div>
                   )}
                 </div>
-
 
                 {/* FOOTER REDISEÑADO */}
                 <div className="vtp-tarea-footer">
@@ -295,75 +314,81 @@ const tareasFiltradas = proyecto?.tareas
         </div>
       </div>
 
-        {modalVisible && tareaActual && (
-          <div className="vtp-modal">
-            <div className="vtp-modal-content">
-              <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
-                <FiX />
-              </button>
-              
-              <div className="vtp-modal-header">
-                <h3>{tareaActual.t_nombre}</h3>
-                <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-                  {tareaActual.t_estatus}
-                </span>
-              </div>
+      {/* Modal de Evidencias (Existente) */}
+      {modalVisible && tareaActual && (
+        <div className="vtp-modal">
+          <div className="vtp-modal-content">
+            <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
+              <FiX />
+            </button>
+            
+            <div className="vtp-modal-header">
+              <h3>{tareaActual.t_nombre}</h3>
+              <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
+                {tareaActual.t_estatus}
+              </span>
+            </div>
 
-              {evidencias.length > 0 ? (
-                <div className="vtp-evidencias-container">
-                  <div className="vtp-evidencias-navegacion">
-                    <div className="vtp-imagen-container">
-                      {imagenCargando && <div className="vtp-imagen-cargando"></div>}
-                      {console.log("URL de la evidencia:", evidencias[indiceActual].archivo_url)}
-                      <img
-  src={evidencias[indiceActual].archivo_url}
-  alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
-  className="vtp-imagen-evidencia"
-  onLoad={handleImageLoad}
-  onError={handleImageError}
-  style={{ display: imagenCargando ? 'none' : 'block' }}
-/>
-
-                    </div>
-
-                    {evidencias.length > 1 && (
-                      <>
-                        <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
-                          <FiChevronLeft size={28} />
-                        </button>
-                        <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
-                          <FiChevronRight size={28} />
-                        </button>
-                      </>
-                    )}
+            {evidencias.length > 0 ? (
+              <div className="vtp-evidencias-container">
+                <div className="vtp-evidencias-navegacion">
+                  <div className="vtp-imagen-container">
+                    {imagenCargando && <div className="vtp-imagen-cargando"></div>}
+                    <img
+                      src={evidencias[indiceActual].archivo_url}
+                      alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
+                      className="vtp-imagen-evidencia"
+                      onLoad={handleImageLoad}
+                      onError={handleImageError}
+                      style={{ display: imagenCargando ? 'none' : 'block' }}
+                    />
                   </div>
 
                   {evidencias.length > 1 && (
-                    <div className="vtp-contador">
-                      <span>{indiceActual + 1} / {evidencias.length}</span>
-                    </div>
+                    <>
+                      <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
+                        <FiChevronLeft size={28} />
+                      </button>
+                      <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
+                        <FiChevronRight size={28} />
+                      </button>
+                    </>
                   )}
-
-                  <div className="vtp-evidencias-info">
-                    <span className="vtp-tarea-fecha">
-                      Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
-                    </span>
-                  </div>
                 </div>
-              ) : (
-                <div className="vtp-sin-evidencias"></div>
-              )}
-            </div>
-          </div>
-        )}
-        {tareaCompletada && (
-  <div className="vtp-toast">
-    <FiCheck style={{ marginRight: "8px" }} />
-    Tarea completada correctamente
-  </div>
-)}
 
-  </Layout>
+                {evidencias.length > 1 && (
+                  <div className="vtp-contador">
+                    <span>{indiceActual + 1} / {evidencias.length}</span>
+                  </div>
+                )}
+
+                <div className="vtp-evidencias-info">
+                  <span className="vtp-tarea-fecha">
+                    Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="vtp-sin-evidencias"></div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. Modal de Confirmación para Finalizar Tarea (Nuevo) */}
+      <ConfirmModal
+        isOpen={confirmModalOpen}
+        title="Confirmar"
+        message={`¿Estás seguro que deseas marcar como finalizada la tarea "${tareaAFinalizar?.t_nombre}"?`}
+        onConfirm={ejecutarFinalizacionTarea}
+        onCancel={() => {
+          setConfirmModalOpen(false);
+          setTareaAFinalizar(null);
+        }}
+      />
+
+
+    </Layout>
   );
 }
 
