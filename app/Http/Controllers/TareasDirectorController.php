@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\Tarea;
 use App\Models\Proyecto;
 use App\Models\Usuario;
+use App\Models\HistorialModificacion;
 use App\Notifications\TareaAsignada;
 use Illuminate\Support\Facades\Log;
 use App\Models\Evidencia;
+use Carbon\Carbon;
+
 use DB;
 
 class TareasDirectorController extends Controller
@@ -105,7 +108,8 @@ public function tareasActivasPorProyecto($idProyecto)
 public function obtenerTareasProyectosJefe(Request $request)
 {
     try {
-       $usuario = DB::table('c_usuario')
+        // 1️⃣ Obtener usuario
+        $usuario = DB::table('c_usuario')
             ->where('id_usuario', $request->query('usuario'))
             ->first();
 
@@ -115,35 +119,82 @@ public function obtenerTareasProyectosJefe(Request $request)
 
         $idDepartamento = $usuario->id_departamento;
 
-        $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
-            ->where('p_estatus', 'ILIKE', 'EN PROCESO')
-            ->whereHas('tareas', function($q) {
-                // Solo proyectos que tengan al menos una tarea EN PROCESO o FINALIZADA
-                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['en proceso', 'finalizada']);
-            })
-            ->with(['tareas' => function($q) {
-                // Trae todas las tareas EN PROCESO o FINALIZADA con sus evidencias
-                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['en proceso', 'finalizada'])
-                    ->with('evidencias');
-            }])
-            ->get()
-            ->map(function($proyecto) {
-                // 1. Total de tareas (independiente de estatus)
-                $proyecto->total_tareas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)->count();
+        // 2️⃣ Trimestre actual
+        $hoy = Carbon::now();
+        $mesActual = $hoy->month;
+        $trimestreActual = ceil($mesActual / 3);
+        $inicioTrimestreActual = Carbon::create($hoy->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
+        
+        // 🔹 DEFINIR FILTROS REUTILIZABLES
+        // Esto asegura que uses exactamente la misma lógica para filtrar proyectos y tareas
+        
+        // Estados de proyectos permitidos
+        $estadosProyecto = ['En proceso']; 
+        
+        // Estados de tareas permitidos
+        $estadosTarea = ['En proceso', 'Finalizada'];
 
-                // 2. Tareas completadas (Progreso validado por el jefe)
-                $proyecto->tareas_completadas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)
-                    ->where('t_estatus', 'ILIKE', 'Finalizada')
-                    ->count();
+        // Closure para filtrar tareas (se usa en whereHas y en with)
+        $filtroTareas = function($q) use ($estadosTarea) {
+            // Usamos whereIn con array_map para simular ILIKE de forma más limpia o whereRaw si prefieres
+            $q->whereRaw("LOWER(t_estatus) IN ('en proceso', 'finalizada')");
+        };
 
-                // 3. ¡NUEVA MÉTRICA! Tareas listas para revisión (Estatus 'En Proceso' Y tienen evidencia)
-                $proyecto->tareas_a_revisar = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)
-                    ->where('t_estatus', 'ILIKE', 'En Proceso') // Tareas en estatus 'En Proceso'
-                    ->whereHas('evidencias') // ¡Que además tengan evidencias subidas!
-                    ->count();
-                
-                return $proyecto;
-            });
+        $proyectos = collect();
+
+        // 3️⃣ BD principal (trimestre actual)
+        $proyectos = $proyectos->merge(
+            \App\Models\Proyecto::on('pgsql')
+                ->where('id_departamento', $idDepartamento)
+                // Aceptamos proyectos En proceso O Finalizados
+                ->whereIn('p_estatus', $estadosProyecto) 
+                // SOLO proyectos que tengan al menos una tarea que cumpla el filtro
+                ->whereHas('tareas', $filtroTareas)
+                // Cargamos SOLO las tareas que cumplen el filtro
+                ->with(['tareas' => function($q) use ($filtroTareas) {
+                    $filtroTareas($q);
+                    $q->with('evidencias');
+                }])
+                ->where('pf_fin', '>=', $inicioTrimestreActual)
+                ->get()
+        );
+
+        // 4️⃣ BD histórica (trimestres anteriores)
+        $proyectos = $proyectos->merge(
+            \App\Models\Proyecto::on('pgsql_second')
+                ->where('id_departamento', $idDepartamento)
+                ->whereIn('p_estatus', $estadosProyecto)
+                ->whereHas('tareas', $filtroTareas)
+                ->with(['tareas' => function($q) use ($filtroTareas) {
+                    $filtroTareas($q);
+                    $q->with('evidencias');
+                }])
+                ->where('pf_fin', '<', $inicioTrimestreActual)
+                ->get()
+        );
+
+        // 5️⃣ Calcular métricas (EN MEMORIA)
+        // Ya no hacemos consultas a la BD aquí, usamos la colección $proyecto->tareas cargada arriba
+        $proyectos = $proyectos->map(function($proyecto) {
+            
+            // Como usamos 'with' con filtro, $proyecto->tareas SOLO contiene las tareas deseadas.
+            // Si whereHas funcionó, este count SIEMPRE será > 0.
+            $proyecto->total_tareas = $proyecto->tareas->count();
+
+            // Filtramos sobre la colección en memoria (mucho más rápido y sin errores de conexión)
+            $proyecto->tareas_completadas = $proyecto->tareas
+                ->filter(function($t) {
+                    return stripos($t->t_estatus, 'Finalizada') !== false;
+                })->count();
+
+            $proyecto->tareas_a_revisar = $proyecto->tareas
+                ->filter(function($t) {
+                    // Checamos estatus y si tiene evidencias cargadas
+                    return stripos($t->t_estatus, 'En proceso') !== false && $t->evidencias->isNotEmpty();
+                })->count();
+
+            return $proyecto;
+        });
 
         return response()->json([
             'success' => true,
@@ -154,6 +205,8 @@ public function obtenerTareasProyectosJefe(Request $request)
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 }
+
+
 public function CambiarStatusTareaFinalizada($idTarea)
 {
     $tarea = Tarea::find($idTarea);
@@ -174,34 +227,50 @@ public function CambiarStatusTareaFinalizada($idTarea)
         'tarea' => $tarea
     ]);
 }
-//METODO QUE PERMITE MODIFICAR EL ESTATUS DE UNA TAREA A FINALIZADAS
-public function cambiarStatusTareaEnProceso($idTarea)
+public function cambiarStatusTareaEnProceso(Request $request, $idTarea)
 {
-
-    $tarea = Tarea::find($idTarea);
-
-    if (!$tarea) {
-        return response()->json([
-            'success' => false,
-            'mensaje' => 'Tarea no encontrada'
-        ], 404);
-    }
+    DB::beginTransaction(); 
 
     try {
+        $tarea = Tarea::find($idTarea);
+
+        if (!$tarea) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Tarea no encontrada'
+            ], 404);
+        }
+
+        // 1. Modificar el estatus de la tarea
         $tarea->t_estatus = "En proceso";
         $tarea->save();
 
-        return response()->json([
-            'success' => true,
-            'mensaje' => 'Tarea marcada como en proceso',
-            'tarea' => $tarea
+        // 2. Guardar en el Historial
+        // IMPORTANTE: Obtenemos el id_usuario del Request
+        $usuarioId = $request->input('usuario_id');
+
+        HistorialModificacion::create([
+            'id_proyecto' => $tarea->id_proyecto, 
+            'id_tarea'    => $idTarea,            
+            'id_usuario'  => $usuarioId,
+            'accion'      => 'REACTIVACION TAREA',
+            'detalles'    => "Fue modificado el estatus de la tarea de Finalizada e En proceso."
         ]);
-    } catch (\Exception $e) {
-        
+
+        DB::commit(); // Confirmar cambios
 
         return response()->json([
+            'success' => true,
+            'mensaje' => 'Tarea marcada como en proceso y registrada en historial',
+            'tarea' => $tarea
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollBack(); // Deshacer si hay error
+        
+        return response()->json([
             'success' => false,
-            'mensaje' => 'Ocurrió un error al actualizar la tarea'
+            'mensaje' => 'Ocurrió un error al actualizar la tarea: ' . $e->getMessage()
         ], 500);
     }
 }
@@ -242,7 +311,7 @@ public function completarTarea($id)
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
-    public function obtenerProyectosCompletados(Request $request)
+   public function obtenerProyectosCompletados(Request $request)
 {
     try {
         $usuarioId = $request->query('usuario_id'); 
@@ -255,47 +324,29 @@ public function completarTarea($id)
         $idDepartamento = $usuario->id_departamento;
 
         $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
-            // 🛑 GRUPO DE CONDICIONES para visibilidad del proyecto
-            ->where(function ($query) {
-                // 1. Condición: El proyecto está en estatus 'Finalizada' (estado archivado).
-                $query->where('p_estatus', 'ILIKE', 'Finalizado')
-                      
-                      // 2. Condición: El proyecto está en estatus 'En proceso' (estado desbloqueado), 
-                      //    PERO todavía tiene tareas que requieren la acción de 'Finalizada'.
-                      ->orWhere(function ($q) {
-                          // Usamos 'En proceso' con el espacio.
-                          $q->where('p_estatus', 'ILIKE', 'En proceso')
-                            ->whereHas('tareas', function($tq) {
-                                // Mantenemos visible el proyecto si, aun estando en 'En proceso',
-                                // tiene al menos una tarea que sigue 'Finalizada'.
-                                $tq->where('t_estatus', 'ILIKE', 'Finalizada'); 
-                            });
-                      });
-            })
-            // 🛑 FIN DEL GRUPO DE CONDICIONES
+            ->whereIn('p_estatus', ['Finalizado', 'En proceso'])
             
-            // whereHas: Nos aseguramos de cargar proyectos que tengan tareas en estado Finalizada O En proceso.
-            ->whereHas('tareas', function($q) {
-                // Usamos LOWER para asegurar que no haya problemas de mayúsculas/minúsculas al buscar las tareas.
-                $q->whereIn(DB::raw('LOWER(t_estatus)'), ['finalizada', 'En proceso']); 
+            // Solo proyectos que tengan tareas
+            ->whereHas('tareas')
+            
+            // Excluir proyectos que tengan al menos una tarea NO finalizada
+            ->whereDoesntHave('tareas', function($q) {
+                $q->where('t_estatus', 'NOT ILIKE', 'Finalizada');
             })
             
-            // with: Cargamos las tareas para el frontend
+            // Cargar tareas finalizadas y sus evidencias
             ->with(['tareas' => function($q) {
-                // Excluimos 'pendiente', solo cargamos 'Finalizada' y 'En proceso'.
-                $q->where(DB::raw('LOWER(t_estatus)'), '!=', 'pendiente')
+                $q->where('t_estatus', 'ILIKE', 'Finalizada')
                   ->with('evidencias');
             }])
-
-            ->get()
-            ->map(function($proyecto) {
-                // Mantenemos la lógica de contadores
-                $proyecto->total_tareas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)->count();
-                $proyecto->tareas_completadas = \App\Models\Tarea::where('id_proyecto', $proyecto->id_proyecto)
-                    ->whereHas('evidencias') 
-                    ->count();
-                return $proyecto;
-            });
+            
+            // Contadores para frontend
+            ->withCount(['tareas as total_tareas'])
+            ->withCount(['tareas as tareas_completadas' => function($q) {
+                $q->where('t_estatus', 'ILIKE', 'Finalizada');
+            }])
+            
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -306,6 +357,9 @@ public function completarTarea($id)
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 }
+
+
+
 public function tareasPendientesUsuario(Request $request)
 {
     try {

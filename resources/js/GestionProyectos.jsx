@@ -89,8 +89,17 @@ function GestionProyectos() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
-
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const irAProyecto = (id, nombre) => {
+  localStorage.setItem("id_proyecto", id);
+  localStorage.setItem("nombre_proyecto", nombre);
+
+  navigate("/ListaDeTareas", {
+    state: { id_proyecto: id }
+  });
+};
+
+
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("usuario"));
@@ -272,12 +281,6 @@ function GestionProyectos() {
         </div>
       </div>
     );
-  };
-
-  const irAProyecto = (id, nombre) => {
-    localStorage.setItem("id_proyecto", id);
-    localStorage.setItem("nombre_proyecto", nombre);
-    navigate(`/proyecto/${id}`);
   };
 
   if (loading) {
@@ -486,12 +489,12 @@ function GestionProyectos() {
 
                       <div className="tdj-proyecto-footer">
                         <button
-                          className="tdj-btn-primary"
-                          onClick={() => irAProyecto(proyecto.id_proyecto, proyecto.p_nombre)}
-                        >
-                          <FaTasks className="tdj-btn-icon" />
-                          Gestionar Proyecto
-                        </button>
+  className="tdj-btn-primary"
+  onClick={() => irAProyecto(proyecto.id_proyecto, proyecto.p_nombre)}
+>
+  <FaTasks className="tdj-btn-icon" />
+  Ver proyecto
+</button>
                       </div>
                     </div>
                   );

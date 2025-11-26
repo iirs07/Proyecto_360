@@ -9,6 +9,8 @@ import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ConfirmModal from "../components/ConfirmModal";
+import EmptyState from "../components/EmptyState";
+import { useRolNavigation } from "./utils/navigation";
 
 function TareasenProceso() {
   const [cargando, setCargando] = useState(false);
@@ -18,6 +20,7 @@ function TareasenProceso() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
+   const { volverSegunRol } = useRolNavigation();
 
   useEffect(() => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -163,29 +166,33 @@ function TareasenProceso() {
                 <span className="tep-kpi-label">Tareas completadas</span>
               </div>
             </div>
+             
           </div>
+          
         )}
 
-        <div className="barra-busqueda-global-container mb-4">
-          <div className="barra-busqueda-global-wrapper">
-            <FaSearch className="barra-busqueda-global-icon" />
-            <input
-              type="text"
-              placeholder="Buscar proyectos por nombre..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="barra-busqueda-global-input"
-            />
-            {busqueda && (
-              <button
-                className="buscador-clear-global"
-                onClick={() => setBusqueda("")}
-              >
-                <FiX />
-              </button>
-            )}
-          </div>
-        </div>
+{proyectos.length > 0 && (
+  <div className="barra-busqueda-global-container mb-4">
+    <div className="barra-busqueda-global-wrapper">
+      <FaSearch className="barra-busqueda-global-icon" />
+      <input
+        type="text"
+        placeholder="Buscar proyectos por nombre..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="barra-busqueda-global-input"
+      />
+      {busqueda && (
+        <button
+          className="buscador-clear-global"
+          onClick={() => setBusqueda("")}
+        >
+          <FiX />
+        </button>
+      )}
+    </div>
+  </div>
+)}
 
         <div className="tep-lista-proyectos">
           {loading ? (
@@ -241,7 +248,7 @@ function TareasenProceso() {
                         <span className={`tep-stat-val ${p.tareas_a_revisar}`}>
                           {p.tareas_a_revisar || 0}
                         </span>
-                        <span className="tep-stat-lbl">En revisión</span>
+                        <span className="tep-stat-lbl">Por revisar</span>
                       </div>
                     </div>
 
@@ -270,10 +277,13 @@ function TareasenProceso() {
               );
             })
           ) : (
-            <div className="tep-empty-state">
-              <LuClock3 size={48} style={{opacity:0.3, marginBottom:'15px'}} />
-              <h3>No se encontraron proyectos</h3>
-            </div>
+            <EmptyState
+                        titulo="TAREAS PENDIENTES POR REVISAR"
+                        mensaje="No hay tareas por revisar."
+                        botonTexto="Volver al Tablero"
+                        onVolver={volverSegunRol}
+                        icono={logo3}
+                      />
           )}
         </div>
 

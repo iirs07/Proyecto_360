@@ -34,7 +34,8 @@ function Reporte() {
   const opcionesReporte = [
     { value: "vencidas", label: "Tareas Vencidas" },
     { value: "proximas", label: "Próximas a Vencer" },
-    { value: "completadas", label: "Tareas Completadas" }
+    { value: "completadas", label: "Tareas Completadas" },
+    { value: "modificaciones", label: "Historial de Modificaciones" } 
   ];
 
   const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
@@ -65,114 +66,108 @@ function Reporte() {
 
   const validarFechas = () => {
     const nuevosErrores = {};
-    if (tipoReporte === "vencidas") {
+    // Agregamos "modificaciones" a la condición
+    if (["vencidas", "completadas", "modificaciones"].includes(tipoReporte)) {
       if (!fechaInicio) nuevosErrores.fechaInicio = "Selecciona la fecha de inicio.";
       if (!fechaFin) nuevosErrores.fechaFin = "Selecciona la fecha de fin.";
     }
+    
     if (tipoReporte === "proximas") {
       if (!fechaFin) nuevosErrores.fechaFin = "Selecciona la fecha hasta.";
     }
-    if (tipoReporte === "completadas") {
-      if (!fechaInicio) nuevosErrores.fechaInicio = "Selecciona la fecha de inicio.";
-      if (!fechaFin) nuevosErrores.fechaFin = "Selecciona la fecha de fin.";
-    }
+    
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const generarPDF = async () => {
-  if (!validarFechas()) return;
+ const generarPDF = async () => {
+    if (!validarFechas()) return;
 
-  setCargando(true);
-  setProgreso(0);
+    setCargando(true);
+    setProgreso(0);
 
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
-  
-  let url = `/generar-pdf?tipo=${tipoReporte}`;
-  
-  if (usuario) {
-    url += `&nombre=${encodeURIComponent(usuario.nombre)}&a_paterno=${encodeURIComponent(usuario.a_paterno)}&a_materno=${encodeURIComponent(usuario.a_materno)}`;
-    url += `&id_departamento=${usuario.id_departamento}`;
-  }
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    
+    let url = `/generar-pdf?tipo=${tipoReporte}`;
+    
+    if (usuario) {
+      url += `&nombre=${encodeURIComponent(usuario.nombre)}&a_paterno=${encodeURIComponent(usuario.a_paterno)}&a_materno=${encodeURIComponent(usuario.a_materno)}`;
+      url += `&id_departamento=${usuario.id_departamento}`;
+    }
 
-  if (tipoReporte === "vencidas") {
-    if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split('T')[0]}`;
-    if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
-  }
-  if (tipoReporte === "proximas" && fechaFin) {
-    url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
-  }
-  if (tipoReporte === "completadas") {
-    if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split('T')[0]}`;
-    if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
-  }
+    if (["vencidas", "completadas", "modificaciones"].includes(tipoReporte)) {
+        if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split('T')[0]}`;
+        if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
+    }
 
-  console.log("URL de solicitud:", url);
+    // Este bloque maneja "proximas" que solo requiere Fin
+    if (tipoReporte === "proximas" && fechaFin) {
+      url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
+    }
+    // --- FIN DE LA CORRECCIÓN ---
+    // (Borré los if individuales de "vencidas" y "completadas" que tenías abajo porque ya están arriba)
 
-  const intervalo = setInterval(() => {
-    setProgreso(prev => {
-      if (prev >= 90) {
-        clearInterval(intervalo);
-        return prev;
+    console.log("URL de solicitud:", url);
+
+    const intervalo = setInterval(() => {
+      setProgreso(prev => {
+        if (prev >= 90) {
+          clearInterval(intervalo);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
+    try {
+      const response = await fetch(url);
+      
+      console.log("Respuesta del servidor:", response.status);
+      console.log("Content-Type:", response.headers.get('Content-Type'));
+      
+      // Verificar si la respuesta es realmente un PDF
+      const contentLength = response.headers.get('Content-Length');
+      
+      if (!response.ok) {
+        // Intentar leer el error como texto
+        const errorText = await response.text();
+        console.error("Error del servidor:", errorText);
+        throw new Error(`Error al generar el PDF: ${response.status} - ${errorText}`);
       }
-      return prev + 10;
-    });
-  }, 200);
 
-  try {
-    const response = await fetch(url);
-    
-    console.log("Respuesta del servidor:", response.status);
-    console.log("Content-Type:", response.headers.get('Content-Type'));
-    
-    // Verificar si la respuesta es realmente un PDF
-    const contentLength = response.headers.get('Content-Length');
-    console.log("Content-Length:", contentLength);
-    
-    if (!response.ok) {
-      // Intentar leer el error como texto
-      const errorText = await response.text();
-      console.error("Error del servidor:", errorText);
-      throw new Error(`Error al generar el PDF: ${response.status} - ${errorText}`);
-    }
-
-    const blob = await response.blob();
-    
-    console.log("Tamaño del blob:", blob.size);
-    console.log("Tipo del blob:", blob.type);
-    if (blob.size < 1000) {
-      const blobText = await blob.text();
-      console.log("Contenido del blob (primeros 500 chars):", blobText.substring(0, 500));
-      if (blobText.trim().startsWith('{') || blobText.includes('error')) {
-        throw new Error(`Error del servidor: ${blobText}`);
+      const blob = await response.blob();
+      
+      if (blob.size < 1000) {
+        const blobText = await blob.text();
+        if (blobText.trim().startsWith('{') || blobText.includes('error')) {
+          throw new Error(`Error del servidor: ${blobText}`);
+        }
       }
+      
+      clearInterval(intervalo);
+      setProgreso(100);
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+      
+      const nuevaUrl = URL.createObjectURL(blob);
+      
+      setPdfUrl(nuevaUrl);
+      setMostrarVisor(true);
+      
+      setFechaInicio(null);
+      setFechaFin(null);
+      
+      setTimeout(() => setProgreso(0), 500);
+      
+    } catch (error) {
+      console.error("Error al generar el PDF:", error);
+      alert(`Error al generar el PDF: ${error.message}`);
+    } finally {
+      clearInterval(intervalo);
+      setCargando(false);
     }
-    
-    clearInterval(intervalo);
-    setProgreso(100);
-    if (pdfUrl) {
-      URL.revokeObjectURL(pdfUrl);
-    }
-    
-    const nuevaUrl = URL.createObjectURL(blob);
-    console.log("URL generada:", nuevaUrl);
-    
-    setPdfUrl(nuevaUrl);
-    setMostrarVisor(true);
-    
-    setFechaInicio(null);
-    setFechaFin(null);
-    
-    setTimeout(() => setProgreso(0), 500);
-    
-  } catch (error) {
-    console.error("Error al generar el PDF:", error);
-    alert(`Error al generar el PDF: ${error.message}`);
-  } finally {
-    clearInterval(intervalo);
-    setCargando(false);
-  }
-};
+  };
 
   const cerrarVisor = () => {
     setMostrarVisor(false);
@@ -212,7 +207,7 @@ function Reporte() {
             </div>
           </div>
           <div className={`fecha-selectores-container ${tipoReporte === 'proximas' ? 'tareas-proximas' : ''} ${tipoReporte === 'completadas' ? 'tareas-completadas' : ''}`}>
-            {tipoReporte === 'vencidas' && (
+            {(tipoReporte === 'vencidas' || tipoReporte === 'modificaciones') && (
               <div className="d-flex flex-md-row justify-content-center gap-3 mb-3">
                 <div className="reportes-fecha-item">
                   <label className="reportes-d-form-label fw-bold">Fecha de inicio:</label>

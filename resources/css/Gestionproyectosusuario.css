@@ -301,11 +301,11 @@
 
 .tdu-proyectos-title {
   font-weight: 700;
-  color: #2d3748;
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-  line-height: 1.3;
-  text-transform: uppercase;
+    color: #000;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    line-height: 1.3;
+    text-transform: uppercase;
 }
 
 .tdu-proyectos-dates {
@@ -430,10 +430,11 @@
 
 /* === Descripción del proyecto === */
 .tdu-proyecto-description {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+    margin: 0;
+    text-transform: uppercase;
 }
 
 .tdu-proyecto-description p {
@@ -601,3 +602,28 @@
   }
 }
 
+.tdu-progreso-barra-container {
+  width: 100%;
+  height: 10px;
+  background: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  margin: 10px 0;
+}
+
+.tdu-progreso-segmento {
+  height: 100%;
+}
+
+.tdu-progreso-segmento.completada {
+  background-color: #28a745; 
+}
+
+.tdu-progreso-segmento.progreso {
+  background-color: #ffc107; 
+}
+
+.tdu-progreso-segmento.pendiente {
+  background-color: #ff0707; 
+}
