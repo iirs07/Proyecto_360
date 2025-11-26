@@ -21,7 +21,7 @@ export default function PrincipalSuperusuario() {
   const navigate = useNavigate();
   const token = localStorage.getItem("jwt_token"); 
   
-  // ✅ OBTENER URL DESDE .env
+  // OBTENER URL DESDE .env
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function PrincipalSuperusuario() {
       return;
     }
 
-    // ✅ OBTENER DATOS CON LOS NOMBRES CORRECTOS DE localStorage
+    // OBTENER DATOS CON LOS NOMBRES CORRECTOS DE localStorage
     const storedUsuario = localStorage.getItem("usuario");
     
     if (storedUsuario) {
@@ -59,7 +59,7 @@ export default function PrincipalSuperusuario() {
     // Obtener departamentos
     const fetchDepartamentos = async () => {
       try {
-        // ✅ USAR API_URL DESDE .env
+        // USAR API_URL DESDE .env
         const res = await fetch(`${API_URL}/api/departamentos`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export default function PrincipalSuperusuario() {
     };
 
     fetchDepartamentos();
-  }, [navigate, token, API_URL]); // ✅ AGREGAR API_URL A LAS DEPENDENCIAS
+  }, [navigate, token, API_URL]); 
 
   const handleSelect = (depId, depNombre) => {
     const departamentoSlug = slugify(depNombre);

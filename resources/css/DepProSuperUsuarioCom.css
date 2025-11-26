@@ -1,5 +1,5 @@
-/* ==================== CONTENEDOR PRINCIPAL PROCESO ==================== */
-.procom-proceso-container {
+/* ==================== CONTENEDOR PRINCIPAL COMPLETADOS ==================== */
+.procom-completados-container {
   position: relative;
   z-index: 1;
   padding: 20px;
@@ -9,23 +9,23 @@
   box-sizing: border-box;
 }
 
-.procom-proceso-container .resumen-metricas-container,
-.procom-proceso-container .conteo-proyectos-card,
-.procom-proceso-container .proyecto-proceso-item,
-.procom-proceso-container .proyecto-proceso-columna,
-.procom-proceso-container .procom-sort-button,
-.procom-proceso-container .visualizacion-control-container,
-.procom-proceso-container .proyecto-sin-tareas {
+.procom-completados-container .resumen-metricas-container,
+.procom-completados-container .conteo-proyectos-card,
+.procom-completados-container .proyecto-completado-item,
+.procom-completados-container .proyecto-completado-columna,
+.procom-completados-container .procom-sort-button,
+.procom-completados-container .visualizacion-control-container,
+.procom-completados-container .proyecto-sin-tareas {
   background-color: initial !important;
 }
 
-.procom-proceso-container.procom-cargando {
+.procom-completados-container.procom-cargando {
   opacity: 0.7;
   pointer-events: none;
 }
 
 /* ==================== HEADER PRINCIPAL ==================== */
-.procom-proceso-container .resumen-metricas-container {
+.procom-completados-container .resumen-metricas-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -421,14 +421,9 @@
   opacity: 1;
 }
 
-/* ==================== PROYECTOS EN PROCESO ==================== */
-.proyectos-proceso-lista {
-  position: relative;
-  z-index: 5;
-}
-
-.proyecto-proceso-item {
-  background: linear-gradient(135deg, #ffffff 0%, #fff8f8 50%, #fff0f0 100%);
+/* ==================== PROYECTOS COMPLETADOS ==================== */
+.proyecto-completado-item {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fff8 50%, #f0fff0 100%);
   padding: 24px;
   border-radius: 18px 18px 4px 18px;
   box-shadow: 
@@ -442,38 +437,37 @@
   transition: all 0.3s ease;
   min-height: auto;
   height: auto;
-  animation: fadeInUp 0.5s ease-out;
 }
 
-.proyecto-proceso-item:hover {
+.proyecto-completado-item:hover {
   transform: translateY(-2px);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Barra inferior ROJA para proyectos en proceso */
-.proyecto-proceso-item::before {
+/* Barra inferior VERDE */
+.proyecto-completado-item::before {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 6px;
-  background: linear-gradient(90deg, #861542, #9a1c4a, #b32152) !important;
+  background: linear-gradient(90deg, #15803d, #16a34a, #22c55e) !important;
   border-radius: 0 0 6px 6px;
   opacity: 1;
   transition: opacity 0.3s ease;
-  box-shadow: 0 2px 4px rgba(134, 21, 66, 0.3);
+  box-shadow: 0 2px 4px rgba(22, 163, 74, 0.3);
 }
 
-.proyecto-proceso-item.procom-cargando {
+.proyecto-completado-item.procom-cargando {
   opacity: 0.6;
   pointer-events: none;
 }
 
-/* ==================== HEADER DEL PROYECTO EN PROCESO ==================== */
-.proyecto-proceso-header {
+/* ==================== HEADER DEL PROYECTO COMPLETADO ==================== */
+.proyecto-completado-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -487,19 +481,19 @@
 }
 
 /* ==================== TÍTULO DEL PROYECTO - MOSTRAR COMPLETO ==================== */
-.proyecto-proceso-nombre {
+.proyecto-completado-nombre {
   flex: 1;
   min-width: 0;
   max-width: 100%;
 }
 
-.proyecto-proceso-nombre .proyecto-proceso-valor {
+.proyecto-completado-nombre .proyecto-completado-valor {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #861542 !important;
+  color: #15803d !important;
   line-height: 1.3;
   display: block;
-  text-shadow: 0 1px 2px rgba(134, 21, 66, 0.15);
+  text-shadow: 0 1px 2px rgba(21, 128, 61, 0.15);
   transition: all 0.2s ease;
   white-space: normal;
   overflow: visible;
@@ -511,7 +505,7 @@
 }
 
 /* ==================== BADGES DE ESTADO ==================== */
-.proyecto-proceso-badges {
+.proyecto-completado-badges {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
@@ -520,7 +514,7 @@
   align-items: flex-start;
 }
 
-.badge-estado-proceso {
+.badge-estado-completado {
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -540,7 +534,7 @@
 }
 
 /* Efecto de brillo al hover */
-.badge-estado-proceso::before {
+.badge-estado-completado::before {
   content: '';
   position: absolute;
   top: 0;
@@ -556,36 +550,36 @@
   transition: left 0.6s ease;
 }
 
-.badge-estado-proceso:hover::before {
+.badge-estado-completado:hover::before {
   left: 100%;
 }
 
-.badge-estado-proceso:hover {
+.badge-estado-completado:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.badge-estado-proceso:active {
+.badge-estado-completado:active {
   transform: translateY(0) scale(1);
   transition: all 0.1s ease;
 }
 
-/* Badge específico para En Proceso */
-.badge-estado-proceso[data-estado="En proceso"] {
+/* Badge específico para Completado */
+.badge-estado-completado[data-estado="Finalizado"] {
   background: linear-gradient(
     135deg, 
-    rgba(134, 21, 66, 0.15) 0%, 
-    rgba(154, 28, 74, 0.08) 100%
+    rgba(22, 163, 74, 0.15) 0%, 
+    rgba(22, 163, 74, 0.08) 100%
   ) !important;
-  color: #861542 !important;
-  border-color: rgba(134, 21, 66, 0.4) !important;
+  color: #15803d !important;
+  border-color: rgba(22, 163, 74, 0.4) !important;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 
 /* ==================== GRID DE INFORMACIÓN ==================== */
-.proyecto-proceso-columnas {
+.proyecto-completado-columnas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
@@ -594,7 +588,7 @@
   z-index: 11;
 }
 
-.proyecto-proceso-columna {
+.proyecto-completado-columna {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -611,7 +605,7 @@
   backdrop-filter: blur(10px);
 }
 
-.proyecto-proceso-columna:hover {
+.proyecto-completado-columna:hover {
   transform: translateY(-1px);
   box-shadow: 
     0 3px 10px rgba(0, 0, 0, 0.08),
@@ -619,12 +613,12 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%) !important;
 }
 
-.proyecto-proceso-columna:hover .proyecto-proceso-icon {
+.proyecto-completado-columna:hover .proyecto-completado-icon {
   transform: scale(1.1);
   transition: transform 0.2s ease;
 }
 
-.proyecto-proceso-label {
+.proyecto-completado-label {
   font-size: 0.7rem;
   font-weight: 800;
   color: #6c757d;
@@ -636,51 +630,19 @@
 }
 
 /* ICONOS */
-.proyecto-proceso-icon {
+.proyecto-completado-icon {
   font-size: 10px;
   opacity: 0.9;
   color: #861542 !important;
   transition: transform 0.2s ease;
 }
 
-.proyecto-proceso-valor {
+.proyecto-completado-valor {
   font-size: 0.85rem;
   font-weight: 700;
   color: #2c3e50;
   line-height: 1.2;
   display: block;
-}
-
-/* ==================== CONTENEDOR DE PROGRESO ==================== */
-.proyecto-proceso-progreso-container {
-  margin-top: 12px;
-  position: relative;
-  z-index: 11;
-}
-
-.proyecto-proceso-progreso {
-  background: rgba(248, 249, 250, 0.8);
-  border-radius: 8px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.proyecto-proceso-sin-tareas {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: rgba(248, 249, 250, 0.8);
-  border-radius: 6px;
-  border: 1px dashed #dee2e6;
-  font-size: 0.75rem;
-  color: #6c757d;
-}
-
-.sin-tareas-mini-icon {
-  font-size: 10px;
-  color: #861542;
-  opacity: 0.7;
 }
 
 /* ==================== MENSAJE SIN PROYECTOS ==================== */
@@ -693,7 +655,7 @@
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%) !important;
   border-radius: 16px;
   margin: 20px 0;
-  border: 2px dashed rgba(134, 21, 66, 0.3);
+  border: 2px dashed rgba(22, 163, 74, 0.3);
   position: relative;
   z-index: 6;
   backdrop-filter: blur(20px);
@@ -707,7 +669,7 @@
 
 .proyecto-sin-tareas .no-data-icon {
   font-size: 48px;
-  color: #861542;
+  color: #16a34a;
   opacity: 0.5;
 }
 
@@ -724,21 +686,9 @@
   opacity: 0.8;
 }
 
-/* ==================== ANIMACIONES ==================== */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 768px) {
-  .procom-proceso-container {
+  .procom-completados-container {
     padding: 12px;
   }
   
@@ -789,7 +739,7 @@
     height: 38px !important;
   }
   
-  .proyecto-proceso-header {
+  .proyecto-completado-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -797,22 +747,22 @@
     padding-bottom: 10px;
   }
   
-  .proyecto-proceso-badges {
+  .proyecto-completado-badges {
     width: 100%;
     justify-content: flex-start;
     margin-top: 8px;
   }
   
-  .proyecto-proceso-columnas {
+  .proyecto-completado-columnas {
     grid-template-columns: 1fr;
     gap: 8px;
   }
   
-  .proyecto-proceso-item {
+  .proyecto-completado-item {
     padding: 14px;
   }
   
-  .proyecto-proceso-nombre .proyecto-proceso-valor {
+  .proyecto-completado-nombre .proyecto-completado-valor {
     font-size: 1rem;
     white-space: normal;
     overflow: visible;
@@ -822,7 +772,7 @@
 }
 
 @media (max-width: 480px) {
-  .procom-proceso-container {
+  .procom-completados-container {
     padding: 8px;
   }
   
@@ -841,15 +791,15 @@
     font-size: 1rem;
   }
   
-  .proyecto-proceso-item {
+  .proyecto-completado-item {
     padding: 12px;
   }
   
-  .proyecto-proceso-nombre .proyecto-proceso-valor {
+  .proyecto-completado-nombre .proyecto-completado-valor {
     font-size: 1rem;
   }
   
-  .badge-estado-proceso {
+  .badge-estado-completado {
     padding: 4px 10px;
     font-size: 0.65rem;
   }
