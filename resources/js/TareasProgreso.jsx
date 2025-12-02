@@ -39,14 +39,12 @@ export default function TareasProgreso() {
     const [evidenciasUrls, setEvidenciasUrls] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // -------------------- GUARDAR EN LocalStorage --------------------
+    // -------------------- GUARDAR EN localStorage --------------------
     useEffect(() => {
-<<<<<<< HEAD
         if (proyectoSlug) localStorage.setItem("last_proyectoSlug", proyectoSlug);
         if (idProyecto) localStorage.setItem("last_idProyecto", idProyecto);
         if (nombreProyecto) localStorage.setItem("last_nombreProyecto", nombreProyecto);
         if (descripcionProyecto) localStorage.setItem("last_descripcionProyecto", descripcionProyecto);
-=======
         if (proyectoSlug) localStorage.setItem("last_proyectoSlug", proyectoSlug);
         if (idProyecto) localStorage.setItem("last_idProyecto", idProyecto);
         if (nombreProyecto) localStorage.setItem("last_nombreProyecto", nombreProyecto);
@@ -57,7 +55,7 @@ export default function TareasProgreso() {
         if (depNombre) {
             setDepartamentoNombre(depNombre);
         }
->>>>>>> d54328f92f975041b0a6bf09acc02b01dc04509e
+
     }, [proyectoSlug, idProyecto, nombreProyecto, descripcionProyecto]);
 
     // -------------------- MODAL EVIDENCIAS --------------------
