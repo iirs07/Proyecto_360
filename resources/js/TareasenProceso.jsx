@@ -229,7 +229,6 @@ function TareasenProceso() {
 
   ) : (
 
-    // 🟩 Caso 3: Hay proyectos y hay coincidencias
     proyectosFiltrados.map((p) => {
       const porcentaje = Math.round(
         ((p.tareas_completadas || 0) / (p.total_tareas || 1)) * 100
