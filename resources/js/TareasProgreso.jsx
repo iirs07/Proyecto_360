@@ -55,7 +55,6 @@ export default function TareasProgreso() {
         if (depNombre) {
             setDepartamentoNombre(depNombre);
         }
-
     }, [proyectoSlug, idProyecto, nombreProyecto, descripcionProyecto]);
 
     // -------------------- MODAL EVIDENCIAS --------------------
