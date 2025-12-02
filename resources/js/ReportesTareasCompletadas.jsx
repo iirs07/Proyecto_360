@@ -1,7 +1,7 @@
-import React, { useState, forwardRef, useEffect } from "react";
+import React, { useState, forwardRef, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import { FaCalendarAlt, FaFilePdf, FaBars } from "react-icons/fa";
+import { FaCalendarAlt, FaFilePdf, FaTimesCircle } from "react-icons/fa"; // Agregué icono de cancelar
 import ErrorMensaje from "../components/ErrorMensaje";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
@@ -27,6 +27,7 @@ const CalendarButton = forwardRef(({ value, onClick }, ref) => (
     </span>
   </button>
 ));
+
 function ReportesTareasCompletadas() {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [mostrarVisor, setMostrarVisor] = useState(false);
@@ -36,12 +37,14 @@ function ReportesTareasCompletadas() {
   const [cargando, setCargando] = useState(false);
   const [progreso, setProgreso] = useState(0);
   const navigate = useNavigate();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  
+  // REFS PARA CANCELACIÓN
+  const abortControllerRef = useRef(null);
+  const intervaloRef = useRef(null);
 
   const handleLogout = () => {
-    localStorage.removeItem("jwt_token");
-    localStorage.removeItem("usuario");
+    sessionStorage.removeItem("jwt_token");
+    sessionStorage.removeItem("usuario");
     navigate("/Login", { replace: true });
   };
 
@@ -53,22 +56,38 @@ function ReportesTareasCompletadas() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
+  // NUEVA FUNCIÓN PARA CANCELAR
+  const cancelarGeneracion = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort(); 
+    }
+    
+    if (intervaloRef.current) {
+      clearInterval(intervaloRef.current); // Detiene la barra de progreso
+    }
+
+    setCargando(false);
+    setProgreso(0);
+  };
+
   const generarPDF = async () => {
     if (!validarFechas()) return;
+
+    // Reiniciar controlador de aborto
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
 
     setCargando(true);
     setProgreso(0);
 
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    const token = localStorage.getItem("jwt_token");
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) {
-      console.warn("No autenticado. Redirigiendo al login...");
       navigate("/Login", { replace: true });
       return;
     }
 
     if (!usuario || !usuario.id_usuario) {
-      console.log("No se pudo obtener la información de usuario necesaria.");
       setCargando(false);
       return;
     }
@@ -77,44 +96,40 @@ function ReportesTareasCompletadas() {
     if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split("T")[0]}`;
     if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split("T")[0]}`;
 
-    const intervalo = setInterval(() => {
+    // Usamos el ref para el intervalo
+    intervaloRef.current = setInterval(() => {
       setProgreso(prev => (prev >= 90 ? prev : prev + 10));
     }, 200);
 
     try {
       const response = await fetch(url, {
+        signal: abortControllerRef.current.signal, // Conectamos el abortController
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/pdf",
         },
       });
+
       if (response.status === 401) {
-        console.warn("Token inválido o expirado (401). Redirigiendo a login...");
-        localStorage.removeItem("jwt_token");
-        localStorage.removeItem("usuario");
-        navigate("/Login", { replace: true });
+        handleLogout();
         return;
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log(`Error al generar PDF: ${response.status} - ${errorText}`);
-        clearInterval(intervalo);
-        setCargando(false);
-        return;
+        throw new Error(`Error ${response.status}: ${await response.text()}`);
       }
 
       const contentType = response.headers.get("Content-Type");
       const blob = await response.blob();
+      
       if (!contentType || !contentType.includes("application/pdf")) {
-        const blobText = await blob.text();
-        console.log("No se recibió un PDF válido. Contenido del servidor:", blobText);
-        clearInterval(intervalo);
-        setCargando(false);
-        return;
+         console.log("No es un PDF válido");
+         setCargando(false);
+         clearInterval(intervaloRef.current);
+         return;
       }
 
-      clearInterval(intervalo);
+      clearInterval(intervaloRef.current);
       setProgreso(100);
 
       if (pdfUrl) URL.revokeObjectURL(pdfUrl);
@@ -127,9 +142,15 @@ function ReportesTareasCompletadas() {
       setTimeout(() => setProgreso(0), 500);
 
     } catch (error) {
-      console.error("Error inesperado al generar el PDF:", error);
+      if (error.name === 'AbortError') {
+        // El usuario canceló manualmente, no hacemos nada o mostramos un toast leve
+        console.log("Petición abortada correctamente.");
+      } else {
+        console.error("Error inesperado al generar el PDF:", error);
+      }
     } finally {
-      clearInterval(intervalo);
+      // Limpieza final si no fue cancelado manualmente antes
+      if (intervaloRef.current) clearInterval(intervaloRef.current);
       setCargando(false);
     }
   };
@@ -141,24 +162,17 @@ function ReportesTareasCompletadas() {
       setPdfUrl(null);
     }, 1000);
   };
+
   useEffect(() => {
     const forceDatePickerZIndex = () => {
-      // Buscar todos los poppers del DatePicker
       const poppers = document.querySelectorAll('.react-datepicker-popper');
       poppers.forEach(popper => {
-        // Sobreescribir el estilo en línea
         popper.style.zIndex = '9999';
       });
     };
-
-    // Ejecutar inmediatamente
     forceDatePickerZIndex();
     const observer = new MutationObserver(forceDatePickerZIndex);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
+    observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
 
@@ -220,61 +234,72 @@ function ReportesTareasCompletadas() {
 
           <div className="d-flex flex-column align-items-center gap-2">
             {cargando && (
-  <div className="reportes-tc-progress-contenedor mt-4">
-    <div className="d-flex justify-content-between mb-2">
-      <small className="reportes-tc-text">Generando PDF...</small>
-      <small className="reportes-tc-text fw-bold">{progreso}%</small>
-    </div>
-    <div className="reportes-tc-progress">
-      <div
-        className="reportes-tc-progress-bar"
-        role="progressbar"
-        style={{ width: `${progreso}%` }}
-        aria-valuenow={progreso}
-        aria-valuemin="0"
-        aria-valuemax="100"
-      ></div>
-    </div>
-  </div>
-)}
-
+              <div className="reportes-tc-progress-contenedor mt-4 w-100" style={{maxWidth: '500px'}}>
+                <div className="d-flex justify-content-between mb-2">
+                  <small className="reportes-tc-text">Generando PDF...</small>
+                  <small className="reportes-tc-text fw-bold">{progreso}%</small>
+                </div>
+                <div className="reportes-tc-progress">
+                  <div
+                    className="reportes-tc-progress-bar"
+                    role="progressbar"
+                    style={{ width: `${progreso}%` }}
+                    aria-valuenow={progreso}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="reportes-tc-boton-wrapper w-100 d-flex justify-content-center">
-  <button 
-    type="button"
-    className="reportes-tc-boton-form"
-    onClick={generarPDF}
-    disabled={cargando}
-  >
-    {cargando ? (
-      <>
-        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        Generando PDF...
-      </>
-    ) : (
-      <>
-        <FaFilePdf className="me-2" />
-        Generar PDF
-      </>
-    )}
-  </button>
-</div>
+          <div className="reportes-tc-boton-wrapper w-100 d-flex justify-content-center gap-3 mt-3">
+            {/* Botón Generar (Deshabilitado si carga) */}
+            <button 
+              type="button"
+              className="reportes-tc-boton-form"
+              onClick={generarPDF}
+              disabled={cargando}
+            >
+              {cargando ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <FaFilePdf className="me-2" />
+                  Generar PDF
+                </>
+              )}
+            </button>
 
+            {/* Botón Cancelar (Solo visible si carga) */}
+            {cargando && (
+              <button 
+                type="button"
+                className="reportes-tc-boton-form" 
+                onClick={cancelarGeneracion}
+                
+              >
+                <FaTimesCircle className="me-2" />
+                Cancelar
+              </button>
+            )}
+          </div>
 
-        {mostrarVisor && pdfUrl && (
-          <PdfViewer
-            pdfUrl={pdfUrl}
-            fileName={`Reporte_de_tareas_completadas.pdf`}
-            onClose={cerrarVisor}
-          />
-        )}
+          {mostrarVisor && pdfUrl && (
+            <PdfViewer
+              pdfUrl={pdfUrl}
+              fileName={`Reporte_de_tareas_completadas.pdf`}
+              onClose={cerrarVisor}
+            />
+          )}
+        </div>
       </div>
-            </div>
     </Layout>
   );
 }
 
 export default ReportesTareasCompletadas;
-
 

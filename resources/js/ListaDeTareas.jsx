@@ -1,168 +1,146 @@
 import React, { useState, useEffect } from "react";
-import { FaExclamationCircle, FaCheckCircle, FaClock, FaTasks, FaBars  } from "react-icons/fa";
+import { FaExclamationCircle, FaCheckCircle, FaClock, FaTasks } from "react-icons/fa";
 import "../css/global.css";
-import "../css/ListaDeTareas.css";
-import logo3 from "../imagenes/logo3.png";
+import "../css/ListaDeTareas.css"; 
 import { useLocation } from "react-router-dom";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 
-
 function VertareasUsuario() {
   const [tareas, setTareas] = useState([]);
   const [busqueda, setBusqueda] = useState("");
-  const [loading, setLoading] = useState(true); 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
- const location = useLocation();
+  useEffect(() => {
+    const cargarTareas = async () => {
+      let idProyecto = location.state?.id_proyecto || sessionStorage.getItem("id_proyecto");
+      if (idProyecto) sessionStorage.setItem("id_proyecto", idProyecto);
 
-useEffect(() => {
-  const cargarTareas = async () => {
-    let idProyecto = location.state?.id_proyecto;
-    if (!idProyecto) {
-      idProyecto = sessionStorage.getItem("id_proyecto");
-    } else {
-      sessionStorage.setItem("id_proyecto", idProyecto);
-    }
+      const token = sessionStorage.getItem("jwt_token");
+      if (!idProyecto || !token) return;
 
-    const token = localStorage.getItem("jwt_token");
-
-    if (!idProyecto) return alert("No se encontró el proyecto.");
-    if (!token) return alert("No hay token de autenticación.");
-
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/proyectos/${idProyecto}/tareas-activas`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json().catch(async () => ({ error: await res.text() }));
-
-      if (res.ok && data.tareas) {
-        setTareas(data.tareas);
-      } else {
-        console.error("Error al cargar tareas:", data);
-        setTareas([]);
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/proyectos/${idProyecto}/tareas-activas`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        if (res.ok && data.tareas) setTareas(data.tareas);
+        else setTareas([]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error al cargar tareas:", err);
-      alert("Ocurrió un error al cargar las tareas.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    cargarTareas();
+  }, [location.state]);
 
-  cargarTareas();
-}, [location.state]);
-
-
-  const tareasFiltradas = tareas.filter(
-    (t) =>
+  const tareasFiltradas = tareas.filter((t) =>
       !busqueda ||
-      t.t_nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-      t.proyectoNombre?.toLowerCase().includes(busqueda.toLowerCase())
+      t.t_nombre?.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const nombreProyecto = tareas[0]?.proyectoNombre || "Proyecto sin nombre";
+  const nombreProyecto = tareas[0]?.proyectoNombre || "Proyecto";
 
-  const getStatusIcon = (estatus) => {
-    switch (estatus?.trim().toLowerCase()) {
-      case "en proceso":
-        return <FaClock className="vertarea-icono-estado en-proceso" />;
-      case "finalizado":
-        return <FaCheckCircle className="vertarea-icono-estado finalizada" />;
-      case "pendiente":
-      default:
-        return <FaExclamationCircle className="vertarea-icono-estado pendiente" />;
-    }
+  // --- LÓGICA DE URGENCIA (SOLO PARA PENDIENTES) ---
+  const obtenerUrgencia = (fechaFinString) => {
+    if (!fechaFinString) return "tiempo"; 
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fechaFin = new Date(fechaFinString);
+    fechaFin.setHours(0, 0, 0, 0);
+
+    const diferencia = fechaFin - hoy;
+    const dias = Math.ceil(diferencia / (1000 * 60 * 60 * 24));
+
+    if (dias < 0) return "vencida"; // Rojo
+    if (dias === 0) return "hoy";   // Naranja
+    if (dias <= 3) return "alerta"; // Amarillo
+    return "tiempo";                // Verde/Blanco
   };
 
-  const getEstatusClass = (estatus) => {
-    if (!estatus) return "";
-    const est = estatus.trim().toLowerCase();
-    switch (est) {
-      case "pendiente":
-        return "vertarea-estatus-Pendiente";
-      case "finalizado":
-        return "vertarea-tarea-estatus-Finalizado";
-      case "en proceso":
-        return "vertarea-tarea-estatus-proceso";
-      default:
-        return "";
-    }
+  // --- CLASES DINÁMICAS ---
+  const getContainerClass = (estatus, fechaFin) => {
+    const est = estatus?.toLowerCase().trim();
+    if (est === "completada" || est === "finalizado") return "lt-item-finalizado";
+    if (est === "en proceso") return "lt-item-proceso";
+    if (est === "pendiente") return `lt-item-pendiente ${obtenerUrgencia(fechaFin)}`;
+    return "";
   };
 
-  const getItemClass = (estatus) => {
-    const est = estatus?.toLowerCase();
-    if (est === "finalizado") return "vertarea-item-tarea-finalizado";
-    if (est === "pendiente") return "vertarea-item-tarea-pendiente";
-    return "vertarea-item-tarea-proceso";
+  const getBadgeClass = (estatus, fechaFin) => {
+    const est = estatus?.toLowerCase().trim();
+    if (est === "completada" || est === "finalizado") return "lt-badge-finalizado";
+    if (est === "en proceso") return "lt-badge-proceso";
+    if (est === "pendiente") return `lt-badge-pendiente ${obtenerUrgencia(fechaFin)}`;
+    return "";
+  };
+
+  const getIcon = (estatus, fechaFin) => {
+    const est = estatus?.toLowerCase().trim();
+    if (est === "completada" || est === "finalizado") return <FaCheckCircle className="lt-icono-estado lt-icono-finalizado" />;
+    if (est === "en proceso") return <FaClock className="lt-icono-estado lt-icono-proceso" />;
+    
+    // Pendiente con color dinámico
+    const urgencia = obtenerUrgencia(fechaFin);
+    return <FaExclamationCircle className={`lt-icono-estado icono-pendiente ${urgencia}`} />;
   };
 
   return (
-     <Layout
-        titulo="TAREAS DE UN PROYECTO"
-        sidebar={<MenuDinamico activeRoute="Vertareas" />}
-      >
+    <Layout titulo="TAREAS DE UN PROYECTO" sidebar={<MenuDinamico activeRoute="Vertareas" />}>
       <div className="contenedor-global">
         {loading ? (
-          <div className="loader-container">
-            <div className="loader-logo">
-              <img src={logo3} alt="Cargando" />
-            </div>
-            <div className="loader-texto">CARGANDO...</div>
-            <div className="loader-spinner"></div>
-          </div>
+          <div className="loader-container"><div className="loader-spinner"></div></div>
         ) : (
-          <div className="vertarea-proyectos-card">
-            <h3 className="vertarea-nombre-proyecto">{nombreProyecto}</h3>
+          <div className="lt-card-principal">
+            <h3 className="lt-titulo-proyecto">{nombreProyecto}</h3>
             
-            {tareasFiltradas.length > 0 && !busqueda && (
-              <div className="vertarea-contador">
-                <FaTasks />
-                {tareasFiltradas.length} tarea{tareasFiltradas.length !== 1 ? 's' : ''} en total
-              </div>
-            )}
+          <div className="lt-contador-tareas">
+  <FaTasks /> {tareasFiltradas.length} tareas registradas
+</div>
 
-            {tareasFiltradas.length > 0 && (
-              <ul className="vertarea-lista-tareas-TP">
-                {tareasFiltradas.map((tarea) => (
-                  <li key={tarea.id_tarea} className={getItemClass(tarea.t_estatus)}>
-                    <div className="vertarea-info-tarea-TP">
-                      <div className="vertarea-header">
-                        {getStatusIcon(tarea.t_estatus)}
-                        <label className="vertarea-nombre">{tarea.t_nombre}</label>
-                      </div>
-                      <div className="vertarea-footer">
-                        <span className={`vertarea-estatus-TP ${getEstatusClass(tarea.t_estatus)}`}>
-                          {tarea.t_estatus}
-                        </span>
-                        <span className="vertarea-fecha-TP">
-                          {tarea.tf_fin ? `Vence: ${tarea.tf_fin}` : 'Sin fecha límite'}
-                        </span>
-                      </div>
+
+            <ul className="lt-lista-tareas-grid">
+              {tareasFiltradas.map((tarea) => (
+                <li key={tarea.id_tarea} className={`lt-tarea-card ${getContainerClass(tarea.t_estatus, tarea.tf_fin)}`}>
+                  
+                  {/* Izquierda: Icono y Nombre */}
+                  <div className="lt-tarea-contenido-izq">
+                    <div className="lt-icono-wrapper">
+                      {getIcon(tarea.t_estatus, tarea.tf_fin)}
                     </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+                    <span className="lt-tarea-nombre">{tarea.t_nombre}</span>
+                  </div>
 
+                  {/* Derecha: Badge y Fecha */}
+                  <div className="lt-tarea-contenido-der">
+                    <span className={`lt-tarea-badge ${getBadgeClass(tarea.t_estatus, tarea.tf_fin)}`}>
+                      {tarea.t_estatus}
+                    </span>
+                    <span className="lt-tarea-fecha">
+                      {tarea.tf_fin ? `Vence: ${tarea.tf_fin}` : 'Sin fecha'}
+                    </span>
+                  </div>
+
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
-     </Layout>
+    </Layout>
   );
 }
 
 export default VertareasUsuario;
-
 
 
 

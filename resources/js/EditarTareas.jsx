@@ -82,7 +82,7 @@ const handleInputChange = (campo) => {
   const [loadingInicial, setLoadingInicial] = useState(true);
   const [datosOriginales, setDatosOriginales] = useState(null);
 
-  const token = localStorage.getItem("jwt_token");
+  const token = sessionStorage.getItem("jwt_token");
 
   // ===== FETCH DEPARTAMENTOS =====
   useEffect(() => {

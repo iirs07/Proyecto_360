@@ -174,7 +174,6 @@
   color: white;
 }
 
-/* FECHA LIMPIA */
 .vtp-fecha-limpia {
   display: flex;
   align-items: center;
@@ -305,107 +304,135 @@
   font-size: 1.5rem;
   font-weight: 700;
 }
+/* ==============================
+   MODAL VTP 
+============================== */
 
-/* EL RESTO DEL CSS DEL MODAL SE MANTIENE IGUAL */
 .vtp-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.75); /* Oscuridad ajustada */
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
   padding: 20px;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .vtp-modal-content {
   background: white;
-  border-radius: 12px;
-  max-width: 800px;
+  border-radius: 16px; /* Curvas más suaves (antes 12px) */
+  max-width: 900px; /* Un poco más ancho para consistencia */
   width: 100%;
-  max-height: 90vh;
-  padding: 24px;
+  max-height: 95vh; /* Altura flexible */
+  padding: 0; /* Quitamos padding global para manejarlo por secciones */
   position: relative;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.vtp-modal-cerrar {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(255, 193, 7, 0.15);
-  border: 1.5px solid rgba(255, 193, 7, 0.3);
-  border-radius: 8px;
-  color: #FFC107;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 6px;
-  transition: all 0.3s ease;
-  z-index: 10;
-}
-
-.vtp-modal-cerrar:hover {
-  background: #FFC107;
-  color: #fff;
-}
-
+/* HEADER LIMPIO */
 .vtp-modal-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
-  padding-right: 50px;
+  justify-content: space-between; /* Alineación extremos */
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+  flex-shrink: 0;
 }
 
 .vtp-modal-header h3 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #861542;
-  line-height: 1.3;
-}
-
-.vtp-modal-estatus {
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-weight: 600;
-  font-size: 0.75rem;
+  color: #2d3748; 
   text-transform: uppercase;
-  background: rgba(255, 193, 7, 0.15);
-  color: #b38700;
-  border: 1px solid #FFC107;
 }
 
-.vtp-imagen-container {
+/* BOTÓN CERRAR*/
+.vtp-modal-cerrar {
+  position: static; 
+  background: #4a5568; 
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.vtp-modal-cerrar:hover {
+  background: #2d3748;
+  transform: rotate(90deg);
+  color: white;
+}
+
+/* ESTATUS  */
+.vtp-modal-estatus {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+/* CUERPO */
+.vtp-evidencias-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vtp-evidencias-navegacion {
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 10px;
+}
+
+.vtp-imagen-container {
   width: 100%;
-  max-height: 60vh;
-  min-height: 300px;
+  max-height: 65vh; 
+  min-height: 200px;
   background: #f8fafc;
   border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border: 1px solid #e2e8f0;
+  position: relative;
 }
 
 .vtp-imagen-evidencia {
-  width: 100%;
-  height: 100%;
-  max-height: 60vh;
+  max-width: 100%;
+  max-height: 65vh;
   object-fit: contain;
 }
 
+/* BOTONES NAVEGACIÓN  */
 .vtp-btn-navegacion {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #FFC107;
-  border: none;
+  background: rgba(255, 255, 255, 0.8); 
+  border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -413,41 +440,32 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  color: #000;
-  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  color: #4a5568;
   z-index: 5;
 }
 
-.vtp-btn-prev { left: 16px; }
-.vtp-btn-next { right: 16px; }
+.vtp-btn-prev { left: 10px; }
+.vtp-btn-next { right: 10px; }
 
 .vtp-btn-navegacion:hover {
-  background: #FFB300;
+  background: #fff;
+  color: #861542; 
   transform: translateY(-50%) scale(1.1);
 }
 
-.vtp-contador {
-  font-weight: 600;
-  color: #861542;
-  font-size: 0.85rem;
-  margin-bottom: 12px;
-  text-align: center;
-  background: rgba(255, 193, 7, 0.1);
-  padding: 6px 16px;
-  border-radius: 16px;
-  display: inline-block;
-  border: 1px solid rgba(255, 193, 7, 0.2);
-}
-
+/* FOOTER INFO */
 .vtp-evidencias-info {
+  margin-top: 0.5rem;
   font-size: 0.85rem;
   color: #64748b;
   text-align: center;
-  background: #f8fafc;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  font-weight: 500;
+  background: transparent; 
+  border: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

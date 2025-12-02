@@ -20,8 +20,6 @@ import { useRolNavigation } from "./utils/navigation";
 
 registerLocale("es", es);
 
-
-
 // Estado guardado
 const EstadoGuardado = ({ tipo }) => (
   <div className="mp-estado-guardado-wrapper mb-3">
@@ -119,8 +117,8 @@ const [loadingModificar, setLoadingModificar] = useState(false);
   // Carga del proyecto
  useEffect(() => {
   if (idProyecto && !proyectoCargado) {
-    setLoadingProyecto(true); // 🔹 Solo carga de datos
-    const token = localStorage.getItem("jwt_token");
+    setLoadingProyecto(true); 
+    const token = sessionStorage.getItem("jwt_token");
     
     if (!token) {
       setErrorServidor("No autenticado");
@@ -225,7 +223,7 @@ const [loadingModificar, setLoadingModificar] = useState(false);
      setLoadingModificar(true); // 🔹 Solo al guardar cambios
     setErrorServidor(null);
 
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     const nombre = nombreProyectoRef.current?.value.trim() || '';
     const descripcion = descripcionProyectoRef.current?.value.trim() || '';
 
@@ -245,7 +243,7 @@ const [loadingModificar, setLoadingModificar] = useState(false);
     });
 
     if (res.status === 401) {
-      localStorage.removeItem("jwt_token");
+      sessionStorage.removeItem("jwt_token");
       navigate("/Login", { replace: true });
       return;
     }

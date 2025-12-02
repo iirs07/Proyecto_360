@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/EliminarProyectos.css";
-import { FaSearch, FaTrash, FaCalendarAlt } from "react-icons/fa";
+import { FaSearch, FaTrash, FaCalendarAlt, FaExclamationTriangle } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
@@ -23,9 +23,9 @@ function EliminarProyectos() {
 
   // Cargar proyectos sin tareas
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     const idUsuario = usuario?.id_usuario;
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
 
     if (!idUsuario || !token) {
       setLoading(false);
@@ -41,8 +41,8 @@ function EliminarProyectos() {
     })
       .then((res) => {
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
-          localStorage.removeItem("usuario");
+          sessionStorage.removeItem("jwt_token");
+          sessionStorage.removeItem("usuario");
           navigate("/Login", { replace: true });
           return { success: false, mensaje: "No autorizado" };
         }
@@ -67,7 +67,7 @@ function EliminarProyectos() {
   };
   const eliminarProyecto = () => {
     if (!proyectoAEliminar) return;
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
 
     fetch(`http://127.0.0.1:8000/api/proyectos/${proyectoAEliminar.id_proyecto}/eliminar`, {
       method: "DELETE",
@@ -108,7 +108,7 @@ function EliminarProyectos() {
             <FaSearch className="barra-busqueda-global-icon" />
             <input
               type="text"
-              placeholder="Buscar proyectos por nombre..."
+              placeholder="Buscar proyectos..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               className="barra-busqueda-global-input"
@@ -119,28 +119,33 @@ function EliminarProyectos() {
               </button>
             )}
           </div>
+          {busqueda && (
+      <div className="buscador-resultados-global">
+        {proyectos.length} resultado(s) para "{busqueda}"
+      </div>
+    )}
         </div>
       )}
 
       {/* Lista de proyectos */}
       <div className="eliminar-proyectos-lista">
-        {loading ? (
-          <div className="loader-container">
-            <div className="loader-logo">
-              <img src={logo3} alt="Cargando" />
-            </div>
-            <div className="loader-texto">CARGANDO...</div>
-            <div className="loader-spinner"></div>
-          </div>
-        ) : proyectosFiltrados.length === 0 ? (
-          <EmptyState
-            titulo="ELIMINAR PROYECTOS"
-            mensaje="No hay proyectos disponibles."
-            botonTexto="Volver al Tablero"
-            onVolver={volverSegunRol}
-            icono={logo3}
-          />
-        ) : (
+       {loading ? (
+  <div className="loader-container">
+    ...
+  </div>
+) : proyectos.length === 0 ? (
+  // Backend no devolvió proyectos
+  <EmptyState
+    titulo="ELIMINAR PROYECTOS"
+    mensaje="No hay proyectos disponibles."
+    botonTexto="Volver al Tablero"
+    onVolver={volverSegunRol}
+    icono={logo3}
+  />
+) : proyectosFiltrados.length === 0 ? (
+  // No hay coincidencias en la búsqueda
+  null
+) : (
           proyectosFiltrados.map((p) => {
             const fechaFin = new Date(p.pf_fin);
             const hoy = new Date();

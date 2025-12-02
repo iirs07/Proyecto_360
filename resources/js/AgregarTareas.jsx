@@ -48,6 +48,8 @@ function AgregarTareas() {
   const [minFecha, setMinFecha] = useState(null);
   const [maxFecha, setMaxFecha] = useState(null);
   const [camposModificados, setCamposModificados] = useState({});
+const [proyectoActual, setProyectoActual] = useState(null);
+const [nombreProyecto, setNombreProyecto] = useState("");
 
 
   const ajustarAltura = (ref) => {
@@ -58,95 +60,116 @@ function AgregarTareas() {
   };
 
   const getHeaders = () => {
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) {
-      localStorage.removeItem("jwt_token");
-      localStorage.removeItem("usuario");
+      sessionStorage.removeItem("jwt_token");
+      sessionStorage.removeItem("usuario");
       navigate("/Login", { replace: true });
       return null;
     }
     return { Authorization: `Bearer ${token}`, Accept: "application/json" };
   };
 
+useEffect(() => {
+  const token = sessionStorage.getItem("jwt_token");
+  if (!token) {
+    navigate("/Login", { replace: true });
+    return;
+  }
+
+  console.log("location.state:", location.state);
+
+  if (location.state && location.state.id_proyecto) {
+    setProyectoActual({ id_proyecto: location.state.id_proyecto });
+    setNombreProyecto(location.state.p_nombre || "Proyecto");
+  } else {
+    // Redirige si no viene desde las interfaces correctas
+    navigate("/NuevoProyecto", { replace: true });
+  }
+}, [navigate, location]);
+
 
   // ============================================================
   //  CARGA INICIAL: fechas + departamentos + usuarios
   // ============================================================
-  useEffect(() => {
-    const cargarTodo = async () => {
-      const headers = getHeaders();
-      if (!headers) return;
+ useEffect(() => {
+  if (!proyectoActual?.id_proyecto) return; // Solo cargar si proyectoActual existe
 
-      try {
-        setLoadingInicial(true);
+  const cargarTodo = async () => {
+    const headers = getHeaders();
+    if (!headers) return;
 
-        const [fechasRes, depRes] = await Promise.all([
-          fetch(`/api/proyectos/${id_proyecto}/fechasProyecto`, { headers }),
-          fetch("/api/CatalogoDepartamentos", { headers })
-        ]);
+    try {
+      setLoadingInicial(true);
 
-        if (fechasRes.status === 401 || depRes.status === 401) {
-          localStorage.removeItem("jwt_token");
+      const [fechasRes, depRes] = await Promise.all([
+        fetch(`/api/proyectos/${proyectoActual.id_proyecto}/fechasProyecto`, { headers }),
+        fetch("/api/CatalogoDepartamentos", { headers })
+      ]);
+
+      if (fechasRes.status === 401 || depRes.status === 401) {
+        sessionStorage.removeItem("jwt_token");
+        navigate("/Login", { replace: true });
+        return;
+      }
+
+      const fechas = await fechasRes.json();
+      const deps = await depRes.json();
+
+      // Fechas del proyecto
+      if (fechas.success) {
+        const inicio = new Date(fechas.pf_inicio);
+        const fin = new Date(fechas.pf_fin);
+
+        const inicioMex = new Date(inicio);
+        inicioMex.setHours(inicioMex.getHours() + 6);
+
+        const finMex = new Date(fin);
+        finMex.setHours(finMex.getHours() + 6);
+
+        setMinFecha(inicioMex);
+        setMaxFecha(finMex);
+      }
+
+      // Departamentos
+      setDepartamentos(deps);
+
+      let depFinal;
+
+      if (id_departamento_inicial) {
+        depFinal = parseInt(id_departamento_inicial);
+      } else if (deps.length > 0) {
+        depFinal = deps[0].id_departamento;
+      } else {
+        depFinal = "";
+      }
+
+      setDepartamentoSeleccionado(depFinal);
+
+      // Usuarios iniciales del primer departamento
+      if (depFinal) {
+        const usuariosRes = await fetch(`/api/departamentos/${depFinal}/usuarios`, { headers });
+
+        if (usuariosRes.status === 401) {
+          sessionStorage.removeItem("jwt_token");
           navigate("/Login", { replace: true });
           return;
         }
 
-        const fechas = await fechasRes.json();
-        const deps = await depRes.json();
-
-        // Fechas del proyecto
-        if (fechas.success) {
-          const inicio = new Date(fechas.pf_inicio);
-          const fin = new Date(fechas.pf_fin);
-
-          const inicioMex = new Date(inicio);
-          inicioMex.setHours(inicioMex.getHours() + 6);
-
-          const finMex = new Date(fin);
-          finMex.setHours(finMex.getHours() + 6);
-
-          setMinFecha(inicioMex);
-          setMaxFecha(finMex);
-        }
-
-        // Departamentos
-        setDepartamentos(deps);
-
-        let depFinal;
-
-        if (id_departamento_inicial) {
-          depFinal = parseInt(id_departamento_inicial);
-        } else if (deps.length > 0) {
-          depFinal = deps[0].id_departamento;
-        } else {
-          depFinal = "";
-        }
-
-        setDepartamentoSeleccionado(depFinal);
-
-        // Usuarios iniciales del primer departamento
-        if (depFinal) {
-          const usuariosRes = await fetch(`/api/departamentos/${depFinal}/usuarios`, { headers });
-
-          if (usuariosRes.status === 401) {
-            localStorage.removeItem("jwt_token");
-            navigate("/Login", { replace: true });
-            return;
-          }
-
-          const usuariosData = await usuariosRes.json();
-          setUsuarios(usuariosData);
-        }
-
-        setLoadingInicial(false);
-      } catch (err) {
-        console.error(err);
-        setLoadingInicial(false);
+        const usuariosData = await usuariosRes.json();
+        setUsuarios(usuariosData);
       }
-    };
 
-    cargarTodo();
-  }, []);
+      setLoadingInicial(false);
+    } catch (err) {
+      console.error(err);
+      setLoadingInicial(false);
+    }
+  };
+
+  cargarTodo();
+}, [proyectoActual]); // <- depende de proyectoActual
+
 
 
   // ============================================================
@@ -163,7 +186,7 @@ function AgregarTareas() {
         const res = await fetch(`/api/departamentos/${departamentoSeleccionado}/usuarios`, { headers });
 
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
+          sessionStorage.removeItem("jwt_token");
           navigate("/Login", { replace: true });
           return;
         }
@@ -215,7 +238,7 @@ function AgregarTareas() {
 
     const headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("jwt_token")}`
+      Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`
     };
 
     try {
@@ -227,8 +250,8 @@ function AgregarTareas() {
       });
 
       if (res.status === 401) {
-        localStorage.removeItem("jwt_token");
-        localStorage.removeItem("usuario");
+        sessionStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("usuario");
         navigate("/Login", { replace: true });
         return;
       }
@@ -462,7 +485,7 @@ useEffect(() => {
                 <button
                   type="button"
                   className="agregartareas-btn-vt"
-                  onClick={() => navigate("/Vertareasusuario", { state: { id_proyecto } })}
+                  onClick={() => navigate("/ListaDeTareas", { state: { id_proyecto } })}
                 >
                   <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
                   Ver Tareas

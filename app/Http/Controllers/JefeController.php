@@ -18,7 +18,7 @@ use DB;
 
 class JefeController extends Controller
 {
-    //METODO QUE DEVUELVE LOS PROYECTOS Y NUMERO DE TAREAS DE UN USUARIO ESPECIFICO- SE USA EN LA INTERFAZ DE USUARIO.JSX
+    //METODO QUE DEVUELVE LOS PROYECTOS Y NUMERO DE TAREAS DE UN USUARIO ESPECIFICO- 
 public function ProyectosDeUsuario(Request $request)
 {
     try {
@@ -119,7 +119,7 @@ public function tareasPorUsuario(Request $request)
             'proyectos.descripcion as descripcion_proyecto',
             'proyectos.pf_inicio',
             'proyectos.pf_fin',
-            \DB::raw("COUNT(CASE WHEN LOWER(TRIM(tareas.t_estatus)) = 'finalizada' THEN 1 END) as tareas_completadas"),
+            \DB::raw("COUNT(CASE WHEN LOWER(TRIM(tareas.t_estatus)) = 'completada' THEN 1 END) as tareas_completadas"),
             \DB::raw("COUNT(CASE WHEN LOWER(TRIM(tareas.t_estatus)) = 'pendiente' THEN 1 END) as tareas_pendientes"),
             \DB::raw("COUNT(CASE WHEN LOWER(TRIM(tareas.t_estatus)) = 'en proceso' THEN 1 END) as tareas_en_progreso"),
             \DB::raw("COUNT(tareas.id_tarea) as total_tareas")
@@ -250,7 +250,7 @@ public function ObtenerTareasCompletadasUsuario($idUsuario)
     try {
         $tareas = DB::table('tareas')
             ->where('tareas.id_usuario', $idUsuario) // Filtramos por el ID de usuario
-            ->whereRaw("UPPER(TRIM(tareas.t_estatus)) = ?", ['FINALIZADA']) // Filtramos solo tareas con estatus "FINALIZADO"
+            ->whereRaw("UPPER(TRIM(tareas.t_estatus)) = ?", ['COMPLETADA']) // Filtramos solo tareas con estatus "FINALIZADO"
             ->select('tareas.*') 
             ->get();
         if ($tareas->isEmpty()) {

@@ -116,6 +116,7 @@
 /* =========================== Tarjetas de tareas ============================ */
 .tu-tareas-contenedor {
   width: 100%;
+  max-width: 900px;
 }
 
 .tu-tareas-lista {
@@ -329,186 +330,187 @@
   font-size: 1rem;
 }
 
-/* =========================== Modal Moderno ============================ */
+/* =========================== 
+   MODAL DE SUBIDA 
+   =========================== */
 .tu-modal-preview {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(0, 0, 0, 0.75); 
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10000;
   padding: 1rem;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px); 
   animation: fadeIn 0.3s ease-out;
 }
 
 .tu-modal-content-preview {
   display: flex;
   flex-direction: column;
-  max-width: 900px;
+  max-width: 600px;
   width: 100%;
-  max-height: 100vh;
-  border-radius: 6px;
+  max-height: 90vh;
+  border-radius: 16px; 
   background: #fff;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   overflow: hidden;
+  position: relative;
 }
+
+/* Header Limpio */
 .tu-modal-header {
   position: relative;
   display: flex;
-  justify-content: center; 
+  justify-content: space-between; 
   align-items: center;
-  padding: 1rem;
-  border-bottom: 3px solid #ff6b9d;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0; 
+  background: #fff;
 }
 
 .tu-modal-header h2 {
   margin: 0;
-  font-size: 1.4rem;
-  font-weight: 600;
-  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2d3748;
   text-transform: uppercase;
-  max-width: calc(100% - 60px); 
-  word-break: break-word;       
-  overflow-wrap: break-word;   
+  letter-spacing: 0.5px;
 }
+
 .tu-modal-close {
-  position: absolute;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+  background: #4a5568; 
+  color: white;        
+  border-radius: 50%;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #5f1742;
-  font-size: 40px;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
 }
 
 .tu-modal-close:hover {
-  background: rgba(255, 255, 255, 0.35);
-  color: #410f1f;
+  background: #2d3748; 
+  color: #fff;
+  transform: rotate(90deg); 
 }
-
+/* Cuerpo del Modal */
 .tu-modal-body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  padding: 1rem;
+  padding: 1.5rem;
+  background: #f8fafc; 
 }
 
 .tu-modal-body img {
   max-width: 100%;
-  max-height: 60vh;
+  max-height: 50vh;
   object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.tu-modal-body img:hover {
-  transform: scale(1.03);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .tu-modal-description {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #64748b;
   text-align: center;
-  padding: 0.5rem 1rem;
-  background: #fefefe;
-  font-size: 0.95rem;
-  color: #000;
 }
 
+/* Footer de Botones */
 .tu-modal-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: #f8f9fa;
-  flex-wrap: wrap;
-  
-}
-/* Bloquear botones cuando están disabled */
-.tu-modal-preview button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none; 
-  filter: grayscale(40%);
+  padding: 1.25rem 1.5rem;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
 }
 
-/* Quitar hover */
-.tu-modal-preview button:disabled:hover {
-  background-color: inherit !important;
-  color: inherit !important;
-  transform: none !important;
-}
-
-.tu-btn-cancelar, .tu-btn-subir {
-  width: 140px;            
-  padding: 0.7rem 1rem;
+.tu-btn-base {
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
   font-size: 0.9rem;
-  background: #861542;
-  color: white;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;            
+  min-width: 120px;
 }
 
-.tu-btn-cancelar:hover, .tu-btn-subir:hover {
+.tu-btn-cancelar {
+  background: white;
+  border: 2px solid #cbd5e0;
+  color: #4a5568;
+}
+
+.tu-btn-cancelar:hover {
+  border-color: #a0aec0;
+  background: #f7fafc;
+  color: #2d3748;
+}
+.tu-btn-subir {
+  background: #861542; 
+  border: 2px solid #861542;
+  color: white;
+}
+
+.tu-btn-subir:hover {
   background: #6a1035;
+  border-color: #6a1035;
+  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.25);
 }
 
-.tu-btn-subir .spinner {
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top: 2px solid #fff;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 0.6s linear infinite;
-  display: inline-block;
-}
-
-
-.tu-btn-cancelar:hover, .tu-btn-subir:hover {
-  background: #6a1035;
-}
 .tu-btn-subir:disabled {
-  cursor: not-allowed;
   opacity: 0.6;
-  user-select: none;
+  cursor: not-allowed;
+  filter: grayscale(20%);
 }
 
+/* Spinner dentro del botón */
 .tu-btn-subir .spinner {
   border: 2px solid rgba(255,255,255,0.3);
   border-top: 2px solid #fff;
   border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  animation: spin 0.6s linear infinite;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
   display: inline-block;
-  margin-right: 0.5rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 /* Animaciones */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .tu-modal-content-preview {
+    max-width: 95%;
+    margin: 10px;
+  }
+  .tu-modal-footer {
+    flex-direction: column-reverse; 
+  }
+  .tu-btn-base {
+    width: 100%;
+  }
 }
 
 @keyframes slideUp {
@@ -584,16 +586,16 @@
 @media (max-width: 480px) {
   .tu-btn-cancelar,
   .tu-btn-subir {
-    width: auto;            /* no ocupar todo el ancho */
-    max-width: 90%;         /* que no se salgan de la pantalla */
-    margin: 0 auto;         /* centra el botón */
-    justify-content: center; /* íconos y texto centrados */
+    width: auto;           
+    max-width: 90%;        
+    margin: 0 auto;        
+    justify-content: center; 
   }
 
   .tu-modal-footer {
     flex-direction: column;
     gap: 0.5rem;
-    align-items: center;    /* centra todos los botones en la columna */
+    align-items: center;   
   }
 }
 

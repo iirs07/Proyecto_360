@@ -32,8 +32,8 @@ const [tareaAEliminar, setTareaAEliminar] = useState(null);
   useEffect(() => {
   const fetchTareasPorProyecto = async () => {
     try {
-      const usuario = JSON.parse(localStorage.getItem("usuario"));
-      const token = localStorage.getItem("jwt_token"); 
+      const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+      const token = sessionStorage.getItem("jwt_token"); 
 
       if (!usuario?.id_usuario || !token) {
         setLoading(false); 
@@ -52,8 +52,8 @@ const [tareaAEliminar, setTareaAEliminar] = useState(null);
       );
 
       if (res.status === 401) {
-        localStorage.removeItem("jwt_token");
-        localStorage.removeItem("usuario");
+        sessionStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("usuario");
         navigate("/Login", { replace: true });
         return;
       }
@@ -101,7 +101,7 @@ const eliminarTarea = async () => {
   if (!tareaAEliminar) return;
 
   try {
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     const res = await fetch(
       `http://127.0.0.1:8000/api/EliminarTarea/${tareaAEliminar.id_tarea}`,
       {
@@ -159,6 +159,11 @@ const handleEliminarClick = (tarea) => {
             </button>
           )}
         </div>
+         {busqueda && (
+                <div className="buscador-verproyectos-resultados-info">
+                  {proyectosFiltrados.length} resultado(s) para "{busqueda}"
+                </div>
+              )}
         {proyectosFiltrados.length > 0 && (
           <div style={{ marginTop: "10px" }}>
             <SelectDinamico
@@ -175,79 +180,71 @@ const handleEliminarClick = (tarea) => {
       </div>
     )}
 
-    {/* Lista de proyectos y tareas */}
-    {loading ? (
-      <div className="loader-container">
-        <div className="loader-logo">
-          <img src={logo3} alt="Cargando" />
+  {loading ? (
+  <div className="loader-container">
+    <div className="loader-logo">
+      <img src={logo3} alt="Cargando" />
+    </div>
+    <div className="loader-texto">CARGANDO...</div>
+    <div className="loader-spinner"></div>
+  </div>
+) : proyectos.length === 0 ? (
+  // EmptyState solo cuando backend NO devolvió proyectos
+  <EmptyState
+    titulo="ELIMINAR TAREAS"
+    mensaje="No hay proyectos disponibles."
+    botonTexto="Volver al Tablero"
+    onVolver={volverSegunRol}
+    icono={logo3}
+  />
+) : (
+  
+  proyectosFiltrados.map(({ proyecto, tareas }) => (
+    <div key={proyecto.id_proyecto} className="et-card">
+      <h5 className="et-nombre-proyecto">{proyecto.p_nombre}</h5>
+
+      <div className="et-info">
+        <div className="et-info-item">
+          <FaTasks className="et-info-icon" />
+          <span>
+            <strong>Tareas:</strong> {tareas.length}
+          </span>
         </div>
-        <div className="loader-texto">CARGANDO...</div>
-        <div className="loader-spinner"></div>
       </div>
-    ) : proyectosFiltrados.length === 0 ? (
-      <EmptyState
-        titulo="MODIFICAR TAREAS"
-        mensaje="No hay proyectos disponibles."
-        botonTexto="Volver al Tablero"
-        onVolver={volverSegunRol}
-        icono={logo3}
-      />
-    ) : (
-      proyectosFiltrados.map(({ proyecto, tareas }) => (
-        <div key={proyecto.id_proyecto} className="et-card">
-          <h5 className="et-nombre-proyecto">{proyecto.p_nombre}</h5>
 
-          <div className="et-info">
-            <div className="et-info-item">
-              <FaTasks className="et-info-icon" />
-              <span>
-                <strong>Tareas:</strong> {tareas.length}
-              </span>
-            </div>
-          </div>
+      {tareas.length > 0 ? (
+        <ul className="et-tareas-lista">
+          {tareas.map((tarea) => (
+            <li key={tarea.id_tarea} className="et-item-en-proceso">
+              <div className="et-info">
+                <div className="et-header">
+                  <label className="et-nombre-tarea">{tarea.t_nombre}</label>
+                </div>
+                <div className="et-footer">
+                  <span className={`et-estatus ${tarea.t_estatus?.toLowerCase().replace(' ', '-')}`}>
+                    {tarea.t_estatus}
+                  </span>
+                  <span className="et-fecha">
+                    <FaCalendarAlt className="et-fecha-icon" />
+                    Vence: {tarea.tf_fin || tarea.fechaVencimiento}
+                  </span>
 
-          {tareas.length > 0 ? (
-            <ul className="et-tareas-lista">
-              {tareas.map((tarea) => (
-                <li key={tarea.id_tarea} className="et-item-en-proceso">
-                  <div className="et-info">
-                    <div className="et-header">
-                      <label className="et-nombre-tarea">{tarea.t_nombre}</label>
-                    </div>
-                     <div className="et-footer">
-                          <span className={`et-estatus ${tarea.t_estatus?.toLowerCase().replace(' ', '-')}`}>
-                            {tarea.t_estatus}
-                          </span>
-                          <span className="et-fecha">
-  <FaCalendarAlt className="et-fecha-icon" />
-  Vence: {tarea.tf_fin || tarea.fechaVencimiento}
-</span>
+                  <button
+                    className="et-btn-tarea"
+                    onClick={() => handleEliminarClick(tarea)}
+                  >
+                    <FaTrash style={{ marginRight: "8px" }} /> Eliminar
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null }
+    </div>
+  ))
+)}
 
-                          <button
-  className="et-btn-tarea"
-  onClick={() => handleEliminarClick(tarea)}
->
-  <FaTrash style={{ marginRight: "8px" }} />
-  Eliminar
-</button>
-
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState
-              titulo="ELIMINAR TAREAS"
-              mensaje="No hay tareas disponibles para este proyecto."
-              botonTexto="Volver al Tablero"
-              onVolver={volverSegunRol}
-              icono={logo3}
-            />
-          )}
-        </div>
-      ))
-    )}
     <ConfirmModal
   isOpen={modalOpen}
   title="Confirmar eliminación"

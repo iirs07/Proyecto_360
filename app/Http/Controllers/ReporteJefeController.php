@@ -29,6 +29,10 @@ public function generarReporteCompletadas(Request $request)
         return response()->json(['message' => 'La fecha de inicio no puede ser mayor que la fecha fin.'], 400);
     }
 
+    // Aseguramos que el script respete la desconexión del usuario
+    ignore_user_abort(false);
+    set_time_limit(0); // Evitar límite de tiempo para PDFs grandes
+
     date_default_timezone_set('America/Mexico_City');   
     $hoy = Carbon::now()->format('d/m/Y');
     $hora = Carbon::now()->format('H:i:s');
@@ -53,7 +57,7 @@ public function generarReporteCompletadas(Request $request)
     $trimestreActual = ceil($mesActual / 3);
     $inicioTrimestreActual = Carbon::create($hoyCarbon->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
 
-    // 1️⃣ Consultar BD principal (pgsql)
+    //  Consultar BD principal (pgsql)
     if (Carbon::parse($fechaFin) >= $inicioTrimestreActual) {
         $inicio = max(Carbon::parse($fechaInicio), $inicioTrimestreActual);
         $fin    = Carbon::parse($fechaFin);
@@ -64,7 +68,7 @@ public function generarReporteCompletadas(Request $request)
         $tareas = $tareas->merge($query->get());
     }
 
-    // 2️⃣ Consultar BD histórica (pgsql_second)
+    // Consultar BD histórica (pgsql_second)
     if (Carbon::parse($fechaInicio) < $inicioTrimestreActual) {
         $inicio = Carbon::parse($fechaInicio);
         $fin    = min(Carbon::parse($fechaFin), $inicioTrimestreActual->copy()->subSecond());
@@ -75,6 +79,10 @@ public function generarReporteCompletadas(Request $request)
         $tareas = $tareas->merge($query->get());
     }
 
+    // Revisar si el usuario cerró la conexión antes de generar el PDF
+    if (connection_aborted()) {
+        return; // Salimos inmediatamente, sin gastar recursos
+    }
 
     $tipo = 'completadas-jefe';
 
@@ -88,6 +96,11 @@ public function generarReporteCompletadas(Request $request)
         'hoy' => $hoy,
         'hora' => $hora
     ])->render();
+
+    // Revisar otra vez antes de PDF (en caso de que haya tardado en generar HTML)
+    if (connection_aborted()) {
+        return;
+    }
 
     // Generar PDF
     $mpdf = new Mpdf();
@@ -105,5 +118,6 @@ public function generarReporteCompletadas(Request $request)
 
     return $mpdf->Output('Reporte_de_tareas_completadas.pdf', 'I');
 }
+
 
 }

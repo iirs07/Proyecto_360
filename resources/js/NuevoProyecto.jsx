@@ -44,7 +44,7 @@ function NuevoProyecto() {
   const [camposModificados, setCamposModificados] = useState({});
 
 
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
   const id_usuario = usuario?.id_usuario;
   const id_departamento = usuario?.id_departamento;
 
@@ -94,7 +94,7 @@ function NuevoProyecto() {
   };
  const handleGuardar = async (e) => {
     e?.preventDefault();
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) {
         alert("Sesión expirada. Redirigiendo al login.");
         navigate("/Login", { replace: true });
@@ -143,7 +143,7 @@ function NuevoProyecto() {
 
         if (res.status === 401) {
             alert("Token inválido o expirado. Redirigiendo al login.");
-            localStorage.removeItem("jwt_token");
+            sessionStorage.removeItem("jwt_token");
             navigate("/Login", { replace: true });
             return;
         }
@@ -183,7 +183,7 @@ useEffect(() => {
   const handleBeforeUnload = (e) => {
     if (Object.keys(camposModificados).length > 0) {
       e.preventDefault();
-      e.returnValue = ""; // Necesario para mostrar el diálogo
+      e.returnValue = ""; 
     }
   };
 

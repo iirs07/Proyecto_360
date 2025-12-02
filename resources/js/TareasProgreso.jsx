@@ -15,15 +15,15 @@ export default function TareasProgreso() {
     const location = useLocation();
 
     // -------------------- ESTADO BASE --------------------
-    const [idProyecto, setIdProyecto] = useState(location.state?.idProyecto || localStorage.getItem("last_idProyecto"));
+    const [idProyecto, setIdProyecto] = useState(location.state?.idProyecto ||sessionStorage.getItem("last_idProyecto"));
     const [nombreProyecto, setNombreProyecto] = useState(
         location.state?.nombreProyecto || 
-        localStorage.getItem("last_nombreProyecto") || 
+        sessionStorage.getItem("last_nombreProyecto") || 
         proyectoSlug.replace(/-/g, " ")
     );
     const [descripcionProyecto, setDescripcionProyecto] = useState(
         location.state?.descripcionProyecto || 
-        localStorage.getItem("last_descripcionProyecto") || 
+        sessionStorage.getItem("last_descripcionProyecto") || 
         "Sin descripción"
     );
 
@@ -36,12 +36,12 @@ export default function TareasProgreso() {
     const [evidenciasUrls, setEvidenciasUrls] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // -------------------- GUARDAR EN LOCALSTORAGE --------------------
+    // -------------------- GUARDAR EN sessionStorage --------------------
     useEffect(() => {
-        if (proyectoSlug) localStorage.setItem("last_proyectoSlug", proyectoSlug);
-        if (idProyecto) localStorage.setItem("last_idProyecto", idProyecto);
-        if (nombreProyecto) localStorage.setItem("last_nombreProyecto", nombreProyecto);
-        if (descripcionProyecto) localStorage.setItem("last_descripcionProyecto", descripcionProyecto);
+        if (proyectoSlug) sessionStorage.setItem("last_proyectoSlug", proyectoSlug);
+        if (idProyecto) sessionStorage.setItem("last_idProyecto", idProyecto);
+        if (nombreProyecto) sessionStorage.setItem("last_nombreProyecto", nombreProyecto);
+        if (descripcionProyecto) sessionStorage.setItem("last_descripcionProyecto", descripcionProyecto);
     }, [proyectoSlug, idProyecto, nombreProyecto, descripcionProyecto]);
 
     // -------------------- MODAL EVIDENCIAS --------------------
@@ -71,7 +71,7 @@ export default function TareasProgreso() {
 
     // -------------------- FUNCION PARA CARGAR TAREAS --------------------
     const fetchTareas = useCallback(async () => {
-        const token = localStorage.getItem("jwt_token");
+        const token = sessionStorage.getItem("jwt_token");
         if (!token) {
             navigate("/login");
             return;
@@ -153,9 +153,9 @@ export default function TareasProgreso() {
             <div className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
                 <MenuDinamico 
                     collapsed={sidebarCollapsed} 
-                    departamentoId={localStorage.getItem('last_depId')} 
-                    departamentoNombre={localStorage.getItem('last_depNombre')} 
-                    departamentoSlug={localStorage.getItem('last_depSlug')} 
+                    departamentoId={sessionStorage.getItem('last_depId')} 
+                    departamentoNombre={sessionStorage.getItem('last_depNombre')} 
+                    departamentoSlug={sessionStorage.getItem('last_depSlug')} 
                     activeRoute="proceso"
                 />
             </div>

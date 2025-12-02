@@ -657,3 +657,78 @@ transform: translateY(-3px);
     align-items: flex-start;
   }
 }
+/* ======== ESTILOS NUEVOS PARA PROYECTOS SIN TAREAS ======== */
+
+/* 1. Nueva Tarjeta Métrica Gris (Sin Definir) */
+.tdu-metrica-sin-definir {
+  border-left-color: #fafafa; 
+  background-color: #6c757d;
+}
+
+.tdu-metrica-sin-definir .tdu-metrica-icono {
+  color: #fafafa;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 2. Estilo para la tarjeta del proyecto en la lista */
+.tdj-proyecto-card-encabezado.sin-definir {
+  border-left-color: #6c757d;
+  background-color: #fafafa; /* Fondo ligeramente grisaceo */
+}
+
+/* Hacemos el título un poco menos intenso en proyectos vacíos */
+.tdj-proyecto-card-encabezado.sin-definir .tdj-proyecto-titulo {
+  color: #555;
+}
+
+/* 3. Badge de "Requiere Configuración" */
+.tdj-prioridad-badge.alerta-config {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* 4. Ajuste para cuando el Donut Chart está vacío (N/A) */
+.tdj-grafica-circular.tdj-sin-tareas {
+  background: #e9ecef;
+  border: 2px solid #dee2e6;
+}
+
+.tdj-grafica-circular.tdj-sin-tareas .tdj-circular-center {
+  color: #adb5bd;
+  font-size: 0.8rem;
+}
+/* Estilos para el texto de fecha */
+.tdj-tiempo-label {
+    font-weight: bold;
+    color: #4a5568; /* Color normal */
+}
+
+.tdj-tiempo-label.finalizado {
+    color: #28a745; /* Verde */
+}
+
+.tdj-tiempo-label.vencido {
+    color: #dc3545; /* Rojo */
+}
+
+/* Bordes izquierdos de las tarjetas según estado */
+.tdj-proyecto-card-encabezado {
+    border-left: 5px solid transparent; /* Base */
+}
+
+.tdj-proyecto-card-encabezado.completado {
+    border-left-color: #28a745;
+}
+.tdj-proyecto-card-encabezado.progreso {
+    border-left-color: #ffc107;
+}
+.tdj-proyecto-card-encabezado.pendiente {
+    border-left-color: #dc3545; /* O el color que uses para pendiente */
+}
+.tdj-proyecto-card-encabezado.vencido {
+    border-left-color: #8b0000; /* Rojo oscuro */
+}
+.tdj-proyecto-card-encabezado.sin-definir {
+    border-left-color: #6c757d; /* Gris */
+}

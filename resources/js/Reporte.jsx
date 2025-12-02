@@ -86,7 +86,7 @@ function Reporte() {
     setCargando(true);
     setProgreso(0);
 
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
     
     let url = `/generar-pdf?tipo=${tipoReporte}`;
     
@@ -104,8 +104,6 @@ function Reporte() {
     if (tipoReporte === "proximas" && fechaFin) {
       url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
     }
-    // --- FIN DE LA CORRECCIÓN ---
-    // (Borré los if individuales de "vencidas" y "completadas" que tenías abajo porque ya están arriba)
 
     console.log("URL de solicitud:", url);
 

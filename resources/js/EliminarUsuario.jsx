@@ -19,7 +19,7 @@ export default function EliminarUsuario() {
   const [modalOpen, setModalOpen] = useState(false);
   const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
 
-  const usuarioLogueado = JSON.parse(localStorage.getItem("usuario"));
+  const usuarioLogueado = JSON.parse(sessionStorage.getItem("usuario"));
   const idUsuario = usuarioLogueado?.id_usuario;
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function EliminarUsuario() {
     }
 
     const fetchUsuarios = async () => {
-      const token = localStorage.getItem("jwt_token");
+      const token = sessionStorage.getItem("jwt_token");
       if (!token) {
         setError("Usuario no autorizado.");
         setLoadingInicial(false);
@@ -56,7 +56,7 @@ export default function EliminarUsuario() {
   }, [idUsuario]);
 
   const eliminarUsuario = async (id_usuario) => {
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) {
       setError("Usuario no autorizado.");
       return;

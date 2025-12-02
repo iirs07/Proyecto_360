@@ -1,318 +1,195 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-.vertarea-proyectos-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border: none;
+/* --- CONTENEDOR PRINCIPAL --- */
+.lt-card-principal {
+  background: #fff;
   border-radius: 20px;
-  padding: 30px;
+  padding: 40px;
+  max-width: 900px;
   margin: 30px auto;
-  width: 100%;
-  max-width: 800px;
-  box-shadow: 0 10px 30px rgba(134, 21, 66, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(134, 21, 66, 0.1);
-  z-index: 3;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border-top: 5px solid #861542; 
+   position: relative;
+  z-index: 4;
 }
 
-.ver-tarea-proyectos-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #861542, #a83267);
-}
-
-.ver-tarea-proyectos-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(134, 21, 66, 0.15);
-}
-
-.vertarea-nombre-proyecto {
-  font-size: 28px;
+.lt-titulo-proyecto {
+  font-size: 21px;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 30px;
-  color: #861542;
+  margin-bottom: 25px;
+  color: #0B0C10;
   padding: 10px;
   position: relative;
   text-transform: uppercase;
 }
 
-.vertarea-nombre-proyecto::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 25%;
-  width: 50%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #861542, transparent);
-}
-
-/* Lista de tareas mejorada */
-.vertarea-lista-tareas-TP {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* Items de tareas mejorados */
-.vertarea-item-tarea-pendiente,
-.vertarea-item-tarea-finalizado,
-.vertarea-item-tarea-proceso {
-  border-radius: 15px;
-  padding: 20px;
+.lt-contador-tareas {
+  text-align: center;
+  color: #1f2937;
+  font-weight: 500;
+  margin-bottom: 30px;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  position: relative;
-  overflow: hidden;
-}
-
-.vertarea-item-tarea-pendiente {
-  background: linear-gradient(135deg, #fff5f5, #fed7d7);
-  border-color: #fc8181;
-}
-
-.vertarea-item-tarea-finalizado {
-  background: linear-gradient(135deg, #f0fff4, #c6f6d5);
-  border-color: #48bb78;
-}
-
-.vertarea-item-tarea-proceso {
-  background: linear-gradient(135deg, #fffaf0, #feebc8);
-  border-color: #ed8936;
-}
-
-.vertarea-item-tarea-pendiente:hover,
-.vertarea-item-tarea-finalizado:hover,
-.vertarea-item-tarea-proceso:hover {
-  transform: translateX(10px);
-  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.1);
-}
-
-.vertarea-info-tarea-TP {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  justify-content: center;
   gap: 8px;
 }
 
-.vertarea-header {
+
+.lt-contador-tareas svg {
+  color: #861542; 
+  font-size: 1.2rem;
+}
+
+/* --- GRID DE LA LISTA --- */
+.lt-lista-tareas-grid {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* --- TARJETA DE TAREA (BASE) --- */
+.lt-tarea-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid #e2e8f0;
+  border-left: 6px solid transparent; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 4;
+}
+
+.lt-tarea-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* --- ESTRUCTURA INTERNA --- */
+.lt-tarea-contenido-izq {
   display: flex;
   align-items: center;
   gap: 15px;
-  margin-bottom: 5px;
+  flex: 1;
 }
 
-/* Iconos mejorados */
-.vertarea-icono-estado {
-  font-size: 1.6rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+.lt-tarea-contenido-der {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 140px;
 }
 
-.vertarea-icono-estado.en-proceso { 
-  color: #d69e2e; 
-  animation: pulse 2s infinite;
-}
-.vertarea-icono-estado.finalizada { 
-  color: #38a169; 
-}
-.vertarea-icono-estado.pendiente { 
-  color: #e53e3e; 
-  animation: bounce 2s infinite;
+.lt-tarea-nombre {
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-transform: uppercase;
 }
 
+.lt-tarea-fecha {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* --- ICONOS --- */
+.lt-icono-estado {
+  font-size: 1.5rem;
+}
+
+/* --- BADGES (ETIQUETAS) --- */
+.lt-tarea-badge {
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   ESTILOS POR ESTADO 
+   ========================================================= */
+
+/* 1. FINALIZADO (Verde Fijo) */
+.lt-tarea-card.lt-item-finalizado {
+  border-left-color: #10b981; 
+  background: #f0fff4;
+  z-index: 4;
+}
+.lt-icono-finalizado { color: #10b981; }
+.lt-badge-finalizado { background: #d1fae5; color: #047857; }
+
+
+/* 2. EN PROCESO (Amarillo Fijo) */
+.lt-tarea-card.lt-item-proceso {
+  border-left-color: #f59e0b; 
+  background: #fffbeb;
+    z-index: 4;
+}
+.lt-icono-proceso { color: #f59e0b; }
+.lt-badge-proceso { background: #fef3c7; color: #b45309; }
+
+
+/* 3. PENDIENTE (Lógica de 4 colores) */
+
+/* A) TIEMPO (Verde/Gris suave - Falta mucho) */
+.lt-tarea-card.lt-item-pendiente.tiempo {
+  border-left-color: #94a3b8; 
+  background: #fff;
+}
+.lt-icono-pendiente.tiempo { color: #94a3b8; }
+.lt-badge-pendiente.tiempo { background: #f1f5f9; color: #475569; }
+
+/* B) ALERTA (Amarillo suave - 1 a 3 días) */
+.lt-tarea-card.lt-item-pendiente.alerta {
+  border-left-color: #ecc94b;
+  background: linear-gradient(to right, #fffff0, #fff);
+}
+.lt-icono-pendiente.alerta { color: #d69e2e; }
+.lt-badge-pendiente.alerta { background: #fefcbf; color: #975a16; }
+
+/* C) HOY (Naranja - Urgente) */
+.lt-tarea-card.lt-item-pendiente.hoy {
+  border-left-color: #ed8936;
+  background: linear-gradient(to right, #fffaf0, #fff);
+}
+.lt-icono-pendiente.hoy { color: #dd6b20; animation: pulse 2s infinite; }
+.lt-badge-pendiente.hoy { background: #feebc8; color: #c05621; }
+
+/* D) VENCIDA (Rojo - Pasado) */
+.lt-tarea-card.lt-item-pendiente.vencida {
+  border-left-color: #ef4444;
+  background: linear-gradient(to right, #fef2f2, #fff);
+}
+.lt-icono-pendiente.vencida { color: #ef4444; animation: bounce 2s infinite; }
+.lt-badge-pendiente.vencida { background: #fee2e2; color: #991b1b; }
+
+
+/* --- ANIMACIONES --- */
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
 }
-
 @keyframes bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
 }
 
-.vertarea-nombre {
-  font-weight: 600;
-  font-size: 18px;
-  color: #2d3748;
-  margin: 0;
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .lt-tarea-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .lt-tarea-contenido-der { align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-between;}
 }
-
-/* Footer de tarea mejorado */
-.vertarea-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-/* Estados mejorados */
-.vertarea-estatus-Pendiente,
-.tarea-estatus-Finalizado,
-.tarea-estatus-proceso {
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.vertarea-estatus-Pendiente {
-  background: #fed7d7;
-  color: #c53030;
-}
-
-.tarea-estatus-Finalizado {
-  background: #c6f6d5;
-  color: #276749;
-}
-
-.tarea-estatus-proceso {
-  background: #feebc8;
-  color: #d69e2e;
-}
-
-.vertarea-fecha-TP {
-  font-size: 14px;
-  color: #4a5568;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 4px 12px;
-  border-radius: 12px;
-}
-
-/* Mensaje de no tareas mejorado */
-.vertarea-no-tareas-mensaje {
-  background: linear-gradient(135deg, #fff5f5, #fed7d7);
-  color: #2d3748;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  text-align: center;
-  padding: 40px 30px;
-  margin: 30px auto;
-  min-height: 200px;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(134, 21, 66, 0.1);
-  border: 2px dashed #861542;
-  transition: all 0.3s ease;
-}
-
-.vertarea-no-tareas-mensaje:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(134, 21, 66, 0.15);
-}
-
-.vertarea-no-tareas-mensaje svg {
-  color: #861542;
-  width: 60px;
-  height: 60px;
-  opacity: 0.8;
-}
-
-.vertarea-no-tareas-mensaje span {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.5;
-  color: #861542;
-}
-
-
-/* Contador de tareas */
-.vertarea-contador {
-  text-align: center;
-  color: #861542;
-  font-size: 14px;
-  margin-bottom: 20px;
-  background: rgba(134, 21, 66, 0.05);
-  padding: 10px 20px;
-  border-radius: 20px;
-  display: inline-block;
-  margin: 0 auto 20px auto;
-  border: 1px solid rgba(134, 21, 66, 0.1);
-  font-weight: 500;
-}
-
-.vertarea-contador svg {
-  margin-right: 8px;
-  color: #861542;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .vertarea-proyectos-card {
-    margin: 20px 15px;
-    padding: 20px;
-    border-radius: 15px;
-  }
-  
-  .vertarea-nombre-proyecto {
-    font-size: 24px;
-  }
-  
-  .vertarea-header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-  
-  .vertarea-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-  
-  .vertarea-item-tarea-pendiente,
-  .vertarea-item-tarea-finalizado,
-  .vertarea-item-tarea-proceso {
-    padding: 15px;
-  }
-  
-  .vertarea-no-tareas-mensaje {
-    padding: 30px 20px;
-    min-height: 150px;
-  }
-  
-  .vertarea-no-tareas-mensaje svg {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .vertarea-no-tareas-mensaje span {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  .vertarea-nombre-proyecto {
-    font-size: 20px;
-  }
-  
-  .vertarea-nombre {
-    font-size: 16px;
-  }
-  
-  .vertarea-footer {
-    align-items: center;
-  }
-}
-
-
 
 

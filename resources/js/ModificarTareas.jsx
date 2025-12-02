@@ -31,8 +31,8 @@ function ModificarTareas() {
   useEffect(() => {
   const fetchTareasPorProyecto = async () => {
     try {
-      const usuario = JSON.parse(localStorage.getItem("usuario"));
-      const token = localStorage.getItem("jwt_token"); // <-- obtener token
+      const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+      const token = sessionStorage.getItem("jwt_token"); 
 
       if (!usuario?.id_usuario || !token) {
         setLoading(false); 
@@ -51,8 +51,8 @@ function ModificarTareas() {
       );
 
       if (res.status === 401) {
-        localStorage.removeItem("jwt_token");
-        localStorage.removeItem("usuario");
+        sessionStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("usuario");
         navigate("/Login", { replace: true });
         return;
       }
@@ -123,6 +123,11 @@ function ModificarTareas() {
             </button>
           )}
         </div>
+        {busqueda && (
+                <div className="buscador-verproyectos-resultados-info">
+                  {proyectos.length} resultado(s) para "{busqueda}"
+                </div>
+              )}
         {proyectosFiltrados.length > 0 && (
           <div style={{ marginTop: "10px" }}>
             <SelectDinamico
@@ -139,78 +144,71 @@ function ModificarTareas() {
       </div>
     )}
 
-    {/* Lista de proyectos y tareas */}
     {loading ? (
-      <div className="loader-container">
-        <div className="loader-logo">
-          <img src={logo3} alt="Cargando" />
+  <div className="loader-container">
+    <div className="loader-logo">
+      <img src={logo3} alt="Cargando" />
+    </div>
+    <div className="loader-texto">CARGANDO...</div>
+    <div className="loader-spinner"></div>
+  </div>
+) : proyectos.length === 0 ? (
+  // EmptyState solo cuando backend NO devolvió proyectos
+  <EmptyState
+    titulo="MODIFICAR TAREAS"
+    mensaje="No hay proyectos disponibles."
+    botonTexto="Volver al Tablero"
+    onVolver={volverSegunRol}
+    icono={logo3}
+  />
+) : (
+  //Renderizamos los proyectos filtrados
+  proyectosFiltrados.map(({ proyecto, tareas }) => (
+    <div key={proyecto.id_proyecto} className="mt-card">
+      <h5 className="mt-nombre-proyecto">{proyecto.p_nombre}</h5>
+
+      <div className="mt-info">
+        <div className="mt-info-item">
+          <FaTasks className="mt-info-icon" />
+          <span>
+            <strong>Tareas:</strong> {tareas.length}
+          </span>
         </div>
-        <div className="loader-texto">CARGANDO...</div>
-        <div className="loader-spinner"></div>
       </div>
-    ) : proyectosFiltrados.length === 0 ? (
-      <EmptyState
-        titulo="MODIFICAR TAREAS"
-        mensaje="No hay proyectos disponibles."
-        botonTexto="Volver al Tablero"
-        onVolver={volverSegunRol}
-        icono={logo3}
-      />
-    ) : (
-      proyectosFiltrados.map(({ proyecto, tareas }) => (
-        <div key={proyecto.id_proyecto} className="mt-card">
-          <h5 className="mt-nombre-proyecto">{proyecto.p_nombre}</h5>
 
-          <div className="mt-info">
-            <div className="mt-info-item">
-              <FaTasks className="mt-info-icon" />
-              <span>
-                <strong>Tareas:</strong> {tareas.length}
-              </span>
-            </div>
-          </div>
+      {tareas.length > 0 ? (
+        <ul className="mt-tareas-lista">
+          {tareas.map((tarea) => (
+            <li key={tarea.id_tarea} className="mt-item-en-proceso">
+              <div className="mt-info">
+                <div className="mt-header">
+                  <label className="mt-nombre-tarea">{tarea.t_nombre}</label>
+                </div>
+                <div className="mt-footer">
+                  <span className={`mt-estatus ${tarea.t_estatus?.toLowerCase().replace(' ', '-')}`}>
+                    {tarea.t_estatus}
+                  </span>
+                  <span className="mt-fecha">
+                    <FaCalendarAlt className="mt-fecha-icon" />
+                    Vence: {tarea.tf_fin || tarea.fechaVencimiento}
+                  </span>
 
-          {tareas.length > 0 ? (
-            <ul className="mt-tareas-lista">
-              {tareas.map((tarea) => (
-                <li key={tarea.id_tarea} className="mt-item-en-proceso">
-                  <div className="mt-info">
-                    <div className="mt-header">
-                      <label className="mt-nombre-tarea">{tarea.t_nombre}</label>
-                    </div>
-                     <div className="mt-footer">
-                          <span className={`mt-estatus ${tarea.t_estatus?.toLowerCase().replace(' ', '-')}`}>
-                            {tarea.t_estatus}
-                          </span>
-                          <span className="mt-fecha">
-  <FaCalendarAlt className="mt-fecha-icon" />
-  Vence: {tarea.tf_fin || tarea.fechaVencimiento}
-</span>
+                  <button
+                    className="mt-btn-modificar-tarea"
+                    onClick={() => handleModificarTarea(tarea)}
+                  >
+                    <FaEdit style={{ marginRight: "8px" }} /> Modificar
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null }
+    </div>
+  ))
+)}
 
-                          <button
-                            className="mt-btn-modificar-tarea"
-                            onClick={() => handleModificarTarea(tarea)}
-                          >
-                            <FaEdit style={{ marginRight: "8px" }} /> 
-                            Modificar
-                          </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState
-              titulo="MODIFICAR TAREAS"
-              mensaje="No hay tareas disponibles para este proyecto."
-              botonTexto="Volver al Tablero"
-              onVolver={volverSegunRol}
-              icono={logo3}
-            />
-          )}
-        </div>
-      ))
-    )}
   </div>
 </Layout>
 

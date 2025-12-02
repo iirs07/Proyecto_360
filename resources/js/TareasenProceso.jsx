@@ -23,11 +23,11 @@ function TareasenProceso() {
    const { volverSegunRol } = useRolNavigation();
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     if (!usuario?.id_usuario) return;
 
     const obtenerProyectos = async () => {
-      const token = localStorage.getItem("jwt_token");
+      const token = sessionStorage.getItem("jwt_token");
       if (!token) return;
 
       setLoading(true);
@@ -63,7 +63,7 @@ function TareasenProceso() {
   }, []);
 
   const handleCompletarTareaProyecto = async (idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) return;
 
     setCargando(true);
@@ -175,13 +175,15 @@ function TareasenProceso() {
   <div className="barra-busqueda-global-container mb-4">
     <div className="barra-busqueda-global-wrapper">
       <FaSearch className="barra-busqueda-global-icon" />
+
       <input
         type="text"
-        placeholder="Buscar proyectos por nombre..."
+        placeholder="Buscar proyectos..."
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
         className="barra-busqueda-global-input"
       />
+
       {busqueda && (
         <button
           className="buscador-clear-global"
@@ -191,101 +193,141 @@ function TareasenProceso() {
         </button>
       )}
     </div>
+
+    {busqueda && (
+      <div className="buscador-resultados-global">
+        {proyectosFiltrados.length} resultado(s) para "{busqueda}"
+      </div>
+    )}
   </div>
 )}
 
-        <div className="tep-lista-proyectos">
-          {loading ? (
-            <div className="loader-container">
-              <div className="loader-logo">
-                <img src={logo3} alt="Cargando proyectos" />
-              </div>
-              <div className="loader-texto">CARGANDO...</div>
-              <div className="loader-spinner"></div>
+
+        
+      <div className="tep-lista-proyectos">
+  {loading ? (
+    <div className="loader-container">
+      <div className="loader-logo">
+        <img src={logo3} alt="Cargando proyectos" />
+      </div>
+      <div className="loader-texto">CARGANDO...</div>
+      <div className="loader-spinner"></div>
+    </div>
+
+  ) : proyectos.length === 0 ? (
+
+    <EmptyState
+      titulo="TAREAS PENDIENTES POR REVISAR"
+      mensaje="No hay tareas por revisar."
+      botonTexto="Volver al Tablero"
+      onVolver={volverSegunRol}
+      icono={logo3}
+    />
+
+  ) : proyectosFiltrados.length === 0 ? (
+   null
+
+  ) : (
+
+    // 🟩 Caso 3: Hay proyectos y hay coincidencias
+    proyectosFiltrados.map((p) => {
+      const porcentaje = Math.round(
+        ((p.tareas_completadas || 0) / (p.total_tareas || 1)) * 100
+      );
+      const listoParaFinalizar =
+        p.p_estatus !== "Completada" && todasLasTareasFinalizadas(p);
+
+      return (
+        <div key={p.id_proyecto} className="tep-project-card-horizontal">
+          <div
+            className={`tep-status-stripe ${
+              p.p_estatus === "Completada" ? "completed" : ""
+            }`}
+          ></div>
+
+          <div className="tep-col-info">
+            <div className="tep-header-badges">
+              <span
+                className={`tep-badge-status ${
+                  p.p_estatus === "Completada" ? "completed" : "process"
+                }`}
+              >
+                {p.p_estatus}
+              </span>
+              <span className="tep-badge-date">
+                <FaRegCalendarAlt /> {formatearFecha(p.pf_fin)}
+              </span>
             </div>
-          ) : proyectosFiltrados.length > 0 ? (
-            proyectosFiltrados.map((p) => {
-              const porcentaje = Math.round(((p.tareas_completadas || 0) / (p.total_tareas || 1)) * 100);
-              const listoParaFinalizar = p.p_estatus !== "Finalizada" && todasLasTareasFinalizadas(p);
+            <h3 className="tep-project-title">{p.p_nombre}</h3>
+          </div>
 
-              return (
-                <div key={p.id_proyecto} className="tep-project-card-horizontal">
-                  <div className={`tep-status-stripe ${p.p_estatus === 'Finalizada' ? 'completed' : ''}`}></div>
+          <div className="tep-col-progress">
+            <div className="tep-progress-meta">
+              <span>Avance General</span>
+              <span className="tep-percent-text">{porcentaje}%</span>
+            </div>
+            <div className="tep-progress-track">
+              <div
+                className="tep-progress-fill"
+                style={{ width: `${porcentaje}%` }}
+              ></div>
+            </div>
+          </div>
 
-                  <div className="tep-col-info">
-                    <div className="tep-header-badges">
-                      <span className={`tep-badge-status ${p.p_estatus === 'Finalizada' ? 'completed' : 'process'}`}>
-                        {p.p_estatus}
-                      </span>
-                      <span className="tep-badge-date">
-                        <FaRegCalendarAlt /> {formatearFecha(p.pf_fin)}
-                      </span>
-                    </div>
-                    <h3 className="tep-project-title">{p.p_nombre}</h3>
-                  </div>
+          <div className="tep-col-actions">
+            <div className="tep-mini-stats-grid">
+              <div className="tep-stat-item">
+                <span className="tep-stat-val">
+                  {p.tareas_completadas || 0}
+                </span>
+                <span className="tep-stat-lbl">Tareas completadas</span>
+              </div>
+              <div className="tep-stat-item">
+                <span className="tep-stat-val">{p.total_tareas || 0}</span>
+                <span className="tep-stat-lbl">Total tareas</span>
+              </div>
+              <div className="tep-stat-item">
+                <span className="tep-stat-val">
+                  {p.tareas_a_revisar || 0}
+                </span>
+                <span className="tep-stat-lbl">Por revisar</span>
+              </div>
+            </div>
 
-                  <div className="tep-col-progress">
-                    <div className="tep-progress-meta">
-                      <span>Avance General</span>
-                      <span className="tep-percent-text">{porcentaje}%</span>
-                    </div>
-                    <div className="tep-progress-track">
-                      <div className="tep-progress-fill" style={{ width: `${porcentaje}%` }}></div>
-                    </div>
-                  </div>
+            <div className="tep-action-buttons">
+              {listoParaFinalizar && (
+                <label
+                  className="tep-check-finish"
+                  title="Marcar como finalizado"
+                >
+                  <input
+                    type="checkbox"
+                    checked={false}
+                    onChange={() => {
+                      setProyectoSeleccionado(p);
+                      setModalOpen(true);
+                    }}
+                    disabled={cargando}
+                  />
+                  <span className="tep-check-label">Finalizar</span>
+                </label>
+              )}
 
-                  <div className="tep-col-actions">
-                    <div className="tep-mini-stats-grid">
-                      <div className="tep-stat-item">
-                        <span className="tep-stat-val">{p.tareas_completadas || 0}</span>
-                        <span className="tep-stat-lbl">Tareas completadas</span>
-                      </div>
-                      <div className="tep-stat-item">
-                        <span className="tep-stat-val">{p.total_tareas || 0}</span>
-                        <span className="tep-stat-lbl">Total tareas</span>
-                      </div>
-                      <div className="tep-stat-item">
-                        <span className={`tep-stat-val ${p.tareas_a_revisar}`}>
-                          {p.tareas_a_revisar || 0}
-                        </span>
-                        <span className="tep-stat-lbl">Por revisar</span>
-                      </div>
-                    </div>
-
-                    <div className="tep-action-buttons">
-                       {listoParaFinalizar && (
-                        <label className="tep-check-finish" title="Marcar como finalizado">
-                          <input 
-                            type="checkbox" 
-                            checked={false}
-                            onChange={() => {
-                              setProyectoSeleccionado(p);
-                              setModalOpen(true);
-                            }} 
-                            disabled={cargando} 
-                          />
-                          <span className="tep-check-label">Finalizar</span>
-                        </label>
-                       )}
-                       
-                       <button className="tep-btn-details" onClick={() => handleVerTareas(p)}>
-                         Ver detalles <FaArrowRight className="tep-icon-arrow"/>
-                       </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <EmptyState
-                        titulo="TAREAS PENDIENTES POR REVISAR"
-                        mensaje="No hay tareas por revisar."
-                        botonTexto="Volver al Tablero"
-                        onVolver={volverSegunRol}
-                        icono={logo3}
-                      />
-          )}
+              <button
+                className="tep-btn-details"
+                onClick={() => handleVerTareas(p)}
+              >
+                Ver detalles <FaArrowRight className="tep-icon-arrow" />
+              </button>
+            </div>
+          </div>
         </div>
+      );
+    })
+  )}
+</div>
+
+    
 
         <ConfirmModal
           isOpen={modalOpen}

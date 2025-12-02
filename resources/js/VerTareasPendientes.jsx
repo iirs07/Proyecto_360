@@ -33,8 +33,8 @@ function VerTareasPendientes() {
 
   const obtenerProyectoActualizado = async () => {
     const proyectoGuardado = sessionStorage.getItem("proyectoSeleccionado");
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    const token = localStorage.getItem("jwt_token"); 
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    const token = sessionStorage.getItem("jwt_token"); 
 
     if (!proyectoGuardado || !usuario?.id_usuario) {
       return navigate("/tareas-en-proceso");
@@ -73,7 +73,7 @@ function VerTareasPendientes() {
             ...proyectoSeleccionado,
             tareas: (proyectoSeleccionado.tareas || []).map(t => ({
               ...t,
-              t_estatus: "Finalizada",
+              t_estatus: "Completada",
             })),
           };
           setProyecto(proyectoActualizado);
@@ -108,7 +108,7 @@ function VerTareasPendientes() {
   }
 
   const tareasFiltradas = proyecto?.tareas
-    ?.filter(t => t.t_estatus.toLowerCase() !== "finalizada")
+    ?.filter(t => t.t_estatus.toLowerCase() !== "completada")
     ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
 
@@ -118,7 +118,7 @@ function VerTareasPendientes() {
     const idTarea = tareaAFinalizar?.id_tarea; 
     if (!idTarea) return;
 
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
     if (!token) return alert("No hay token de autenticación, inicia sesión.");
 
     try {
@@ -143,7 +143,7 @@ function VerTareasPendientes() {
           
           const tareasActualizadas = prevProyecto.tareas.map(tarea =>
             tarea.id_tarea === idTarea 
-              ? { ...tarea, t_estatus: "Finalizada" }
+              ? { ...tarea, t_estatus: "Completada" }
               : tarea
           );
           
@@ -248,7 +248,7 @@ function VerTareasPendientes() {
 
                 {/* ACCIONES */}
                 <div className="vtp-acciones-tarea">
-                  {t.t_estatus !== "Finalizada" && (
+                  {t.t_estatus !== "Completada" && (
                     <div className="vtp-accion-finalizar">
                       <input
                         type="checkbox"
@@ -314,66 +314,82 @@ function VerTareasPendientes() {
         </div>
       </div>
 
-      {/* Modal de Evidencias (Existente) */}
-      {modalVisible && tareaActual && (
-        <div className="vtp-modal">
-          <div className="vtp-modal-content">
-            <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
-              <FiX />
-            </button>
+      {/* Modal de Evidencias (Interfaz VTP) */}
+{modalVisible && tareaActual && (
+  <div className="vtp-modal">
+    <div className="vtp-modal-content">
+      
+      {/* HEADER MODIFICADO: Botón ahora está dentro para alineación */}
+      <div className="vtp-modal-header">
+        
+        {/* Lado Izquierdo: Título y Estatus */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+          <h3 style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {tareaActual.t_nombre}
+          </h3>
+          <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
+            {tareaActual.t_estatus}
+          </span>
+        </div>
+
+        {/* Lado Derecho: Botón Cerrar (Con estilo nuevo) */}
+        <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
+          <FiX />
+        </button>
+      </div>
+
+      {/* BODY */}
+      {evidencias.length > 0 ? (
+        <div className="vtp-evidencias-container">
+          <div className="vtp-evidencias-navegacion">
             
-            <div className="vtp-modal-header">
-              <h3>{tareaActual.t_nombre}</h3>
-              <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-                {tareaActual.t_estatus}
-              </span>
+            {/* Botón Anterior */}
+            {evidencias.length > 1 && (
+              <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
+                <FiChevronLeft size={24} />
+              </button>
+            )}
+
+            {/* Imagen Container */}
+            <div className="vtp-imagen-container">
+              {imagenCargando && <div className="vtp-imagen-cargando"></div>}
+              <img
+                src={evidencias[indiceActual].archivo_url}
+                alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
+                className="vtp-imagen-evidencia"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                style={{ display: imagenCargando ? 'none' : 'block' }}
+              />
             </div>
 
-            {evidencias.length > 0 ? (
-              <div className="vtp-evidencias-container">
-                <div className="vtp-evidencias-navegacion">
-                  <div className="vtp-imagen-container">
-                    {imagenCargando && <div className="vtp-imagen-cargando"></div>}
-                    <img
-                      src={evidencias[indiceActual].archivo_url}
-                      alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
-                      className="vtp-imagen-evidencia"
-                      onLoad={handleImageLoad}
-                      onError={handleImageError}
-                      style={{ display: imagenCargando ? 'none' : 'block' }}
-                    />
-                  </div>
-
-                  {evidencias.length > 1 && (
-                    <>
-                      <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
-                        <FiChevronLeft size={28} />
-                      </button>
-                      <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
-                        <FiChevronRight size={28} />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {evidencias.length > 1 && (
-                  <div className="vtp-contador">
-                    <span>{indiceActual + 1} / {evidencias.length}</span>
-                  </div>
-                )}
-
-                <div className="vtp-evidencias-info">
-                  <span className="vtp-tarea-fecha">
-                    Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="vtp-sin-evidencias"></div>
+            {/* Botón Siguiente */}
+            {evidencias.length > 1 && (
+              <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
+                <FiChevronRight size={24} />
+              </button>
             )}
           </div>
+
+          {/* Footer Info Unificado */}
+          <div className="vtp-evidencias-info">
+             {evidencias.length > 1 && (
+               <span style={{fontWeight:'bold', marginRight:'10px'}}>
+                 {indiceActual + 1} / {evidencias.length}
+               </span>
+             )}
+             <span className="vtp-tarea-fecha">
+               Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
+             </span>
+          </div>
+
         </div>
+      ) : (
+        <div className="vtp-sin-evidencias">No hay evidencias disponibles</div>
       )}
+    </div>
+  </div>
+)}
 
       {/* 6. Modal de Confirmación para Finalizar Tarea (Nuevo) */}
       <ConfirmModal

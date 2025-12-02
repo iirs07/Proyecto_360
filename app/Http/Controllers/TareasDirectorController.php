@@ -80,7 +80,7 @@ public function tareasActivasPorProyecto($idProyecto)
 
     // 🔹 Conteos por estatus
     $conteos = [
-        'completadas' => $tareas->where('t_estatus', 'finalizada')->count(),
+        'completadas' => $tareas->where('t_estatus', 'completada')->count(),
         'pendientes' => $tareas->where('t_estatus', 'pendiente')->count(),
         'en_proceso' => $tareas->where('t_estatus', 'en proceso')->count(),
         'total' => $tareas->count(),
@@ -90,7 +90,7 @@ public function tareasActivasPorProyecto($idProyecto)
     $proyectos = $proyectos->map(function ($proyecto) use ($tareas) {
         $tareasProyecto = $tareas->where('id_proyecto', $proyecto->id_proyecto);
         $total = $tareasProyecto->count();
-        $completadas = $tareasProyecto->where('t_estatus', 'finalizada')->count();
+        $completadas = $tareasProyecto->where('t_estatus', 'completada')->count();
 
         $proyecto->total_tareas = $total;
         $proyecto->tareas_completadas = $completadas;
@@ -132,12 +132,12 @@ public function obtenerTareasProyectosJefe(Request $request)
         $estadosProyecto = ['En proceso']; 
         
         // Estados de tareas permitidos
-        $estadosTarea = ['En proceso', 'Finalizada'];
+        $estadosTarea = ['En proceso', 'Completada'];
 
         // Closure para filtrar tareas (se usa en whereHas y en with)
         $filtroTareas = function($q) use ($estadosTarea) {
             // Usamos whereIn con array_map para simular ILIKE de forma más limpia o whereRaw si prefieres
-            $q->whereRaw("LOWER(t_estatus) IN ('en proceso', 'finalizada')");
+            $q->whereRaw("LOWER(t_estatus) IN ('en proceso', 'completada')");
         };
 
         $proyectos = collect();
@@ -184,7 +184,7 @@ public function obtenerTareasProyectosJefe(Request $request)
             // Filtramos sobre la colección en memoria (mucho más rápido y sin errores de conexión)
             $proyecto->tareas_completadas = $proyecto->tareas
                 ->filter(function($t) {
-                    return stripos($t->t_estatus, 'Finalizada') !== false;
+                    return stripos($t->t_estatus, 'Completada') !== false;
                 })->count();
 
             $proyecto->tareas_a_revisar = $proyecto->tareas
@@ -218,12 +218,12 @@ public function CambiarStatusTareaFinalizada($idTarea)
         ], 404);
     }
 
-    $tarea->t_estatus = "Finalizada";
+    $tarea->t_estatus = "Completada";
     $tarea->save();
 
     return response()->json([
         'success' => true,
-        'mensaje' => 'Tarea marcada como finalizada',
+        'mensaje' => 'Tarea marcada como completada',
         'tarea' => $tarea
     ]);
 }
@@ -254,7 +254,7 @@ public function cambiarStatusTareaEnProceso(Request $request, $idTarea)
             'id_tarea'    => $idTarea,            
             'id_usuario'  => $usuarioId,
             'accion'      => 'REACTIVACION TAREA',
-            'detalles'    => "Fue modificado el estatus de la tarea de Finalizada e En proceso."
+            'detalles'    => "Fue modificado el estatus de la tarea de Completada e En proceso."
         ]);
 
         DB::commit(); // Confirmar cambios
@@ -291,7 +291,7 @@ public function completarTarea($id)
 
             // Actualizar el estado
             $tarea->update([
-                't_estatus' => 'Finalizada',
+                't_estatus' => 'Completada',
                 'tf_completada' => now()
             ]);
 
@@ -299,7 +299,7 @@ public function completarTarea($id)
 
             return response()->json([
                 'success' => true,
-                'mensaje' => 'Tarea marcada como Finalizada',
+                'mensaje' => 'Tarea marcada como completada',
                 'tarea' => $tarea
             ]);
 
@@ -315,6 +315,11 @@ public function completarTarea($id)
 {
     try {
         $usuarioId = $request->query('usuario_id'); 
+        
+        // 1. Recibir los nuevos filtros
+        $anio = $request->query('anio');
+        $mes = $request->query('mes');
+
         $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
 
         if (!$usuario) {
@@ -323,30 +328,40 @@ public function completarTarea($id)
 
         $idDepartamento = $usuario->id_departamento;
 
-        $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
-            ->whereIn('p_estatus', ['Finalizado', 'En proceso'])
+        // 2. Pasamos $anio y $mes al "use" para poder usarlos dentro
+        $construirConsulta = function($query) use ($idDepartamento, $anio, $mes) {
+            $query->where('id_departamento', $idDepartamento)
+                ->whereIn('p_estatus', ['Finalizado']);
+
+            // 3. APLICAR FILTROS DE FECHA SI EXISTEN
+            if ($anio) {
+                $query->whereYear('pf_fin', $anio);
+            }
             
-            // Solo proyectos que tengan tareas
-            ->whereHas('tareas')
-            
-            // Excluir proyectos que tengan al menos una tarea NO finalizada
-            ->whereDoesntHave('tareas', function($q) {
-                $q->where('t_estatus', 'NOT ILIKE', 'Finalizada');
-            })
-            
-            // Cargar tareas finalizadas y sus evidencias
-            ->with(['tareas' => function($q) {
-                $q->where('t_estatus', 'ILIKE', 'Finalizada')
-                  ->with('evidencias');
-            }])
-            
-            // Contadores para frontend
-            ->withCount(['tareas as total_tareas'])
-            ->withCount(['tareas as tareas_completadas' => function($q) {
-                $q->where('t_estatus', 'ILIKE', 'Finalizada');
-            }])
-            
-            ->get();
+            if ($mes) {
+                $query->whereMonth('pf_fin', $mes);
+            }
+                
+            // El resto de la consulta sigue igual...
+            return $query->whereHas('tareas')
+                ->whereDoesntHave('tareas', function($q) {
+                    $q->where('t_estatus', 'NOT ILIKE', 'Completada');
+                })
+                ->with(['tareas' => function($q) {
+                    $q->where('t_estatus', 'ILIKE', 'Completada')
+                      ->with('evidencias');
+                }])
+                ->withCount(['tareas as total_tareas'])
+                ->withCount(['tareas as tareas_completadas' => function($q) {
+                    $q->where('t_estatus', 'ILIKE', 'Completada');
+                }]);
+        };
+
+        // Consultar ambas BDs con los filtros aplicados
+        $proyectosPrincipal = $construirConsulta(\App\Models\Proyecto::on('pgsql'))->get();
+        $proyectosHistorico = $construirConsulta(\App\Models\Proyecto::on('pgsql_second'))->get();
+
+        $proyectos = $proyectosPrincipal->merge($proyectosHistorico);
 
         return response()->json([
             'success' => true,
@@ -438,14 +453,14 @@ public function tareasCompletadasDepartamento(Request $request)
     $tareas = DB::table('tareas as t')
         ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
         ->where('p.id_departamento', $idDepartamento)
-        ->whereRaw("UPPER(TRIM(t.t_estatus)) = ?", ['FINALIZADA'])
+        ->whereRaw("UPPER(TRIM(t.t_estatus)) = ?", ['COMPLETADA'])
         ->select('t.*', 'p.p_nombre', 'p.pf_inicio', 'p.pf_fin', 'p.p_estatus')
         ->get();
 
     if ($tareas->isEmpty()) {
         return response()->json([
             'success' => false,
-            'mensaje' => 'No hay tareas finalizadas para este departamento'
+            'mensaje' => 'No hay tareas completadas para este departamento'
         ]);
     }
 
