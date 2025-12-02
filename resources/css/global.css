@@ -97,13 +97,18 @@ body {
     font-family: 'Merriweather', serif;
     color: var(--secondary-color);
     font-weight: bold;
-    font-size: clamp(14px, 2vw, 19px);
+    font-size: clamp(12px, 1.5vw, 17px); 
     line-height: 1.3em;
     text-transform: uppercase;
     text-align: center;
     white-space: normal;
     word-break: break-word;
     max-width: 100%;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px; 
 }
 
 /* ===========================

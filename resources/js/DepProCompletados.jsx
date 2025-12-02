@@ -15,7 +15,7 @@ import {
     FaTasks
 } from "react-icons/fa";
 
-import "../css/DepProSuperUsuario.css";
+import "../css/DepProSuperUsuarioCom.css";
 import "../css/global.css";
 import "../css/useOrdenamiento.css";
 
@@ -26,6 +26,9 @@ import MenuDinamico from "../components/MenuDinamico";
 import { slugify } from "./utils/slugify";
 import { useProyectosOrdenados } from '../hooks/useProyectosOrdenados';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
+
+// Obtener la URL base desde las variables de entorno de Vite
+const API_URL = import.meta.env.VITE_API_URL;
 
 // --- Dropdown de Ordenamiento Mejorado ---
 const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) => {
@@ -57,6 +60,12 @@ const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) =
             ))}
         </div>
     );
+};
+
+// Función para determinar la clase según el porcentaje de progreso (para finalizados siempre verde)
+const getColorClassByProgress = (porcentaje) => {
+    // Como son proyectos finalizados, siempre serán verde
+    return 'proyecto-completado';
 };
 
 export default function DepProCompletados() {
@@ -116,20 +125,20 @@ export default function DepProCompletados() {
     const fetchDatos = async (initialLoad = false) => {
         const token = localStorage.getItem("jwt_token");
         if (!token) {
-            navigate("/login", { replace: true });
+            navigate("/", { replace: true });
             return;
         }
 
         if (!depId) {
             console.error("ID de departamento no disponible. Redirigiendo.");
-            navigate("/Principal", { replace: true });
+            navigate("/PrincipalSuperusuario", { replace: true });
             return;
         }
 
         try {
             if (initialLoad) setLoading(true);
             const res = await fetch(
-                `http://127.0.0.1:8000/api/departamentos/${depId}/progresos`,
+                `${API_URL}/api/departamentos/${depId}/progresos`,
                 {
                     headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
                 }
@@ -178,7 +187,7 @@ export default function DepProCompletados() {
                 />
             }
         >
-            <div className="procom-proceso-container" style={{ zIndex: 1 }}>
+            <div className="procom-completados-container" style={{ zIndex: 1 }}>
                 {/* HEADER CON CONTROLES EN LÍNEA HORIZONTAL */}
                 {proyectosOrdenados.length > 0 && (
                     <div className="resumen-metricas-container" style={{ zIndex: 10 }}>
@@ -278,7 +287,7 @@ export default function DepProCompletados() {
                 )}
                 
                 {/* LISTA DE PROYECTOS */}
-                <div className="proyectos-linea" style={{ zIndex: 5 }}>
+                <div className="proyectos-completados-lista" style={{ zIndex: 5 }}>
                     {proyectosOrdenados.length === 0 ? (
                         <div className="proyecto-sin-tareas" style={{ zIndex: 6 }}>
                             <div className="sin-tareas-icon">
@@ -290,11 +299,15 @@ export default function DepProCompletados() {
                     ) : (
                         proyectosOrdenados.map((proyecto, index) => {
                             const slugProyecto = slugify(proyecto.p_nombre);
+                            const porcentaje = proyecto.porcentaje || 0;
+                            const progressClass = getColorClassByProgress(porcentaje);
                             
                             return (
                                 <div 
                                     key={proyecto.id_proyecto} 
-                                    className="proyecto-linea-item completado"
+                                    className={`proyecto-completado-item ${progressClass}`}
+                                    data-progreso={porcentaje}
+                                    data-estado="finalizado"
                                     style={{ 
                                         zIndex: 10 + index,
                                         animationDelay: `${index * 0.1}s` 
@@ -305,7 +318,7 @@ export default function DepProCompletados() {
                                                 idProyecto: proyecto.id_proyecto,
                                                 nombreProyecto: proyecto.p_nombre,
                                                 descripcionProyecto: proyecto.descripcion,
-                                                porcentaje: proyecto.porcentaje,
+                                                porcentaje: porcentaje,
                                                 totalTareas: proyecto.total_tareas,
                                                 tareasCompletadas: proyecto.tareas_completadas,
                                             },
@@ -313,57 +326,57 @@ export default function DepProCompletados() {
                                     }
                                 >
                                     {/* HEADER DEL PROYECTO */}
-                                    <div className="proyecto-header">
-                                        <div className="proyecto-nombre">
-                                            <span className="proyecto-valor">{proyecto.p_nombre}</span>
+                                    <div className="proyecto-completado-header">
+                                        <div className="proyecto-completado-nombre">
+                                            <span className="proyecto-completado-valor">{proyecto.p_nombre}</span>
                                         </div>
-                                        <div className="proyecto-badges">
-                                            <span className="badge-estado completado" data-estado={proyecto.p_estatus}>
-                                                {proyecto.p_estatus}
+                                        <div className="proyecto-completado-badges">
+                                            <span className="badge-estado-completado" data-estado={proyecto.p_estatus}>
+                                                {proyecto.p_estatus} ✓
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* INFORMACIÓN DEL PROYECTO */}
-                                    <div className="proyecto-columnas">
-                                        <div className="proyecto-linea-columna">
-                                            <span className="proyecto-label">
-                                                <FaCalendarAlt className="proyecto-icon" />
+                                    <div className="proyecto-completado-columnas">
+                                        <div className="proyecto-completado-columna">
+                                            <span className="proyecto-completado-label">
+                                                <FaCalendarAlt className="proyecto-completado-icon" />
                                                 Inicio
                                             </span>
-                                            <span className="proyecto-valor">{proyecto.pf_inicio}</span>
+                                            <span className="proyecto-completado-valor">{proyecto.pf_inicio}</span>
                                         </div>
-                                        <div className="proyecto-linea-columna">
-                                            <span className="proyecto-label">
-                                                <FaFlagCheckered className="proyecto-icon" />
+                                        <div className="proyecto-completado-columna">
+                                            <span className="proyecto-completado-label">
+                                                <FaFlagCheckered className="proyecto-completado-icon" />
                                                 Fin
                                             </span>
-                                            <span className="proyecto-valor">{proyecto.pf_fin}</span>
+                                            <span className="proyecto-completado-valor">{proyecto.pf_fin}</span>
                                         </div>
-                                        <div className="proyecto-linea-columna">
-                                            <span className="proyecto-label">
-                                                <FaUser className="proyecto-icon" />
+                                        <div className="proyecto-completado-columna">
+                                            <span className="proyecto-completado-label">
+                                                <FaUser className="proyecto-completado-icon" />
                                                 Encargado
                                             </span>
-                                            <span className="proyecto-valor">{proyecto.responsable}</span>
+                                            <span className="proyecto-completado-valor">{proyecto.responsable}</span>
                                         </div>
-                                        <div className="proyecto-linea-columna">
-                                            <span className="proyecto-label">
-                                                <FaChartLine className="proyecto-icon" />
+                                        <div className="proyecto-completado-columna">
+                                            <span className="proyecto-completado-label">
+                                                <FaChartLine className="proyecto-completado-icon" />
                                                 Progreso
                                             </span>
-                                            <span className="proyecto-valor" style={{ color: '#28A745', fontWeight: 'bold' }}>
-                                                {proyecto.porcentaje || 0}%
+                                            <span className="proyecto-completado-valor" style={{ color: '#15803d', fontWeight: 'bold' }}>
+                                                {porcentaje}% ✓
                                             </span>
                                         </div>
                                     </div>
 
-                                    {/* COMPONENTE DE PROGRESO - USANDO LAS MISMAS PROPS QUE EL OTRO COMPONENTE */}
-                                    <div className="proyecto-linea-progreso-container">
+                                    {/* COMPONENTE DE PROGRESO */}
+                                    <div className="proyecto-completado-progreso-container">
                                         {proyecto.total_tareas > 0 ? (
-                                            <div className="proyecto-linea-progreso">
+                                            <div className="proyecto-completado-progreso">
                                                 <ProgresoProyecto
-                                                    progresoInicial={proyecto.porcentaje}
+                                                    progresoInicial={porcentaje}
                                                     tareasTotales={proyecto.total_tareas}
                                                     tareasCompletadas={proyecto.tareas_completadas}
                                                     tipo={tipoVisualizacionGlobal}
@@ -371,7 +384,7 @@ export default function DepProCompletados() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="proyecto-sin-tareas-mini">
+                                            <div className="proyecto-completado-sin-tareas">
                                                 <FaTasks className="sin-tareas-mini-icon" />
                                                 <span>Sin tareas asignadas</span>
                                             </div>

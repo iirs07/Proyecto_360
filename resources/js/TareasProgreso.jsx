@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-// CAMBIO 1: Importamos FaBars para la hamburguesa
 import { FaBars } from "react-icons/fa"; 
 import "../css/TareasProgreso.css";
 import "../css/global.css";
@@ -8,6 +7,9 @@ import logo3 from "../imagenes/logo3.png";
 import folderIcon from "../imagenes/folder.png";
 import MenuDinamico from "../components/MenuDinamico";
 import { useAutoRefresh } from "../hooks/useAutoRefresh";
+
+// USO DE .ENV
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function TareasProgreso() {
     const { proyectoSlug } = useParams(); 
@@ -26,22 +28,36 @@ export default function TareasProgreso() {
         sessionStorage.getItem("last_descripcionProyecto") || 
         "Sin descripción"
     );
+    const [departamentoNombre, setDepartamentoNombre] = useState(localStorage.getItem("last_depNombre") || "Departamento");
 
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [tareas, setTareas] = useState([]);
-    const [loading, setLoading] = useState(true); // loader solo al inicio
+    const [loading, setLoading] = useState(true); 
     const [expandedTask, setExpandedTask] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [imagenActual, setImagenActual] = useState("");
     const [evidenciasUrls, setEvidenciasUrls] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // -------------------- GUARDAR EN sessionStorage --------------------
+    // -------------------- GUARDAR EN LocalStorage --------------------
     useEffect(() => {
-        if (proyectoSlug) sessionStorage.setItem("last_proyectoSlug", proyectoSlug);
-        if (idProyecto) sessionStorage.setItem("last_idProyecto", idProyecto);
-        if (nombreProyecto) sessionStorage.setItem("last_nombreProyecto", nombreProyecto);
-        if (descripcionProyecto) sessionStorage.setItem("last_descripcionProyecto", descripcionProyecto);
+<<<<<<< HEAD
+        if (proyectoSlug) localStorage.setItem("last_proyectoSlug", proyectoSlug);
+        if (idProyecto) localStorage.setItem("last_idProyecto", idProyecto);
+        if (nombreProyecto) localStorage.setItem("last_nombreProyecto", nombreProyecto);
+        if (descripcionProyecto) localStorage.setItem("last_descripcionProyecto", descripcionProyecto);
+=======
+        if (proyectoSlug) localStorage.setItem("last_proyectoSlug", proyectoSlug);
+        if (idProyecto) localStorage.setItem("last_idProyecto", idProyecto);
+        if (nombreProyecto) localStorage.setItem("last_nombreProyecto", nombreProyecto);
+        if (descripcionProyecto) localStorage.setItem("last_descripcionProyecto", descripcionProyecto);
+        
+        // Obtener nombre del departamento del localStorage
+        const depNombre = localStorage.getItem("last_depNombre");
+        if (depNombre) {
+            setDepartamentoNombre(depNombre);
+        }
+>>>>>>> d54328f92f975041b0a6bf09acc02b01dc04509e
     }, [proyectoSlug, idProyecto, nombreProyecto, descripcionProyecto]);
 
     // -------------------- MODAL EVIDENCIAS --------------------
@@ -82,7 +98,7 @@ export default function TareasProgreso() {
 
             // Si no hay idProyecto, buscarlo por slug
             if (!proyectoId && proyectoSlug) {
-                const resProyecto = await fetch(`http://127.0.0.1:8000/api/proyectos/slug/${proyectoSlug}`, {
+                const resProyecto = await fetch(`${API_URL}/api/proyectos/slug/${proyectoSlug}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -93,22 +109,25 @@ export default function TareasProgreso() {
                     setNombreProyecto(dataProyecto.nombre);
                     setDescripcionProyecto(dataProyecto.descripcion || "Sin descripción");
                 } else {
-                    console.error("No se encontró el proyecto por slug");
                     return;
                 }
             }
 
             if (!proyectoId) {
-                console.error("No se recibió ni se pudo obtener el id del proyecto");
                 return;
             }
 
             // Obtener tareas
-            const resTareas = await fetch(`http://127.0.0.1:8000/api/proyectos/${proyectoId}/tareas`, {
+            const resTareas = await fetch(`${API_URL}/api/proyectos/${proyectoId}/tareas`, {
                 headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
             });
 
-            if (!resTareas.ok) throw new Error(`HTTP ${resTareas.status}`);
+            if (!resTareas.ok) {
+                setTareas([]);
+                setLoading(false);
+                return;
+            }
+
             const data = await resTareas.json();
 
             // Ordenar por fecha de inicio
@@ -120,10 +139,9 @@ export default function TareasProgreso() {
 
             setTareas(data);
         } catch (err) {
-            console.error("Error al cargar tareas:", err);
             setTareas([]);
         } finally {
-            setLoading(false); // solo al inicio
+            setLoading(false);
         }
     }, [idProyecto, proyectoSlug, navigate]);
 
@@ -167,14 +185,21 @@ export default function TareasProgreso() {
                 </div>
 
                 <div className="header-global">
-                    {/* CAMBIO 2: Usamos FaBars para la hamburguesa */}
                     <div className="header-left" onClick={toggleSidebar}>
                         <FaBars className="icono-hamburguesa-global" />
                     </div>
                     <div className="barra-center">
                         <span className="titulo-barra-global">
-                            TAREAS DEL PROYECTO {nombreProyecto.toUpperCase()}
+                            TAREAS DEL PROYECTO - {departamentoNombre.toUpperCase()}
                         </span>
+                    </div>
+                </div>
+
+                {/* CONTENEDOR PARA EL NOMBRE DEL PROYECTO */}
+                <div className="proyecto-nombre-contenedor">
+                    <div className="proyecto-nombre-content">
+                        <div className="proyecto-labels">PROYECTO:</div>
+                        <div className="proyecto-nombre-texto">{nombreProyecto}</div>
                     </div>
                 </div>
 
