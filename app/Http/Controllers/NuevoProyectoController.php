@@ -349,46 +349,80 @@ public function completar($idProyecto)
 }
 public function CambiarStatusProyectoTerminado(Request $request, $id)
 {
-    // Iniciamos una transacción para asegurar que ambos cambios se guarden o ninguno
+    // Validamos que venga el array de tareas (puede venir vacío, pero debe ser array)
+    $request->validate([
+        'usuario_id' => 'required',
+        'tareas_ids' => 'array' 
+    ]);
+
     DB::beginTransaction();
 
     try {
-        $proyecto = Proyecto::find($id);
+        // 1. BUSCAR O RESTAURAR PROYECTO
+        // ------------------------------------------------------
+        $proyecto = Proyecto::on('pgsql')->find($id);
 
+        // Si no lo encuentra, intentar reabrir desde la base histórica
         if (!$proyecto) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'Proyecto no encontrado'
-            ], 404);
+            $reabrir = $this->reabrirProyecto($id);
+
+            if (!$reabrir->original['success']) {
+                return response()->json([
+                    'success' => false,
+                    'mensaje' => 'Proyecto no encontrado en ninguna base.'
+                ], 404);
+            }
+
+            // Ahora el proyecto debería existir en la BD principal
+            $proyecto = Proyecto::on('pgsql')->find($id);
         }
 
-        // 1. Cambiamos el estatus del proyecto
+        // 2. REACTIVAR EL PROYECTO
+        // ------------------------------------------------------
         $proyecto->p_estatus = "En proceso";
         $proyecto->save();
 
-        // 2. Guardamos en el historial (Bitácora)
-        // Obtenemos el ID del usuario desde la petición del Frontend
+        // 3. REACTIVAR LAS TAREAS SELECCIONADAS (NUEVO BLOQUE)
+        // ------------------------------------------------------
+        // Obtenemos la lista de IDs que envió React: [101, 102, etc]
+        $tareasIds = $request->input('tareas_ids', []); 
+        $cantidadTareasReactivadas = 0;
+
+        if (!empty($tareasIds)) {
+            // Asumiendo que tu modelo se llama Tarea (ajusta si es Task o Tareas)
+            // Actualizamos estatus solo de las que coincidan con la lista
+            $cantidadTareasReactivadas = \App\Models\Tarea::whereIn('id_tarea', $tareasIds)
+                ->update(['t_estatus' => 'En proceso']);
+        }
+
+        // 4. GUARDAR EN EL HISTORIAL
+        // ------------------------------------------------------
         $usuarioId = $request->input('usuario_id'); 
+        
+        // Personalizamos el mensaje para saber cuántas tareas se abrieron
+        $detalleMsg = 'El proyecto fue cambiado de estatus Finalizado a En Proceso.';
+        if ($cantidadTareasReactivadas > 0) {
+            $detalleMsg .= " Se reactivaron además $cantidadTareasReactivadas tareas específicas.";
+        }
 
         HistorialModificacion::create([
             'id_proyecto' => $id,
-            'id_tarea'    => null, // Es NULL porque modificamos el PROYECTO, no una tarea específica
+            'id_tarea'    => null,
             'id_usuario'  => $usuarioId,
             'accion'      => 'REAPERTURA PROYECTO',
-            'detalles'    => 'El proyecto fue cambiado de estatus Finalizado a En Proceso.'
+            'detalles'    => $detalleMsg
         ]);
 
-        // Confirmamos los cambios en la BD
         DB::commit();
 
         return response()->json([
             'success' => true,
-            'mensaje' => 'Proyecto marcado como En Proceso y movimiento registrado',
-            'proyecto' => $proyecto
+            'mensaje' => 'Proyecto reactivado exitosamente',
+            'proyecto' => $proyecto,
+            'tareas_reactivadas' => $cantidadTareasReactivadas
         ]);
 
     } catch (\Exception $e) {
-        // Si algo falla, deshacemos los cambios
         DB::rollBack();
         return response()->json([
             'success' => false, 
@@ -396,4 +430,87 @@ public function CambiarStatusProyectoTerminado(Request $request, $id)
         ], 500);
     }
 }
+
+public function reabrirProyecto($id)
+{
+    // Definimos las conexiones para que sea fácil de leer
+    $dbPrincipal = DB::connection('pgsql');
+    $dbArchivo   = DB::connection('pgsql_second');
+
+    // Iniciamos transacción para que todo pase o nada pase
+    $dbPrincipal->beginTransaction();
+    $dbArchivo->beginTransaction();
+
+    try {
+        // 1. BUSCAR: Encontrar el proyecto en el "Congelador" (Archivo)
+        $proyectoArchivado = $dbArchivo->table('proyectos')->where('id_proyecto', $id)->first();
+
+        if (!$proyectoArchivado) {
+            return response()->json(['success' => false, 'message' => 'El proyecto no está en el archivo.']);
+        }
+
+        // 2. RESTAURAR PROYECTO: Mover de Archivo -> Principal
+        // Usamos (array) para convertir el objeto y forzar que se inserte con el MISMO ID
+        $dbPrincipal->table('proyectos')->insert((array)$proyectoArchivado);
+
+        // 3. RESTAURAR RELACIONES (Tareas, Deptos, Historial ANTERIOR)
+        
+        // A) Tareas
+        $tareas = $dbArchivo->table('tareas')->where('id_proyecto', $id)->get();
+        foreach ($tareas as $t) {
+            $dbPrincipal->table('tareas')->insert((array)$t);
+        }
+
+        // B) Departamentos
+        $deptos = $dbArchivo->table('proyectos_departamentos')->where('id_proyecto', $id)->get();
+        foreach ($deptos as $d) {
+            $dbPrincipal->table('proyectos_departamentos')->insert((array)$d);
+        }
+
+        // C) Historial Viejo (Traemos el historial viejo para que no se pierda)
+        $historialViejo = $dbArchivo->table('historial_modificaciones')->where('id_proyecto', $id)->get();
+        foreach ($historialViejo as $h) {
+            $dbPrincipal->table('historial_modificaciones')->insert((array)$h);
+        }
+
+        // 4. ELIMINAR DEL ARCHIVO (Para no tener duplicados)
+        // El orden de borrado importa: Hijos primero, Padre al final
+        $dbArchivo->table('historial_modificaciones')->where('id_proyecto', $id)->delete();
+        $dbArchivo->table('tareas')->where('id_proyecto', $id)->delete();
+        $dbArchivo->table('proyectos_departamentos')->where('id_proyecto', $id)->delete();
+        $dbArchivo->table('proyectos')->where('id_proyecto', $id)->delete();
+
+        // ---------------------------------------------------------------
+        // AHORA SÍ: El proyecto ID 6 ya existe en la tabla principal.
+        // Ya podemos modificarlo y el historial NO fallará.
+        // ---------------------------------------------------------------
+
+        // 5. ACTUALIZAR ESTATUS Y CREAR NUEVO LOG
+        $proyectoRestaurado = Proyecto::find($id); // Ya lo encuentra en la BD principal
+        $proyectoRestaurado->p_estatus = 'En Proceso';
+        // $proyectoRestaurado->pf_fin = null; // Opcional: limpiar fecha fin
+        $proyectoRestaurado->save(); 
+
+        // Aquí tu sistema intentará insertar en historial_modificaciones.
+        // Como el proyecto ID 6 ya está en la tabla 'proyectos', ¡FUNCIONARÁ!
+        
+        // Si tienes una función manual para registrar historial:
+        // $this->registrarHistorial($id, 'REAPERTURA', 'Proyecto recuperado del archivo histórico.');
+
+        $dbPrincipal->commit();
+        $dbArchivo->commit();
+
+        return response()->json(['success' => true, 'message' => 'Proyecto restaurado correctamente.']);
+
+    } catch (\Exception $e) {
+        $dbPrincipal->rollBack();
+        $dbArchivo->rollBack();
+        
+        return response()->json([
+            'success' => false, 
+            'error' => 'Error al restaurar: ' . $e->getMessage()
+        ]);
+    }
+}
+
 }

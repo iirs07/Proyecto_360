@@ -47,7 +47,7 @@ class ReporteDirectorController extends Controller
         
         // CORRECCIÓN 1: Inicializar variables por defecto
         $movimientos = collect(); 
-        $vistaPDF = 'pdf.ReportesDirector'; // Vista por defecto (para tareas)
+        $vistaPDF = 'pdf.ReportesDirector'; 
 
         switch ($tipo) {
             case 'modificaciones':
@@ -171,7 +171,8 @@ class ReporteDirectorController extends Controller
             'margin_top' => 20,
             'margin_bottom' => 50,
             'margin_left' => 20,
-            'margin_right' => 20
+            'margin_right' => 20,
+             'default_font' => 'dejavusans' 
         ]);
 
         $mpdf->showImageErrors = true;

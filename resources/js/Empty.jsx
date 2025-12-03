@@ -7,7 +7,7 @@ import logo3 from "../imagenes/logo3.png";
 
 const Empty = () => {
   const navigate = useNavigate();
-  const rol = localStorage.getItem("rol");
+  const rol = sessionStorage.getItem("rol");
 
   const handleVolver = () => {
     switch (rol) {

@@ -13,7 +13,7 @@ const ROLES = [
 function GenerarInvitacion() {
 
     const navigate = useNavigate();
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
 
     const [rol, setRol] = useState('');
     const [selectedRolText, setSelectedRolText] = useState("Selecciona un rol");
@@ -75,7 +75,7 @@ function GenerarInvitacion() {
                 const res = await fetch("http://127.0.0.1:8000/api/departamentos", { headers });
 
                 if (res.status === 401) {
-                    localStorage.removeItem("jwt_token");
+                    sessionStorage.removeItem("jwt_token");
                     navigate("/Login");
                     return;
                 }
@@ -129,7 +129,7 @@ function GenerarInvitacion() {
             });
 
             if (res.status === 401) {
-                localStorage.removeItem("jwt_token");
+                sessionStorage.removeItem("jwt_token");
                 navigate("/Login");
                 return;
             }

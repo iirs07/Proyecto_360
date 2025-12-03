@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+// IMPORTANTE: Agregamos useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/formulario.css";
@@ -19,31 +20,52 @@ function TareasAsignadas() {
   const [nombreProyecto, setNombreProyecto] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [open, setOpen] = useState(false);
+  
   const refs = useRef({});
   const navigate = useNavigate();
+  const location = useLocation(); // Hook para recibir los datos
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
+  // ---------------------------------------------------------
+  // VALIDACIÓN DE ACCESO Y CONFIGURACIÓN INICIAL
+  // ---------------------------------------------------------
   useEffect(() => {
-    const token = localStorage.getItem("jwt_token");
+    // 1. Verificamos Autenticación (Token)
+    // Buscamos en ambos storages por seguridad, priorizando sessionStorage como usas
+    const token = sessionStorage.getItem("jwt_token");
+    
     if (!token) {
       navigate("/Login", { replace: true });
       return;
     }
 
-    const idProyecto = localStorage.getItem("id_proyecto");
-    const nombre = localStorage.getItem("nombre_proyecto");
+    // 2. Verificamos Origen (Datos del Proyecto)
+    // location.state trae los datos enviados por navigate desde la lista.
+    // Si entran por URL directa, location.state es null.
+    if (location.state && location.state.id_proyecto) {
+      
+      // Acceso Permitido: Cargamos los datos del estado
+      setProyectoActual({ id_proyecto: location.state.id_proyecto });
+      setNombreProyecto(location.state.nombre_proyecto || "Proyecto");
 
-    if (idProyecto) {
-      setProyectoActual({ id_proyecto: idProyecto });
-      setNombreProyecto(nombre || "Proyecto");
+    } else {
+      navigate("/ListaDeProyectos", { replace: true });
+    
     }
-  }, [navigate]);
+  }, [navigate, location]); 
+  // ---------------------------------------------------------
+
 
   const fetchTareas = async () => {
-    const token = localStorage.getItem("jwt_token");
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    if (!token || !usuario || !proyectoActual) return;
+    const token = sessionStorage.getItem("jwt_token");
+    const usuarioString = sessionStorage.getItem("usuario");
+    
+    // Si falta algo esencial, no hacemos el fetch (la redirección del otro useEffect se encargará)
+    if (!token || !usuarioString || !proyectoActual) return;
+
+    const usuario = JSON.parse(usuarioString);
 
     try {
       const res = await fetch(
@@ -52,8 +74,8 @@ function TareasAsignadas() {
       );
 
       if (res.status === 401) {
-        localStorage.removeItem("jwt_token");
-        localStorage.removeItem("usuario");
+        sessionStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("usuario");
         navigate("/Login", { replace: true });
         return;
       }
@@ -65,12 +87,14 @@ function TareasAsignadas() {
     }
   };
 
+  // Este efecto reacciona cuando "proyectoActual" se establece exitosamente en el primer useEffect
   useEffect(() => {
     if (proyectoActual) {
       setLoading(true);
       fetchTareas().finally(() => setLoading(false));
     }
   }, [proyectoActual]);
+
 
   const getUrgenciaTarea = (fechaFin) => {
     const ahora = new Date();
@@ -111,41 +135,42 @@ function TareasAsignadas() {
   };
 
   const handleUpload = async () => {
-  if (!archivoSeleccionado || !proyectoActual) return;
+    if (!archivoSeleccionado || !proyectoActual) return;
 
-  const token = localStorage.getItem("jwt_token");
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  if (!token || !usuario) return alert("Sesión expirada");
+    const token = sessionStorage.getItem("jwt_token") ;
+    const usuario = JSON.parse(sessionStorage.getItem("usuario") );
+    
+    if (!token || !usuario) return alert("Sesión expirada");
 
-  const formData = new FormData();
-  formData.append("id_proyecto", proyectoActual.id_proyecto);
-  formData.append("id_tarea", tareaActual);
-  formData.append("id_departamento", usuario.id_departamento);
-  formData.append("id_usuario", usuario.id_usuario);
-  formData.append("ruta_archivo", archivoSeleccionado.file);
+    const formData = new FormData();
+    formData.append("id_proyecto", proyectoActual.id_proyecto);
+    formData.append("id_tarea", tareaActual);
+    formData.append("id_departamento", usuario.id_departamento);
+    formData.append("id_usuario", usuario.id_usuario);
+    formData.append("ruta_archivo", archivoSeleccionado.file);
 
-  try {
-    setSubiendo(true);
-    const res = await fetch("http://127.0.0.1:8000/api/evidencias", {
-      method: "POST",
-      body: formData,
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    try {
+      setSubiendo(true);
+      const res = await fetch("http://127.0.0.1:8000/api/evidencias", {
+        method: "POST",
+        body: formData,
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    const data = await res.json().catch(() => null);
+      const data = await res.json().catch(() => null);
 
-    if (res.ok && data?.success) {
-      handleCancelar();     
-      await fetchTareas();  // vuelve a traer las tareas con evidencias_count actualizado
-    } else {
-      alert(`Error al subir el archivo: ${data?.error || data?.message || "Intente nuevamente"}`);
+      if (res.ok && data?.success) {
+        handleCancelar();    
+        await fetchTareas();  // Recarga tareas
+      } else {
+        alert(`Error al subir el archivo: ${data?.error || data?.message || "Intente nuevamente"}`);
+      }
+    } catch (error) {
+      alert("Error de conexión. Verifique su internet.");
+    } finally {
+      setSubiendo(false);
     }
-  } catch (error) {
-    alert("Error de conexión. Verifique su internet.");
-  } finally {
-    setSubiendo(false);
-  }
-};
+  };
 
 
   const tareasFiltradas = tareas.filter(tarea => {
@@ -168,13 +193,8 @@ function TareasAsignadas() {
       </div>
     );
 
-    if (!proyectoActual) return (
-      <div className="tu-empty-state">
-        <FaExclamationTriangle className="tu-empty-icon" />
-        <h3 className="tu-empty-title">Proyecto no encontrado</h3>
-        <p className="tu-empty-message">No se pudo cargar la información del proyecto.</p>
-      </div>
-    );
+    // Si no hay proyecto (está redirigiendo o falló), no mostramos nada
+    if (!proyectoActual) return null;
 
     if (tareasFiltradas.length === 0) return (
       <div className="tu-empty-state">
@@ -201,7 +221,7 @@ function TareasAsignadas() {
                     <h3 className="tu-tarea-nombre">{tarea.t_nombre}</h3>
                       {tarea.descripcion && (
                     <div className="tu-detalle-item">
-                      <span className="tu-detalle-descripcion"><strong>Descripción:</strong> {tarea.descripcion}</span>
+                      <span className="tu-detalle-descripcion"> {tarea.descripcion}</span>
                     </div>
                   )}
                     <div className="tu-tarea-badges">
@@ -224,13 +244,12 @@ function TareasAsignadas() {
                   </div>
                 </div>
                 <input 
-  type="file" 
-  ref={(el) => (refs.current[tarea.id_tarea] = { current: el })}
-  style={{ display: "none" }} 
-  onChange={handleArchivoChange} 
-  accept=".jpg,.jpeg,.png"
-/>
-
+                  type="file" 
+                  ref={(el) => (refs.current[tarea.id_tarea] = { current: el })}
+                  style={{ display: "none" }} 
+                  onChange={handleArchivoChange} 
+                  accept=".jpg,.jpeg,.png"
+                />
               </div>
             );
           })}
@@ -241,106 +260,101 @@ function TareasAsignadas() {
 
   return (
      <Layout
-        titulo="TAREAS ASIGNADAS"
-        sidebar={<MenuDinamico activeRoute="tareas-asignadas" />}
-      >
-        <div className="container my-4">
-          <div className="row justify-content-center">
-            <div className="col-12 col-lg-10 col-xl-8">
-              <div className="tu-proyecto-header-section"><h1 className="titulo-global">{nombreProyecto}</h1></div>
-<div className="tu-filtros-container">
-  <div className="tu-filtros-inner">
-    <div className="tu-filtro-left">
-      <label className="select-etiqueta-inline">Filtrar por estado:</label>
-      <div className="tu-filtro-group">
-        <SelectDinamico
-          opciones={["Todas las tareas", "Retrasadas", "Urgentes (vence hoy)", "Próximas"]}
-          valor={filtroEstado === "todas" ? "Todas las tareas" :
-                 filtroEstado === "vencidas" ? "Retrasadas" :
-                 filtroEstado === "urgentes" ? "Urgentes (vence hoy)" : "Próximas"}
-          setValor={(valor) => {
-            if (valor === "Todas las tareas") setFiltroEstado("todas");
-            else if (valor === "Retrasadas") setFiltroEstado("vencidas");
-            else if (valor === "Urgentes (vence hoy)") setFiltroEstado("urgentes");
-            else setFiltroEstado("proximas");
-          }}
-        />
-      </div>
-    </div>
+       titulo="TAREAS ASIGNADAS"
+       sidebar={<MenuDinamico activeRoute="tareas-asignadas" />}
+     >
+       <div className="container my-4">
+         <div className="row justify-content-center">
+           <div className="col-12 col-lg-10 col-xl-8">
+             <div className="tu-proyecto-header-section"><h1 className="titulo-global">{nombreProyecto}</h1></div>
+            <div className="tu-filtros-container">
+              <div className="tu-filtros-inner">
+                <div className="tu-filtro-left">
+                  <label className="select-etiqueta-inline">Filtrar por estado:</label>
+                  <div className="tu-filtro-group">
+                    <SelectDinamico
+                      opciones={["Todas las tareas", "Retrasadas", "Urgentes (vence hoy)", "Próximas"]}
+                      valor={filtroEstado === "todas" ? "Todas las tareas" :
+                             filtroEstado === "vencidas" ? "Retrasadas" :
+                             filtroEstado === "urgentes" ? "Urgentes (vence hoy)" : "Próximas"}
+                      setValor={(valor) => {
+                        if (valor === "Todas las tareas") setFiltroEstado("todas");
+                        else if (valor === "Retrasadas") setFiltroEstado("vencidas");
+                        else if (valor === "Urgentes (vence hoy)") setFiltroEstado("urgentes");
+                        else setFiltroEstado("proximas");
+                      }}
+                    />
+                  </div>
+                </div>
 
-    <div className="tu-tareas-stats">
-      <span className="tu-stat-total">Total: {tareasFiltradas.length}</span>
-    </div>
-  </div>
-</div>
+                <div className="tu-tareas-stats">
+                  <span className="tu-stat-total">Total: {tareasFiltradas.length}</span>
+                </div>
+              </div>
+            </div>
 
+             {renderContenido()}
+           </div>
+         </div>
+       </div>
 
+      {archivoSeleccionado && tareaSeleccionada && (
+        <div className="tu-modal-preview">
+          <div className="tu-modal-content-preview">
+            <div className="tu-modal-header">
+              <h2>Evidencia de: {tareaSeleccionada.t_nombre}</h2> 
 
-              {renderContenido()}
+              <button 
+                className="tu-modal-close" 
+                onClick={!subiendo ? handleCancelar : undefined}
+                disabled={subiendo}
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="tu-modal-body">
+              <img 
+                src={archivoSeleccionado.url} 
+                alt={`Evidencia de ${tareaSeleccionada.t_nombre}`} 
+              />
+            </div>
+
+            <div className="tu-modal-description">
+              {archivoSeleccionado.file.name} - Vista previa del archivo seleccionado.
+            </div>
+
+            <div className="tu-modal-footer">
+
+              <button 
+                className="tu-btn-base tu-btn-cancelar" 
+                onClick={!subiendo ? handleCancelar : undefined}
+                disabled={subiendo}
+              >
+                Cancelar
+              </button>
+
+              <button 
+                className="tu-btn-base tu-btn-subir" 
+                onClick={handleUpload} 
+                disabled={subiendo}
+              >
+                {subiendo ? (
+                  <>
+                    <span 
+                      className="spinner-border spinner-border-sm me-2" 
+                      role="status" 
+                      aria-hidden="true"
+                    ></span>
+                    Subiendo...
+                  </>
+                ) : "Subir"}
+              </button>
+
             </div>
           </div>
         </div>
-
-       {archivoSeleccionado && tareaSeleccionada && (
-  <div className="tu-modal-preview">
-    <div className="tu-modal-content-preview">
-      <div className="tu-modal-header">
-        <h2>Evidencia de: {tareaSeleccionada.t_nombre}</h2> 
-
-        {/* BOTÓN CERRAR (X) BLOQUEADO DURANTE SUBIDA */}
-        <button 
-          className="tu-modal-close" 
-          onClick={!subiendo ? handleCancelar : undefined}
-          disabled={subiendo}
-        >
-          &times;
-        </button>
-      </div>
-
-      <div className="tu-modal-body">
-        <img 
-          src={archivoSeleccionado.url} 
-          alt={`Evidencia de ${tareaSeleccionada.t_nombre}`} 
-        />
-      </div>
-
-      <div className="tu-modal-description">
-        {archivoSeleccionado.file.name} - Vista previa del archivo seleccionado.
-      </div>
-
-      <div className="tu-modal-footer">
-
-        {/* BOTÓN CANCELAR BLOQUEADO DURANTE SUBIDA */}
-        <button 
-          className="tu-btn-cancelar" 
-          onClick={!subiendo ? handleCancelar : undefined}
-          disabled={subiendo}
-        >
-          Cancelar
-        </button>
-
-        {/* BOTÓN SUBIR */}
-        <button 
-          className="tu-btn-subir" 
-          onClick={handleUpload} 
-          disabled={subiendo}
-        >
-          {subiendo ? (
-            <>
-              <span 
-                className="spinner-border spinner-border-sm me-2" 
-                role="status" 
-                aria-hidden="true"
-              ></span>
-              Subiendo...
-            </>
-          ) : "Subir"}
-        </button>
-
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
     </Layout>  
   );

@@ -140,6 +140,32 @@ CREATE TABLE evidencias (
         REFERENCES c_usuario(id_usuario)
         ON DELETE CASCADE
 );
+CREATE TABLE historial_modificaciones (
+    id_historial SERIAL PRIMARY KEY,
+    id_proyecto INT NOT NULL,
+    id_tarea INT NULL,
+    id_usuario INT NOT NULL,
+    accion VARCHAR(255) NOT NULL,
+    detalles TEXT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+
+    CONSTRAINT fk_historial_proyecto
+        FOREIGN KEY (id_proyecto)
+        REFERENCES proyectos(id_proyecto)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_historial_tarea
+        FOREIGN KEY (id_tarea)
+        REFERENCES tareas(id_tarea)
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_historial_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES c_usuario(id_usuario)
+        ON DELETE CASCADE
+);
+
 
 -- Tabla invitaciones
 CREATE TABLE invitaciones (

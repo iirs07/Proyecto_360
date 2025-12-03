@@ -5,7 +5,10 @@ const ProtectedRoute = () => {
   // 🔑 Verifica si el token existe en el almacenamiento local.
   // Esto es lo que evita que un usuario escriba la URL sin haber iniciado sesión
   // y lo que permite que el acceso funcione en otra pestaña del mismo navegador.
-  const token = localStorage.getItem("jwt_token");
+  const token = sessionStorage.getItem("jwt_token") 
+             || localStorage.getItem("jwt_token");
+
+
 
   // Si el token NO existe, redirige al usuario a la página de inicio de sesión o a la principal.
   if (!token) {

@@ -20,8 +20,8 @@ function TareasCompletadasDepartamento() {
   useEffect(() => {
   const fetchTareasCompletadas = async () => {
     try {
-      const usuario = JSON.parse(localStorage.getItem("usuario"));
-      const token = localStorage.getItem("jwt_token");
+      const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+      const token = sessionStorage.getItem("jwt_token");
 
       if (!usuario?.id_usuario) {
         setMensajeAPI("Usuario no logeado");
@@ -105,35 +105,35 @@ function TareasCompletadasDepartamento() {
         >
 
           <div className="container my-4">
-            {proyectosAgrupados.length > 0 && ( 
+           {tareas.length > 0 && (
   <div className="barra-busqueda-global-container mb-4">
-  <div className="barra-busqueda-global-wrapper">
-    <FaSearch className="barra-busqueda-global-icon" />
-    <input
-      type="text"
-      placeholder="Buscar tareas ..."
-      value={busqueda}
-      onChange={(e) => setBusqueda(e.target.value)}
-      className="barra-busqueda-global-input"
-    />
+    <div className="barra-busqueda-global-wrapper">
+      <FaSearch className="barra-busqueda-global-icon" />
+      <input
+        type="text"
+        placeholder="Buscar tareas ..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="barra-busqueda-global-input"
+      />
+      {busqueda && (
+        <button
+          className="buscador-clear-global"
+          onClick={() => setBusqueda("")}
+        >
+          <FiX />
+        </button>
+      )}
+    </div>
+
     {busqueda && (
-      <button
-        className="buscador-clear-global"
-        onClick={() => setBusqueda("")}
-      >
-        <FiX />
-      </button>
+      <div className="buscador-resultados-global">
+        {tareasFiltradas.length} resultado(s) para "{busqueda}"
+      </div>
     )}
   </div>
+)}
 
-
-  {busqueda && (
-    <div className="buscador-resultados-global">
-      {tareasFiltradas.length} resultado(s) para "{busqueda}"
-    </div>
-  )}
-</div>
-            )}
             <div className="tcj-proyectos-filtros">
               
               {/* --- CAMBIO 2: Lógica de renderizado corregida --- */}

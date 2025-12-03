@@ -22,8 +22,8 @@ function AgregarT() {
 
   useEffect(() => {
   const fetchProyectosUsuario = async () => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    const token = localStorage.getItem("jwt_token");
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    const token = sessionStorage.getItem("jwt_token");
     const idUsuario = usuario?.id_usuario;
 
     if (!idUsuario) {
@@ -200,7 +200,7 @@ const modificar = (idProyecto) => {
                   </div>
                 ))
               ) : (
-                <p>No se encontraron proyectos que coincidan con la búsqueda</p>
+                null
               )}
             </div>
           </>

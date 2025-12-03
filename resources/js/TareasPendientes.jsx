@@ -18,8 +18,8 @@ function TareasPendientes() {
   useEffect(() => {
     const fetchTareasPendientes = async () => {
       try {
-        const usuario = JSON.parse(localStorage.getItem("usuario"));
-        const token = localStorage.getItem("jwt_token");
+        const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+        const token = sessionStorage.getItem("jwt_token");
 
         if (!usuario?.id_usuario || !token) {
           setLoading(false);
@@ -38,8 +38,8 @@ function TareasPendientes() {
         );
 
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
-          localStorage.removeItem("usuario");
+          lsessionStorage.removeItem("jwt_token");
+          sessionStorage.removeItem("usuario");
           navigate("/Login", { replace: true });
           return;
         }

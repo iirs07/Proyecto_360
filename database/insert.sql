@@ -32,3 +32,14 @@ VALUES (1, 'Violeta', 'Romay', 'Hernandez', '2281234567', NOW(), NOW());
 
 INSERT INTO usuario (id_usuario_login, rol, correo, contrasena, created_at, updated_at)
 VALUES (2, 'Usuario', 'coralsofia2003@outlook.com', '$2y$12$bMpsNd977xM.R0rNKPXKdOC1RsYywq0OULNGIy1zF4u6R.4sRjy.e', NOW(), NOW());
+
+
+-- Dar permisos de lectura/escritura sobre todas las tablas
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO proyecto360_user;
+
+-- Dar permisos sobre todas las secuencias (para los SERIAL/IDs)
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO proyecto360_user;
+
+-- Opcional: para futuras tablas creadas
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO proyecto360_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO proyecto360_user;

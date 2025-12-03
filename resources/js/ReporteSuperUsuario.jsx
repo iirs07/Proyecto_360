@@ -31,7 +31,7 @@ export default function ReporteSuperUsuario() {
     const abortControllerRef = useRef(null); 
 
     const navigate = useNavigate();
-    const token = localStorage.getItem('jwt_token');
+    const token = sessionStorage.getItem('jwt_token');
 
     const listaMeses = [
         { value: "01", label: "Enero" }, { value: "02", label: "Febrero" },
@@ -49,7 +49,7 @@ export default function ReporteSuperUsuario() {
 
     // 🟢 FUNCIÓN DE LOGOUT
     const handleLogout = () => {
-        localStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("jwt_token");
         navigate("/login", { replace: true });
     };
 

@@ -109,11 +109,15 @@ function Login() {
         setLoading(false);
         return;
       }
-
+/* SESSION STORAGE*/
+      sessionStorage.setItem("jwt_token", data.token);
+      sessionStorage.setItem("rol", data.usuario.rol);
+      sessionStorage.setItem("usuario", JSON.stringify(data.usuario));
       /* Guardar datos de sesión */
       localStorage.setItem("jwt_token", data.token);
       localStorage.setItem("rol", data.usuario.rol);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+
 
       setPassword("");
 

@@ -30,16 +30,16 @@ public function ObtenerTareasCompletadasDepartamento(Request $request)
 
         $idDepartamento = $usuario->id_departamento;
 
-        // 2️⃣ Obtener todos los proyectos del departamento con tareas FINALIZADAS
+        // 2️⃣ Obtener todos los proyectos del departamento con tareas COMPLETADAS
         $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
             ->where('p_estatus', 'ILIKE', 'EN PROCESO') // puedes cambiarlo si deseas incluir también proyectos finalizados
             ->whereHas('tareas', function($q) {
-                // Solo proyectos que tengan al menos una tarea FINALIZADA
-                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'FINALIZADA'");
+                // Solo proyectos que tengan al menos una tarea COMPLETADAS
+                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'COMPLETADA'");
             })
             ->with(['tareas' => function($q) {
-                // Trae únicamente las tareas FINALIZADAS con sus evidencias
-                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'FINALIZADA'")
+                // Trae únicamente las tareas COMPLETADAS con sus evidencias
+                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'COMPLETADA'")
                   ->with('evidencias');
             }])
             ->get();
@@ -48,7 +48,7 @@ public function ObtenerTareasCompletadasDepartamento(Request $request)
         if ($proyectos->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'mensaje' => 'No se encontraron proyectos con tareas finalizadas para este departamento'
+                'mensaje' => 'No se encontraron proyectos con tareas COMPLETADASs para este departamento'
             ], 404);
         }
 

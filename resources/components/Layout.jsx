@@ -13,10 +13,12 @@ export default function Layout({ titulo, children, sidebar, ...rest }) {
     const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
     const handleLogout = () => {
+        sessionStorage.removeItem("jwt_token");
         localStorage.removeItem("jwt_token");
         localStorage.removeItem("last_depId");
         localStorage.removeItem("last_depNombre");
         localStorage.removeItem("last_depSlug");
+        sessionStorage.removeItem("user_role");
         localStorage.removeItem("user_role"); // O 'rol', según tu Login.js
         navigate("/Login", { replace: true });
     };

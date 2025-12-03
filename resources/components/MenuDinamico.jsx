@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
-  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt, FaBriefcase
 } from "react-icons/fa";
 import { 
   FiUsers
@@ -23,7 +23,8 @@ export default function MenuDinamico({
     activeRoute
 }) {
     // 🚩 CORRECCIÓN CRUCIAL: Usamos 'rol' en lugar de 'user_role' (basado en Login.js)
-    const rol = localStorage.getItem('rol') || 'Superusuario'; 
+  // SOLO PARA PRUEBAS: prioriza sessionStorage
+const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Superusuario';
 
     
     const location = useLocation();
@@ -92,15 +93,15 @@ export default function MenuDinamico({
       ],
     },
     { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
-    { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaUsers, action: onLogout }
+    { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
   ]
 },
 Usuario: {
   principal: [
     { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
-    { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaHourglassHalf },
+    { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaTasks },
     { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
-    { key: 'logout', label: "CERRAR SESIÓN", icon: FaUsers, action: onLogout },
+    { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
   ],
 },
     };

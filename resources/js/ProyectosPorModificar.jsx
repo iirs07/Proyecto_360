@@ -20,9 +20,9 @@ function ProyectosListaModificar() {
   const { volverSegunRol } = useRolNavigation();
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     const idUsuario = usuario?.id_usuario;
-    const token = localStorage.getItem("jwt_token");
+    const token = sessionStorage.getItem("jwt_token");
 
     if (!idUsuario || !token) {
       setLoading(false);
@@ -41,8 +41,8 @@ function ProyectosListaModificar() {
     )
       .then((res) => {
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
-          localStorage.removeItem("usuario");
+          sessionStorage.removeItem("jwt_token");
+          sessionStorage.removeItem("usuario");
           navigate("/Login", { replace: true });
           return { success: false, mensaje: "No autorizado" };
         }
@@ -71,7 +71,7 @@ function ProyectosListaModificar() {
   }, [navigate]);
 
   const modificar = (idProyecto) => {
-    localStorage.setItem("id_proyecto", idProyecto);
+    sessionStorage.setItem("id_proyecto", idProyecto);
     navigate("/modificarProyecto", { state: { idProyecto } });
   };
 
@@ -113,7 +113,7 @@ function ProyectosListaModificar() {
                 <FaSearch className="barra-busqueda-global-icon" />
                 <input
                   type="text"
-                  placeholder="Buscar proyectos por nombre..."
+                  placeholder="Buscar proyectos..."
                   value={busqueda}
                   onChange={(e) => setBusqueda(e.target.value)}
                   className="barra-busqueda-global-input"
@@ -124,6 +124,11 @@ function ProyectosListaModificar() {
                   </button>
                 )}
               </div>
+              {busqueda && (
+      <div className="buscador-resultados-global">
+        {proyectosFiltrados.length} resultado(s) para "{busqueda}"
+      </div>
+    )}
               {mostrarSelect && (
   <div style={{ marginTop: '10px' }}>
     <SelectDinamico
@@ -142,71 +147,81 @@ function ProyectosListaModificar() {
           </>
         )}
 
-        {/* Lista de proyectos */}
         <div className="modificar-proyectos-lista">
-          {loading ? (
-            <div className="loader-container">
-              <div className="loader-logo">
+    {loading ? (
+        // LOADER
+        <div className="loader-container">
+            <div className="loader-logo">
                 <img src={logo3} alt="Cargando" />
-              </div>
-              <div className="loader-texto">CARGANDO PROYECTOS...</div>
-              <div className="loader-spinner"></div>
             </div>
-          ) : proyectosFiltrados.length === 0 ? (
-            <EmptyState
-              titulo="MODIFICAR PROYECTOS"
-              mensaje="No hay proyectos disponibles."
-              botonTexto="Volver al Tablero"
-              onVolver={volverSegunRol}
-              icono={logo3}
-            />
-          ) : (
-            proyectosFiltrados.map((p) => {
-              const fechaFin = new Date(p.pf_fin);
-              const hoy = new Date();
-              fechaFin.setHours(0, 0, 0, 0);
-              hoy.setHours(0, 0, 0, 0);
-
-              const estaVencido = fechaFin < hoy;
-
-              return (
-                <div key={p.id_proyecto} className="modificar-proyectos-card">
-                  <h5 className="modificar-proyectos-nombre">{p.p_nombre}</h5>
-
-                   <div className="modificar-proyectos-info">
-                                         <div className="modificar-proyectos-info-item">
-                                           <FaCalendarAlt className="modificar-proyectos-info-icon" />
-                                           <span>
-                                             <strong>Fecha fin:</strong> {fechaFin.toLocaleDateString()}
-                                           </span>
-                                         </div>
-                     <div className="modificar-proyectos-info-item">
-                                            <FaTasks className="modificar-proyectos-info-icon" />
-                                            <span>
-                                              <strong>Tareas:</strong> {p.total_tareas || 0}
-                                            </span>
-                                          </div>
-                    {estaVencido && (
-                      <div className="modificar-proyectos-alerta">
-                        <FaExclamationTriangle /> <strong>¡Vencido!</strong>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="modificar-proyectos-botones">
-                    <button
-    className="modificar-proyectos-btn"
-    onClick={() => modificar(p.id_proyecto)}
-  >
-    <FaEdit style={{ marginRight: "8px" }} /> 
-    Modificar proyecto
-  </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
+            <div className="loader-texto">CARGANDO PROYECTOS...</div>
+            <div className="loader-spinner"></div>
         </div>
+    ) : !hayProyectos ? (
+        //  BACKEND NO DEVOLVIÓ NADA
+        <EmptyState
+            titulo="MODIFICAR PROYECTOS"
+            mensaje="No hay proyectos disponibles."
+            botonTexto="Volver al Tablero"
+            onVolver={volverSegunRol}
+            icono={logo3}
+        />
+    ) : proyectosFiltrados.length === 0 ? (
+        // BACKEND SÍ DEVOLVIÓ PROYECTOS
+        // PERO LA BÚSQUEDA NO ENCONTRÓ NADA
+        null
+    ) : (
+        // ✔️ MOSTRAR TARJETAS FILTRADAS
+        proyectosFiltrados.map((p) => {
+            const fechaFin = new Date(p.pf_fin);
+            const hoy = new Date();
+            fechaFin.setHours(0, 0, 0, 0);
+            hoy.setHours(0, 0, 0, 0);
+
+            const estaVencido = fechaFin < hoy;
+
+            return (
+                <div key={p.id_proyecto} className="modificar-proyectos-card">
+                    <h5 className="modificar-proyectos-nombre">{p.p_nombre}</h5>
+
+                    <div className="modificar-proyectos-info">
+                        <div className="modificar-proyectos-info-item">
+                            <FaCalendarAlt className="modificar-proyectos-info-icon" />
+                            <span>
+                                <strong>Fecha fin:</strong>{" "}
+                                {fechaFin.toLocaleDateString()}
+                            </span>
+                        </div>
+
+                        <div className="modificar-proyectos-info-item">
+                            <FaTasks className="modificar-proyectos-info-icon" />
+                            <span>
+                                <strong>Tareas:</strong> {p.total_tareas || 0}
+                            </span>
+                        </div>
+
+                        {estaVencido && (
+                            <div className="modificar-proyectos-alerta">
+                                <FaExclamationTriangle /> <strong>¡Vencido!</strong>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="modificar-proyectos-botones">
+                        <button
+                            className="modificar-proyectos-btn"
+                            onClick={() => modificar(p.id_proyecto)}
+                        >
+                            <FaEdit style={{ marginRight: "8px" }} />
+                            Modificar proyecto
+                        </button>
+                    </div>
+                </div>
+            );
+        })
+    )}
+</div>
+
       </div>
     </Layout>
   );

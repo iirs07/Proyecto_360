@@ -1,56 +1,91 @@
 import React, { useState, useEffect } from "react";
 import "../css/DesbloquearProyectos.css"; 
 import "../css/formulario.css"; 
-import { FiX, FiChevronLeft, FiChevronRight, FiArchive, FiUnlock } from "react-icons/fi";
-import { FaCheckCircle, FaSearch, FaTasks } from "react-icons/fa";
+import { FiX, FiChevronLeft, FiChevronRight, FiArchive, FiUnlock, FiCheck } from "react-icons/fi";
+import { FaTasks, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
+import ConfirmModal from "../components/ConfirmModal"; // <--- 1. IMPORTAR EL MODAL
 import { useRolNavigation } from "./utils/navigation";
 
 function DesbloquearProyectos() {
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [proyectosDesbloqueados, setProyectosDesbloqueados] = useState([]); 
+  
+  // --- ESTADO LOCAL PARA LA INTERFAZ ---
+  const [proyectosExpandidos, setProyectosExpandidos] = useState([]); 
+  const [tareasSeleccionadas, setTareasSeleccionadas] = useState({});
+
+  // --- ESTADOS PARA EL MODAL DE CONFIRMACIÓN (NUEVO) ---
+  const [modalConfirmacionOpen, setModalConfirmacionOpen] = useState(false);
+  const [idProyectoAReactivar, setIdProyectoAReactivar] = useState(null);
+
+  // --- FILTROS ---
+  const [anio, setAnio] = useState("");
+  const [mes, setMes] = useState("");
+  
   const navigate = useNavigate();
 
+  // --- MODAL EVIDENCIAS ---
   const [modalVisible, setModalVisible] = useState(false);
   const [tareaActual, setTareaActual] = useState(null);
   const [evidencias, setEvidencias] = useState([]);
   const [indiceActual, setIndiceActual] = useState(0);
   const [imagenCargando, setImagenCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState(false);
+
   const { volverSegunRol } = useRolNavigation();
 
+  const currentYear = new Date().getFullYear();
+  const startYear = 2025; 
+  const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i);
+
+  // --- LÓGICA DE PREDICCIÓN ---
+  const esProyectoArchivado = (fechaFinProyecto) => {
+    if (!fechaFinProyecto) return false;
+    const fechaFin = new Date(fechaFinProyecto);
+    const ahora = new Date();
+    const mesInicioTrimestre = Math.floor(ahora.getMonth() / 3) * 3;
+    const inicioTrimestre = new Date(ahora.getFullYear(), mesInicioTrimestre, 1);
+    return fechaFin < inicioTrimestre;
+  };
+
+  // --- CARGA INICIAL DE PROYECTOS ---
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     if (!usuario?.id_usuario) return;
 
     const obtenerProyectosCompletados = async () => {
-      const token = localStorage.getItem("jwt_token");
+      setLoading(true); 
+      const token = sessionStorage.getItem("jwt_token");
 
       try {
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-          }
-        );
+        let url = `http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`;
+        if (anio) url += `&anio=${anio}`;
+        if (mes) url += `&mes=${mes}`;
+
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+        });
 
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
+          sessionStorage.removeItem("jwt_token");
           navigate("/Login", { replace: true });
           return;
         }
 
         const data = await res.json();
         if (data.success) setProyectos(data.proyectos);
+        else setProyectos([]); 
+
       } catch (error) {
         console.error("Error al obtener proyectos:", error);
       } finally {
@@ -59,177 +94,120 @@ function DesbloquearProyectos() {
     };
 
     obtenerProyectosCompletados();
-  }, [navigate]);
+  }, [navigate, anio, mes]);
 
   const proyectosFiltrados = proyectos.filter(p =>
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const handleDesbloquearProyecto = async (idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    // 1. OBTENER EL USUARIO PARA MANDAR SU ID
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+  // --- NUEVA LÓGICA: MANEJO DE ESTADO LOCAL ---
 
-    const estaDesbloqueado = proyectosDesbloqueados.includes(idProyecto);
+  const handleExpandirProyecto = (idProyecto) => {
+    if (!proyectosExpandidos.includes(idProyecto)) {
+        setProyectosExpandidos(prev => [...prev, idProyecto]);
+        setTareasSeleccionadas(prev => ({ ...prev, [idProyecto]: [] }));
+    }
+  };
 
-    if (estaDesbloqueado) {
-        // Nota: Aquí también pasamos el usuario a la función de bloquear
-        const exitoBloqueo = await handleBloquearProyecto(idProyecto); 
-        if (exitoBloqueo) {
-            setProyectosDesbloqueados(prev => prev.filter(id => id !== idProyecto));
-        }
-        return; 
-    } 
-    
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/cambiar-status`, {
-            method: 'PUT',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            // 2. AGREGAR EL BODY CON EL ID
+  const handleCancelarReapertura = (idProyecto) => {
+    setProyectosExpandidos(prev => prev.filter(id => id !== idProyecto));
+    setTareasSeleccionadas(prev => {
+        const newState = { ...prev };
+        delete newState[idProyecto];
+        return newState;
+    });
+  };
+
+  const handleToggleTarea = (idProyecto, idTarea) => {
+    setTareasSeleccionadas(prev => {
+        const seleccionadasActuales = prev[idProyecto] || [];
+        if (seleccionadasActuales.includes(idTarea)) {
+            return { ...prev, [idProyecto]: seleccionadasActuales.filter(id => id !== idTarea) };
+        } else {
+            return { ...prev, [idProyecto]: [...seleccionadasActuales, idTarea] };
+        }
+    });
+  };
+
+  // -------------------------------------------------------------
+  // --- PASO 1: ABRIR EL MODAL  ---
+  // -------------------------------------------------------------
+  const handlePedirConfirmacion = (idProyecto) => {
+    setIdProyectoAReactivar(idProyecto);
+    setModalConfirmacionOpen(true);
+  };
+
+  // -------------------------------------------------------------
+  // --- PASO 2: EJECUTAR REACTIVACIÓN ---
+  // -------------------------------------------------------------
+  const ejecutarReactivacion = async () => {
+    if (!idProyectoAReactivar) return; // Seguridad
+
+    const token = sessionStorage.getItem("jwt_token");
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    
+    // Obtenemos las tareas usando el ID guardado en el estado
+    const tareasParaAbrir = tareasSeleccionadas[idProyectoAReactivar] || [];
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyectoAReactivar}/cambiar-status`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
             body: JSON.stringify({
-                usuario_id: usuario.id_usuario
-            })
-        });
+                usuario_id: usuario.id_usuario,
+                tareas_ids: tareasParaAbrir 
+            }) 
+        });
 
-        if (res.status === 401) {
-            localStorage.removeItem("jwt_token");
+        if (res.status === 401) {
+            sessionStorage.removeItem("jwt_token");
             navigate("/Login", { replace: true });
             return;
         }
 
         const data = await res.json();
-        if (data.success) {
-            setProyectosDesbloqueados(prev => [...prev, idProyecto]); 
-            setProyectos(prev =>
-                prev.map(p =>
-                    p.id_proyecto === idProyecto ? { ...p, p_estatus: "En proceso" } : p
-                )
-            );
-        }
-    } catch (error) {
-        console.error("Error al desbloquear proyecto:", error);
-    }
-  };
-
-  const handleBloquearProyecto = async (idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    // 1. OBTENER EL USUARIO
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    
-    if (!token) {
-        navigate("/Login", { replace: true });
-        return false;
-    }
-
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyecto}/finalizar`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                Authorization: `Bearer ${token}` 
-            },
-            // 2. AGREGAR EL BODY
-            body: JSON.stringify({
-                usuario_id: usuario.id_usuario
-            })
-        });
-
-        if (res.status === 401) {
-            localStorage.removeItem("jwt_token");
-            navigate("/Login", { replace: true });
-            return false;
-        }
-        
-        if (!res.ok) {
-            console.error("Error al archivar proyecto:", await res.json());
-            return false;
-        }
-
-        const data = await res.json();
 
         if (data.success) {
-            setProyectos(prev =>
-                prev.map(p =>
-                    p.id_proyecto === idProyecto ? { ...p, p_estatus: "Finalizado" } : p
-                )
-            );
-            return true;
+            // Actualizar UI
+            setProyectos(prev => prev.filter(p => p.id_proyecto !== idProyectoAReactivar));
+            handleCancelarReapertura(idProyectoAReactivar);
+            
+            // CERRAR MODAL Y LIMPIAR
+            setModalConfirmacionOpen(false);
+            setIdProyectoAReactivar(null);
+            
+            // Opcional: Toast de éxito
+            // alert("Proyecto reactivado correctamente."); 
         } else {
-            console.error(data.mensaje || "No se pudo archivar el proyecto");
-            return false;
+            alert("Error al reactivar: " + (data.mensaje || "Intente de nuevo"));
+            setModalConfirmacionOpen(false); // Cerramos el modal incluso si falla para que pueda reintentar
         }
+
     } catch (error) {
-        console.error("Error de red al archivar proyecto:", error);
-        return false;
+        console.error("Error en reactivación:", error);
+        alert("Error de conexión al reactivar el proyecto.");
+        setModalConfirmacionOpen(false);
     }
   };
 
-  const handleCompletarTarea = async (id, idProyecto) => {
-    const token = localStorage.getItem("jwt_token");
-    // 1. OBTENER EL USUARIO
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/tareas/${id}/cambiar-estatus-enproceso`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json', // <--- IMPORTANTE: Asegúrate que esté esta línea
-          'Accept': 'application/json',
-          "Authorization": `Bearer ${token}` 
-        },
-        // 2. AGREGAR EL BODY
-        body: JSON.stringify({
-            usuario_id: usuario.id_usuario
-        })
-      });
-      
-      if (res.status === 401) {
-        localStorage.removeItem("jwt_token");
-        navigate("/Login", { replace: true });
-        return;
-      }
-      
-      if (!res.ok) {
-        let errorMsg = `HTTP error! status: ${res.status}`;
-        try {
-          const errorData = await res.json();
-          if (errorData.mensaje) errorMsg += ` - ${errorData.mensaje}`;
-        } catch {}
-        throw new Error(errorMsg);
-      }
-
-      const data = await res.json();
-
-      if (data.success) {
-        setProyectos(prev =>
-          prev.map(proy => {
-            if (proy.id_proyecto === idProyecto) {
-              const tareasActualizadas = proy.tareas.map(t =>
-                t.id_tarea === id ? { ...t, t_estatus: "En proceso" } : t
-              );
-              return { ...proy, tareas: tareasActualizadas };
-            }
-            return proy;
-          })
-        );
-      } else {
-        console.warn("No se pudo actualizar la tarea:", data.mensaje);
-      }
-    } catch (error) {
-      console.error("Error al actualizar tarea:", error.message);
-    }
-  };
-
-  // ----- Modal de evidencias -----
-  const handleVerEvidencias = (tarea) => {
+  // --- MANEJO DE IMÁGENES ---
+  const handleVerEvidencias = (tarea, fechaFinProyecto) => {
     setTareaActual(tarea);
     setEvidencias(tarea.evidencias || []);
     setIndiceActual(0);
-    setImagenCargando(true);
+    
+    const esAntiguo = esProyectoArchivado(fechaFinProyecto);
+    if (esAntiguo) {
+        setImagenCargando(false);
+        setErrorCarga(true);
+    } else {
+        setImagenCargando(true);
+        setErrorCarga(false);
+    }
     setModalVisible(true);
   };
 
@@ -239,30 +217,39 @@ function DesbloquearProyectos() {
     setEvidencias([]);
     setIndiceActual(0);
     setImagenCargando(false);
+    setErrorCarga(false);
   };
 
   const handlePrev = () => {
     if (evidencias.length <= 1) return;
-    setImagenCargando(true);
+    if (!errorCarga) setImagenCargando(true);
     setIndiceActual(prev => (prev === 0 ? evidencias.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
     if (evidencias.length <= 1) return;
-    setImagenCargando(true);
+    if (!errorCarga) setImagenCargando(true);
     setIndiceActual(prev => (prev === evidencias.length - 1 ? 0 : prev + 1));
   };
 
-  const handleImageLoad = () => setImagenCargando(false);
-  const handleImageError = (e) => {
-    console.error("Error cargando imagen:", evidencias[indiceActual]);
+  const handleImageLoad = () => {
+      setImagenCargando(false);
+      setErrorCarga(false);
+  };
+
+  const handleImageError = () => {
     setImagenCargando(false);
-    e.target.style.display = 'none';
+    setErrorCarga(true);
   };
 
   const getStatusClass = (estatus) => {
     if (!estatus) return '';
     return estatus.toLowerCase().replace(/\s+/g, '-');
+  };
+
+  const limpiarFiltrosFecha = () => {
+    setAnio("");
+    setMes("");
   };
 
   return (
@@ -272,24 +259,74 @@ function DesbloquearProyectos() {
     >
       <div className="contenedor-global">
 
-        {proyectosFiltrados.length > 0 && (
-          <div className="barra-busqueda-global-container mb-4">
-             <p className="subtitulo-global">Gestiona y reactiva proyectos finalizados</p>
-            <div className="barra-busqueda-global-wrapper">
-              <FaSearch className="barra-busqueda-global-icon" />
-              <input
-                type="text"
-                placeholder="Buscar proyectos..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="barra-busqueda-global-input"
-              />
-              {busqueda && (
-                <button className="buscador-clear-global" onClick={() => setBusqueda("")}>
-                  <FiX />
-                </button>
+        {/* --- BARRA DE BÚSQUEDA Y FILTROS --- */}
+        {(proyectos.length > 0 || anio !== "" || mes !== "") && (
+          <div className="barra-busqueda-dp-container mb-4">
+            <p className="subtitulo-global">Gestiona y reactiva proyectos finalizados e históricos</p>
+            
+            <div className="barra-busqueda-dp-wrapper" >
+              <div className="barra-filtros-fecha" >
+                <select 
+                  value={anio}
+                  onChange={(e) => setAnio(e.target.value)}
+                  className="barra-busqueda-dp-select"
+                >
+                  <option value="">Año</option>
+                  {years.map(y => <option key={y} value={y}>{y}</option>)}
+                </select>
+
+                <select 
+                  value={mes}
+                  onChange={(e) => setMes(e.target.value)}
+                  className="barra-busqueda-dp-select mes"
+                >
+                  <option value="">Mes</option>
+                  <option value="01">Enero</option>
+                  <option value="02">Febrero</option>
+                  <option value="03">Marzo</option>
+                  <option value="04">Abril</option>
+                  <option value="05">Mayo</option>
+                  <option value="06">Junio</option>
+                  <option value="07">Julio</option>
+                  <option value="08">Agosto</option>
+                  <option value="09">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+                {(anio || mes) && (
+                 <button onClick={limpiarFiltrosFecha} className="btn-limpiar-filtros" title="Limpiar">
+                   <FiX />
+                 </button>
+               )}
+              </div>
+
+              {proyectos.length > 0 && (
+                <div className="barra-buscador-texto" >
+                    <FaSearch className="barra-busqueda-dp-icon" />
+                    <input
+                      type="text"
+                      placeholder="Buscar proyectos..."
+                      value={busqueda}
+                      onChange={(e) => setBusqueda(e.target.value)}
+                      className="barra-busqueda-dp-input"
+                    />
+                    {busqueda && (
+                      <button className="buscador-clear-dp" onClick={() => setBusqueda("")}>
+                        <FiX />
+                      </button>
+                    )}
+                </div>
               )}
             </div>
+
+            {busqueda && (
+                <div className="contenedor-resultados-centrado" >
+                    <div className="buscador-dp-resultados-info">
+                      {proyectosFiltrados.length} resultado(s) para "{busqueda}"
+                    </div>
+                </div>
+            )}
           </div>
         )}
 
@@ -302,188 +339,246 @@ function DesbloquearProyectos() {
               <div className="loader-spinner"></div>
             </div>
           ) : proyectosFiltrados.length > 0 ? (
+            
             proyectosFiltrados.map(p => {
-              const estaDesbloqueado = proyectosDesbloqueados.includes(p.id_proyecto);
+              const estaExpandido = proyectosExpandidos.includes(p.id_proyecto);
+              const tareasMarcadas = tareasSeleccionadas[p.id_proyecto] || [];
 
               return (
-                <div key={p.id_proyecto} className={`dp-card ${estaDesbloqueado ? 'dp-card-desbloqueado' : ''}`}>
-                  
-                  {/* Header del proyecto */}
+                <div key={p.id_proyecto} className={`dp-card ${estaExpandido ? 'dp-card-desbloqueado' : ''}`}>
+                
                   <div className="dp-card-header">
                     <div className="dp-proyecto-info">
                       <h3 className="dp-proyecto-nombre">{p.p_nombre}</h3>
                       <div className="dp-proyecto-meta">
-                       
                         <div className="dp-tareas-count">
                           <FaTasks className="dp-tareas-icon" />
                           {p.tareas_completadas || 0} / {p.total_tareas || 0} tareas
                         </div>
+                        <div className="dp-tareas-count">
+                            <FaCalendarAlt className="dp-tareas-icon" />
+                            {p.pf_fin && (
+                                <span>Finalizó: {new Date(p.pf_fin).toLocaleDateString()}</span>
+                            )}
+                        </div>
                       </div>
                     </div>
-                    
-                    {/* Estado del proyecto */}
                     <div className="dp-estado-container">
-                      <div className={`dp-status-badge ${estaDesbloqueado ? 'dp-status-desbloqueado' : 'dp-status-bloqueado'}`}>
-                        {estaDesbloqueado ? (
-                          <>
-                            <FiUnlock className="dp-status-icon" />
-                            <span>REABIERTO</span>
-                          </>
+                      <div className={`dp-status-badge ${estaExpandido ? 'dp-status-desbloqueado' : 'dp-status-bloqueado'}`}>
+                        {estaExpandido ? (
+                          <> <FiUnlock className="dp-status-icon" /> <span>EN REVISIÓN</span> </>
                         ) : (
-                          <>
-                            <FiArchive className="dp-status-icon" />
-                            <span>ARCHIVADO</span>
-                          </>
+                          <> <FiArchive className="dp-status-icon" /> <span>ARCHIVADO</span> </>
                         )}
                       </div>
                     </div>
                   </div>
 
-                 {/* Tareas: se muestran solo si el proyecto está desbloqueado */}
-{estaDesbloqueado && (
-  <div className="dp-tareas-section">
-    <div className="dp-tareas-header">
-      <h4 className="dp-tareas-titulo">Tareas para reabrir</h4>
-      <span className="dp-tareas-subtitulo">Marca las tareas que deseas reactivar</span>
-    </div>
-    
-    <div className="dp-tareas-lista">
-      {p.tareas.map(t => (
-        <div key={t.id_tarea} className="dp-tarea-item">
-          <div className="dp-tarea-content">
-            <div className="dp-tarea-info">
-              <span className="dp-tarea-nombre">{t.t_nombre}</span>
-            </div>
-            
-            <div className="dp-tarea-actions">
-              {t.evidencias?.length > 0 && (
-                <button className="dp-btn-evidencias" onClick={() => handleVerEvidencias(t)}>
-                  Ver Evidencias ({t.evidencias.length})
-                </button>
-              )}
-              
-              <label className="dp-checkbox-container">
-                <input
-                  type="checkbox"
-                  checked={t.t_estatus === "En proceso"}
-                  onChange={() => handleCompletarTarea(t.id_tarea, p.id_proyecto)}
-                />
-                <span className="dp-checkbox-checkmark"></span>
-                <span className="dp-checkbox-label">
-                  {t.t_estatus === "En proceso" ? "En Proceso" : "Marcar"}
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-                  
+                  {estaExpandido ? (
+                  /* --- SECCIÓN EXPANDIDA --- */
+                  <div className="dp-tareas-section">
+                    <div className="dp-tareas-header">
+                      <h4 className="dp-tareas-titulo">Tareas para reabrir</h4>
+                      <span className="dp-tareas-subtitulo">
+                        Marca las tareas que deseas reactivar. Si no marcas ninguna, solo se abrirá el proyecto.
+                      </span>
+                    </div>
+                    <div className="dp-tareas-lista">
+                      {p.tareas.map(t => (
+                        <div key={t.id_tarea} className="dp-tarea-item">
+                          <div className="dp-tarea-content">
+                            <div className="dp-tarea-info">
+                              <span className="dp-tarea-nombre">{t.t_nombre}</span>
+                            </div>
+                            <div className="dp-tarea-actions">
+                              {t.evidencias?.length > 0 && (
+                                <button className="dp-btn-evidencias" onClick={() => handleVerEvidencias(t, p.pf_fin)}>
+                                  Ver Evidencias ({t.evidencias.length})
+                                </button>
+                              )}
+                              
+                              <label className="dp-checkbox-container">
+                                <input
+                                  type="checkbox"
+                                  checked={tareasMarcadas.includes(t.id_tarea)}
+                                  onChange={() => handleToggleTarea(p.id_proyecto, t.id_tarea)}
+                                />
+                                <span className="dp-checkbox-checkmark"></span>
+                                <span className="dp-checkbox-label">
+                                  {tareasMarcadas.includes(t.id_tarea) ? "Reactivar" : "Mantener Finalizada"}
+                                </span>
+                              </label>
 
-                  {/* Botón de acción principal */}
-                  <div className="dp-accion-container">
-                    <button 
-                      className={`dp-btn-accion-principal ${estaDesbloqueado ? 'dp-btn-bloqueado' : 'dp-btn-desbloqueado'}`}
-                      onClick={() => handleDesbloquearProyecto(p.id_proyecto)}
-                    >
-                      {estaDesbloqueado ? (
-                        <>
-                          <FiArchive className="dp-btn-icon" />
-                          ARCHIVAR PROYECTO
-                        </>
-                      ) : (
-                        <>
-                          <FiUnlock className="dp-btn-icon" />
-                          REABRIR PROYECTO
-                        </>
-                      )}
-                    </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                     
-                    {estaDesbloqueado && (
-                      <p className="dp-accion-nota">
-                        Al archivar el proyecto, las tareas marcadas como "En proceso" permanecerán activas
-                      </p>
-                    )}
-                  </div>
+                    <div className="dp-accion-container" style={{ display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+                        
+                        <button 
+                            className="dp-btn-accion-secundaria"
+                            style={{ backgroundColor: '#f59e0b', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                            onClick={() => handleCancelarReapertura(p.id_proyecto)}
+                        >
+                             <FiX /> CANCELAR
+                        </button>
 
+                        <button 
+                            className="dp-btn-accion-principal dp-btn-desbloqueado"
+                            onClick={() => handlePedirConfirmacion(p.id_proyecto)}
+                        >
+                            <FiCheck className="dp-btn-icon" /> CONFIRMAR REACTIVACIÓN
+                        </button>
+                    </div>
+                    
+                  </div>
+                  ) : (
+                    /* --- ESTADO CONTRAÍDO --- */
+                    <div className="dp-accion-container">
+                        <button 
+                          className="dp-btn-accion-principal dp-btn-bloqueado"
+                          onClick={() => handleExpandirProyecto(p.id_proyecto)}
+                        >
+                           <FiUnlock className="dp-btn-icon" /> REABRIR PROYECTO
+                        </button>
+                    </div>
+                  )}
+                  
                 </div>
               );
             })
+
+          ) : busqueda !== "" ? (
+              null
+          ) : (anio !== "" || mes !== "") ? (
+              <div style={{ textAlign: 'center', marginTop: '40px', width: '100%' }}>
+                 <div className="buscador-dp-resultados-info">
+                    No se encontraron proyectos para la fecha seleccionada.
+                 </div>
+              </div>
           ) : (
-               <EmptyState
-    titulo="LISTA DE PROYECTOS"
-    mensaje="Actualmente no tienes proyectos finalizados para modificar su estatus"
-    botonTexto="Volver al Tablero"
-    onVolver={volverSegunRol} 
-    icono={logo3}
-  />         
+             <EmptyState
+                titulo="LISTA DE PROYECTOS"
+                mensaje="Actualmente no tienes proyectos finalizados."
+                botonTexto="Volver al Tablero"
+                onVolver={volverSegunRol} 
+                icono={logo3}
+             />        
           )}
         </div>
       </div>
 
-      {modalVisible && tareaActual && (
-        <div className="dp-modal">
-          <div className="dp-modal-content">
-            <button className="dp-modal-cerrar" onClick={handleCerrarModal}>
-              <FiX />
-            </button>
-            <div className="dp-modal-header">
-              <h3>{tareaActual.t_nombre}</h3>
-              <span className={`dp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-                {tareaActual.t_estatus}
-              </span>
+     {/* --- MODAL EVIDENCIAS --- */}
+{modalVisible && tareaActual && (
+  <div className="dp-modal">
+    <div className="dp-modal-content">
+      
+      <div className="dp-modal-header">
+ 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+          <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {tareaActual.t_nombre}
+          </h3>
+          <span className={`dp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
+            {tareaActual.t_estatus}
+          </span>
+        </div>
+
+        <button className="dp-modal-cerrar" onClick={handleCerrarModal}>
+          <FiX />
+        </button>
+      </div>
+
+      {/* BODY */}
+      {evidencias.length > 0 ? (
+        <div className="dp-evidencias-container">
+          <div className="dp-evidencias-navegacion">
+            
+            {/* Botón Anterior */}
+            {evidencias.length > 1 && (
+              <button className="dp-btn-navegacion dp-btn-prev" onClick={handlePrev}>
+                <FiChevronLeft size={24} />
+              </button>
+            )}
+
+            {/* Imagen */}
+            <div className="dp-imagen-container">
+              {errorCarga ? (
+                 <div className="dp-error-placeholder">
+                    <FiArchive size={40} style={{ marginBottom: '10px', opacity: 0.5 }} />
+                    <h4>Evidencia Archivada</h4>
+                 </div>
+              ) : (
+                <>
+                  {imagenCargando && <div className="dp-imagen-cargando"></div>}
+                  <img
+                    src={`http://127.0.0.1:8000/storage/${evidencias[indiceActual].ruta_archivo}`}
+                    alt="Evidencia"
+                    className="dp-imagen-evidencia"
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                    style={{ display: imagenCargando ? 'none' : 'block' }}
+                  />
+                </>
+              )}
             </div>
 
-            {evidencias.length > 0 ? (
-              <div className="dp-evidencias-container">
-                <div className="dp-evidencias-navegacion">
-                  <div className="dp-imagen-container">
-                    {imagenCargando && <div className="dp-imagen-cargando"></div>}
-                    <img
-                      src={`http://127.0.0.1:8000/storage/${evidencias[indiceActual].ruta_archivo}`}
-                      alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
-                      className="dp-imagen-evidencia"
-                      onLoad={handleImageLoad}
-                      onError={handleImageError}
-                      style={{ display: imagenCargando ? 'none' : 'block' }}
-                    />
-                  </div>
-
-                  {evidencias.length > 1 && (
-                    <>
-                      <button className="dp-btn-navegacion dp-btn-prev" onClick={handlePrev}>
-                        <FiChevronLeft size={28} />
-                      </button>
-                      <button className="dp-btn-navegacion dp-btn-next" onClick={handleNext}>
-                        <FiChevronRight size={28} />
-                      </button>
-                    </>
-                  )}
-                </div>
-
-                {evidencias.length > 1 && (
-                  <div className="dp-contador">
-                    <span>{indiceActual + 1} / {evidencias.length}</span>
-                  </div>
-                )}
-
-                <div className="dp-evidencias-info">
-                  <span className="dp-tarea-fecha">
-                    Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="dp-sin-evidencias">No hay evidencias disponibles</div>
+            {/* Botón Siguiente */}
+            {evidencias.length > 1 && (
+              <button className="dp-btn-navegacion dp-btn-next" onClick={handleNext}>
+                <FiChevronRight size={24} />
+              </button>
             )}
           </div>
+
+          {/* Footer Info */}
+          <div className="dp-evidencias-info">
+             {evidencias.length > 1 && (
+               <span style={{fontWeight:'bold', marginRight:'10px'}}>
+                 {indiceActual + 1} / {evidencias.length}
+               </span>
+             )}
+             <span className="dp-tarea-fecha">Subido: {evidencias[indiceActual]?.created_at}</span>
+          </div>
+
         </div>
+      ) : (
+        <div className="dp-sin-evidencias">No hay evidencias disponibles</div>
       )}
+    </div>
+  </div>
+)}
+
+      
+      <ConfirmModal
+        isOpen={modalConfirmacionOpen}
+        title="Confirmar Reactivación"
+        message={(() => {
+            if (!idProyectoAReactivar) return "";
+            
+            const proyecto = proyectos.find(p => p.id_proyecto === idProyectoAReactivar);
+            const nombre = proyecto ? proyecto.p_nombre : "el proyecto";
+            
+            const tareasMarcadas = tareasSeleccionadas[idProyectoAReactivar] || [];
+            const numTareas = tareasMarcadas.length;
+
+            if (numTareas > 0) {
+            return `¿Estás seguro que deseas reactivar el proyecto "${nombre}" y ${numTareas} tarea(s) seleccionada(s)? Pasarán a estado 'En Proceso'.`;
+            } else {
+            return `¿Estás seguro que deseas reactivar el proyecto "${nombre}"? Solo el proyecto pasará a 'En Proceso', las tareas se mantendrán finalizadas.`;
+            }
+        })()}
+        onConfirm={ejecutarReactivacion}
+        onCancel={() => {
+            setModalConfirmacionOpen(false);
+            setIdProyectoAReactivar(null);
+        }}
+      />
+
     </Layout>
   );
 }
 
 export default DesbloquearProyectos;
-

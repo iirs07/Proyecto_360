@@ -4,7 +4,7 @@ export const useRolNavigation = () => {
   const navigate = useNavigate();
 
   const volverSegunRol = () => {
-    const rol = localStorage.getItem("rol");
+    const rol = sessionStorage.getItem("rol");
     switch (rol) {
       case "Jefe":
         navigate("/GestionProyectos");
