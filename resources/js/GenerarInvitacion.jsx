@@ -123,7 +123,7 @@ function GenerarInvitacion() {
                 body: JSON.stringify({
                     rol,
                     id_departamento: idDepartamento,
-                    creado_por: 1, 
+                    creado_por: 6, 
                     max_usos: cantidad
                 })
             });
