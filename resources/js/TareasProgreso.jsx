@@ -200,7 +200,7 @@ export default function TareasProgreso() {
                     </div>
                 </div>
 
-                <div className="proyecto-descripcion-contenedor">
+                <div className="proyecto-descripcions-contenedor">
                     <strong>Descripción del proyecto:</strong>
                     <p>{descripcionProyecto}</p>
                 </div>

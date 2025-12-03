@@ -520,7 +520,7 @@
   align-items: flex-start;
 }
 
-.badge-estado-proceso {
+.badgeS-estado-proceso {
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 0.75rem;
@@ -540,7 +540,7 @@
 }
 
 /* Efecto de brillo al hover */
-.badge-estado-proceso::before {
+.badgeS-estado-proceso::before {
   content: '';
   position: absolute;
   top: 0;
@@ -556,25 +556,25 @@
   transition: left 0.6s ease;
 }
 
-.badge-estado-proceso:hover::before {
+.badgeS-estado-proceso:hover::before {
   left: 100%;
 }
 
-.badge-estado-proceso:hover {
+.badgeS-estado-proceso:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 
     0 4px 16px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.badge-estado-proceso:active {
+.badgeS-estado-proceso:active {
   transform: translateY(0) scale(1);
   transition: all 0.1s ease;
 }
 
 /* Badge específico para En Proceso */
-.badge-estado-proceso[data-estado="En proceso"] {
-  background: linear-gradient(
+.badgeS-estado-proceso[data-estado="EN PROCESO"] {
+    background: linear-gradient(
     135deg, 
     rgba(134, 21, 66, 0.15) 0%, 
     rgba(154, 28, 74, 0.08) 100%
@@ -849,7 +849,7 @@
     font-size: 1rem;
   }
   
-  .badge-estado-proceso {
+  .badgeS-estado-proceso {
     padding: 4px 10px;
     font-size: 0.65rem;
   }

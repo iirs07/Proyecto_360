@@ -26,7 +26,7 @@ export default function PrincipalSuperusuario() {
 
   useEffect(() => {
     if (!token) {
-      navigate("/Login", { replace: true });
+      navigate("/", { replace: true });
       return;
     }
 

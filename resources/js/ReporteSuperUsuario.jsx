@@ -33,11 +33,14 @@ export default function ReporteSuperUsuario() {
     const navigate = useNavigate();
     const token = sessionStorage.getItem('jwt_token');
 
+    // 🟢 VARIABLE DE ENTORNO PARA LA URL BASE DE LA API
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const listaMeses = [
         { value: "01", label: "Enero" }, { value: "02", label: "Febrero" },
         { value: "03", label: "Marzo" }, { value: "04", label: "Abril" },
         { value: "05", label: "Mayo" }, { value: "06", label: "Junio" },
-        { value: "07", label: "Julio" }, { value: "08", label: "Agosto" },
+        { value: "07", label: "Julio" }, { value: "08", label: "Agusto" },
         { value: "09", label: "Septiembre" }, { value: "10", label: "Octubre" },
         { value: "11", label: "Noviembre" }, { value: "12", label: "Diciembre" },
     ];
@@ -63,8 +66,8 @@ export default function ReporteSuperUsuario() {
 
         const fetchAreas = async () => {
             try {
-                // Autenticación con Bearer Token
-                const response = await fetch("http://127.0.0.1:8000/api/departamentos", {
+                // Autenticación con Bearer Token - USANDO VARIABLE DE ENTORNO
+                const response = await fetch(`${API_URL}/api/departamentos`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -99,7 +102,7 @@ export default function ReporteSuperUsuario() {
         };
 
         fetchAreas();
-    }, [token, navigate]);
+    }, [token, navigate, API_URL]);
     // === FIN CARGA DE DATOS ===
 
 
@@ -217,7 +220,7 @@ export default function ReporteSuperUsuario() {
         }
         // --- Fin validación ---
 
-        const API_URL = `http://127.0.0.1:8000/api/reporte${urlFiltros}`;
+        const REPORTE_URL = `${API_URL}/api/reporte${urlFiltros}`;
 
         try {
             setIsGenerating(true); 
@@ -229,7 +232,7 @@ export default function ReporteSuperUsuario() {
             const signal = controller.signal;
 
             // 🟢 LLAMADA FETCH
-            const response = await fetch(API_URL, {
+            const response = await fetch(REPORTE_URL, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
@@ -436,14 +439,14 @@ export default function ReporteSuperUsuario() {
                         <div className="form-section tipo-proyecto-section">
                             <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
                            <select 
-    value={tipoProyecto} 
-    onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}}
-    className="input-estado"
->
-    <option value="Finalizados">Finalizados</option>
-    <option value="En proceso">En proceso</option>
-    <option value="Ambos">Ambos</option>
-</select>
+                                value={tipoProyecto} 
+                                onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}}
+                                className="input-estado"
+                            >
+                                <option value="Finalizados">Finalizados</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Ambos">Ambos</option>
+                            </select>
 
                         </div>
                     </div>

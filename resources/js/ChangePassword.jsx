@@ -21,6 +21,9 @@ export default function ChangePassword() {
   const navigate = useNavigate();
   const domains = ['gmail.com', 'outlook.com', 'hotmail.com', 'minatitlan.gob.mx'];
 
+  // 🟢 VARIABLE DE ENTORNO PARA LA URL BASE DE LA API
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // 1. Crear referencias
   const userInputRef = useRef(null);
   const codigoRef = useRef(null);
@@ -53,7 +56,8 @@ export default function ChangePassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/password-reset/send-token', {
+      // 🟢 USANDO VARIABLE DE ENTORNO
+      const res = await fetch(`${API_URL}/api/password-reset/send-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: fullEmail }),
@@ -87,7 +91,8 @@ export default function ChangePassword() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/password-reset', {
+      // 🟢 USANDO VARIABLE DE ENTORNO
+      const res = await fetch(`${API_URL}/api/password-reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: fullEmail, token: codigo, password }),
