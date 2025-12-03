@@ -154,7 +154,7 @@ export default function DepProProceso() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             const proyectosEnProceso = data.filter(
-                p => p.p_estatus === "En proceso" && 
+                p => p.p_estatus === "EN PROCESO" && 
                     (p.total_tareas === 0 || p.tareas_completadas < p.total_tareas)
             );
             setProyectos(proyectosEnProceso);
@@ -316,7 +316,7 @@ export default function DepProProceso() {
                                     key={proyecto.id_proyecto} 
                                     className={`proyecto-proceso-item ${progressClass}`}
                                     data-progreso={porcentaje}
-                                    data-estado="en-proceso"
+                                    data-estado="EN PROCESO"
                                     style={{ 
                                         zIndex: 10 + index,
                                         animationDelay: `${index * 0.1}s` 
@@ -334,18 +334,17 @@ export default function DepProProceso() {
                                         })
                                     }
                                 >
-                                    {/* HEADER DEL PROYECTO */}
-                                    <div className="proyecto-proceso-header">
-                                        <div className="proyecto-proceso-nombre">
-                                            <span className="proyecto-proceso-valor">{proyecto.p_nombre}</span>
-                                        </div>
-                                        <div className="proyecto-proceso-badges">
-                                            <span className="badge-estado-proceso" data-estado={proyecto.p_estatus}>
-                                                {proyecto.p_estatus}
-                                            </span>
-                                        </div>
+                                {/* HEADER DEL PROYECTO */}
+                                <div className="proyecto-proceso-header">
+                                    <div className="proyecto-proceso-nombre">
+                                        <span className="proyecto-proceso-valor">{proyecto.p_nombre}</span>
                                     </div>
-
+                                    <div className="proyecto-proceso-badges">
+                                        <span className="badgeS-estado-proceso" data-estado="EN PROCESO">
+                                            {proyecto.p_estatus}
+                                        </span>
+                                    </div>
+                                </div>
                                     {/* INFORMACIÓN DEL PROYECTO */}
                                     <div className="proyecto-proceso-columnas">
                                         <div className="proyecto-proceso-columna">
