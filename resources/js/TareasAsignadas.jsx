@@ -192,8 +192,6 @@ function TareasAsignadas() {
         <div className="loader-spinner"></div>
       </div>
     );
-
-    // Si no hay proyecto (está redirigiendo o falló), no mostramos nada
     if (!proyectoActual) return null;
 
     if (tareasFiltradas.length === 0) return (
@@ -266,7 +264,7 @@ function TareasAsignadas() {
        <div className="container my-4">
          <div className="row justify-content-center">
            <div className="col-12 col-lg-10 col-xl-8">
-             <div className="tu-proyecto-header-section"><h1 className="titulo-global">{nombreProyecto}</h1></div>
+             <div className="tu-proyecto-header-section"><h1 className="tu-nombre-proyecto">{nombreProyecto}</h1></div>
             <div className="tu-filtros-container">
               <div className="tu-filtros-inner">
                 <div className="tu-filtro-left">

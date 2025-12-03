@@ -15,13 +15,13 @@ function VerTareasPendientes() {
   const [tareaCompletada, setTareaCompletada] = useState(false);
 
   const [proyecto, setProyecto] = useState(null);
-  const [tareaActual, setTareaActual] = useState(null); // Para el modal de evidencias
+  const [tareaActual, setTareaActual] = useState(null); 
   const [evidencias, setEvidencias] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false); // Para el modal de evidencias
+  const [modalVisible, setModalVisible] = useState(false); 
   
   // 2. Estados para el Modal de Confirmación
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [tareaAFinalizar, setTareaAFinalizar] = useState(null); // Tarea seleccionada para borrar/finalizar
+  const [tareaAFinalizar, setTareaAFinalizar] = useState(null); 
 
   const [indiceActual, setIndiceActual] = useState(0);
   const [busqueda, setBusqueda] = useState("");
@@ -253,7 +253,7 @@ function VerTareasPendientes() {
                       <input
                         type="checkbox"
                         id={`check-${t.id_tarea}`}
-                        // 5. CAMBIO: En lugar de llamar directo a completar, abrimos modal
+                        
                         onChange={() => abrirModalConfirmacion(t)}
                         checked={false} // Mantener desmarcado visualmente hasta que se confirme y desaparezca de la lista
                         disabled={cargando}

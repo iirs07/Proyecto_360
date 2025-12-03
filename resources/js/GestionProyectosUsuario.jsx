@@ -196,9 +196,17 @@ function GestionProyectosUsuario() {
         {/* === MÉTRICAS SUPERIORES === */}
         <div className="tdu-metrica-grid">
           <MetricCard
+            icon={<FaLayerGroup size={24} />}
+            number={conteos.total}
+            label="Total de tareas"
+            subtext="Todas las actividades"
+            color="#fff"
+            className="tdu-metrica-total"
+          />
+          <MetricCard
             icon={<FaCheckCircle size={24} />}
             number={conteos.completadas}
-            label="Tareas Completadas"
+            label="Tareas finalizadas"
             subtext={`${porcentajeCompletitud}% del total`}
             color="#fff"
             className="tdu-metrica-completadas"
@@ -206,7 +214,7 @@ function GestionProyectosUsuario() {
           <MetricCard
             icon={<FaHourglassHalf size={24} />}
             number={conteos.pendientes}
-            label="Pendientes"
+            label="Tareas pendientes"
             subtext="Por iniciar"
             color="#fff"
             className="tdu-metrica-pendientes"
@@ -214,18 +222,10 @@ function GestionProyectosUsuario() {
           <MetricCard
             icon={<FaTasks size={24} />}
             number={conteos.en_progreso}
-            label="En Progreso"
+            label="Tareas en proceso"
             subtext="En ejecución"
             color="#fff"
             className="tdu-metrica-en-progreso"
-          />
-          <MetricCard
-            icon={<FaLayerGroup size={24} />}
-            number={conteos.total}
-            label="Total de Tareas"
-            subtext="Todas las actividades"
-            color="#fff"
-            className="tdu-metrica-total"
           />
         </div>
 
@@ -326,7 +326,7 @@ function GestionProyectosUsuario() {
                 const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
                 const esVencido = diasRestantes < 0 && progreso < 100;
 
-                // 2. Determinar la clase adicional para la etiqueta de tiempo (REEMPLAZO DEL STYLE)
+                // 2. Determinar la clase adicional para la etiqueta de tiempo
                 let estadoTiempoClass = "";
                 if (progreso === 100) {
                     estadoTiempoClass = "finalizado";
@@ -351,8 +351,8 @@ function GestionProyectosUsuario() {
                       
                       <div className="tdu-proyecto-meta">
                         <span className="tdu-total-tareas">
-    {proyecto.total_tareas} {proyecto.total_tareas === 1 ? 'tarea' : 'tareas'}
-</span>
+                        {proyecto.total_tareas} {proyecto.total_tareas === 1 ? 'tarea' : 'tareas'}
+                        </span>
                         {esVencido && (
                           <div className="tdu-prioridad-badge">
                             <FaExclamationTriangle size={10} style={{ marginRight: '4px' }} />
@@ -426,14 +426,17 @@ function GestionProyectosUsuario() {
                       )}
                     </div>
 
+                   
                     <div className="tdu-proyecto-footer">
-                      <button
-                        className="tdu-btn-primary"
-                        onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
-                      >
-                        <FaTasks className="tdu-btn-icon" />
-                        Ver Tareas
-                      </button>
+                      {progreso < 100 && (
+                        <button
+                          className="tdu-btn-primary"
+                          onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
+                        >
+                          <FaTasks className="tdu-btn-icon" />
+                          Ver Tareas
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

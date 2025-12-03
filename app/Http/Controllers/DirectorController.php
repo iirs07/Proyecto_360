@@ -32,7 +32,7 @@ public function ObtenerTareasCompletadasDepartamento(Request $request)
 
         // 2️⃣ Obtener todos los proyectos del departamento con tareas COMPLETADAS
         $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
-            ->where('p_estatus', 'ILIKE', 'EN PROCESO') // puedes cambiarlo si deseas incluir también proyectos finalizados
+            ->where('p_estatus', 'En proceso')
             ->whereHas('tareas', function($q) {
                 // Solo proyectos que tengan al menos una tarea COMPLETADAS
                 $q->whereRaw("UPPER(TRIM(t_estatus)) = 'COMPLETADA'");
@@ -140,8 +140,8 @@ public function tareasPendientesUsuario(Request $request)
                 DB::raw('COUNT(t.id_tarea) as total_tareas')
             )
             ->where('p.id_departamento', $idDepartamento)
-            ->where('p.p_estatus', 'EN PROCESO')
-            ->whereRaw("UPPER(TRIM(t.t_estatus)) = ?", ['PENDIENTE'])
+            ->where('p.p_estatus', 'En proceso')
+            ->where('t.t_estatus', 'Pendiente')
             ->groupBy('p.id_proyecto')
             ->get();
 
@@ -149,7 +149,7 @@ public function tareasPendientesUsuario(Request $request)
         foreach ($proyectos as $proyecto) {
             $tareas = DB::table('tareas')
                 ->where('id_proyecto', $proyecto->id_proyecto)
-                ->whereRaw("UPPER(TRIM(t_estatus)) = ?", ['PENDIENTE'])
+                ->where('t_estatus', 'Pendiente')
                 ->get();
 
             $proyectosConTareas[] = [
