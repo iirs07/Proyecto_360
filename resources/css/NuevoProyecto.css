@@ -71,4 +71,28 @@
 }
 
 
+/* --- Sobrescribir estilos de deshabilitado (evitar el gris feo) --- */
 
+/* Para los TextAreas (Nombre y Descripción) */
+.nv-form-input:disabled {
+    background-color: #ffffff !important; /* Fondo blanco */
+    color: #212529 !important;            /* Texto negro/oscuro legible */
+    opacity: 1 !important;                /* Quitar la transparencia por defecto */
+    border-color: #dee2e6 !important;     /* Mantener el borde sutil */
+    cursor: default;                      /* Cursor normal, no de "prohibido" */
+    box-shadow: none;                     /* Quitar sombras si las hubiera */
+}
+
+/* Para los Botones de Fecha (Datepicker) */
+.nv-btn-calendario:disabled {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    opacity: 1 !important;
+    border: 1px solid #dee2e6 !important; /* Asegurar que tenga borde si se pierde */
+    cursor: default;
+}
+
+/* Opcional: Si quieres que el icono del calendario se vea un poco más apagado */
+.nv-btn-calendario:disabled svg {
+    color: #6c757d; 
+}

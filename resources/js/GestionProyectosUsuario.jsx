@@ -34,8 +34,8 @@ const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   
   const gradient = `
     conic-gradient(
-      #28a745 0% ${pctCompletadas}%,
-      #ffc107 ${pctCompletadas}% ${pctCompletadas + pctEnProceso}%,
+      #27ae60 0% ${pctCompletadas}%,
+      #f39c12 ${pctCompletadas}% ${pctCompletadas + pctEnProceso}%,
       #dc3545 ${pctCompletadas + pctEnProceso}% 100%
     )
   `;
@@ -53,11 +53,9 @@ const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
 };
 
 // === Componente de tarjeta de métricas ===
-const MetricCard = ({ icon, number, label, subtext, color, className }) => (
+const MetricCard = ({ icon, number, label, subtext, className }) => (
   <div className={`tdu-metrica-card ${className}`}>
-    <div className="tdu-metrica-icono" style={{ color }}>
-      {icon}
-    </div>
+    <div className="tdu-metrica-icono">{icon}</div>
     <div className="tdu-metrica-content">
       <div className="tdu-metrica-numero">{number}</div>
       <div className="tdu-metrica-label">{label}</div>
@@ -107,6 +105,7 @@ function GestionProyectosUsuario() {
         setLoading(true);
         const token = sessionStorage.getItem("jwt_token");
 
+        // Ajusta la URL de tu API según corresponda
         const res = await fetch(
           `http://127.0.0.1:8000/api/usuario/tareas?usuario=${userData.id_usuario}`,
           {
@@ -154,9 +153,12 @@ function GestionProyectosUsuario() {
 
   // === Navegar a la vista de tareas ===
   const irATareas = (idProyecto, nombreProyecto) => {
-    sessionStorage.setItem("id_proyecto", idProyecto);
-    sessionStorage.setItem("nombre_proyecto", nombreProyecto);
-    navigate("/tareasusuario");
+    navigate("/TareasAsignadas", { 
+      state: { 
+        id_proyecto: idProyecto, 
+        nombre_proyecto: nombreProyecto 
+      } 
+    });
   };
 
   if (loading) {
@@ -175,7 +177,6 @@ function GestionProyectosUsuario() {
       sidebar={<MenuDinamico activeRoute="gestion-proyectosusuario" />}
     >
       <div className="tdu-contenido">
-        
         {/* === HEADER BIENVENIDA === */}
         <div className="tdu-seccion-bienvenida">
           <div className="tdu-bienvenida-content">
@@ -200,7 +201,6 @@ function GestionProyectosUsuario() {
             number={conteos.total}
             label="Total de tareas"
             subtext="Todas las actividades"
-            color="#fff"
             className="tdu-metrica-total"
           />
           <MetricCard
@@ -208,7 +208,6 @@ function GestionProyectosUsuario() {
             number={conteos.completadas}
             label="Tareas finalizadas"
             subtext={`${porcentajeCompletitud}% del total`}
-            color="#fff"
             className="tdu-metrica-completadas"
           />
           <MetricCard
@@ -216,7 +215,6 @@ function GestionProyectosUsuario() {
             number={conteos.pendientes}
             label="Tareas pendientes"
             subtext="Por iniciar"
-            color="#fff"
             className="tdu-metrica-pendientes"
           />
           <MetricCard
@@ -224,7 +222,6 @@ function GestionProyectosUsuario() {
             number={conteos.en_progreso}
             label="Tareas en proceso"
             subtext="En ejecución"
-            color="#fff"
             className="tdu-metrica-en-progreso"
           />
         </div>
@@ -313,57 +310,62 @@ function GestionProyectosUsuario() {
           ) : (
             <div className="tdu-proyecto-grid">
               {filteredProyectos.map((proyecto) => {
-                
-                // 1. Cálculos de progreso y fechas
                 const progreso = proyecto.total_tareas > 0
                   ? Math.round((proyecto.tareas_completadas / proyecto.total_tareas) * 100)
                   : 0;
                 
-                let statusClass = "pendiente";
-                if (progreso === 100) statusClass = "completado";
-                else if (progreso >= 50) statusClass = "progreso";
-
+                const estatusGlobal = proyecto.p_estatus || "En proceso";
+                
+                // --- LÓGICA DE ESTADOS Y COLORES ---
+                const esProyectoFinalizado = estatusGlobal === "Finalizado";
                 const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
-                const esVencido = diasRestantes < 0 && progreso < 100;
+                const esVencido = !esProyectoFinalizado && diasRestantes < 0;
 
-                // 2. Determinar la clase adicional para la etiqueta de tiempo
-                let estadoTiempoClass = "";
-                if (progreso === 100) {
-                    estadoTiempoClass = "finalizado";
-                } else if (diasRestantes < 0) {
-                    estadoTiempoClass = "vencido";
+                // 1. Color del borde de la tarjeta (semáforo lateral)
+                let statusClass = "pendiente"; // Por defecto (si no hay tareas)
+                if (esProyectoFinalizado) statusClass = "completado";
+                else if (esVencido) statusClass = "vencido";
+                else if (progreso > 0) statusClass = "progreso";
+
+                // 2. Color del texto de tiempo restante
+                let estadoTiempoClass = esProyectoFinalizado ? "finalizado" : esVencido ? "vencido" : "";
+
+                // 3. Lógica SIMPLIFICADA para el Badge (Solo dos estatus principales)
+                // Si es "Finalizado" -> Verde. Cualquier otra cosa -> Naranja (En Proceso)
+                let claseBadge = "en-proceso"; 
+                if (esProyectoFinalizado) {
+                  claseBadge = "finalizado";
+                } else {
+                  // Asumimos "En proceso" para todo lo demás si solo manejas 2
+                  claseBadge = "en-proceso";
                 }
 
                 return (
-                  <div
-                    key={proyecto.id_proyecto}
-                    className={`tdu-proyecto-card-encabezado ${statusClass}`}
-                  >
+                  <div key={proyecto.id_proyecto} className={`tdu-proyecto-card-encabezado ${statusClass}`}>
                     <div className="tdu-project-header">
                       <div className="tdu-proyecto-titulo-seccion">
-                        <h3 className="tdu-proyecto-titulo">{proyecto.p_nombre}</h3>
+                        
+                        {/* CONTENEDOR TÍTULO + BADGE */}
+                        <div className="tdu-proyecto-titulo-badge">
+                          <h3 className="tdu-proyecto-titulo">{proyecto.p_nombre}</h3>
+                          
+                          {/* BADGE CON CLASE DINÁMICA */}
+                          <span className={`tdu-proyecto-badge ${claseBadge}`}>
+                            {estatusGlobal}
+                          </span>
+                        </div>
+
                         {proyecto.descripcion_proyecto && (
-                          <p className="tdu-proyecto-descripcion">
-                            {proyecto.descripcion_proyecto}
-                          </p>
+                          <p className="tdu-proyecto-descripcion">{proyecto.descripcion_proyecto}</p>
                         )}
                       </div>
-                      
                       <div className="tdu-proyecto-meta">
                         <span className="tdu-total-tareas">
-                        {proyecto.total_tareas} {proyecto.total_tareas === 1 ? 'tarea' : 'tareas'}
+                          {proyecto.total_tareas} {proyecto.total_tareas === 1 ? 'tarea asignada' : 'tareas asignadas'}
                         </span>
-                        {esVencido && (
-                          <div className="tdu-prioridad-badge">
-                            <FaExclamationTriangle size={10} style={{ marginRight: '4px' }} />
-                            VENCIDO
-                          </div>
-                        )}
-                        {!esVencido && diasRestantes !== null && diasRestantes >= 0 && diasRestantes < 7 && (
-                          <div className="tdu-prioridad-badge alta">
-                            <FaExclamationTriangle size={10} style={{ marginRight: '4px' }} />
-                            URGENTE
-                          </div>
+                        {esVencido && <div className="tdu-prioridad-badge"><FaExclamationTriangle size={10} />VENCIDO</div>}
+                        {!esVencido && !esProyectoFinalizado && diasRestantes !== null && diasRestantes >= 0 && diasRestantes < 7 && (
+                          <div className="tdu-prioridad-badge alta"><FaExclamationTriangle size={10} />URGENTE</div>
                         )}
                       </div>
                     </div>
@@ -377,48 +379,26 @@ function GestionProyectosUsuario() {
                           total={proyecto.total_tareas}
                         />
                       </div>
-
                       <div className="tdu-detalles-metricas">
-                        <div className="tdu-metrica-item">
-                          <div className="tdu-metrica-dot tdu-completada"></div>
-                          <span>Completadas</span>
-                          <strong>{proyecto.tareas_completadas}</strong>
-                        </div>
-                        <div className="tdu-metrica-item">
-                          <div className="tdu-metrica-dot tdu-progreso"></div>
-                          <span>En Progreso</span>
-                          <strong>{proyecto.tareas_en_progreso}</strong>
-                        </div>
-                        <div className="tdu-metrica-item">
-                          <div className="tdu-metrica-dot tdu-pendiente"></div>
-                          <span>Pendientes</span>
-                          <strong>{proyecto.tareas_pendientes}</strong>
-                        </div>
+                        <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-completada"></div><span>Completadas</span><strong>{proyecto.tareas_completadas}</strong></div>
+                        <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-progreso"></div><span>En Progreso</span><strong>{proyecto.tareas_en_progreso}</strong></div>
+                        <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-pendiente"></div><span>Pendientes</span><strong>{proyecto.tareas_pendientes}</strong></div>
                       </div>
                     </div>
 
                     <div className="tdu-proyecto-info">
                       <div className="tdu-dias">
-                        <div className="tdu-dias-item">
-                          <FaCalendarAlt size={12} />
-                          <span>Inicio:</span>
-                          <strong>{proyecto.pf_inicio || "—"}</strong>
-                        </div>
-                        <div className="tdu-dias-item">
-                          <FaCalendarAlt size={12} />
-                          <span>Fin:</span>
-                          <strong>{proyecto.pf_fin || "—"}</strong>
-                        </div>
+                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><span>Inicio:</span><strong>{proyecto.pf_inicio || "—"}</strong></div>
+                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><span>Fin:</span><strong>{proyecto.pf_fin || "—"}</strong></div>
                       </div>
-
                       {diasRestantes !== null && (
                         <div className="tdu-tiempo-restante">
-               
                           <span className={`tdu-tiempo-label ${estadoTiempoClass}`}>
                             {(() => {
-                              if (progreso === 100) return "Proyecto Finalizado";
+                              if (esProyectoFinalizado) return "Proyecto Cerrado";
                               if (diasRestantes < 0) return `Venció hace ${Math.abs(diasRestantes)} días`;
                               if (diasRestantes === 0) return "Último día (Hoy)";
+                              if (progreso === 100) return "Proyecto Activo";
                               return `${diasRestantes} días restantes`;
                             })()}
                           </span>
@@ -426,18 +406,18 @@ function GestionProyectosUsuario() {
                       )}
                     </div>
 
-                   
                     <div className="tdu-proyecto-footer">
-                      {progreso < 100 && (
-                        <button
-                          className="tdu-btn-primary"
-                          onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
-                        >
-                          <FaTasks className="tdu-btn-icon" />
-                          Ver Tareas
-                        </button>
-                      )}
-                    </div>
+  {(proyecto.tareas_completadas < proyecto.total_tareas) && (
+    <button
+      className="tdu-btn-primary"
+      onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
+    >
+      <FaTasks className="tdu-btn-icon" />
+      Ver Mis Tareas
+    </button>
+  )}
+</div>
+
                   </div>
                 );
               })}
@@ -450,5 +430,3 @@ function GestionProyectosUsuario() {
 }
 
 export default GestionProyectosUsuario;
-
-

@@ -140,9 +140,9 @@
 }
 
 /* Gradientes para tarjetas de métricas */
-.tdu-metrica-completadas { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+.tdu-metrica-completadas { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); } /* Verde ajustado */
 .tdu-metrica-pendientes { background: linear-gradient(135deg, #bb2937 0%, #dc3545 100%); }
-.tdu-metrica-en-progreso { background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%); }
+.tdu-metrica-en-progreso { background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%); } /* Naranja ajustado */
 .tdu-metrica-total { background: linear-gradient(135deg, #861542 0%, #a02a5e 100%); }
 
 /* === Progreso general === */
@@ -181,16 +181,16 @@
   border-radius: 10px;
   overflow: hidden;
   display: flex;
-  margin: 10px 0;
-  margin-bottom: 1rem;
+  margin: 10px 0 1rem 0;
 }
 
 .tdu-progreso-segmento {
   height: 100%;
+  transition: width 0.5s ease, background 0.5s ease;
 }
-.tdu-progreso-segmento.tdu-completada { background-color: #28a745; }
-.tdu-progreso-segmento.tdu-progreso { background-color: #ffc107; }
-.tdu-progreso-segmento.tdu-pendiente { background-color: #ff0707; }
+.tdu-progreso-segmento.tdu-completada { background-color: #27ae60; }
+.tdu-progreso-segmento.tdu-progreso { background-color: #f39c12; }
+.tdu-progreso-segmento.tdu-pendiente { background-color: #dc3545; }
 
 .tdu-progreso-stats {
   display: flex;
@@ -201,8 +201,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   color: #000;
+   font-weight: 500;
 }
 
 .tdu-conteo {
@@ -211,8 +212,8 @@
   border-radius: 50%;
 }
 
-.tdu-conteo.tdu-completada { background: #28a745; }
-.tdu-conteo.tdu-progreso { background: #ffc107; }
+.tdu-conteo.tdu-completada { background: #27ae60; }
+.tdu-conteo.tdu-progreso { background: #f39c12; }
 .tdu-conteo.tdu-pendiente { background: #dc3545; }
 
 /* === Mis Proyectos === */
@@ -290,7 +291,6 @@
   left: 0;
   right: 0;
   height: 4px;
-
 }
 
 .tdu-proyecto-card-encabezado:hover {
@@ -298,6 +298,12 @@
   border-color: #861542;
   box-shadow: 0 12px 30px rgba(134, 21, 66, 0.15);
 }
+
+/* Borde izquierdo según estado */
+.tdu-proyecto-card-encabezado.completado { border-left: 6px solid #27ae60; }
+.tdu-proyecto-card-encabezado.progreso { border-left: 6px solid #f39c12; }
+.tdu-proyecto-card-encabezado.pendiente { border-left: 6px solid #dc3545; }
+.tdu-proyecto-card-encabezado.vencido { border-left: 6px solid #8b0000; }
 
 /* Header del proyecto */
 .tdu-project-header {
@@ -355,11 +361,13 @@
   font-size: 0.75rem;
   font-weight: 700;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background: #dc3545;
+  color: white;
 }
-.tdu-prioridad-badge.alta {
-  background-color: #ffc107;
-  color: #2d3748;
-}
+
+.tdu-prioridad-badge.alta { background-color: #f39c12; color: #2d3748; }
+.tdu-prioridad-badge.media { background-color: #ff9500; color: #fff; }
+.tdu-prioridad-badge.baja { background-color: #27ae60; color: #fff; }
 
 /* Cuerpo del proyecto (Gráfica y métricas) */
 .tdu-proyecto-body {
@@ -382,6 +390,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: conic-gradient(#27ae60 0%, #f39c12 50%, #dc3545 100%);
+  transition: background 0.5s ease;
 }
 
 .tdu-circular-center {
@@ -430,8 +440,8 @@
   height: 8px;
   border-radius: 50%;
 }
-.tdu-metrica-dot.tdu-completada { background: #28a745; }
-.tdu-metrica-dot.tdu-progreso { background: #ffc107; }
+.tdu-metrica-dot.tdu-completada { background: #27ae60; }
+.tdu-metrica-dot.tdu-progreso { background: #f39c12; }
 .tdu-metrica-dot.tdu-pendiente { background: #dc3545; }
 
 .tdu-metrica-item strong {
@@ -469,7 +479,18 @@
   border-radius: 20px;
   font-size: 0.85rem;
   border: 1px solid #e9ecef;
+  text-align: center;
 }
+
+.tdu-tiempo-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+.tdu-tiempo-label.finalizado { color: #27ae60; font-weight: 700; }
+.tdu-tiempo-label.vencido { color: #dc3545; font-weight: 700; }
 
 /* Footer: Botón */
 .tdu-proyecto-footer {
@@ -534,6 +555,49 @@
   margin: 0 auto;
   line-height: 1.5;
 }
+/* Contenedor del Título y el Badge */
+.tdu-proyecto-titulo-badge {
+  display: flex;
+  justify-content: space-between; /* Título a la izquierda, Badge a la derecha */
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* El estilo BASE del Badge */
+.tdu-proyecto-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 50px; /* Forma de píldora */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* === ESTILOS DINÁMICOS DEL BADGE === */
+
+/* En proceso (Naranja: #f39c12) */
+.tdu-proyecto-badge.en-proceso {
+  background-color: rgba(243, 156, 18, 0.15); /* Naranja muy suave */
+  color: #f39c12;                             /* Naranja fuerte */
+  border: 1px solid rgba(243, 156, 18, 0.3);
+}
+
+/* Finalizado (Verde: #27ae60) */
+.tdu-proyecto-badge.finalizado {
+  background-color: rgba(39, 174, 96, 0.15); /* Verde muy suave */
+  color: #27ae60;                            /* Verde fuerte */
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+/* (Opcional) Vencido - Si en futuro lo necesitas */
+.tdu-proyecto-badge.vencido {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
 
 /* === Responsivo (Media Queries) === */
 @media (max-width: 1200px) {
@@ -543,127 +607,8 @@
 }
 
 @media (max-width: 768px) {
-  .tdu-contenido {
-    padding: 1rem;
-  }
-  
-  .tdu-seccion-bienvenida {
-    flex-direction: column;
-    gap: 1.5rem;
-    text-align: center;
-  }
-  
-  .tdu-metrica-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .tdu-proyecto-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .tdu-proyecto-body {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .tdu-progreso-stats {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .tdu-mis-proyectos-header {
-    flex-direction: column; 
-    align-items: flex-start;
-    gap: 1rem; 
-  }
-
-  .tdu-numero-proyectos {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .tdu-bienvenida-content h1 {
-    font-size: 1.4rem;
-  }
-  
-  .tdu-proyecto-card-encabezado {
-    padding: 1rem;
-  }
-  
-  .tdu-project-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .tdu-proyecto-meta {
-    align-items: flex-start;
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-  
-  .tdu-proyecto-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .tdu-tiempo-restante {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-
-.tdu-tiempo-label {
-  font-weight: normal;
-  color: inherit;
-  transition: color 0.3s ease;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-/* Estado cuando está al 100% */
-.tdu-tiempo-label.finalizado {
-  color: #28a745; /* Verde */
-  font-weight: 700;
-}
-
-/* Estado cuando se pasó la fecha */
-.tdu-tiempo-label.vencido {
-  color: #dc3545; /* Rojo */
-  font-weight: 700;
-}
-.tdu-prioridad-badge{
-   background: #dc3545;
-   color: white; 
-}
-/* Definimos el ancho y estilo base del borde izquierdo para las variantes */
-.tdu-proyecto-card-encabezado.completado,
-.tdu-proyecto-card-encabezado.progreso,
-.tdu-proyecto-card-encabezado.pendiente,
-.tdu-proyecto-card-encabezado.vencido {
-    border-left-width: 6px; /* Hacemos el borde izquierdo más grueso */
-    border-left-style: solid;
-}
-
-/* Colores específicos según el estado */
-.tdu-proyecto-card-encabezado.completado {
-    border-left-color: #28a745; /* Verde */
-}
-
-.tdu-proyecto-card-encabezado.progreso {
-    border-left-color: #ffc107; /* Amarillo */
-}
-
-.tdu-proyecto-card-encabezado.pendiente {
-    border-left-color: #dc3545; /* Rojo (o gris si prefieres) */
-}
-
-.tdu-proyecto-card-encabezado.vencido {
-    border-left-color: #8b0000; /* Rojo oscuro para vencidos */
+  .tdu-contenido { padding: 1rem; }
+  .tdu-seccion-bienvenida { flex-direction: column; gap: 1.5rem; text-align: center; }
+  .tdu-metrica-grid { grid-template-columns: 1fr; }
+  .tdu-proyecto-body { flex-direction: column; gap: 1rem; }
 }

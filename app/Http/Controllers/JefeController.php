@@ -102,7 +102,7 @@ public function obtenerTareasPendientes($idProyecto, $idUsuario)
 
 
 
-//METODO QUE DEVELVE EL NUMERO DE TAREAS Y DATOS DEL PROYECTO PARA MOSTRARSE EN LA INTERFAZ DE GESTIONPROYECTOSUSUARIO
+// METODO QUE DEVELVE EL NUMERO DE TAREAS Y DATOS DEL PROYECTO DE UN USUARIO
 public function tareasPorUsuario(Request $request)
 {
     $usuarioId = $request->query('usuario');
@@ -110,6 +110,7 @@ public function tareasPorUsuario(Request $request)
     if (!$usuarioId) {
         return response()->json(['error' => 'Usuario no especificado'], 400);
     }
+    
     $proyectos = \DB::table('tareas')
         ->join('proyectos', 'tareas.id_proyecto', '=', 'proyectos.id_proyecto')
         ->where('tareas.id_usuario', $usuarioId)
@@ -117,6 +118,7 @@ public function tareasPorUsuario(Request $request)
             'proyectos.id_proyecto',
             'proyectos.p_nombre',
             'proyectos.descripcion as descripcion_proyecto',
+            'proyectos.p_estatus',
             'proyectos.pf_inicio',
             'proyectos.pf_fin',
             \DB::raw("COUNT(CASE WHEN LOWER(TRIM(tareas.t_estatus)) = 'completada' THEN 1 END) as tareas_completadas"),
@@ -128,10 +130,12 @@ public function tareasPorUsuario(Request $request)
             'proyectos.id_proyecto',
             'proyectos.p_nombre',
             'proyectos.descripcion',
+            'proyectos.p_estatus', // <--- AGREGADO: Necesario para el groupBy
             'proyectos.pf_inicio',
             'proyectos.pf_fin'
         )
         ->get();
+
     $conteos = [
         'completadas' => $proyectos->sum('tareas_completadas'),
         'pendientes' => $proyectos->sum('tareas_pendientes'),

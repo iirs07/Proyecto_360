@@ -109,7 +109,7 @@ public function tareasActivasPorProyecto($idProyecto)
 public function obtenerTareasProyectosJefe(Request $request)
 {
     try {
-        // 1️ Obtener usuario
+        // 1. Obtener usuario
         $usuario = DB::table('c_usuario')
             ->where('id_usuario', $request->query('usuario'))
             ->first();
@@ -120,59 +120,74 @@ public function obtenerTareasProyectosJefe(Request $request)
 
         $idDepartamento = $usuario->id_departamento;
 
+        // 2. Calcular fechas del trimestre
         $hoy = Carbon::now();
         $mesActual = $hoy->month;
         $trimestreActual = ceil($mesActual / 3);
         $inicioTrimestreActual = Carbon::create($hoy->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
         
-       
         $estadosProyecto = ['En proceso']; 
 
-        // TAREAS válidas
-        $filtroTareas = function($q) {
+        // Filtro para cargar SOLO las tareas que nos interesan ver en el detalle (En proceso/Completada)
+        $filtroTareasVisibles = function($q) {
             $q->whereIn('t_estatus', ['En proceso', 'Completada']);
         };
 
         $proyectos = collect();
 
-        // 3️ BD principal (trimestre actual)
+        // 3. Consulta BD principal (trimestre actual)
         $proyectos = $proyectos->merge(
             \App\Models\Proyecto::on('pgsql')
                 ->where('id_departamento', $idDepartamento)
-                ->whereIn('p_estatus', $estadosProyecto) 
-                ->whereHas('tareas', $filtroTareas)
-                ->with(['tareas' => function($q) use ($filtroTareas) {
-                    $filtroTareas($q);
+                ->whereIn('p_estatus', $estadosProyecto)
+                
+                // Mantiene el filtro de proyectos (solo trae proyectos que tengan algo de actividad)
+                ->whereHas('tareas', $filtroTareasVisibles) 
+                
+                // CORRECCIÓN CLAVE: Cuenta TODAS las tareas (sin filtros) en la BD
+                ->withCount('tareas') 
+                
+                // Carga la relación filtrada (solo trae los datos de las activas/completadas)
+                ->with(['tareas' => function($q) use ($filtroTareasVisibles) {
+                    $filtroTareasVisibles($q);
                     $q->with('evidencias');
                 }])
                 ->where('pf_fin', '>=', $inicioTrimestreActual)
                 ->get()
         );
 
-        // 4️ BD histórica
+        // 4. Consulta BD histórica (trimestres pasados)
         $proyectos = $proyectos->merge(
             \App\Models\Proyecto::on('pgsql_second')
                 ->where('id_departamento', $idDepartamento)
                 ->whereIn('p_estatus', $estadosProyecto)
-                ->whereHas('tareas', $filtroTareas)
-                ->with(['tareas' => function($q) use ($filtroTareas) {
-                    $filtroTareas($q);
+                ->whereHas('tareas', $filtroTareasVisibles)
+                
+                // CORRECCIÓN CLAVE: Cuenta TODAS las tareas en la histórica
+                ->withCount('tareas')
+                
+                ->with(['tareas' => function($q) use ($filtroTareasVisibles) {
+                    $filtroTareasVisibles($q);
                     $q->with('evidencias');
                 }])
                 ->where('pf_fin', '<', $inicioTrimestreActual)
                 ->get()
         );
 
-        // 5 Calcular métricas
+        // 5. Calcular métricas finales
         $proyectos = $proyectos->map(function($proyecto) {
 
-            $proyecto->total_tareas = $proyecto->tareas->count();
+            // AQUÍ LA CORRECCIÓN: Usamos el conteo total de la BD
+            // 'tareas_count' es creado automáticamente por withCount('tareas')
+            $proyecto->total_tareas = $proyecto->tareas_count;
 
+            // Calculamos completadas usando la colección cargada (que ya está filtrada)
             $proyecto->tareas_completadas = $proyecto->tareas
                 ->filter(function($t) {
                     return $t->t_estatus === 'Completada';
                 })->count();
 
+            // Calculamos 'a revisar' usando la colección cargada
             $proyecto->tareas_a_revisar = $proyecto->tareas
                 ->filter(function($t) {
                     return $t->t_estatus === 'En proceso'

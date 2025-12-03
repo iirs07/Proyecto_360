@@ -606,7 +606,7 @@ transform: translateY(-3px);
 .tdu-dot-legend.progreso { background-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
 .tdu-dot-legend.pendiente { background-color: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
 
-/* ======== LEYENDA INFERIOR (Lado a Lado) ======== */
+/* ======== LEYENDA INFERIOR  ======== */
 .tdu-progreso-stats {
   display: flex;
   justify-content: space-around; 
@@ -626,25 +626,25 @@ transform: translateY(-3px);
   height: 10px;
   border-radius: 50%;
   display: block;
-  flex-shrink: 0; /* Evita que el punto se aplaste */
+  flex-shrink: 0; 
 }
 
-/* AQUÍ ESTÁ EL CAMBIO CLAVE */
+
 .tdu-legend-text {
   display: flex;
-  flex-direction: row; /* Alineación horizontal */
-  align-items: baseline; /* Alinea el texto por la base para que se vea natural */
-  gap: 5px; /* Espacio pequeño entre el número y la palabra */
+  flex-direction: row; 
+  align-items: baseline; 
+  gap: 5px; 
 }
 
 .tdu-legend-num {
   font-weight: 500;
   color: #000;
-  font-size: 1rem; 
+  font-size: 0.8rem; 
 }
 
 .tdu-legend-label {
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: #000;
   font-weight: 500;
 }

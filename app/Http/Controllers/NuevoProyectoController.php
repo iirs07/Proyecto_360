@@ -137,9 +137,10 @@ public function ListaProyectosModificar(Request $request)
         DB::raw("SUM(CASE WHEN t.t_estatus = 'Finalizado' THEN 1 ELSE 0 END) as tareas_completadas")
     )
     ->where('p.id_departamento', $idDepartamento)
-     ->where('p.p_estatus', 'En proceso')
+    ->whereIn('p.p_estatus', ['Pendiente', 'En proceso', 'Finalizado'])
     ->groupBy('p.id_proyecto')
     ->get();
+
         return response()->json([
             'success' => true,
             'proyectos' => $proyectos
