@@ -176,6 +176,14 @@
     border-bottom: 1px solid #DC354530;
 }
 
+/* NUEVO: TAREAS EN PROCESO - AMARILLO */
+.tarea-item.en-proceso {
+    border-left: 8px solid #FFC107;
+    border-top: 1px solid #FFC10730;
+    border-right: 1px solid #FFC10730;
+    border-bottom: 1px solid #FFC10730;
+}
+
 /* Hover tarjeta */
 .tarea-item:hover {
     transform: translateY(-4px) scale(1.01);
@@ -193,6 +201,12 @@
 .tarea-item.pendiente .tarea-titulo:hover,
 .tarea-item.pendiente.tarea-abierta .tarea-titulo {
     background-color: #FDE2E2; 
+}
+
+/* NUEVO: Hover para tareas EN PROCESO - AMARILLO CLARO */
+.tarea-item.en-proceso .tarea-titulo:hover,
+.tarea-item.en-proceso.tarea-abierta .tarea-titulo {
+    background-color: #FFF3CD; 
 }
 
 /* ==== CABECERA / TÍTULO ==== */
@@ -224,11 +238,24 @@
     font-size: 12px;
     font-weight: 700; 
     text-transform: uppercase;
-    color: #fff;
 }
 
-.tarea-estatus.completada { background-color: #28A745; }
-.tarea-estatus.pendiente { background-color: #DC3545; }
+.tarea-estatus.completada { 
+    background-color: #28A745; 
+    color: #ffffff; 
+}
+
+.tarea-estatus.pendiente { 
+    background-color: #DC3545; 
+    color: #ffffff; 
+}
+
+/* NUEVO: ESTATUS EN PROCESO - AMARILLO CON LETRAS NEGRAS */
+.tarea-estatus.en-proceso { 
+    background-color: #FFC107; 
+    color: #ffffff; 
+    border: 1px solid #E0A800;
+}
 
 /* Flecha acordeón */
 .flecha {

@@ -573,7 +573,7 @@
 }
 
 /* Badge específico para En Proceso */
-.badgeS-estado-proceso[data-estado="EN PROCESO"] {
+.badgeS-estado-proceso[data-estado="en-proceso"] {
     background: linear-gradient(
     135deg, 
     rgba(134, 21, 66, 0.15) 0%, 
