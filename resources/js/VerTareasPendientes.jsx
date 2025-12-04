@@ -111,10 +111,8 @@ function VerTareasPendientes() {
     ?.filter(t => t.t_estatus.toLowerCase() !== "completada")
     ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
-
-  // 3. Función lógica que ejecuta la API (se llama DESPUÉS de confirmar)
   const ejecutarFinalizacionTarea = async () => {
-    // Usamos la tarea guardada en el estado temporal
+   
     const idTarea = tareaAFinalizar?.id_tarea; 
     if (!idTarea) return;
 
@@ -157,7 +155,8 @@ function VerTareasPendientes() {
         // Cerramos el modal de confirmación y limpiamos
         setConfirmModalOpen(false);
         setTareaAFinalizar(null);
-        setTareaCompletada(true); // Mostrar toast de éxito
+        setTareaCompletada(true);
+         navigate("/TareasenProceso");
         setTimeout(() => setTareaCompletada(false), 3000); // Ocultar toast después
         
       } else {

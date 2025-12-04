@@ -99,7 +99,7 @@ public function MostrarProyectos(Request $request)
 
     )
     ->where('p.id_departamento', $idDepartamento)
-    ->where('p.p_estatus', 'En proceso')
+   ->whereIn('p.p_estatus', ['En proceso', 'Finalizado'])
     ->groupBy('p.id_proyecto')
     ->get();
         return response()->json([
