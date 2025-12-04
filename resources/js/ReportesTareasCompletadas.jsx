@@ -253,40 +253,40 @@ function ReportesTareasCompletadas() {
             )}
           </div>
 
-          <div className="reportes-tc-boton-wrapper w-100 d-flex justify-content-center gap-3 mt-3">
-            {/* Botón Generar (Deshabilitado si carga) */}
-            <button 
-              type="button"
-              className="reportes-tc-boton-form"
-              onClick={generarPDF}
-              disabled={cargando}
-            >
-              {cargando ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Procesando...
-                </>
-              ) : (
-                <>
-                  <FaFilePdf className="me-2" />
-                  Generar PDF
-                </>
-              )}
-            </button>
+         <div className="reportes-tc-boton-wrapper">
+  {/* Botón Generar */}
+  <button 
+    type="button"
+    className="reportes-tc-boton-form"
+    onClick={generarPDF}
+    disabled={cargando}
+  >
+    {cargando ? (
+      <>
+        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Procesando...
+      </>
+    ) : (
+      <>
+        <FaFilePdf className="me-2" />
+        Generar PDF
+      </>
+    )}
+  </button>
 
-            {/* Botón Cancelar (Solo visible si carga) */}
-            {cargando && (
-              <button 
-                type="button"
-                className="reportes-tc-boton-form" 
-                onClick={cancelarGeneracion}
-                
-              >
-                <FaTimesCircle className="me-2" />
-                Cancelar
-              </button>
-            )}
-          </div>
+  {/* Botón Cancelar */}
+  {cargando && (
+    <button 
+      type="button"
+      className="reportes-tc-boton-form cancelar"
+      onClick={cancelarGeneracion}
+    >
+      <FaTimesCircle className="me-2" />
+      Cancelar
+    </button>
+  )}
+</div>
+
 
           {mostrarVisor && pdfUrl && (
             <PdfViewer

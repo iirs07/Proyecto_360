@@ -204,24 +204,33 @@
 }
 
 .ldp-stat-icon {
-  color: #861542;
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+ color: #861542;
+  font-size: 1.6rem;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 3px 6px rgba(134, 21, 66, 0.3));
 }
 
 .ldp-stat-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #212529;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #2d3748;
   line-height: 1;
+  background: linear-gradient(90deg, #861542, #ff6b9d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .ldp-stat-label {
-  color: #6c757d;
-  font-size: 0.95rem;
-  font-weight: 600;
+   color: #718096;
+  font-size: 1.05rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  margin-top: 0.5rem;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
 }
 
 /* =========================== Footer ============================ */
@@ -244,8 +253,8 @@
 }
 
 .ldp-calendar-icon {
-  color: #6c757d;
-  font-size: 1.1rem;
+  color: #861542;
+  font-size: 1.4rem;
   flex-shrink: 0;
 }
 
@@ -253,12 +262,14 @@
   font-size: 1rem;
   font-weight: 600;
   display: block;
+  font-weight: bold;
   margin-bottom: 0.25rem;
 }
 
 .ldp-dias-restantes {
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-weight: bold;
   display: block;
 }
 
@@ -298,17 +309,34 @@
 }
 
 /* =========================== Resumen ============================ */
-.ldp-summary {
-  text-align: center;
-  padding: 1.5rem;
-  color: #6c757d;
-  font-size: 1rem;
-  font-weight: 600;
-  border-top: 2px solid #e9ecef;
-  margin-top: 2rem;
-  background: #f8f9fa;
-  border-radius: 12px;
+/* Estilo general para el contenedor de badges */
+.ldp-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* espacio entre badges si hay más */
 }
+
+/* Badge de estatus */
+.ldp-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem; /* un poco más pequeño */
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default; /* no clicable */
+}
+
+/* Efecto hover opcional */
+.ldp-status-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+
 
 /* =========================== Responsive mejorado ============================ */
 @media (max-width: 768px) {

@@ -333,6 +333,7 @@
   line-height: 1.4;
   margin: 0;
   text-transform: uppercase;
+  font-weight: bold;
 }
 
 /* Meta info (Badges, tareas count) */
@@ -419,7 +420,6 @@
   background: #f7fafc;
 }
 
-/* Métricas detalladas al lado de la gráfica */
 .tdu-detalles-metricas {
   display: flex;
   flex-direction: column;
@@ -433,6 +433,7 @@
   gap: 0.5rem;
   font-size: 0.9rem;
   color: #4a5568;
+  font-weight: bold;
 }
 
 .tdu-metrica-dot {
@@ -580,8 +581,8 @@
 
 /* En proceso (Naranja: #f39c12) */
 .tdu-proyecto-badge.en-proceso {
-  background-color: rgba(243, 156, 18, 0.15); /* Naranja muy suave */
-  color: #f39c12;                             /* Naranja fuerte */
+  background-color: #f39c12; 
+  color: #ffffff;                             
   border: 1px solid rgba(243, 156, 18, 0.3);
 }
 
@@ -598,6 +599,28 @@
   color: #b91c1c;
   border: 1px solid #fecaca;
 }
+/* === NUEVOS ESTADOS SIMPLIFICADOS === */
+
+/* Borde lateral */
+.tdu-proyecto-card-encabezado.finalizado {
+  border-left: 6px solid #27ae60; /* Verde */
+}
+
+.tdu-proyecto-card-encabezado.en-proceso {
+  border-left: 6px solid #f1c40f; /* Amarillo */
+}
+
+/* Badge */
+.tdu-proyecto-badge.finalizado {
+  background-color: #27ae60;
+  color: white;
+}
+
+.tdu-proyecto-badge.en-proceso {
+  background-color: #f1c40f;
+  color: white;
+}
+
 
 /* === Responsivo (Media Queries) === */
 @media (max-width: 1200px) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 // Importamos los iconos que ya usas
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
-  FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
+  FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, FaLayerGroup,
   FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt, FaBriefcase
 } from "react-icons/fa";
 import { 
@@ -99,7 +99,7 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
 Usuario: {
   principal: [
     { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
-    { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaTasks },
+    { key: 'tareas', label: "MIS PROYECTOS", path: "/ListaDeProyectos", icon: FaLayerGroup },
     { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
     { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
   ],

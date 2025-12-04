@@ -8,7 +8,7 @@ import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
-import { FaTasks, FaCalendarAlt, FaExclamationTriangle, FaSearch, FaRegFolder } from 'react-icons/fa';
+import { FaTasks, FaCalendarAlt, FaExclamationTriangle, FaSearch } from 'react-icons/fa';
 
 function ListaDeProyectos() {
   const navigate = useNavigate(); 
@@ -16,7 +16,7 @@ function ListaDeProyectos() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('fecha');
-    const { volverSegunRol } = useRolNavigation();
+  const { volverSegunRol } = useRolNavigation();
 
   const formatFecha = (fecha) => {
     if (!fecha) return '';
@@ -24,17 +24,12 @@ function ListaDeProyectos() {
     return f.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
-  const getUrgencyInfo = (fecha) => {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+  const getProjectStatus = (proyecto) => proyecto.p_estatus || "En proceso";
 
-    const fin = new Date(fecha + "T00:00");
-    fin.setHours(0,0,0,0);
-
-    const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) return { color: '#dc3545', label: 'Vencido', days: diffDays };
-    return { color: '#e0a905ff', label: 'Próximo', days: diffDays };
+  const statusColors = {
+    "Finalizado": "#28a745", // verde
+    "En proceso": "#ffc107",  // amarillo
+    "En revisión": "#17a2b8"  // azul
   };
 
   const contarTareas = (tareas) => {
@@ -124,7 +119,7 @@ function ListaDeProyectos() {
   }, [proyectos, searchTerm, sortBy]);
 
   const renderProyectoCard = (proyecto) => {
-    const urgencia = getUrgencyInfo(proyecto.pf_fin);
+    const status = getProjectStatus(proyecto);
     const tareasInfo = contarTareas(proyecto.tareas);
 
     return (
@@ -136,14 +131,12 @@ function ListaDeProyectos() {
             </div>
 
             <div className="ldp-header-badges">
-              <span className="ldp-urgency-badge" style={{ backgroundColor: urgencia.color }}>
-                {urgencia.label}
+              <span 
+                className="ldp-status-badge" 
+                style={{ backgroundColor: statusColors[status] }}
+              >
+                {status}
               </span>
-              <FaExclamationTriangle 
-                className="ldp-warning-icon"
-                style={{ color: urgencia.color }}
-                title={`${tareasInfo.vencidas} tareas vencidas`}
-              />
             </div>
           </div>
 
@@ -163,19 +156,26 @@ function ListaDeProyectos() {
             <div className="ldp-fecha-info">
               <FaCalendarAlt className="ldp-calendar-icon" />
               <div>
-                <span className="ldp-fecha-text" style={{ color: urgencia.color }}>
+                <span className="ldp-fecha-text" >
                   Vence: {formatFecha(proyecto.pf_fin)}
                 </span>
-                <span className="ldp-dias-restantes" style={{ color: urgencia.color }}>
-                  {urgencia.days < 0
-                    ? `${Math.abs(urgencia.days)} días de retraso`
-                    : urgencia.days === 0
-                      ? 'Vence hoy'
-                      : urgencia.days === 1
-                        ? '1 día restante'
-                        : `${urgencia.days} días restantes`
-                  }
-                </span>
+                {/* Aquí opcional: mostrar días restantes solo como info */}
+                {proyecto.pf_fin && (
+                  <span className="ldp-dias-restantes">
+                    {(() => {
+                      const hoy = new Date();
+                      const fin = new Date(proyecto.pf_fin + "T00:00");
+                      const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+                      return diffDays < 0
+                        ? `${Math.abs(diffDays)} días de retraso`
+                        : diffDays === 0
+                          ? 'Vence hoy'
+                          : diffDays === 1
+                            ? '1 día restante'
+                            : `${diffDays} días restantes`;
+                    })()}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -194,8 +194,8 @@ function ListaDeProyectos() {
 
   return (
     <Layout
-      titulo="TAREAS ASIGNADAS"
-      sidebar={<MenuDinamico activeRoute="gestion-proyectosusuario" />}
+      titulo="PROYECTOS EN LOS QUE PARTICIPAS"
+      sidebar={<MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
     >
       <div className="ldp-container">
 
@@ -211,17 +211,15 @@ function ListaDeProyectos() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-           
-             {searchTerm && (
-                    <button
-  className="buscador-clear-global"
-  onClick={() => setSearchTerm("")}
->
-  <FiX />
-</button>
-
-                  )}
-                   </div>
+              {searchTerm && (
+                <button
+                  className="buscador-clear-global"
+                  onClick={() => setSearchTerm("")}
+                >
+                  <FiX />
+                </button>
+              )}
+            </div>
 
             {searchTerm && (
               <div className="buscador-resultados-global">
@@ -231,38 +229,31 @@ function ListaDeProyectos() {
           </div>
         )}
 
-       <div className="ldp-content">
-  {loading ? (
-    <div className="loader-container">
-      <div className="loader-logo"><img src={logo3} alt="Cargando proyectos" /></div>
-      <div className="loader-texto">CARGANDO...</div>
-      <div className="loader-spinner"></div>
-    </div>
-  ) : proyectos.length === 0 ? (
-    <EmptyState
-      titulo="TAREAS PENDIENTES POR REVISAR"
-      mensaje="No hay tareas por revisar."
-      botonTexto="Volver al Tablero"
-      onVolver={volverSegunRol}
-      icono={logo3}
-    />
-  ) : (
-    <>
-      {filteredAndSortedProyectos.length > 0 ? (
-        <div className="ldp-proyectos-list">
-          {filteredAndSortedProyectos.map(renderProyectoCard)}
-
-          <div className="ldp-summary">
-            <span>
-              Mostrando {filteredAndSortedProyectos.length} de {proyectos.length} proyectos
-            </span>
-          </div>
+        <div className="ldp-content">
+          {loading ? (
+            <div className="loader-container">
+              <div className="loader-logo"><img src={logo3} alt="Cargando proyectos" /></div>
+              <div className="loader-texto">CARGANDO...</div>
+              <div className="loader-spinner"></div>
+            </div>
+          ) : proyectos.length === 0 ? (
+            <EmptyState
+              titulo="TAREAS PENDIENTES POR REVISAR"
+              mensaje="No hay tareas por revisar."
+              botonTexto="Volver al Tablero"
+              onVolver={volverSegunRol}
+              icono={logo3}
+            />
+          ) : (
+            <>
+              {filteredAndSortedProyectos.length > 0 && (
+                <div className="ldp-proyectos-list">
+                  {filteredAndSortedProyectos.map(renderProyectoCard)}
+                </div>
+              )}
+            </>
+          )}
         </div>
-      ) : null }
-    </>
-  )}
-</div>
-
 
       </div>
     </Layout>
@@ -270,6 +261,7 @@ function ListaDeProyectos() {
 }
 
 export default ListaDeProyectos;
+
 
 
 
