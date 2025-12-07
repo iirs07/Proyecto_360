@@ -7,14 +7,13 @@ import "../css/agregartareas.css";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaUser, FaUsers, FaFileAlt, FaSave, FaTimes, FaListAlt, FaProjectDiagram, FaRegClock } from "react-icons/fa";
 import logo3 from "../imagenes/logo3.png";
-
 
 const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   <button
     type="button"
-    className="btn-calendario w-100 d-flex align-items-center gap-2"
+    className="btn-calendario nv-btn-calendario w-100 d-flex align-items-center gap-2"
     onClick={onClick}
     ref={ref}
   >
@@ -23,10 +22,23 @@ const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   </button>
 ));
 
+// Componente de tarjeta para agrupar campos
+const TaskCard = ({ children, title, icon, className = "" }) => (
+  <div className={`task-card p-4 mb-4 ${className}`}>
+    {title && (
+      <div className="d-flex align-items-center gap-2 mb-3">
+        {icon}
+        <h3 className="task-card-title mb-0">{title}</h3>
+      </div>
+    )}
+    {children}
+  </div>
+);
+
 function AgregarTareas() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id_proyecto, id_departamento_inicial } = location.state || {};
+  const { id_proyecto, id_departamento_inicial, p_nombre } = location.state || {};
 
   const nombreTareaRef = useRef(null);
   const descripcionTareaRef = useRef(null);
@@ -48,9 +60,9 @@ function AgregarTareas() {
   const [minFecha, setMinFecha] = useState(null);
   const [maxFecha, setMaxFecha] = useState(null);
   const [camposModificados, setCamposModificados] = useState({});
-const [proyectoActual, setProyectoActual] = useState(null);
-const [nombreProyecto, setNombreProyecto] = useState("");
-
+  const [proyectoActual, setProyectoActual] = useState(null);
+  const [nombreProyecto, setNombreProyecto] = useState("");
+  const [usuarioSeleccionadoInfo, setUsuarioSeleccionadoInfo] = useState(null);
 
   const ajustarAltura = (ref) => {
     if (ref.current) {
@@ -70,111 +82,95 @@ const [nombreProyecto, setNombreProyecto] = useState("");
     return { Authorization: `Bearer ${token}`, Accept: "application/json" };
   };
 
-useEffect(() => {
-  const token = sessionStorage.getItem("jwt_token");
-  if (!token) {
-    navigate("/Login", { replace: true });
-    return;
-  }
+  useEffect(() => {
+    const token = sessionStorage.getItem("jwt_token");
+    if (!token) {
+      navigate("/Login", { replace: true });
+      return;
+    }
 
-  console.log("location.state:", location.state);
+    if (location.state && location.state.id_proyecto) {
+      setProyectoActual({ id_proyecto: location.state.id_proyecto });
+      setNombreProyecto(location.state.p_nombre || "Proyecto");
+    } else {
+      navigate("/NuevoProyecto", { replace: true });
+    }
+  }, [navigate, location]);
 
-  if (location.state && location.state.id_proyecto) {
-    setProyectoActual({ id_proyecto: location.state.id_proyecto });
-    setNombreProyecto(location.state.p_nombre || "Proyecto");
-  } else {
-    // Redirige si no viene desde las interfaces correctas
-    navigate("/NuevoProyecto", { replace: true });
-  }
-}, [navigate, location]);
+  useEffect(() => {
+    if (!proyectoActual?.id_proyecto) return;
 
+    const cargarTodo = async () => {
+      const headers = getHeaders();
+      if (!headers) return;
 
-  // ============================================================
-  //  CARGA INICIAL: fechas + departamentos + usuarios
-  // ============================================================
- useEffect(() => {
-  if (!proyectoActual?.id_proyecto) return; // Solo cargar si proyectoActual existe
+      try {
+        setLoadingInicial(true);
 
-  const cargarTodo = async () => {
-    const headers = getHeaders();
-    if (!headers) return;
+        const [fechasRes, depRes] = await Promise.all([
+          fetch(`/api/proyectos/${proyectoActual.id_proyecto}/fechasProyecto`, { headers }),
+          fetch("/api/CatalogoDepartamentos", { headers })
+        ]);
 
-    try {
-      setLoadingInicial(true);
-
-      const [fechasRes, depRes] = await Promise.all([
-        fetch(`/api/proyectos/${proyectoActual.id_proyecto}/fechasProyecto`, { headers }),
-        fetch("/api/CatalogoDepartamentos", { headers })
-      ]);
-
-      if (fechasRes.status === 401 || depRes.status === 401) {
-        sessionStorage.removeItem("jwt_token");
-        navigate("/Login", { replace: true });
-        return;
-      }
-
-      const fechas = await fechasRes.json();
-      const deps = await depRes.json();
-
-      // Fechas del proyecto
-      if (fechas.success) {
-        const inicio = new Date(fechas.pf_inicio);
-        const fin = new Date(fechas.pf_fin);
-
-        const inicioMex = new Date(inicio);
-        inicioMex.setHours(inicioMex.getHours() + 6);
-
-        const finMex = new Date(fin);
-        finMex.setHours(finMex.getHours() + 6);
-
-        setMinFecha(inicioMex);
-        setMaxFecha(finMex);
-      }
-
-      // Departamentos
-      setDepartamentos(deps);
-
-      let depFinal;
-
-      if (id_departamento_inicial) {
-        depFinal = parseInt(id_departamento_inicial);
-      } else if (deps.length > 0) {
-        depFinal = deps[0].id_departamento;
-      } else {
-        depFinal = "";
-      }
-
-      setDepartamentoSeleccionado(depFinal);
-
-      // Usuarios iniciales del primer departamento
-      if (depFinal) {
-        const usuariosRes = await fetch(`/api/departamentos/${depFinal}/usuarios`, { headers });
-
-        if (usuariosRes.status === 401) {
+        if (fechasRes.status === 401 || depRes.status === 401) {
           sessionStorage.removeItem("jwt_token");
           navigate("/Login", { replace: true });
           return;
         }
 
-        const usuariosData = await usuariosRes.json();
-        setUsuarios(usuariosData);
+        const fechas = await fechasRes.json();
+        const deps = await depRes.json();
+
+        if (fechas.success) {
+          const inicio = new Date(fechas.pf_inicio);
+          const fin = new Date(fechas.pf_fin);
+
+          const inicioMex = new Date(inicio);
+          inicioMex.setHours(inicioMex.getHours() + 6);
+
+          const finMex = new Date(fin);
+          finMex.setHours(finMex.getHours() + 6);
+
+          setMinFecha(inicioMex);
+          setMaxFecha(finMex);
+        }
+
+        setDepartamentos(deps);
+
+        let depFinal;
+        if (id_departamento_inicial) {
+          depFinal = parseInt(id_departamento_inicial);
+        } else if (deps.length > 0) {
+          depFinal = deps[0].id_departamento;
+        } else {
+          depFinal = "";
+        }
+
+        setDepartamentoSeleccionado(depFinal);
+
+        if (depFinal) {
+          const usuariosRes = await fetch(`/api/departamentos/${depFinal}/usuarios`, { headers });
+
+          if (usuariosRes.status === 401) {
+            sessionStorage.removeItem("jwt_token");
+            navigate("/Login", { replace: true });
+            return;
+          }
+
+          const usuariosData = await usuariosRes.json();
+          setUsuarios(usuariosData);
+        }
+
+        setLoadingInicial(false);
+      } catch (err) {
+        console.error(err);
+        setLoadingInicial(false);
       }
+    };
 
-      setLoadingInicial(false);
-    } catch (err) {
-      console.error(err);
-      setLoadingInicial(false);
-    }
-  };
+    cargarTodo();
+  }, [proyectoActual]);
 
-  cargarTodo();
-}, [proyectoActual]); // <- depende de proyectoActual
-
-
-
-  // ============================================================
-  //  CARGA SOLO USUARIOS CUANDO CAMBIA EL DEPARTAMENTO
-  // ============================================================
   useEffect(() => {
     if (!departamentoSeleccionado) return;
 
@@ -194,6 +190,7 @@ useEffect(() => {
         const data = await res.json();
         setUsuarios(data);
         setUsuarioSeleccionado("");
+        setUsuarioSeleccionadoInfo(null);
       } catch (err) {
         console.error(err);
         setUsuarios([]);
@@ -204,11 +201,15 @@ useEffect(() => {
     fetchUsuarios();
   }, [departamentoSeleccionado]);
 
+  useEffect(() => {
+    if (usuarioSeleccionado && usuarios.length > 0) {
+      const usuario = usuarios.find(u => u.id_usuario == usuarioSeleccionado);
+      setUsuarioSeleccionadoInfo(usuario || null);
+    } else {
+      setUsuarioSeleccionadoInfo(null);
+    }
+  }, [usuarioSeleccionado, usuarios]);
 
-
-  // ============================================================
-  //  GUARDAR NUEVA TAREA
-  // ============================================================
   const handleGuardar = async () => {
     const nombre = nombreTareaRef.current.value.trim();
     const descripcion = descripcionTareaRef.current.value.trim();
@@ -272,7 +273,6 @@ useEffect(() => {
     }
   };
 
-
   const limpiarCampos = (mantener) => {
     if (nombreTareaRef.current) nombreTareaRef.current.value = "";
     if (descripcionTareaRef.current) descripcionTareaRef.current.value = "";
@@ -284,33 +284,38 @@ useEffect(() => {
     setFechaFin(null);
     setUsuarioSeleccionado("");
     setErrores({});
+    setUsuarioSeleccionadoInfo(null);
     if (!mantener) setTareaGuardada(false);
     setIdTareaRecienCreada(null);
   };
 
-  const handleCancelar = () => limpiarCampos();
+  const handleCancelar = () => {
+    if (Object.keys(camposModificados).length > 0) {
+      const confirmar = window.confirm("Tienes cambios sin guardar. ¿Seguro que quieres cancelar?");
+      if (!confirmar) return;
+    }
+    navigate(-1);
+  };
 
   const handleInputChange = (campo) => {
-  setErrores(prev => ({ ...prev, [campo]: null }));
-  setCamposModificados(prev => ({ ...prev, [campo]: true }));
-};
-
-useEffect(() => {
-  const handleBeforeUnload = (e) => {
-    if (Object.keys(camposModificados).length > 0) {
-      e.preventDefault();
-      e.returnValue = ""; 
-    }
+    setErrores(prev => ({ ...prev, [campo]: null }));
+    setCamposModificados(prev => ({ ...prev, [campo]: true }));
   };
 
-  window.addEventListener("beforeunload", handleBeforeUnload);
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (Object.keys(camposModificados).length > 0) {
+        e.preventDefault();
+        e.returnValue = ""; 
+      }
+    };
 
-  return () => {
-    window.removeEventListener("beforeunload", handleBeforeUnload);
-  };
-}, [camposModificados]);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [camposModificados]);
 
   if (loadingInicial) {
     return (
@@ -322,63 +327,107 @@ useEffect(() => {
     );
   }
 
+  const calcularDuracion = () => {
+    if (fechaInicio && fechaFin) {
+      const diffTime = Math.abs(fechaFin - fechaInicio);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays;
+    }
+    return 0;
+  };
 
   return (
-    <Layout titulo="NUEVA TAREA" sidebar={<MenuDinamico activeRoute="Nueva tarea" />}>
-      <div className="agregartareas-contenedor">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-8 col-lg-6 agregartareas-contenedor">
-            <h1 className="titulo-global">Agregar nueva tarea</h1>
-
-            {/* Nombre */}
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="nombreTarea" className="agregartareas-label fw-bold">Nombre de la tarea</label>
-              <textarea
-                id="nombreTarea"
-                ref={nombreTareaRef}
-                className="form-control agregartareas-input"
-                placeholder="Escribe el nombre de la tarea"
-                rows={1}
-                onInput={() => {
-                  ajustarAltura(nombreTareaRef);
-                  handleInputChange("nombre");
-                }}
-              />
-              <ErrorMensaje mensaje={errores.nombre} />
-            </div>
-
-            {/* Descripción */}
-<div className="mb-3 d-flex flex-column">
-  <label htmlFor="descripcionTarea" className="agregartareas-label fw-bold">
-    Descripción
-  </label>
-  <textarea
-    id="descripcionTarea"
-    ref={descripcionTareaRef}
-    className="form-control agregartareas-input"
-    placeholder="Escribe la descripción"
-    rows={2}
-    style={{ overflow: "hidden" }}
-    onInput={() => {
-      ajustarAltura(descripcionTareaRef);
-      handleInputChange("descripcion");
-    }}
-  />
-  <ErrorMensaje mensaje={errores.descripcion} />
-</div>
+   <Layout titulo="NUEVA TAREA" sidebar={<MenuDinamico activeRoute="Nueva tarea" />}>
+  <div className="agregartareas-contenedor">
+    {/* Encabezado con información del proyecto */}
+    <div className="project-header d-flex align-items-center gap-3 mb-4 p-3 rounded">
+      
+      <div className="flex-grow-1">
+        <h1 className="agregartareas-titulo mb-1">Crear Nueva Tarea</h1>
+        <div className="project-info d-flex flex-wrap gap-3 justify-content-center align-items-center">
 
 
-            {/* Departamento */}
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="departamento" className="agregartareas-label fw-bold">Departamento</label>
+          <span className="agregartareas-muted">
+            <strong>Proyecto:</strong> {nombreProyecto || "Sin nombre"}
+          </span>
+          
+        </div>
+      </div>
+    </div>
+
+    {/* Mensaje de éxito */}
+    {tareaGuardada && (
+      <div className="alert alert-success d-flex align-items-center gap-3 mb-4" role="alert">
+        <FaSave size={24} />
+        <div>
+          <h5 className="mb-1">¡Tarea creada exitosamente!</h5>
+          <p className="mb-0">La tarea ha sido guardada y puedes verla en la lista de tareas.</p>
+        </div>
+      </div>
+    )}
+
+    {/* CONTENEDOR ÚNICO PARA TODO */}
+    <div className="agregartareas-contenedor">
+      {/* Información de la tarea */}
+      <TaskCard title="Información de la Tarea" icon={<FaFileAlt color="#861542" />}>
+        <div className="mb-4">
+          <label htmlFor="nombreTarea" className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+            <span className="required-field">*</span>
+            Nombre de la tarea
+          </label>
+          <textarea
+            id="nombreTarea"
+            ref={nombreTareaRef}
+            className="form-control agregartareas-input"
+            placeholder="Ingrese un nombre para la tarea"
+            rows={1}
+            onInput={() => {
+              ajustarAltura(nombreTareaRef);
+              handleInputChange("nombre");
+            }}
+          />
+         
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="descripcionTarea" className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+            <span className="required-field">*</span>
+            Descripción detallada
+          </label>
+          <textarea
+            id="descripcionTarea"
+            ref={descripcionTareaRef}
+            className="form-control agregartareas-input"
+            placeholder="Describa la tarea"
+            rows={3}
+            onInput={() => {
+              ajustarAltura(descripcionTareaRef);
+              handleInputChange("descripcion");
+            }}
+          />
+         
+        </div>
+      </TaskCard>
+
+      {/* Asignación de recursos */}
+      <TaskCard title="Asignación de Recursos" icon={<FaUsers color="#861542" />}>
+        <div className="row g-3">
+
+            <label htmlFor="departamento" className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+              <span className="required-field">*</span>
+              Departamento
+            </label>
+            <div className="input-group">
+              <span className="input-group-text bg-light">
+                <FaUsers />
+              </span>
               <select
                 id="departamento"
                 value={departamentoSeleccionado}
                 onChange={(e) => {
-  setDepartamentoSeleccionado(parseInt(e.target.value));
-  handleInputChange("departamento");
-}}
-
+                  setDepartamentoSeleccionado(parseInt(e.target.value));
+                  handleInputChange("departamento");
+                }}
                 className="form-select"
               >
                 {departamentos.map(d => (
@@ -388,10 +437,17 @@ useEffect(() => {
                 ))}
               </select>
             </div>
+      
 
-            {/* Usuario */}
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="usuario" className="agregartareas-label fw-bold">Usuario</label>
+       
+            <label htmlFor="usuario" className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+              <span className="required-field">*</span>
+              Usuario asignado
+            </label>
+            <div className="input-group">
+              <span className="input-group-text bg-light">
+                <FaUser />
+              </span>
               <select
                 id="usuario"
                 value={usuarioSeleccionado}
@@ -411,92 +467,184 @@ useEffect(() => {
                   </option>
                 ))}
               </select>
-              <ErrorMensaje mensaje={errores.usuario} />
             </div>
+            <ErrorMensaje mensaje={errores.usuario} />
+          </div>
+     
 
-            {/* Fechas */}
-            <div className="row mb-3">
-              <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="agregartareas-label fw-bold mb-1">Fecha de inicio</label>
-                <DatePicker
-                  selected={fechaInicio}
-                  onChange={date => {
-                    setFechaInicio(date);
-                    handleInputChange("inicio");
-                  }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={minFecha}
-                  maxDate={fechaFin || maxFecha}
-                  customInput={<CalendarButton />}
-                />
-                <ErrorMensaje mensaje={errores.inicio} />
+        {usuarioSeleccionadoInfo && (
+          <div className="user-info-card p-3 mt-3 rounded">
+            <div className="d-flex align-items-center gap-3">
+              <div className="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style={{ width: '48px', height: '48px' }}>
+                {usuarioSeleccionadoInfo.nombre?.charAt(0).toUpperCase()}
+                {usuarioSeleccionadoInfo.apaterno?.charAt(0).toUpperCase()}
               </div>
-
-              <div className="col-12 col-md-6 mb-3 d-flex flex-column">
-                <label className="agregartareas-label fw-bold mb-1">Fecha de fin</label>
-                <DatePicker
-                  selected={fechaFin}
-                  onChange={date => {
-                    setFechaFin(date);
-                    handleInputChange("fin");
-                  }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={fechaInicio || minFecha}
-                  maxDate={maxFecha}
-                  customInput={<CalendarButton />}
-                />
-                <ErrorMensaje mensaje={errores.fin} />
+              <div>
+                <h6 className="mb-1">
+                  {`${usuarioSeleccionadoInfo.nombre} ${usuarioSeleccionadoInfo.apaterno} ${usuarioSeleccionadoInfo.amaterno}`
+                    .split(" ")
+                    .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+                    .join(" ")}
+                </h6>
+                <p className="text-muted mb-0 small">Usuario asignado</p>
               </div>
             </div>
+          </div>
+        )}
+      </TaskCard>
 
-            <div className="d-flex flex-column flex-md-row gap-2 justify-content-center">
-              <button
-                type="button"
-                className="btn-agregartareas cancelar w-100 w-md-auto"
-                onClick={handleCancelar}
-                disabled={loadingTarea}
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                className="btn-agregartareas guardar w-100 w-md-auto"
-                onClick={handleGuardar}
-                disabled={loadingTarea}
-              >
-                {loadingTarea && (
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                )}
-                {loadingTarea ? "Guardando…" : "Guardar Tarea"}
-              </button>
-            </div>
-
-            {tareaGuardada && !loadingTarea && (
-              <div className="mt-3 d-flex justify-content-center">
-                <button
-                  type="button"
-                  className="agregartareas-btn-vt"
-                  onClick={() => navigate("/ListaDeTareas", { state: { id_proyecto } })}
-                >
-                  <span style={{ fontSize: "1.5rem", marginRight: "8px", lineHeight: "0.8" }}>←</span>
-                  Ver Tareas
-                </button>
+      {/* Cronograma */}
+<TaskCard title="Cronograma" icon={<FaRegClock color="#861542" />}>
+  <div className="row g-4">
+              <div className="col-12 col-md-6">
+                <div className="fecha-container">
+               
+      <label className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+        <span className="required-field">*</span>
+        Fecha de inicio
+      </label>
+      <DatePicker
+        selected={fechaInicio}
+        onChange={date => {
+          setFechaInicio(date);
+          handleInputChange("inicio");
+        }}
+        dateFormat="dd/MM/yyyy"
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"
+        locale="es"
+        minDate={minFecha}
+        maxDate={fechaFin || maxFecha}
+        customInput={<CalendarButton />}
+        className="w-100"
+      />
+      {fechaInicio && (
+        <small className="text-muted mt-1 d-block">
+          {fechaInicio.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </small>
+      )}
+      <ErrorMensaje mensaje={errores.inicio} />
+  </div>
               </div>
+
+   <div className="col-12 col-md-6">
+                <div className="fecha-container">
+      <label className="agregartareas-label d-flex align-items-center gap-2 mb-2">
+        <span className="required-field">*</span>
+        Fecha de fin
+      </label>
+      <DatePicker
+        selected={fechaFin}
+        onChange={date => {
+          setFechaFin(date);
+          handleInputChange("fin");
+        }}
+        dateFormat="dd/MM/yyyy"
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"
+        locale="es"
+        minDate={fechaInicio || minFecha}
+        maxDate={maxFecha}
+        customInput={<CalendarButton />}
+        className="w-100"
+      />
+      {fechaFin && (
+        <small className="text-muted mt-1 d-block">
+          {fechaFin.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </small>
+      )}
+      <ErrorMensaje mensaje={errores.fin} />
+    </div>
+  </div>
+   </div>
+
+  {/* Indicador de duración */}
+  {fechaInicio && fechaFin && (
+    <div className="duration-indicator p-3 rounded text-center mt-3">
+      <FaRegClock className="mb-2" size={20} />
+      <h5 className="mb-1">{calcularDuracion()} días</h5>
+      <p className="text-muted small mb-0">Duración estimada</p>
+    </div>
+  )}
+
+  {/* Rango del proyecto */}
+  {minFecha && maxFecha && (
+    <div className="project-range mt-3 p-2 rounded small">
+      <p className="mb-1"><strong>Rango del proyecto:</strong></p>
+      <p className="mb-0 text-muted">
+        {minFecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}{" - "}
+        {maxFecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+      </p>
+    </div>
+  )}
+</TaskCard>
+
+
+      {/* Panel de acciones */}
+      <div className="actions-panel p-4 rounded mt-4">
+        <h5 className="mb-3">Acciones</h5>
+        <div className="d-flex flex-column gap-2">
+          <button
+            type="button"
+            className="btn-action btn-save d-flex align-items-center justify-content-center gap-2"
+            onClick={handleGuardar}
+            disabled={loadingTarea}
+          >
+            {loadingTarea ? (
+              <>
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Guardando…
+              </>
+            ) : (
+              <>
+                <FaSave />
+                Guardar Tarea
+              </>
             )}
+          </button>
 
+          <button
+            type="button"
+            className="btn-action btn-cancel d-flex align-items-center justify-content-center gap-2"
+            onClick={handleCancelar}
+            disabled={loadingTarea}
+          >
+            <FaTimes />
+            Cancelar
+          </button>
+        </div>
+
+        {tareaGuardada && !loadingTarea && (
+          <div className="mt-3">
+            <button
+              type="button"
+              className="btn-action btn-list d-flex align-items-center justify-content-center gap-2 w-100"
+              onClick={() => navigate("/ListaDeTareas", { state: { id_proyecto } })}
+            >
+              <FaListAlt />
+              Ver Todas las Tareas
+            </button>
+          </div>
+        )}
+
+        {/* Estado del formulario */}
+        <div className="mt-4 pt-3 border-top">
+          <div className="form-status d-flex justify-content-between align-items-center">
+            <span className={`status-indicator ${Object.keys(camposModificados).length > 0 ? 'status-pending' : 'status-saved'}`}>
+              {Object.keys(camposModificados).length > 0 ? '● Cambios sin guardar' : '● Guardado'}
+            </span>
+            <small className="text-muted">
+              <span className="required-field me-1">*</span> Obligatorio
+            </small>
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
+  </div>
+</Layout>
+
   );
 }
 
