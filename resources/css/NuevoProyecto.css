@@ -1,5 +1,5 @@
 
-.contenedor-formulario-principal {
+.nv-contenedor{
   max-width: 900px;
   margin-left: auto;
   margin-right: auto;
@@ -28,9 +28,9 @@
     display: inline-flex; 
     justify-content: center;
 }
-.field-card {
+.nv-field-card {
   background: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e1e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease;
@@ -38,12 +38,11 @@
   position: relative;
 }
 
-.field-card:hover {
+.nv-field-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Títulos de sección */
-.seccion-titulo {
+.nv-seccion-titulo {
   color: #2c3e50;
   font-size: 1.25rem;
   font-weight: 600;
@@ -51,25 +50,24 @@
   border-bottom: 2px solid #86154233;
 }
 
-.seccion-icono {
+.nv-seccion-icono {
   font-size: 1.2rem;
 }
-.campo-requerido {
+.nv-campo-requerido {
   color: #e74c3c;
   font-weight: bold;
 }
 
-/* Mejoras para los campos de fecha */
-.fecha-container {
+.nv-fecha-container {
   position: relative;
 }
 
-.fecha-container .react-datepicker-wrapper {
+.nv-fecha-container .react-datepicker-wrapper {
   width: 100%;
 }
 
 /* Indicador de duración */
-.duracion-indicador {
+.nv-duracion-indicador {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border: 1px dashed #adb5bd;
   border-radius: 6px;
@@ -78,89 +76,113 @@
 
 
 
-.btn-cancelar {
+.nv-btn-cancelar {
   background-color: #f8f9fa;
   color: #6c757d;
   border: 2px solid #dee2e6 !important;
 }
 
-.btn-cancelar:hover:not(:disabled) {
+.nv-btn-cancelar:hover:not(:disabled) {
   background-color: #e9ecef;
   color: #495057;
   border-color: #adb5bd !important;
 }
 
-.btn-guardar {
+.nv-btn-guardar {
   background: #861542 ;
   color: white;
    border: 2px solid #861542 !important;
 }
 
 
-.btn-guardar:hover:not(:disabled) {
+.nv-btn-guardar:hover:not(:disabled) {
   background: linear-gradient(135deg, #75133a 0%, #8a1648 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(134, 21, 66, 0.2);
 }
 
-.btn-tarea {
+.nv-btn-tarea {
   background: #861542;
   color: white;
 }
 
-.btn-tarea:hover {
+.nv-btn-tarea:hover {
   background: #861542;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
 }
 
-.btn-ver {
+.nv-btn-ver {
   background:#861542;
   color: white;
 }
 
-.btn-ver:hover {
+.nv-btn-ver:hover {
   background: #861542;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(23, 162, 184, 0.2);
 }
 
-.icono-titulo {
+.nv-icono-titulo {
   padding: 20px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.seccion-icono {
+.nv-seccion-icono {
 color: #861542; 
 }
 
 /* Responsividad mejorada */
 @media (max-width: 768px) {
-  .btn-accion {
+  .nv-btn-accion {
     min-width: 100%;
     width: 100%;
   }
   
-  .field-card {
+  .nv-field-card {
     padding: 1.5rem;
   }
   
-  .seccion-titulo {
+  .nv-seccion-titulo {
     font-size: 1.1rem;
   }
 }
 
 /* Estados de carga */
-.btn-accion:disabled {
+.nv-btn-accion:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none !important;
 }
 
 .nv-form-input {
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+   width: 100%;
+  padding: 12px 15px;
+  font-size: 15px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  outline: none;
+  color: #495057;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 500;
+  overflow: hidden;
+  resize: none;
+  box-sizing: border-box;
+  min-height: 44px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+}
+.nv-form-input::placeholder {
+  color: #adb5bd;
+  font-weight: normal;
+}
+.nv-form-label{
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 6px;
 }
 
 .nv-form-input:focus {
@@ -168,10 +190,10 @@ color: #861542;
   box-shadow: 0 0 0 0.2rem rgba(134, 21, 66, 0.25) !important;
 }
 
-.text-muted small {
+.nv-text-muted small {
   font-size: 0.85rem;
 }
-.btn-accion {
+.nv-btn-accion {
   padding: 12px 24px;
   font-size: 15px;
   border: none;

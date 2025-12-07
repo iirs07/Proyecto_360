@@ -74,10 +74,10 @@
 
 /* NOMBRE DEL PROYECTO */
 .modificar-proyectos-nombre {
-  font-weight: bold;
+   font-weight: bold;
   font-size: 1.4rem;
   text-transform: uppercase;
-  color: #861542;
+  color: #333;
   margin-bottom: 12px;
   position: relative;
   padding-bottom: 8px;
@@ -90,8 +90,7 @@
   left: 0;
   width: 50px;
   height: 2px;
-  background: #861542;
-  transition: width 0.3s ease;
+  background: #333;
 }
 
 .modificar-proyectos-card:hover .modificar-proyectos-nombre::after {

@@ -63,9 +63,15 @@ function AgregarT() {
   fetchProyectosUsuario();
 }, []);
 
-const modificar = (idProyecto) => {
-  navigate("/AgregarTareas", { state: { id_proyecto: idProyecto } }); 
+const modificar = (idProyecto, nombreProyecto) => {
+  navigate("/AgregarTareas", { 
+    state: { 
+      id_proyecto: idProyecto,
+      nombre: nombreProyecto
+    } 
+  });
 };
+
 
 
 
@@ -201,7 +207,8 @@ const modificar = (idProyecto) => {
                     <div className="agregar-tareas-botones">
                       <button
                         className="agregar-tareas-btn"
-                        onClick={() => modificar(p.id_proyecto)}
+                        onClick={() => modificar(p.id_proyecto, p.p_nombre)}
+
                       >
                          <FaTasks style={{ marginRight: "8px" }} />
                         Agregar Tarea

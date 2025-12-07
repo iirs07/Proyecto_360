@@ -45,7 +45,7 @@
   font-weight: bold;
   font-size: 1.4rem;
   text-transform: uppercase;
-  color: #861542;
+  color: #333;
   margin-bottom: 12px;
   position: relative;
   padding-bottom: 8px;
@@ -58,7 +58,7 @@
   left: 0;
   width: 50px;
   height: 2px;
-  background: #861542;
+  background: #333;
 }
 
 .verproyectos-info {
@@ -86,13 +86,6 @@
   border-left-color: #ff6b6b;
 }
 
-.verproyectos-card.con-tareas {
-  border-left-color: #51cf66;
-}
-
-.verproyectos-card.proximo-vencimiento {
-  border-left-color: #ffd43b;
-}
 
 .verproyectos-alerta {
   color: #e03131 !important;
@@ -100,7 +93,7 @@
 }
 
 .verproyectos-advertencia {
-  color: #e67700 !important;
+  color: #333 !important;
   font-weight: 600;
 }
 

@@ -33,7 +33,7 @@ const CalendarButton = React.forwardRef(({ value, onClick, disabled }, ref) => (
 
 // Componente de tarjeta para agrupar campos relacionados
 const FieldCard = ({ children, className = "" }) => (
-  <div className={`field-card p-4 mb-4 ${className}`}>
+  <div className={`nv-field-card p-4 mb-4 ${className}`}>
     {children}
   </div>
 );
@@ -209,10 +209,10 @@ function NuevoProyecto() {
        titulo="NUEVO PROYECTO"
        sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}
      >
-             <div className="contenedor-formulario-principal">
+             <div className="nv-contenedor">
 
     <div className="nv-contenedor-encabezado">
-        <div className="d-flex icono-titulo">
+        <div className="d-flex nv-icono-titulo">
             <div >
                 <h1 className="nv-titulo mb-0">Crear Nuevo Proyecto</h1>
                 <p className="nv-muted mb-0">
@@ -232,8 +232,8 @@ function NuevoProyecto() {
 
           {/* Sección de información básica */}
           <FieldCard>
-           <h3 className="seccion-titulo mb-4 d-flex align-items-center gap-2">
-    <span className="seccion-icono">
+           <h3 className="nv-seccion-titulo mb-4 d-flex align-items-center gap-2">
+    <span className="nv-seccion-icono">
         <FaClipboardList /> 
     </span>
     Datos del proyectos
@@ -260,7 +260,7 @@ function NuevoProyecto() {
 
             <div className="mb-4">
               <label htmlFor="descripcionProyecto" className="nv-form-label d-flex align-items-center gap-2 mb-2">
-                <span className="campo-requerido">*</span>
+                <span className="nv-campo-requerido">*</span>
                 Descripción del proyecto
               </label>
               <textarea
@@ -280,9 +280,9 @@ function NuevoProyecto() {
           
             <div className="row g-4">
               <div className="col-12 col-md-6">
-                <div className="fecha-container">
+                <div className="nv-fecha-container">
                   <label className="nv-form-label d-flex align-items-center gap-2 mb-2">
-                    <span className="campo-requerido">*</span>
+                    <span className="nv-campo-requerido">*</span>
                     Fecha de inicio
                   </label>
                   <div className="position-relative">
@@ -301,7 +301,7 @@ function NuevoProyecto() {
                   </div>
                   <ErrorMensaje mensaje={errores.inicio} />
                   {fechaInicio && (
-                    <small className="text-muted mt-1 d-block">
+                    <small className="nv-text-muted mt-1 d-block">
                       Inicia: {fechaInicio.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </small>
                   )}
@@ -309,9 +309,9 @@ function NuevoProyecto() {
               </div>
 
               <div className="col-12 col-md-6">
-                <div className="fecha-container">
+                <div className="nv-fecha-container">
                   <label className="nv-form-label d-flex align-items-center gap-2 mb-2">
-                    <span className="campo-requerido">*</span>
+                    <span className="nv-campo-requerido">*</span>
                     Fecha de fin
                   </label>
                   <div className="position-relative">
@@ -330,7 +330,7 @@ function NuevoProyecto() {
                   </div>
                   <ErrorMensaje mensaje={errores.fin} />
                   {fechaFin && (
-                    <small className="text-muted mt-1 d-block">
+                    <small className="nv-text-muted mt-1 d-block">
                       Finaliza: {fechaFin.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </small>
                   )}
@@ -339,7 +339,7 @@ function NuevoProyecto() {
               </div>
               {fechaInicio && fechaFin && (
                 <div className="col-12">
-                  <div className="duracion-indicador p-3 mt-2">
+                  <div className="nv-duracion-indicador p-3 mt-2">
                     <div className="d-flex justify-content-between align-items-center">
                       <span className="text-muted">Duración estimada:</span>
                       <span className="fw-bold">
@@ -357,7 +357,7 @@ function NuevoProyecto() {
                 <>
                   <button 
                     type="button"
-                    className="btn-accion btn-cancelar d-flex align-items-center justify-content-center gap-2"
+                    className="nv-btn-accion nv-btn-cancelar d-flex align-items-center justify-content-center gap-2"
                     onClick={handleCancelar}
                     disabled={loading}
                   >
@@ -366,7 +366,7 @@ function NuevoProyecto() {
                   </button>
                   <button 
                     type="button"
-                    className="btn-accion btn-guardar d-flex align-items-center justify-content-center gap-2"
+                    className="nv-btn-accion nv-btn-guardar d-flex align-items-center justify-content-center gap-2"
                     onClick={handleGuardar}
                     disabled={loading}
                   > 
@@ -387,7 +387,7 @@ function NuevoProyecto() {
                 <>
                   <button 
                     type="button"
-                    className="btn-accion btn-tarea d-flex align-items-center justify-content-center gap-2"
+                    className="nv-btn-accion nv-btn-tarea d-flex align-items-center justify-content-center gap-2"
                     onClick={handleNuevaTarea}
                   >
                     <FaTasks />
@@ -395,7 +395,7 @@ function NuevoProyecto() {
                   </button>
                   <button 
                     type="button"
-                    className="btn-accion btn-ver d-flex align-items-center justify-content-center gap-2"
+                    className="nv-btn-accion nv-btn-ver d-flex align-items-center justify-content-center gap-2"
                     onClick={() => navigate("/ListaProyectos")}
                   >
                     <FaEye />
@@ -407,8 +407,8 @@ function NuevoProyecto() {
 
             {/* Leyenda de campos requeridos */}
             <div className="mt-4 pt-3 border-top text-center">
-              <small className="text-muted">
-                <span className="campo-requerido me-1">*</span> Campos obligatorios
+              <small className="nv-text-muted">
+                <span className="nv-campo-requerido me-1">*</span> Campos obligatorios
               </small>
             </div>
           </FieldCard>
