@@ -63,9 +63,15 @@ function AgregarT() {
   fetchProyectosUsuario();
 }, []);
 
-const modificar = (idProyecto) => {
-  navigate("/AgregarTareas", { state: { id_proyecto: idProyecto } }); 
+const modificar = (idProyecto, nombreProyecto) => {
+  navigate("/AgregarTareas", { 
+    state: { 
+      id_proyecto: idProyecto,
+      nombre: nombreProyecto
+    } 
+  });
 };
+
 
 
 
@@ -182,16 +188,27 @@ const modificar = (idProyecto) => {
                 proyectosFiltrados.map((p) => (
                   <div key={p.id_proyecto} className="agregar-tareas-card">
                     <h5 className="agregar-tareas-nombre">{p.p_nombre}</h5>
-                    <div className="agregar-tareas-info-item">
-                                                               <FaCalendarAlt className="agregar-tareas-info-icon" />
-                                                               <span>
-                                                                 <strong>Finaliza:</strong> {p.pf_fin}
-                                                               </span>
-                                                             </div>
+                  <div className="agregar-tareas-info">
+  <div className="agregar-tareas-info-item">
+    <FaCalendarAlt className="agregar-tareas-info-icon" />
+    <div>
+      <strong>Inicia:</strong> {p.pf_inicio}
+    </div>
+  </div>
+
+  <div className="agregar-tareas-info-item">
+    <FaCalendarAlt className="agregar-tareas-info-icon" />
+    <div>
+      <strong>Finaliza:</strong> {p.pf_fin}
+    </div>
+  </div>
+</div>
+
                     <div className="agregar-tareas-botones">
                       <button
                         className="agregar-tareas-btn"
-                        onClick={() => modificar(p.id_proyecto)}
+                        onClick={() => modificar(p.id_proyecto, p.p_nombre)}
+
                       >
                          <FaTasks style={{ marginRight: "8px" }} />
                         Agregar Tarea

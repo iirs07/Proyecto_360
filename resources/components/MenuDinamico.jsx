@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-// Importamos los iconos que ya usas
+
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
-  FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, 
-  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt, FaBriefcase
+  FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, FaLayerGroup,
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt
 } from "react-icons/fa";
-import { 
-  FiUsers
-} from "react-icons/fi";
+
+import { FiUsers } from "react-icons/fi";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "../css/global.css";
-// Ajusta la ruta de slugify si es necesario
+
 import { slugify } from "../js/utils/slugify.jsx"; 
+
 
 export default function MenuDinamico({ 
     collapsed, 
@@ -22,27 +22,33 @@ export default function MenuDinamico({
     onLogout, 
     activeRoute
 }) {
-    // 🚩 CORRECCIÓN CRUCIAL: Usamos 'rol' en lugar de 'user_role' (basado en Login.js)
-  // SOLO PARA PRUEBAS: prioriza sessionStorage
-const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Superusuario';
 
-    
+    // Obtener rol
+    const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Superusuario';
+
     const location = useLocation();
     const navigate = useNavigate();
     const [subMenusAbiertos, setSubMenusAbiertos] = useState({});
 
     // Slug persistente
-    const slug = departamentoSlug || (departamentoNombre ? slugify(departamentoNombre) : localStorage.getItem('last_depSlug') || '');
+    const slug = departamentoSlug || 
+                (departamentoNombre ? slugify(departamentoNombre) : localStorage.getItem('last_depSlug') || '');
+
     if (slug) localStorage.setItem('last_depSlug', slug);
 
-    // Menús por rol (Solo el Superusuario, usando la estructura original)
+    
+    // ============================
+    //     MENÚS DEFINIDOS
+    // ============================
     const menus = {
+
         Superusuario: {
             principal: [
                 { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'reportes', label: 'Reportes', icon: FaFileAlt, path: '/ReporteSuperUsuario' },
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
             ],
+
             departamento: [
                 { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'proceso', label: 'Proyectos en proceso', icon: FaTasks, path: slug ? `/proyectosenproceso/${slug}` : '#' },
@@ -50,15 +56,11 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
             ],
         },
-        // 🆕 AGREGAR MENÚ PARA ADMINISTRADOR
+
         Administrador: {
             principal: [
-                {
-                    key: 'GestionProyectos',
-                    label: 'INICIO',
-                    icon: FaHome,
-                    path: '/GestionProyectos'
-                },
+                { key: 'GestionProyectos', label: 'INICIO', icon: FaHome, path: '/GestionProyectos' },
+
                 {
                     key: 'proyectos',
                     label: "PROYECTOS",
@@ -71,6 +73,7 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
                     ],
                 },
+
                 {
                     key: 'tareas',
                     label: "TAREAS",
@@ -84,6 +87,7 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
                     ],
                 },
+
                 {
                     key: 'usuarios',
                     label: "Usuarios",
@@ -93,18 +97,17 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                     ],
                 },
+
                 { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
-                { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
+                { key: 'logout', label: "CERRAR SESIÓN", path: "/login", icon: FaSignOutAlt, action: onLogout },
             ]
         },
+
+
         Jefe: {
             principal: [
-                {
-                    key: 'GestionProyectos',
-                    label: 'INICIO',
-                    icon: FaHome,
-                    path: '/GestionProyectos'
-                },
+                { key: 'GestionProyectos', label: 'INICIO', icon: FaHome, path: '/GestionProyectos' },
+
                 {
                     key: 'proyectos',
                     label: "PROYECTOS",
@@ -117,6 +120,7 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
                     ],
                 },
+
                 {
                     key: 'tareas',
                     label: "TAREAS",
@@ -130,39 +134,50 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
                     ],
                 },
+
                 {
                     key: 'usuarios',
                     label: "Usuarios",
                     icon: FiUsers,
                     subMenu: [
-                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitaciones", icon: FaUserPlus },
+                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                     ],
                 },
+
                 { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
-                { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
+                { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
             ]
         },
+
+
         Usuario: {
             principal: [
                 { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
-                { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaTasks },
+                { key: 'tareas', label: "MIS PROYECTOS", path: "/ListaDeProyectos", icon: FaLayerGroup },
                 { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
                 { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
             ],
-        },
+        }
+
     };
 
+
     // Detectar tipo de menú según URL
-    const tipoMenu = location.pathname.includes('/proyectosenproceso') ||
-                     location.pathname.includes('/proyectoscompletados') ||
-                     location.pathname.includes('/proyecto') 
-                     ? 'departamento'
-                     : 'principal';
+    const tipoMenu =
+        location.pathname.includes('/proyectosenproceso') ||
+        location.pathname.includes('/proyectoscompletados') ||
+        location.pathname.includes('/proyecto')
+            ? 'departamento'
+            : 'principal';
 
-     const menuItems = menus[rol]?.[tipoMenu] || [];
+    const menuItems = menus[rol]?.[tipoMenu] || [];
 
-    // 🆕 FUNCIÓN PARA TOGGLE SUBMENÚ
+
+    // ===============================
+    //    FUNCIONES DE MENU
+    // ===============================
+
     const toggleSubMenu = (itemKey, event) => {
         event.stopPropagation();
         setSubMenusAbiertos(prev => ({
@@ -171,11 +186,8 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
         }));
     };
 
-     const handleClick = (item) => {
-        // Si tiene submenú, solo expandir/contraer, no navegar
-        if (item.subMenu) {
-            return; // La navegación se maneja en los items del submenú
-        }
+    const handleClick = (item) => {
+        if (item.subMenu) return;
 
         if (item.key === 'logout') {
             if (typeof onLogout === 'function') {
@@ -199,7 +211,6 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
         navigate(item.path, { state: stateToSend });
     };
 
-    // 🆕 FUNCIÓN PARA MANEJAR CLICK EN ITEM DE SUBMENÚ
     const handleSubMenuItemClick = (subItem) => {
         if (!subItem.path || subItem.path === '#') return;
 
@@ -213,13 +224,14 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
         navigate(subItem.path, { state: stateToSend });
     };
 
-    // 🆕 FUNCIÓN PARA RENDERIZAR ITEMS (PRINCIPALES Y SUBMENÚS)
+
+    // RENDERIZAR MENÚS
     const renderMenuItems = (items, nivel = 0) => {
         return items.map(item => {
             const IconComponent = item.icon;
             const tieneSubMenu = item.subMenu && item.subMenu.length > 0;
             const estaAbierto = subMenusAbiertos[item.key];
-            
+
             return (
                 <React.Fragment key={item.key}>
                     <li 
@@ -233,6 +245,7 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                         }}
                     >
                         <IconComponent className="icon" />
+
                         {!collapsed && (
                             <>
                                 <span className="label">{item.label}</span>
@@ -244,17 +257,27 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                             </>
                         )}
                     </li>
-                    
-                    {/* 🆕 RENDERIZAR SUBMENÚ SI ESTÁ ABIERTO */}
+
                     {tieneSubMenu && estaAbierto && !collapsed && (
                         <ul className="submenu">
-                            {renderMenuItems(item.subMenu, nivel + 1)}
+                            {item.subMenu.map(subItem => (
+                                <li 
+                                    key={subItem.key}
+                                    className="submenu-item"
+                                    onClick={() => handleSubMenuItemClick(subItem)}
+                                >
+                                    <subItem.icon className="icon" />
+                                    <span>{subItem.label}</span>
+                                </li>
+                            ))}
                         </ul>
                     )}
+
                 </React.Fragment>
             );
         });
     };
+
 
     return (
         <ul className={`menu-dinamico-list ${collapsed ? 'collapsed' : ''}`}>

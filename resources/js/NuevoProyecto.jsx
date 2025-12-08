@@ -9,9 +9,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/global.css';
 import '../css/formulario.css';
 import '../css/NuevoProyecto.css';
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaTasks, FaEye, FaSave, FaTimes, FaProjectDiagram, FaInfoCircle,FaClipboardList} from "react-icons/fa";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+
 
 registerLocale("es", es);
 
@@ -21,7 +22,7 @@ const CalendarButton = React.forwardRef(({ value, onClick, disabled }, ref) => (
     className="btn-calendario nv-btn-calendario w-100 d-flex align-items-center gap-2"
     onClick={onClick}
     ref={ref}
-    disabled={disabled} // Agregado para respetar el bloqueo
+    disabled={disabled}
   >
     <FaCalendarAlt className={!value ? "nv-text" : ""} /> 
     <span className={!value ? "nv-text" : ""}>
@@ -29,6 +30,13 @@ const CalendarButton = React.forwardRef(({ value, onClick, disabled }, ref) => (
     </span>
   </button>
 ));
+
+// Componente de tarjeta para agrupar campos relacionados
+const FieldCard = ({ children, className = "" }) => (
+  <div className={`nv-field-card p-4 mb-4 ${className}`}>
+    {children}
+  </div>
+);
 
 function NuevoProyecto() {
   const navigate = useNavigate();
@@ -40,17 +48,14 @@ function NuevoProyecto() {
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const [isOpen, setIsOpen] = useState(false);
   
-  // Estado para controlar qué botones se muestran (Guardar vs Nueva Tarea)
   const [mostrarExtras, setMostrarExtras] = useState(true);
-  
-  // Estado para guardar el ID del proyecto recién creado
   const [idProyectoGuardado, setIdProyectoGuardado] = useState(null);
-
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
   const [errores, setErrores] = useState({});
   const [loading, setLoading] = useState(false); 
   const [camposModificados, setCamposModificados] = useState({});
+  const [guardadoExitoso, setGuardadoExitoso] = useState(false);
 
   const usuario = JSON.parse(sessionStorage.getItem("usuario"));
   const id_usuario = usuario?.id_usuario;
@@ -83,19 +88,17 @@ function NuevoProyecto() {
   const handleInputChange = (campo) => {
     setErrores((prev) => ({ ...prev, [campo]: null }));
     setCamposModificados((prev) => ({ ...prev, [campo]: true }));
+    if (guardadoExitoso) setGuardadoExitoso(false);
   };
 
-  // --- LÓGICA MODIFICADA: Cancelar regresa a la pantalla anterior ---
   const handleCancelar = () => {
     if (Object.keys(camposModificados).length > 0) {
       const confirmar = window.confirm("Tienes cambios sin guardar. ¿Seguro que quieres cancelar y salir?");
       if (!confirmar) return;
     }
-    // Regresa a la página anterior en el historial
     navigate(-1);
   };
 
-  // --- LÓGICA MODIFICADA: Redirige usando el ID guardado ---
   const handleNuevaTarea = () => {
     if (!idProyectoGuardado) return;
 
@@ -106,7 +109,7 @@ function NuevoProyecto() {
             id_proyecto: idProyectoGuardado,
             p_nombre: nombreProyectoRef.current.value,
             descripcion: descripcionProyectoRef.current.value,
-            pf_inicio: fechaInicio ? fechaInicio.toISOString() : null, // Asegurar formato fecha
+            pf_inicio: fechaInicio ? fechaInicio.toISOString() : null,
             pf_fin: fechaFin ? fechaFin.toISOString() : null
         } 
     });
@@ -171,23 +174,13 @@ function NuevoProyecto() {
         const data = await res.json().catch(async () => ({ error: await res.text() }));
         if (!res.ok) return alert("Error al guardar el proyecto: " + (data.message || JSON.stringify(data)));
 
-        // --- ÉXITO ---
         const idProyecto = data.id_proyecto || data.proyecto?.id_proyecto;
         
-        // 1. Guardamos el ID para usarlo después
         setIdProyectoGuardado(idProyecto);
-
-        // 2. Cambiamos el estado de los botones
         setMostrarExtras(false);
-        
-        // 3. Limpiamos errores y modificaciones para evitar alertas al salir
+        setGuardadoExitoso(true);
         setErrores({});
         setCamposModificados({});
-
-        
-        
-        // NOTA: Ya no limpiamos los campos (nombreRef.current.value = "") 
-        // para que el usuario vea la información del proyecto creado.
 
     } catch (error) {
         alert("Error al conectar con el servidor");
@@ -199,7 +192,6 @@ function NuevoProyecto() {
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      // Si hay cambios y aun NO se ha guardado (mostrarExtras es true)
       if (Object.keys(camposModificados).length > 0 && mostrarExtras) {
         e.preventDefault();
         e.returnValue = ""; 
@@ -212,130 +204,218 @@ function NuevoProyecto() {
     };
   }, [camposModificados, mostrarExtras]);
 
-
   return (
      <Layout
        titulo="NUEVO PROYECTO"
        sidebar={<MenuDinamico activeRoute="Nuevo proyecto" />}
      >
-        <div className="nv-contenedor">
-            <div className="row justify-content-center g-0">
-           <div className="col-12 col-md-8 col-lg-6">
-              <h1 className="titulo-global">Nuevo Proyecto</h1>
-           </div>
-           
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="nombreProyecto" className="nv-form-label fw-bold nv-label">Nombre del proyecto</label>
+             <div className="nv-contenedor">
+
+    <div className="nv-contenedor-encabezado">
+        <div className="d-flex nv-icono-titulo">
+            <div >
+                <h1 className="nv-titulo mb-0">Crear Nuevo Proyecto</h1>
+                <p className="nv-muted mb-0">
+                    Complete todos los campos requeridos para registrar un nuevo proyecto
+                </p>
+            </div>
+        </div>
+    </div>
+          {guardadoExitoso && (
+            <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+              <FaSave />
+              <div>
+                <strong>¡Proyecto guardado exitosamente!</strong> Ahora puede agregar tareas o ver todos los proyectos.
+              </div>
+            </div>
+          )}
+
+          {/* Sección de información básica */}
+          <FieldCard>
+           <h3 className="nv-seccion-titulo mb-4 d-flex align-items-center gap-2">
+    <span className="nv-seccion-icono">
+        <FaClipboardList /> 
+    </span>
+    Datos del proyectos
+</h3>
+            
+            <div className="mb-4">
+              <label htmlFor="nombreProyecto" className="nv-form-label d-flex align-items-center gap-2 mb-2">
+                <span className="campo-requerido">*</span>
+                Nombre del proyecto
+              </label>
               <textarea
                 id="nombreProyecto"
                 ref={nombreProyectoRef}
                 className="form-control nv-form-input"
-                placeholder="Escribe el nombre del proyecto"
+                placeholder="Ingrese un nombre para el proyecto"
                 rows={1}
-                disabled={!mostrarExtras} // Se bloquea si ya se guardó
+                disabled={!mostrarExtras}
                 onInput={() => { ajustarAltura(nombreProyectoRef); handleInputChange("nombre"); }}
               />
-               <ErrorMensaje mensaje={errores.nombre} />
+              <div className="d-flex justify-content-between align-items-center mt-1">
+                <ErrorMensaje mensaje={errores.nombre} />
+              </div>
             </div>
 
-            <div className="mb-3 d-flex flex-column">
-              <label htmlFor="descripcionProyecto" className="nv-form-label fw-bold nv-label">Descripción del proyecto</label>
+            <div className="mb-4">
+              <label htmlFor="descripcionProyecto" className="nv-form-label d-flex align-items-center gap-2 mb-2">
+                <span className="nv-campo-requerido">*</span>
+                Descripción del proyecto
+              </label>
               <textarea
                 id="descripcionProyecto"
                 ref={descripcionProyectoRef}
                 className="form-control nv-form-input"
-                placeholder="Escribe la descripción del proyecto"
-                rows={3}
-                disabled={!mostrarExtras} // Se bloquea si ya se guardó
+                placeholder="Describa los detalles del proyecto"
+                rows={4}
+                disabled={!mostrarExtras}
                 onInput={() => { ajustarAltura(descripcionProyectoRef); handleInputChange("descripcion"); }}
               />
-              <ErrorMensaje mensaje={errores.descripcion} />
+              <div className="d-flex justify-content-between align-items-center mt-1">
+                <ErrorMensaje mensaje={errores.descripcion} />
+               
+              </div>
+           
+          
+            <div className="row g-4">
+              <div className="col-12 col-md-6">
+                <div className="nv-fecha-container">
+                  <label className="nv-form-label d-flex align-items-center gap-2 mb-2">
+                    <span className="nv-campo-requerido">*</span>
+                    Fecha de inicio
+                  </label>
+                  <div className="position-relative">
+                    <DatePicker
+                      selected={fechaInicio}
+                      onChange={(date) => { setFechaInicio(date); handleInputChange("inicio"); }}
+                      dateFormat="dd/MM/yyyy"
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                      locale="es"
+                      minDate={new Date()}
+                      disabled={!mostrarExtras}
+                      customInput={<CalendarButton disabled={!mostrarExtras} />}
+                    />
+                  </div>
+                  <ErrorMensaje mensaje={errores.inicio} />
+                  {fechaInicio && (
+                    <small className="nv-text-muted mt-1 d-block">
+                      Inicia: {fechaInicio.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </small>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-12 col-md-6">
+                <div className="nv-fecha-container">
+                  <label className="nv-form-label d-flex align-items-center gap-2 mb-2">
+                    <span className="nv-campo-requerido">*</span>
+                    Fecha de fin
+                  </label>
+                  <div className="position-relative">
+                    <DatePicker
+                      selected={fechaFin}
+                      onChange={(date) => { setFechaFin(date); handleInputChange("fin"); }}
+                      dateFormat="dd/MM/yyyy"
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                      locale="es"
+                      minDate={fechaInicio || new Date()}
+                      disabled={!mostrarExtras}
+                      customInput={<CalendarButton disabled={!mostrarExtras} />}
+                    />
+                  </div>
+                  <ErrorMensaje mensaje={errores.fin} />
+                  {fechaFin && (
+                    <small className="nv-text-muted mt-1 d-block">
+                      Finaliza: {fechaFin.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </small>
+                  )}
+                </div>
+                 </div>
+              </div>
+              {fechaInicio && fechaFin && (
+                <div className="col-12">
+                  <div className="nv-duracion-indicador p-3 mt-2">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="text-muted">Duración estimada:</span>
+                      <span className="fw-bold">
+                        {Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24))} días
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-
-           <div className="row mb-3 g-0"> 
-             <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-0 pe-2"> 
-                <label className="nv-form-label fw-bold mb-1">Fecha de inicio</label>
-                <DatePicker
-                  selected={fechaInicio}
-                  onChange={(date) => { setFechaInicio(date); handleInputChange("inicio"); }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={new Date()}
-                  disabled={!mostrarExtras} // Se bloquea si ya se guardó
-                  customInput={<CalendarButton disabled={!mostrarExtras} />}
-                />
-                <ErrorMensaje mensaje={errores.inicio} />
-             </div>
-
-             <div className="col-12 col-md-6 mb-3 d-flex flex-column ps-2 pe-0">
-                <label className="nv-form-label fw-bold mb-1">Fecha de fin</label>
-                <DatePicker
-                  selected={fechaFin}
-                  onChange={(date) => { setFechaFin(date); handleInputChange("fin"); }}
-                  dateFormat="dd/MM/yyyy"
-                  showMonthDropdown
-                  showYearDropdown
-                  dropdownMode="select"
-                  locale="es"
-                  minDate={fechaInicio || new Date()}
-                  disabled={!mostrarExtras} // Se bloquea si ya se guardó
-                  customInput={<CalendarButton disabled={!mostrarExtras} />}
-                />
-                <ErrorMensaje mensaje={errores.fin} />
-             </div>
-           </div>
-
+   
+       
             <div className="d-flex flex-column flex-md-row gap-3 justify-content-center">
               {mostrarExtras ? (
                 <>
                   <button 
                     type="button"
-                    className="nv-btn-form w-100 w-md-auto"
+                    className="nv-btn-accion nv-btn-cancelar d-flex align-items-center justify-content-center gap-2"
                     onClick={handleCancelar}
-                    disabled={loading} 
+                    disabled={loading}
                   >
+                    <FaTimes />
                     Cancelar
                   </button>
                   <button 
                     type="button"
-                    className="nv-btn-form w-100 w-md-auto"
+                    className="nv-btn-accion nv-btn-guardar d-flex align-items-center justify-content-center gap-2"
                     onClick={handleGuardar}
-                    disabled={loading} 
+                    disabled={loading}
                   > 
-                    {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>}
-                    {loading ? "Guardando…" : "Guardar Proyecto"} 
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Guardando…
+                      </>
+                    ) : (
+                      <>
+                        <FaSave />
+                        Guardar Proyecto
+                      </>
+                    )}
                   </button>
                 </>
               ) : (
                 <>
                   <button 
                     type="button"
-                    className="nv-btn-form w-100 w-md-auto"
+                    className="nv-btn-accion nv-btn-tarea d-flex align-items-center justify-content-center gap-2"
                     onClick={handleNuevaTarea}
                   >
-                    Nueva Tarea
+                    <FaTasks />
+                    Agregar Nueva Tarea
                   </button>
                   <button 
                     type="button"
-                    className="nv-btn-form w-100 w-md-auto"
-                    
+                    className="nv-btn-accion nv-btn-ver d-flex align-items-center justify-content-center gap-2"
                     onClick={() => navigate("/ListaProyectos")}
                   >
-                    Ver Proyectos
+                    <FaEye />
+                    Ver Todos los Proyectos
                   </button>
                 </>
               )}
             </div>
 
-          </div>
+            {/* Leyenda de campos requeridos */}
+            <div className="mt-4 pt-3 border-top text-center">
+              <small className="nv-text-muted">
+                <span className="nv-campo-requerido me-1">*</span> Campos obligatorios
+              </small>
+            </div>
+          </FieldCard>
         </div>
     </Layout>
   );
 }
 
 export default NuevoProyecto;
-
 

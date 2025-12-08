@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/VerProyecto.css";
-import { FaCalendarAlt, FaTasks, FaExclamationTriangle, FaSearch } from "react-icons/fa";
+import { FaCalendarAlt, FaTasks, FaExclamationTriangle, FaSearch,FaEye } from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
@@ -173,7 +173,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                       <div className="verproyectos-info-item">
                         <FaCalendarAlt className="verproyectos-info-icon" />
                         <span>
-                          <strong>Fecha fin:</strong> {fechaFin.toLocaleDateString()}
+                          <strong>Finaliza:</strong> {fechaFin.toLocaleDateString()}
                         </span>
                       </div>
 
@@ -191,18 +191,18 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                         </div>
                       )}
 
-                      {esProximo && !estaVencido && (
-                        <div className="verproyectos-info-item verproyectos-advertencia">
-                          <FaExclamationTriangle />
-                          <span>
-                            <strong>
-                              {diasRestantes === 0
-                                ? "Vence hoy"
-                                : `Vence en ${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
-                            </strong>
-                          </span>
-                        </div>
-                      )}
+                     {esProximo && !estaVencido && (
+  <div className="verproyectos-info-item verproyectos-advertencia">
+    <FaExclamationTriangle color="#861542" /> 
+     <span style={{ color: "#333" }}>
+      <strong>
+        {diasRestantes === 0
+          ? "Vence hoy"
+          : `Vence en ${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
+      </strong>
+    </span>
+  </div>
+)}
                     </div>
 
                     <div className="verproyectos-botones">
@@ -219,7 +219,7 @@ const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
                           className="verproyectos-btn proyectos-btn-secondary"
                           onClick={() => verTareas(p.id_proyecto)}
                         >
-                          <FaTasks style={{ marginRight: "8px" }} />
+                          <FaEye style={{ marginRight: "8px" }} />
                           Ver tareas
                         </button>
                       )}

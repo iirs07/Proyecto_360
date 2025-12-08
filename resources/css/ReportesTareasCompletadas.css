@@ -83,7 +83,11 @@
   color: #999;
 }
 .reportes-tc-boton-wrapper {
-  margin-top: 30px; /* Ajusta la distancia que quieras */
+  margin-top: 70px; 
+  display: flex; 
+  justify-content: center; /* Centrar botones horizontalmente */
+  gap: 20px; /* Separación entre botones */
+  flex-wrap: wrap; /* Para que en móviles se acomoden verticalmente */
 }
 /* ==========================
    BOTON PRINCIPAL
@@ -95,7 +99,7 @@
   font-size: 16px;
   border: none;
   margin-top: 40px; 
-  border-radius: 3px;
+  border-radius: 5px;
   box-sizing: border-box;
   color: #fff;
   background-color: #861542;

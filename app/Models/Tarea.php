@@ -21,7 +21,8 @@ class Tarea extends Model
         'descripcion',
         'tf_inicio',
         'tf_fin',
-        't_estatus'
+        't_estatus',
+        'tf_completada'
     ];
 
     // Valor por defecto para estatus

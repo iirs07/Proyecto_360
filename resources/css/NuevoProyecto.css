@@ -1,98 +1,213 @@
+
 .nv-contenedor{
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+
+}
+@media (max-width: 950px) {
+    .contenedor-formulario-principal {
+        max-width: 95%; 
+        padding: 10px; 
+    }
+}
+.nv-titulo {
+    font-size: 2.1rem; 
+    font-weight: bold;
+    color: #333; 
+}
+.nv-muted {
+    font-size: 1rem; 
+    color: #6c757d; 
+    font-weight: 600;
+}
+.nv-contenedor-encabezado {
+    text-align: center; 
+}
+.nv-contenedor-encabezado > .d-flex {
+    display: inline-flex; 
+    justify-content: center;
+}
+.nv-field-card {
+  background: #ffffff;
+  border: 1px solid #e1e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+  z-index: 4;
+  position: relative;
+}
+
+.nv-field-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.nv-seccion-titulo {
+  color: #2c3e50;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #86154233;
+}
+
+.nv-seccion-icono {
+  font-size: 1.2rem;
+}
+.nv-campo-requerido {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.nv-fecha-container {
+  position: relative;
+}
+
+.nv-fecha-container .react-datepicker-wrapper {
   width: 100%;
-  max-width: 800px;
-  margin: 0.3rem auto; 
 }
 
-.nv-form-label {
-  font-size: 18px;
-    font-weight: 400;       
-  color: #212529;
-  margin-bottom: 4px;
-  z-index: 2;
+/* Indicador de duración */
+.nv-duracion-indicador {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px dashed #adb5bd;
+  border-radius: 6px;
+  color: #495057;
 }
 
-.nv-form-input::placeholder {
-  color: #999;
+
+
+.nv-btn-cancelar {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #dee2e6 !important;
 }
+
+.nv-btn-cancelar:hover:not(:disabled) {
+  background-color: #e9ecef;
+  color: #495057;
+  border-color: #adb5bd !important;
+}
+
+.nv-btn-guardar {
+  background: #861542 ;
+  color: white;
+   border: 2px solid #861542 !important;
+}
+
+
+.nv-btn-guardar:hover:not(:disabled) {
+  background: linear-gradient(135deg, #75133a 0%, #8a1648 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.2);
+}
+
+.nv-btn-tarea {
+  background: #861542;
+  color: white;
+}
+
+.nv-btn-tarea:hover {
+  background: #861542;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+}
+
+.nv-btn-ver {
+  background:#861542;
+  color: white;
+}
+
+.nv-btn-ver:hover {
+  background: #861542;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.2);
+}
+
+.nv-icono-titulo {
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nv-seccion-icono {
+color: #861542; 
+}
+
+/* Responsividad mejorada */
+@media (max-width: 768px) {
+  .nv-btn-accion {
+    min-width: 100%;
+    width: 100%;
+  }
+  
+  .nv-field-card {
+    padding: 1.5rem;
+  }
+  
+  .nv-seccion-titulo {
+    font-size: 1.1rem;
+  }
+}
+
+/* Estados de carga */
+.nv-btn-accion:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 .nv-form-input {
-  width: 100%;
-  padding: 15px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+   width: 100%;
+  padding: 12px 15px;
+  font-size: 15px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
   outline: none;
+  color: #495057;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 500;
+  overflow: hidden;
   resize: none;
-  color: #333;
   box-sizing: border-box;
-  z-index: 1;
-  font-family: 'Arial', sans-serif;
-  font-weight: bold; 
+  min-height: 44px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+}
+.nv-form-input::placeholder {
+  color: #adb5bd;
+  font-weight: normal;
+}
+.nv-form-label{
+  font-size: 16px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 6px;
 }
 
 .nv-form-input:focus {
-  border: 3px solid #AA325A4C !important;
-  outline: none !important;  
-  box-shadow: none !important; 
-}
-.nv-btn-form {
-  width: 100%;
-  max-width: 100%;
-  padding: 15px;
-  font-size: 16px;
-  border: none;
-  border-radius: 3px;
-  box-sizing: border-box;
-  color: #fff;
-  background-color: #861542;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-  z-index: 10;
-}
-/* ===========================
-   TEXTO E ICONO DEL BTN CALENDARIO
-=========================== */
-.nv-btn-calendario {
-  display: flex;
-  align-items: center; 
-  gap: 0.5rem;         
+  border-color: #861542 !important;
+  box-shadow: 0 0 0 0.2rem rgba(134, 21, 66, 0.25) !important;
 }
 
-.nv-btn-calendario .nv-text {
-  color: #6c757d;     
-  line-height: 1.3;   
+.nv-text-muted small {
+  font-size: 0.85rem;
+}
+.nv-btn-accion {
+  padding: 12px 24px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  height: 48px;
   display: flex;
   align-items: center;
-  font-size: 16px;   
-}
-.nv-text {
-  color: #6c757d;  
-}
+  justify-content: center;
+  width: 100%;
+  max-width: 260px;  
 
-
-/* --- Sobrescribir estilos de deshabilitado (evitar el gris feo) --- */
-
-/* Para los TextAreas (Nombre y Descripción) */
-.nv-form-input:disabled {
-    background-color: #ffffff !important; /* Fondo blanco */
-    color: #212529 !important;            /* Texto negro/oscuro legible */
-    opacity: 1 !important;                /* Quitar la transparencia por defecto */
-    border-color: #dee2e6 !important;     /* Mantener el borde sutil */
-    cursor: default;                      /* Cursor normal, no de "prohibido" */
-    box-shadow: none;                     /* Quitar sombras si las hubiera */
 }
 
-/* Para los Botones de Fecha (Datepicker) */
-.nv-btn-calendario:disabled {
-    background-color: #ffffff !important;
-    color: #212529 !important;
-    opacity: 1 !important;
-    border: 1px solid #dee2e6 !important; /* Asegurar que tenga borde si se pierde */
-    cursor: default;
-}
 
-/* Opcional: Si quieres que el icono del calendario se vea un poco más apagado */
-.nv-btn-calendario:disabled svg {
-    color: #6c757d; 
-}
+

@@ -29,9 +29,8 @@ public function generarReporteCompletadas(Request $request)
         return response()->json(['message' => 'La fecha de inicio no puede ser mayor que la fecha fin.'], 400);
     }
 
-    // Aseguramos que el script respete la desconexión del usuario
     ignore_user_abort(false);
-    set_time_limit(0); // Evitar límite de tiempo para PDFs grandes
+    set_time_limit(0);
 
     date_default_timezone_set('America/Mexico_City');   
     $hoy = Carbon::now()->format('d/m/Y');
@@ -51,38 +50,51 @@ public function generarReporteCompletadas(Request $request)
 
     $tareas = collect();
 
-    // Determinar fecha límite para la BD principal/histórica
+    // Fechas de corte para separar Histórico vs Actual
     $hoyCarbon = Carbon::now();
     $mesActual = $hoyCarbon->month;
     $trimestreActual = ceil($mesActual / 3);
     $inicioTrimestreActual = Carbon::create($hoyCarbon->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
 
-    //  Consultar BD principal (pgsql)
-    if (Carbon::parse($fechaFin) >= $inicioTrimestreActual) {
-        $inicio = max(Carbon::parse($fechaInicio), $inicioTrimestreActual);
-        $fin    = Carbon::parse($fechaFin);
-
-        $query = Tarea::on('pgsql')->where('id_usuario', $idUsuario)
-                    ->whereBetween('tf_completada', [$inicio, $fin]);
-
-        $tareas = $tareas->merge($query->get());
-    }
-
-    // Consultar BD histórica (pgsql_second)
+    // ---------------------------------------------------------
+    // 1. CONSULTA A LA BD HISTÓRICA (pgsql_second)
+    // ---------------------------------------------------------
+    // Solo entramos si la fecha de inicio es anterior al trimestre actual
     if (Carbon::parse($fechaInicio) < $inicioTrimestreActual) {
         $inicio = Carbon::parse($fechaInicio);
+        // El fin será lo que ocurra primero: la fecha fin del usuario o un segundo antes de que empiece el trimestre actual
         $fin    = min(Carbon::parse($fechaFin), $inicioTrimestreActual->copy()->subSecond());
 
-        $query = Tarea::on('pgsql_second')->where('id_usuario', $idUsuario)
-                    ->whereBetween('tf_completada', [$inicio, $fin]);
+        $queryHistorica = Tarea::on('pgsql_second')
+            ->where('id_usuario', $idUsuario)
+            ->where('t_estatus', 'Completada')
+            ->where(function($q) use ($inicio, $fin) {
+                $q->whereBetween('tf_completada', [$inicio, $fin])
+                  ->orWhereNull('tf_completada'); 
+            });
 
-        $tareas = $tareas->merge($query->get());
+        $tareas = $tareas->merge($queryHistorica->get());
     }
 
-    // Revisar si el usuario cerró la conexión antes de generar el PDF
-    if (connection_aborted()) {
-        return; // Salimos inmediatamente, sin gastar recursos
+    // ---------------------------------------------------------
+    // 2. CONSULTA A LA BD ACTUAL (pgsql / default)
+    // ---------------------------------------------------------
+    // Esta es la parte que te faltaba. Si la fecha fin es igual o mayor al inicio del trimestre, buscamos en la BD actual.
+    if (Carbon::parse($fechaFin) >= $inicioTrimestreActual) {
+        // El inicio será: o el inicio del trimestre, o la fecha que pidió el usuario (la que sea mayor)
+        $inicioActual = max(Carbon::parse($fechaInicio), $inicioTrimestreActual);
+        $finActual    = Carbon::parse($fechaFin);
+
+        $queryActual = Tarea::on('pgsql') // Conexión por defecto
+            ->where('id_usuario', $idUsuario)
+            ->where('t_estatus', 'Completada')
+            ->whereBetween('tf_completada', [$inicioActual, $finActual]);
+
+        $tareas = $tareas->merge($queryActual->get());
     }
+
+    // Revisar si el usuario cerró la conexión
+    if (connection_aborted()) { return; }
 
     $tipo = 'completadas-jefe';
 
@@ -97,16 +109,16 @@ public function generarReporteCompletadas(Request $request)
         'hora' => $hora
     ])->render();
 
-    // Revisar otra vez antes de PDF (en caso de que haya tardado en generar HTML)
-    if (connection_aborted()) {
-        return;
-    }
+    if (connection_aborted()) { return; }
 
     // Generar PDF
-    $mpdf = new Mpdf();
+    $mpdf = new \Mpdf\Mpdf();
     $mpdf->showImageErrors = true;
-    $mpdf->SetWatermarkImage(public_path('imagenes/logo2.png'), 0.1, [150, 200], 'C');
-    $mpdf->showWatermarkImage = true;
+    // Asegúrate que esta ruta sea correcta en tu servidor
+    if(file_exists(public_path('imagenes/logo2.png'))){
+        $mpdf->SetWatermarkImage(public_path('imagenes/logo2.png'), 0.1, [150, 200], 'C');
+        $mpdf->showWatermarkImage = true;
+    }
 
     $cssPath = resource_path('css/PdfTareasCompletadas.css');
     if (file_exists($cssPath)) {

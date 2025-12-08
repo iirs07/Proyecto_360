@@ -11,6 +11,7 @@ import {
   FaLayerGroup,
   FaExclamationTriangle
 } from "react-icons/fa";
+import { FiX } from "react-icons/fi";
 import "../css/formulario.css";
 import "../css/Gestionproyectosusuario.css";
 import Layout from "../components/Layout";
@@ -255,17 +256,19 @@ function GestionProyectosUsuario() {
               ></div>
             )}
           </div>
+          
+          {/* === LEYENDA CON DOTS (Corregido) === */}
           <div className="tdu-progreso-stats">
             <div className="tdu-progreso-stat">
-              <span className="tdu-conteo completada"></span>
+              <div className="tdu-metrica-dot tdu-completada"></div>
               <span>Completadas: {conteos.completadas}</span>
             </div>
             <div className="tdu-progreso-stat">
-              <span className="tdu-conteo progreso"></span>
+              <div className="tdu-metrica-dot tdu-progreso"></div>
               <span>En progreso: {conteos.en_progreso}</span>
             </div>
             <div className="tdu-progreso-stat">
-              <span className="tdu-conteo pendiente"></span>
+              <div className="tdu-metrica-dot tdu-pendiente"></div>
               <span>Pendientes: {conteos.pendientes}</span>
             </div>
           </div>
@@ -283,6 +286,11 @@ function GestionProyectosUsuario() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              {searchTerm && (
+                            <button className="buscador-clear-global" onClick={() => setSearchTerm("")}>
+                              <FiX />
+                            </button>
+                          )}
             </div>
           </div>
         )}
@@ -315,30 +323,28 @@ function GestionProyectosUsuario() {
                   : 0;
                 
                 const estatusGlobal = proyecto.p_estatus || "En proceso";
+                // === LÓGICA DE FECHAS ===
+const diasRestantes = calcularDiasRestantes(proyecto.fecha_fin);
+const esProyectoFinalizado = estatusGlobal === "Finalizado";
+
+// Proyecto vencido solo si NO está finalizado y ya pasó la fecha fin
+const esVencido = !esProyectoFinalizado && diasRestantes !== null && diasRestantes < 0;
+
                 
                 // --- LÓGICA DE ESTADOS Y COLORES ---
-                const esProyectoFinalizado = estatusGlobal === "Finalizado";
-                const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
-                const esVencido = !esProyectoFinalizado && diasRestantes < 0;
+                // SOLO 2 ESTADOS: Finalizado / En proceso
+let statusClass = estatusGlobal === "Finalizado"
+  ? "finalizado"
+  : "en-proceso";
 
-                // 1. Color del borde de la tarjeta (semáforo lateral)
-                let statusClass = "pendiente"; // Por defecto (si no hay tareas)
-                if (esProyectoFinalizado) statusClass = "completado";
-                else if (esVencido) statusClass = "vencido";
-                else if (progreso > 0) statusClass = "progreso";
 
                 // 2. Color del texto de tiempo restante
                 let estadoTiempoClass = esProyectoFinalizado ? "finalizado" : esVencido ? "vencido" : "";
 
-                // 3. Lógica SIMPLIFICADA para el Badge (Solo dos estatus principales)
-                // Si es "Finalizado" -> Verde. Cualquier otra cosa -> Naranja (En Proceso)
-                let claseBadge = "en-proceso"; 
-                if (esProyectoFinalizado) {
-                  claseBadge = "finalizado";
-                } else {
-                  // Asumimos "En proceso" para todo lo demás si solo manejas 2
-                  claseBadge = "en-proceso";
-                }
+                let claseBadge = estatusGlobal === "Finalizado" 
+  ? "finalizado" 
+  : "en-proceso";
+
 
                 return (
                   <div key={proyecto.id_proyecto} className={`tdu-proyecto-card-encabezado ${statusClass}`}>
@@ -388,8 +394,18 @@ function GestionProyectosUsuario() {
 
                     <div className="tdu-proyecto-info">
                       <div className="tdu-dias">
-                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><span>Inicio:</span><strong>{proyecto.pf_inicio || "—"}</strong></div>
-                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><span>Fin:</span><strong>{proyecto.pf_fin || "—"}</strong></div>
+                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><div>
+  <strong>
+    Inicio: {proyecto.pf_inicio || "—"}
+  </strong>
+</div>
+</div>
+                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><div>
+  <strong>
+    Fin: {proyecto.pf_fin || "—"}
+  </strong>
+</div>
+</div>
                       </div>
                       {diasRestantes !== null && (
                         <div className="tdu-tiempo-restante">
@@ -407,16 +423,16 @@ function GestionProyectosUsuario() {
                     </div>
 
                     <div className="tdu-proyecto-footer">
-  {(proyecto.tareas_completadas < proyecto.total_tareas) && (
-    <button
-      className="tdu-btn-primary"
-      onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
-    >
-      <FaTasks className="tdu-btn-icon" />
-      Ver Mis Tareas
-    </button>
-  )}
-</div>
+                      {(proyecto.tareas_completadas < proyecto.total_tareas) && (
+                        <button
+                          className="tdu-btn-primary"
+                          onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
+                        >
+                          <FaTasks className="tdu-btn-icon" />
+                          Ver Mis Tareas
+                        </button>
+                      )}
+                    </div>
 
                   </div>
                 );
