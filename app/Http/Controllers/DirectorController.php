@@ -13,58 +13,7 @@ use DB;
 
 class DirectorController extends Controller
 {
-    //METODO QUE DEVULVE LAS TAREAS COMPLETADAS A UN DIRECTOR
-public function ObtenerTareasCompletadasDepartamento(Request $request)
-{
-    try {
-        $usuario = DB::table('c_usuario')
-            ->where('id_usuario', $request->query('usuario'))
-            ->first();
-
-        if (!$usuario) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'Usuario no encontrado'
-            ], 404);
-        }
-
-        $idDepartamento = $usuario->id_departamento;
-
-        // 2️⃣ Obtener todos los proyectos del departamento con tareas COMPLETADAS
-        $proyectos = \App\Models\Proyecto::where('id_departamento', $idDepartamento)
-            ->where('p_estatus', 'En proceso')
-            ->whereHas('tareas', function($q) {
-                // Solo proyectos que tengan al menos una tarea COMPLETADAS
-                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'COMPLETADA'");
-            })
-            ->with(['tareas' => function($q) {
-                // Trae únicamente las tareas COMPLETADAS con sus evidencias
-                $q->whereRaw("UPPER(TRIM(t_estatus)) = 'COMPLETADA'")
-                  ->with('evidencias');
-            }])
-            ->get();
-
-        // 3️⃣ Verificar si hay proyectos
-        if ($proyectos->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'No se encontraron proyectos con tareas COMPLETADASs para este departamento'
-            ], 404);
-        }
-
-        // 4️⃣ Respuesta final
-        return response()->json([
-            'success' => true,
-            'proyectos' => $proyectos
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
+  
 //ESTE METODO DEVUELVE TODOS LOS PROYECTOS DE UN DEPARTAMENTO
 public function MostrarProyectos(Request $request)
 {
@@ -114,61 +63,6 @@ public function MostrarProyectos(Request $request)
         ], 500);
     }
 }
-//TAREAS PENDIENTES-INTERFAZ TAREAS PENDIENTES DEL DIRECTOR
-public function tareasPendientesUsuario(Request $request)
-{
-    try {
-        $idUsuario = $request->query('usuario');
-        if (!$idUsuario) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'No se recibió el ID de usuario'
-            ], 400);
-        }
-        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
-        if (!$usuario) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'Usuario no encontrado'
-            ], 404);
-        }
-        $idDepartamento = $usuario->id_departamento;
-        $proyectos = DB::table('proyectos as p')
-            ->join('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
-            ->select(
-                'p.*',
-                DB::raw('COUNT(t.id_tarea) as total_tareas')
-            )
-            ->where('p.id_departamento', $idDepartamento)
-            ->where('p.p_estatus', 'En proceso')
-            ->where('t.t_estatus', 'Pendiente')
-            ->groupBy('p.id_proyecto')
-            ->get();
 
-        $proyectosConTareas = [];
-        foreach ($proyectos as $proyecto) {
-            $tareas = DB::table('tareas')
-                ->where('id_proyecto', $proyecto->id_proyecto)
-                ->where('t_estatus', 'Pendiente')
-                ->get();
-
-            $proyectosConTareas[] = [
-                'proyecto' => $proyecto,
-                'tareas' => $tareas
-            ];
-        }
-
-        return response()->json([
-            'success' => true,
-            'proyectos' => $proyectosConTareas
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
 
 }

@@ -3,16 +3,28 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/EliminarProyectos.css";
-import { FaSearch, FaTrash, FaCalendarAlt, FaExclamationTriangle } from "react-icons/fa";
+import { 
+  FaCalendarAlt, 
+  FaTasks, 
+  FaExclamationTriangle, 
+  FaSearch,
+  FaTrash,
+  FaInfoCircle,
+  FaHourglassHalf,
+  FaFilter
+} from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import SelectDinamico from "../components/SelectDinamico";
 import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import ConfirmModal from "../components/ConfirmModal";
+import { getPStatusTagStyle, getBorderClase } from "../components/estatusUtils";
 
 function EliminarProyectos() {
   const [busqueda, setBusqueda] = useState("");
+  const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -20,8 +32,32 @@ function EliminarProyectos() {
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
 
+  const opciones = [
+    { value: "alfabetico", label: "Orden alfabético (A-Z)" },
+    { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
+    { value: "fecha_proxima", label: "Fecha más próxima" },
+    { value: "fecha_lejana", label: "Fecha más lejana" },
+  ];
 
-  // Cargar proyectos sin tareas
+  const proyectosFiltrados = proyectos
+    .filter((p) => p.p_nombre.toLowerCase().includes(busqueda.toLowerCase()))
+    .sort((a, b) => {
+      switch (filtro) {
+        case "alfabetico":
+          return a.p_nombre.localeCompare(b.p_nombre);
+        case "alfabetico_desc":
+          return b.p_nombre.localeCompare(a.p_nombre);
+        case "fecha_proxima":
+          return new Date(a.pf_fin) - new Date(b.pf_fin);
+        case "fecha_lejana":
+          return new Date(b.pf_fin) - new Date(a.pf_fin);
+        default:
+          return 0;
+      }
+    });
+
+  const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
+
   useEffect(() => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     const idUsuario = usuario?.id_usuario;
@@ -32,7 +68,7 @@ function EliminarProyectos() {
       return;
     }
 
-    fetch(`http://127.0.0.1:8000/api/proyectos/sin-tareas?usuario=${idUsuario}`, {
+    fetch(`http://127.0.0.1:8000/api/proyectos/general?usuario=${idUsuario}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -61,10 +97,12 @@ function EliminarProyectos() {
       })
       .finally(() => setLoading(false));
   }, [navigate]);
+
   const confirmarEliminar = (proyecto) => {
     setProyectoAEliminar(proyecto);
     setModalOpen(true);
   };
+
   const eliminarProyecto = () => {
     if (!proyectoAEliminar) return;
     const token = sessionStorage.getItem("jwt_token");
@@ -93,111 +131,201 @@ function EliminarProyectos() {
       });
   };
 
-  const proyectosFiltrados = proyectos.filter((p) =>
-    p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  return (
+    <Layout 
+      titulo="ELIMINAR PROYECTOS" 
+      sidebar={<MenuDinamico activeRoute="eliminar" />}
+    >
+  
 
- return (
-  <Layout titulo="ELIMINAR PROYECTOS" sidebar={<MenuDinamico activeRoute="Eliminar proyecto" />}>
-    <div className="container my-4">
+        {/* FILTROS */}
+        {proyectos.length > 0 && (
+          <div className="eliminar-filtros-container">
+            <div className="eliminar-search-filter-wrapper">
+              
+              {/* BUSCADOR */}
+              <div className="eliminar-search-box">
+                <FaSearch className="eliminar-search-icon" />
+                <input
+                  type="text"
+                  placeholder="Buscar proyectos..."
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                  className="eliminar-search-input"
+                />
+                {busqueda && (
+                  <button
+                    className="eliminar-search-clear-btn"
+                    onClick={() => setBusqueda("")}
+                  >
+                    <FiX />
+                  </button>
+                )}
+              </div>
 
-      {/* Barra de búsqueda */}
-      {proyectos.length > 0 && (
-        <div className="barra-busqueda-global-container mb-4">
-          <div className="barra-busqueda-global-wrapper">
-            <FaSearch className="barra-busqueda-global-icon" />
-            <input
-              type="text"
-              placeholder="Buscar proyectos..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="barra-busqueda-global-input"
-            />
+              {/* SELECT */}
+              {mostrarSelect && (
+                <div className="eliminar-filter-box">
+                  <FaFilter className="eliminar-filter-icon" />
+                  <div className="desktop-only">
+                    <SelectDinamico
+                      opciones={opciones.map((o) => o.label)}
+                      valor={opciones.find((o) => o.value === filtro)?.label}
+                      setValor={(labelSeleccionado) => {
+                        const opcion = opciones.find((o) => o.label === labelSeleccionado);
+                        if (opcion) setFiltro(opcion.value);
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* RESULTADOS */}
             {busqueda && (
-              <button className="buscador-clear-global" onClick={() => setBusqueda("")}>
-                <FiX />
-              </button>
+              <div className="eliminar-search-results-info">
+                <span className="eliminar-results-count">
+                  {proyectos.filter((p) =>
+                    p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
+                  ).length}
+                </span> 
+                resultado(s) para "{busqueda}"
+              </div>
             )}
           </div>
-          {busqueda && (
-      <div className="buscador-resultados-global">
-        {proyectos.length} resultado(s) para "{busqueda}"
-      </div>
-    )}
-        </div>
-      )}
-
-      {/* Lista de proyectos */}
-      <div className="eliminar-proyectos-lista">
-       {loading ? (
-  <div className="loader-container">
-    ...
-  </div>
-) : proyectos.length === 0 ? (
-  // Backend no devolvió proyectos
-  <EmptyState
-    titulo="ELIMINAR PROYECTOS"
-    mensaje="No hay proyectos disponibles."
-    botonTexto="Volver al Tablero"
-    onVolver={volverSegunRol}
-    icono={logo3}
-  />
-) : proyectosFiltrados.length === 0 ? (
-  // No hay coincidencias en la búsqueda
-  null
-) : (
-          proyectosFiltrados.map((p) => {
-            const fechaFin = new Date(p.pf_fin);
-            const hoy = new Date();
-            fechaFin.setHours(0, 0, 0, 0);
-            hoy.setHours(0, 0, 0, 0);
-
-            const estaVencido = fechaFin < hoy;
-
-            return (
-              <div key={p.id_proyecto} className="eliminar-proyectos-card">
-                <h5 className="eliminar-proyectos-nombre">{p.p_nombre}</h5>
-
-                <div className="eliminar-proyectos-fp">
-                  <div className="eliminar-info-item">
-                                          <FaCalendarAlt className="eliminar-info-icon" />
-                                          <span>
-                                            <strong>Finaliza:</strong> {fechaFin.toLocaleDateString()}
-                                          </span>
-                                        </div>
-                  {estaVencido && (
-                    <div className="eliminar-alerta">
-                      <FaExclamationTriangle /> <strong>¡Vencido!</strong>
-                    </div>
-                  )}
-                </div>
-
-                <div className="eliminar-proyectos-botones">
-                  <button
-  className="eliminar-proyectos-btn eliminar"
-  onClick={() => confirmarEliminar(p)}
->
-  <FaTrash style={{ marginRight: "8px" }} /> Eliminar proyecto
-</button>
-                </div>
-              </div>
-            );
-          })
         )}
-      </div>
 
-      {/* Modal de confirmación */}
-      <ConfirmModal
-        isOpen={modalOpen}
-        title="Confirmar eliminación"
-        message={`¿Estás seguro que deseas eliminar el proyecto "${proyectoAEliminar?.p_nombre}"?`}
-        onConfirm={eliminarProyecto}
-        onCancel={() => setModalOpen(false)}
-      />
-    </div>
-  </Layout>
-);
+        {/* LISTA DE PROYECTOS */}
+        <div className="eliminar-proyectos-grid">
+          {loading ? (
+            <div className="loader-container">
+              <div className="loader-logo">
+                <img src={logo3} alt="Cargando proyectos" />
+              </div>
+              <div className="loader-texto">CARGANDO PROYECTOS...</div>
+              <div className="loader-spinner"></div>
+            </div>
+          ) : proyectosFiltrados.length > 0 ? (
+            proyectosFiltrados.map((p) => {
+              const fechaFin = new Date(p.pf_fin);
+              const hoy = new Date();
+              fechaFin.setHours(0, 0, 0, 0);
+              hoy.setHours(0, 0, 0, 0);
 
+              const diasRestantes = Math.floor((fechaFin - hoy) / (1000 * 60 * 60 * 24));
+              const esProximo = diasRestantes >= 0;
+              const estaVencido = diasRestantes < 0;
+
+              return (
+                <div 
+                  key={p.id_proyecto} 
+                  className={`eliminar-proyecto-card ${getBorderClase(p.p_estatus)}`}
+                >
+                  {/* HEADER */}
+                  <div className="eliminar-proyecto-card-header">
+                    <h3 className="eliminar-proyecto-nombre">{p.p_nombre}</h3>
+                    <div className="eliminar-proyecto-status-badge">
+                      <span style={getPStatusTagStyle(p.p_estatus)}>
+                        {p.p_estatus || "Sin estatus"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* INFO */}
+                  <div className="eliminar-proyecto-info-grid">
+                    
+                    {/* FECHA */}
+                    <div className="eliminar-info-item">
+                      <FaCalendarAlt className="eliminar-info-icon" />
+                      <div className="eliminar-info-content">
+                        <div className="eliminar-info-label">Fecha límite</div>
+                        <div className="eliminar-info-value">{fechaFin.toLocaleDateString()}</div>
+                      </div>
+                    </div>
+
+                    {/* DÍAS RESTANTES */}
+                    <div className="eliminar-info-item">
+                      <FaHourglassHalf className="eliminar-info-icon" />
+                      <div className="eliminar-info-content">
+                        <div className="eliminar-info-label">Días restantes</div>
+                        <div className="eliminar-info-value">
+                          {estaVencido
+                            ? "Proyecto vencido"
+                            : diasRestantes === 0
+                              ? "Hoy"
+                              : `${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* TAREAS */}
+                    <div className="eliminar-info-item">
+                      <FaTasks className="eliminar-info-icon" />
+                      <div className="eliminar-info-content">
+                        <div className="eliminar-info-label">Tareas totales</div>
+                        <div className="eliminar-info-value">{p.total_tareas || 0}</div>
+                      </div>
+                    </div>
+
+                    {/* ALERTAS */}
+                    {estaVencido ? (
+                      <div className="eliminar-info-item">
+                        <FaExclamationTriangle className="eliminar-alert-icon expired" />
+                        <div className="eliminar-info-content">
+                          <div className="eliminar-info-label eliminar-alert-label">Estado</div>
+                          <div className="eliminar-info-value eliminar-alert-text expired">¡Vencido!</div>
+                        </div>
+                      </div>
+                    ) : esProximo && diasRestantes <= 3 ? (
+                      <div className="eliminar-info-item">
+                        <FaExclamationTriangle className="eliminar-alert-icon warning" />
+                        <div className="eliminar-info-content">
+                          <div className="eliminar-info-label eliminar-alert-label">Vence</div>
+                          <div className="eliminar-info-value eliminar-alert-text warning">
+                            {diasRestantes === 0 
+                              ? "Hoy" 
+                              : `En ${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* ACCIONES - BOTÓN ELIMINAR */}
+                  <div className="eliminar-proyecto-actions">
+                    <button
+                      className="btn btn-danger eliminar-btn-icon"
+                      onClick={() => confirmarEliminar(p)}
+                    >
+                      <FaTrash />
+                      <span>Eliminar proyecto</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          ) : busqueda.length === 0 ? (
+            <EmptyState
+              titulo="ELIMINAR PROYECTOS"
+              mensaje="No hay proyectos disponibles."
+              botonTexto="Volver al Tablero"
+              onVolver={volverSegunRol}
+              icono={logo3}
+            />
+          ) : null}
+        </div>
+
+        {/* Modal de confirmación */}
+        <ConfirmModal
+          isOpen={modalOpen}
+          title="Confirmar eliminación"
+          message={`¿Estás seguro que deseas eliminar el proyecto "${proyectoAEliminar?.p_nombre}"?`}
+          onConfirm={eliminarProyecto}
+          onCancel={() => setModalOpen(false)}
+        />
+  
+    </Layout>
+  );
 }
 
 export default EliminarProyectos;

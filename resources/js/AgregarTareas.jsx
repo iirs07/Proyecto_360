@@ -101,27 +101,33 @@ const nombreProyectoFinal = p_nombre || nombre || "Proyecto";
   };
 
 useEffect(() => {
-  const token = sessionStorage.getItem("jwt_token");
-  if (!token) {
-    navigate("/Login", { replace: true });
-    return;
-  }
+  console.log("location.state:", location.state);
 
-  if (location.state && location.state.id_proyecto) {
+  const token = sessionStorage.getItem("jwt_token");
+  if (!token) {
+    navigate("/Login", { replace: true });
+    return;
+  }
 
-    setProyectoActual({ id_proyecto: location.state.id_proyecto });
+  if (location.state && location.state.id_proyecto) {
+    setProyectoActual({ id_proyecto: location.state.id_proyecto });
 
-    // importante:
-    const nombreProyectoFinal = location.state.p_nombre 
-                              || location.state.nombre 
-                              || "Proyecto";
+    const nombreProyectoFinal =
+      location.state.nombre_proyecto || 
+      location.state.p_nombre ||        
+      location.state.nombre ||        
+      location.state.nombre_proyecto_final ||  
+      "Proyecto";
+ 
 
-    setNombreProyecto(nombreProyectoFinal);
+    console.log("Nombre final:", nombreProyectoFinal);
+    setNombreProyecto(nombreProyectoFinal);
 
-  } else {
-    navigate("/NuevoProyecto", { replace: true });
-  }
+  } else {
+    navigate("/NuevoProyecto", { replace: true });
+  }
 }, [navigate, location]);
+
 
 
   useEffect(() => {
@@ -371,7 +377,7 @@ useEffect(() => {
           <h1 className="agregartareas-titulo mb-1">Crear Nueva Tarea</h1>
           <div className="agregartareas-project-info d-flex flex-wrap gap-3 align-items-center">
             <span className="agregartareas-muted">
-              <strong>Proyecto:</strong> {nombreProyectoFinal}
+              <strong>Proyecto:</strong> {nombreProyecto}
             </span>
           </div>
         </div>
@@ -382,7 +388,7 @@ useEffect(() => {
       <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
               <FaSave />
               <div>
-                <strong>¡Tareasguardado exitosamente!</strong> La tarea ha sido guardada y puedes verla en la lista de tareas.
+                <strong>¡Tarea guardada exitosamente!</strong> La tarea ha sido guardada y puedes verla en la lista de tareas.
               </div>
             
             </div>

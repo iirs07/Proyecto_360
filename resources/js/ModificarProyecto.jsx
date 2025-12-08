@@ -200,12 +200,11 @@ const [loadingModificar, setLoadingModificar] = useState(false);
 
     const nuevosErrores = {};
     if (!nombre) nuevosErrores.nombre = "El nombre del proyecto es obligatorio.";
-    else if (nombre.length < 3) nuevosErrores.nombre = "El nombre debe tener al menos 3 caracteres.";
-    else if (nombre.length > 100) nuevosErrores.nombre = "El nombre no puede exceder los 100 caracteres.";
+    
+    
 
     if (!descripcion) nuevosErrores.descripcion = "La descripción es obligatoria.";
-    else if (descripcion.length < 10) nuevosErrores.descripcion = "La descripción debe tener al menos 10 caracteres.";
-    else if (descripcion.length > 500) nuevosErrores.descripcion = "La descripción no puede exceder los 500 caracteres.";
+    
 
     if (!inicio) nuevosErrores.inicio = "Selecciona la fecha de inicio.";
     if (!fin) nuevosErrores.fin = "Selecciona la fecha de fin.";

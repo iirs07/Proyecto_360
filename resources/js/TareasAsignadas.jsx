@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
-// IMPORTANTE: Agregamos useLocation
 import { useNavigate, useLocation } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";

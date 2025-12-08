@@ -95,9 +95,10 @@ function GestionProyectos() {
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
 
-  const agregarTarea = (idProyecto) => {
-    navigate("/agregarTareas", { state: { id_proyecto: idProyecto } });
-  };
+  const agregarTarea = (idProyecto, nombreProyecto) => {
+    navigate("/agregarTareas", { state: { id_proyecto: idProyecto, nombre_proyecto: nombreProyecto } });
+};
+
 
   const verTareas = (idProyecto, nombreProyecto) => {
     sessionStorage.setItem("id_proyecto", idProyecto);
@@ -468,7 +469,7 @@ function GestionProyectos() {
                           {sinTareas && (
                             <div className="tdj-prioridad-badge alerta-config">
                               <FaExclamationTriangle size={10} />
-                              Requiere Configuración
+                              Requiere atención
                             </div>
                           )}
 
@@ -559,7 +560,8 @@ function GestionProyectos() {
                           className="tdj-btn-primary"
                           onClick={() => {
                             if (sinTareas) {
-                              agregarTarea(proyecto.id_proyecto);
+                              console.log("Enviando nombre:", proyecto.p_nombre);
+                              agregarTarea(proyecto.id_proyecto,proyecto.p_nombre);
                             } else {
                               verTareas(proyecto.id_proyecto, proyecto.p_nombre);
                             }

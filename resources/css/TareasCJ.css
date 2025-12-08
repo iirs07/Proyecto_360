@@ -1,319 +1,568 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* ================================================= */
+/* ============== ESTRUCTURA PRINCIPAL ============= */
+/* ================================================= */
 
-
-.tcj-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.tcj-proyectos-filtros {
-  display: flex;
-  flex-direction: column; 
-  align-items: stretch;   
-  gap: 10px;
-  margin-bottom: 1.5rem;
+.tf-tareas-contenedor {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
-.tcj-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  border: none;
-  border-radius: 20px;
-  padding: 25px;
-  margin: 20px auto;
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(134, 21, 66, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(134, 21, 66, 0.1);
-  z-index: 1;
+.tf-proyecto-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08); 
+    border: 1px solid #e5e7eb;
+    margin-bottom: 30px; 
+    overflow: hidden; 
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 3;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tcj-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #2f855a, #2f854a);
+.tf-proyecto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.tcj-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(134, 21, 66, 0.15);
+.tf-proyecto-header {
+    padding: 20px 32px;
+    border-bottom: 2px solid rgba(134, 21, 66, 0.1); 
+    box-sizing: border-box;
 }
 
-/* Nombre del proyecto */
-.tcj-proj-name {
-    font-size: 21px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 25px;
-  color: #0B0C10;
-  padding: 10px;
-  position: relative;
-  text-transform: uppercase;
+.tf-proyecto-info {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.tcj-proj-name::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 25%;
-  width: 50%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #2f855a, transparent);
+.tf-proyecto-nombre {
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    line-height: 1.3;
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    text-transform: uppercase;
 }
 
-/* Lista de tareas */
-.tcj-task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.tf-proyecto-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
 }
 
-/* Item de tarea completada - COLOR VERDE */
-.tcj-task-item {
-  background: linear-gradient(135deg, #f0fff4, #c6f6d5);
-  border: 2px solid #38a169;
-  border-radius: 15px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 15px;
+.tf-proyecto-meta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem; 
 }
 
-.tcj-task-item:hover {
-  transform: translateX(10px);
-  box-shadow: 0 8px 20px rgba(134, 21, 66, 0.1);
-}
-
-.tcj-task-info {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 8px;
-}
-
-/* Header tarea */
-.tcj-task-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 5px;
-}
-
-.tcj-icon {
-  font-size: 1.6rem;
-  color: #38a169;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-
-.tcj-task-name {
+.tf-proyecto-tareas-count {
+    font-weight: 600; 
     font-size: 0.9rem;
-  font-weight: 500;
-  line-height: 1.6;
-  color: #475569;
-  margin: 0;
-  text-transform: uppercase;
+    padding: 0.35rem 0.75rem; 
+    border-radius: 9999px; 
+    transition: all 0.2s ease;
 }
 
-.tcj-task-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+/* ================================================= */
+/* ============== LISTA DE TAREAS ================== */
+/* ================================================= */
+
+.tf-tareas-lista {
+    padding: 16px 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.tcj-task-status {
-  background: #c6f6d5;
-  color: #2f855a;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+.tf-tarea-item {
+    margin: 0 24px 14px 24px; 
+    border-radius: 10px; 
+    border: 1px solid #e5e7eb;
+    background: white;
+    transition: all 0.2s ease;
+    width: calc(100% - 48px);
+    box-sizing: border-box;
+    overflow: visible;
+    cursor: pointer;
+    border-left-width: 6px;
+    border-left-style: solid;
 }
 
-.tcj-task-date {
-  font-size: 14px;
-  color: #4a5568;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 4px 12px;
-  border-radius: 12px;
+.tf-tarea-item:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); 
+    border-color: #d1d5db; 
 }
 
-/* Buscador */
-.tcj-search-container {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto 30px auto;
+.tf-tarea-item.active {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #f1f5f9; 
 }
 
-.tcj-search-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
+.tf-tarea-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    border-bottom: 1px solid transparent; 
 }
 
-.tcj-search-input {
-  width: 100%;
-  padding: 15px 50px 15px 50px;
-  border: 2px solid rgba(134, 21, 66, 0.1);
-  border-radius: 50px;
-  background: #ffffff;
-  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.08);
-  font-size: 16px;
-  transition: all 0.3s ease;
-  color: #2d3748;
-  font-family: 'Poppins', sans-serif;
+.tf-tarea-item.active .tf-tarea-header {
+    border-bottom-color: #e5e7eb; 
 }
 
-.tcj-search-input:focus {
-  outline: none;
-  box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
-  transform: translateY(-2px);
-  border-color: #861542;
+.tf-tarea-estado-container {
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.tcj-search-input::placeholder {
-  color: #a0a0a0;
-  font-weight: 400;
+.tf-tarea-estado-indicador {
+    font-size: 1.2rem; 
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; 
+    background: #eff6ff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.tcj-search-icon {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  color: #a0a0a0;
-  pointer-events: none;
-  z-index: 2;
+.tf-tarea-info-contenido {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    align-self: center; 
 }
 
-.tcj-search-clear {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: #888;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+.tf-tarea-titulo-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+    width: 100%;
 }
 
-.tcj-search-clear:hover {
-  color: #861542;
-  background: rgba(134, 21, 66, 0.1);
+.tf-tarea-nombre {
+    font-size: 1.05rem; 
+    font-weight: 700;
+    color: #1f2937;
+    white-space: normal; 
+   text-transform: uppercase;
 }
 
-
-
-.tcj-no-tasks {
-  background: linear-gradient(135deg, #f0fff4, #c6f6d5);
-  color: #2d3748;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  text-align: center;
-  padding: 40px 30px;
-  margin: 30px auto;
-  min-height: 200px;
-  max-width: 500px;
-  box-shadow: 0 10px 25px rgba(134, 21, 66, 0.1);
-  border: 2px dashed #38a169;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 10;
+.tf-tarea-estatus-header {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem; 
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    max-width: fit-content;
+    white-space: nowrap;
 }
 
-.tcj-no-tasks:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(134, 21, 66, 0.15);
+.tf-tarea-acciones-header {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+    flex-shrink: 0;
+    margin-left: auto; 
+    align-self: center; 
 }
 
-.tcj-no-tasks svg {
-  color: #38a169;
-  width: 60px;
-  height: 60px;
-  opacity: 0.8;
+.tf-tarea-info-fecha {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 8px 14px;
+    border-radius: 8px; 
+    border: 2px solid; 
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 130px;
 }
 
-.tcj-no-tasks span {
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.5;
-  color: #2f855a;
+.tf-tarea-fecha-completada {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
-/* Responsive */
+.tf-fecha-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.tf-fecha-texto {
+    font-size: 0.9rem;
+    font-weight: 800; 
+    text-align: center;
+}
+
+.tf-tarea-expand-icon {
+    font-size: 0.8rem; 
+}
+
+.tf-tarea-item.active .tf-tarea-expand-icon {
+    color: #861542; 
+}
+
+/* ================================================= */
+/* ============== DETALLES EXPANDIDOS ============== */
+/* ================================================= */
+
+.tf-tarea-detalles-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.tf-tarea-detalles {
+    padding: 12px 24px; 
+    animation: tf-slideDown 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@keyframes tf-slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tf-detalles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    padding: 12px 16px; 
+    background: #f8fafc; 
+    border-radius: 10px;
+    border: 1px solid #eef1f4;
+    gap: 16px; 
+}
+
+.tf-detalle-item {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center;
+    padding: 10px 0; 
+    border-right: 1px solid #e5e7eb;
+}
+
+.tf-detalle-item:last-child {
+    border-right: none;
+}
+
+.tf-detalle-icono-container-column {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; 
+    flex-shrink: 0;
+    margin-bottom: 8px; 
+}
+
+.tf-detalle-icono {
+    font-size: 1.1rem; 
+    color: #4b5563;
+}
+
+.tf-detalle-label {
+    font-size: 0.75rem;
+    font-weight: 600; 
+    color: #6b7280;
+    text-transform: uppercase;
+    margin: 0; 
+    line-height: 1.2;
+}
+
+.tf-detalle-value {
+    font-size: 1rem;
+    font-weight: 700; 
+    color: #1f2937;
+    word-break: break-word; 
+    white-space: normal;
+    line-height: 1.2;
+    margin: 0; 
+    padding-top: 2px;
+}
+
+/* ================================================= */
+/* ============== FILTROS ========================== */
+/* ================================================= */
+
+.tf-filtros-container {
+    background: white;
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e9ecef;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 4;
+    box-sizing: border-box;
+}
+
+.tf-search-filter-wrapper {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tf-search-box {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.tf-search-input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+}
+
+.tf-search-input:focus {
+    outline: none;
+    border-color: #861542;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(134, 21, 66, 0.1);
+}
+
+.tf-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    color: #861542;
+    font-size: 1rem;
+}
+
+.tf-search-clear-btn {
+    position: absolute;
+    right: 0.9rem;
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.tf-search-clear-btn:hover {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+.tf-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: auto;
+}
+
+.tf-filter-icon {
+    color: #861542;
+    font-size: 1rem;
+}
+
+.tf-search-results-info {
+    text-align: center;
+    padding: 0.6rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.tf-results-count {
+    background: #861542;
+    color: white;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-right: 0.4rem;
+}
+
+/* ================================================= */
+/* ============== ESTADOS SIN RESULTADOS =========== */
+/* ================================================= */
+
+.tf-no-resultados {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.tf-no-resultados-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.tf-no-resultados h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.tf-no-resultados p {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+/* ================================================= */
+/* ============== RESPONSIVE ======================= */
+/* ================================================= */
+
 @media (max-width: 768px) {
-  .tcj-card {
-    margin: 15px;
-    padding: 20px;
-    border-radius: 15px;
-  }
-  
-  .tcj-proj-name {
-    font-size: 20px;
-  }
-  
-  .tcj-task-header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-  
-  .tcj-task-footer {
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-  
-  .tcj-task-item {
-    padding: 15px;
-  }
+    .tf-proyecto-header {
+        padding: 16px 20px;
+    }
+    
+    .tf-tarea-item {
+        margin: 0 16px 14px 16px; 
+        width: calc(100% - 32px);
+    }
+
+    .tf-tarea-header {
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        gap: 10px;
+    }
+
+    .tf-tarea-acciones-header {
+        margin-left: 0; 
+        width: auto;
+        justify-content: flex-end;
+    }
+
+    .tf-tarea-info-fecha {
+        min-width: 120px;
+        padding: 6px 10px;
+    }
+    
+    .tf-detalles-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 480px) {
-  .tcj-proj-name {
-    font-size: 18px;
-  }
-  
-  .tcj-task-name {
-    font-size: 16px;
-  }
-  
-  .tcj-search-input {
-    padding: 12px 15px 12px 45px;
-    font-size: 14px;
-  }
+    .tf-tarea-item {
+        width: 100% !important;
+        margin: 0 0 14px 0 !important;
+        border-left-width: 5px;
+        box-sizing: border-box;
+    }
+
+    .tf-tarea-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 12px;
+        padding: 14px 16px !important;
+        position: relative;
+    }
+
+    .tf-tarea-expand-icon {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        font-size: 1rem;
+        color: #861542;
+    }
+
+    .tf-tarea-info-contenido {
+        width: 100% !important;
+    }
+
+    .tf-tarea-acciones-header {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+        gap: 8px;
+    }
+
+    .tf-tarea-info-fecha {
+        width: 100% !important;
+        min-width: unset !important;
+        margin-top: 8px;
+        justify-content: flex-start !important;
+        flex-direction: row !important;
+    }
+
+    .tf-detalles-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+
+    .tf-detalle-item {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        border-right: none !important;
+    }
+
+    .tf-detalle-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .tf-detalle-label, .tf-detalle-value {
+        text-align: left !important;
+        width: 100% !important;
+    }
 }

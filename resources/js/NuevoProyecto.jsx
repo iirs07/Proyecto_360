@@ -241,7 +241,7 @@ function NuevoProyecto() {
             
             <div className="mb-4">
               <label htmlFor="nombreProyecto" className="nv-form-label d-flex align-items-center gap-2 mb-2">
-                <span className="campo-requerido">*</span>
+                <span className="nv-campo-requerido">*</span>
                 Nombre del proyecto
               </label>
               <textarea

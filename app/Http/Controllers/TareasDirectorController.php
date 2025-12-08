@@ -36,6 +36,45 @@ public function tareasActivasPorProyecto($idProyecto)
         'tareas' => $tareas
     ]);
 }
+public function ListaDeTareas($idProyecto)
+{
+    // Buscar el proyecto
+    $proyecto = Proyecto::find($idProyecto);
+
+    if (!$proyecto) {
+        return response()->json(['error' => 'Proyecto no encontrado'], 404);
+    }
+
+    // Obtener tareas "Pendiente" con usuario y departamento
+    $tareas = Tarea::where('id_proyecto', $idProyecto)
+        ->whereRaw("TRIM(t_estatus) = ?", ['Pendiente'])
+        ->with(['usuario' => function ($query) {
+            $query->select('id_usuario', 'u_nombre', 'a_paterno', 'a_materno', 'id_departamento')
+                  ->with(['departamento' => function($q){
+                      $q->select('id_departamento', 'd_nombre');
+                  }]);
+        }])
+        ->get()
+        ->map(function ($tarea) use ($proyecto) {
+            $tarea->proyectoNombre = $proyecto->p_nombre;
+
+            if ($tarea->usuario) {
+                $tarea->nombre_usuario_asignado = $tarea->usuario->u_nombre . ' ' . $tarea->usuario->a_paterno . ' ' . $tarea->usuario->a_materno;
+                $tarea->nombre_departamento_usuario_asignado = $tarea->usuario->departamento->d_nombre ?? null;
+            } else {
+                $tarea->nombre_usuario_asignado = null;
+                $tarea->nombre_departamento_usuario_asignado = null;
+            }
+
+            return $tarea;
+        });
+
+    return response()->json([
+        'tareas' => $tareas
+    ]);
+}
+
+
     public function dashboardDepartamento(Request $request)
 {
     $usuarioId = $request->query('usuario'); // obtenemos id_usuario enviado desde React
@@ -377,37 +416,48 @@ public function completarTarea($id)
 public function tareasPendientesUsuario(Request $request)
 {
     try {
+        // ... (Paso 1: Obtener datos del usuario consultante, sin cambios)
         $idUsuario = $request->query('usuario');
         if (!$idUsuario) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'No se recibió el ID de usuario'
-            ], 400);
+            return response()->json(['success' => false, 'mensaje' => 'No se recibió el ID de usuario'], 400);
         }
-        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+        $usuario = DB::table('c_usuario as u')->select('u.*')->where('u.id_usuario', $idUsuario)->first();
         if (!$usuario) {
-            return response()->json([
-                'success' => false,
-                'mensaje' => 'Usuario no encontrado'
-            ], 404);
+            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
         }
         $idDepartamento = $usuario->id_departamento;
+        
+        // ... (Paso 2: Obtener Proyectos con nombre de departamento del proyecto, sin cambios)
         $proyectos = DB::table('proyectos as p')
             ->join('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
+            ->join('c_departamento as d', 'p.id_departamento', '=', 'd.id_departamento') 
             ->select(
                 'p.*',
+                'd.d_nombre as nombre_del_departamento_del_proyecto',
                 DB::raw('COUNT(t.id_tarea) as total_tareas')
             )
             ->where('p.id_departamento', $idDepartamento)
             ->where('p.p_estatus', 'En proceso')
            ->whereRaw("TRIM(t_estatus) = ?", ['Pendiente'])
-            ->groupBy('p.id_proyecto')
+            ->groupBy('p.id_proyecto', 'd.d_nombre')
             ->get();
 
         $proyectosConTareas = [];
         foreach ($proyectos as $proyecto) {
-            $tareas = DB::table('tareas')
-                ->where('id_proyecto', $proyecto->id_proyecto)
+            
+            // 3. CONSULTA MODIFICADA: Recuperar tareas, JOIN a c_usuario Y c_departamento
+            $tareas = DB::table('tareas as t')
+                ->join('c_usuario as u', 't.id_usuario', '=', 'u.id_usuario')
+                // 💥 NUEVO JOIN: Para obtener el departamento del usuario asignado (u)
+                ->join('c_departamento as ud', 'u.id_departamento', '=', 'ud.id_departamento')
+                ->select(
+                    't.*', 
+                    // Nombre completo del usuario asignado
+                    DB::raw("u.u_nombre || ' ' || u.a_paterno || ' ' || u.a_materno as nombre_usuario_asignado"),
+                    // 💥 NUEVO CAMPO: Nombre del departamento del usuario asignado
+                    'ud.d_nombre as nombre_departamento_usuario_asignado' 
+                )
+                ->where('t.id_proyecto', $proyecto->id_proyecto)
                 ->whereRaw("TRIM(t_estatus) = ?", ['Pendiente'])
                 ->get();
 
@@ -417,6 +467,7 @@ public function tareasPendientesUsuario(Request $request)
             ];
         }
 
+        // 4. Devolver la respuesta (sin cambios)
         return response()->json([
             'success' => true,
             'proyectos' => $proyectosConTareas
@@ -429,6 +480,76 @@ public function tareasPendientesUsuario(Request $request)
         ], 500);
     }
 }
+
+public function TareasCompletadasD(Request $request)
+{
+    try {
+        // ... (Paso 1: Obtener datos del usuario consultante, sin cambios)
+        $idUsuario = $request->query('usuario');
+        if (!$idUsuario) {
+            return response()->json(['success' => false, 'mensaje' => 'No se recibió el ID de usuario'], 400);
+        }
+        $usuario = DB::table('c_usuario as u')->select('u.*')->where('u.id_usuario', $idUsuario)->first();
+        if (!$usuario) {
+            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
+        }
+        $idDepartamento = $usuario->id_departamento;
+        
+        // ... (Paso 2: Obtener Proyectos con nombre de departamento del proyecto, sin cambios)
+        $proyectos = DB::table('proyectos as p')
+            ->join('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
+            ->join('c_departamento as d', 'p.id_departamento', '=', 'd.id_departamento') 
+            ->select(
+                'p.*',
+                'd.d_nombre as nombre_del_departamento_del_proyecto',
+                DB::raw('COUNT(t.id_tarea) as total_tareas')
+            )
+            ->where('p.id_departamento', $idDepartamento)
+            ->where('p.p_estatus', 'Finalizado')
+           ->whereRaw("TRIM(t_estatus) = ?", ['Completada'])
+            ->groupBy('p.id_proyecto', 'd.d_nombre')
+            ->get();
+
+        $proyectosConTareas = [];
+        foreach ($proyectos as $proyecto) {
+            
+            // 3. CONSULTA MODIFICADA: Recuperar tareas, JOIN a c_usuario Y c_departamento
+            $tareas = DB::table('tareas as t')
+                ->join('c_usuario as u', 't.id_usuario', '=', 'u.id_usuario')
+                // 💥 NUEVO JOIN: Para obtener el departamento del usuario asignado (u)
+                ->join('c_departamento as ud', 'u.id_departamento', '=', 'ud.id_departamento')
+                ->select(
+                    't.*', 
+                    // Nombre completo del usuario asignado
+                    DB::raw("u.u_nombre || ' ' || u.a_paterno || ' ' || u.a_materno as nombre_usuario_asignado"),
+                    // 💥 NUEVO CAMPO: Nombre del departamento del usuario asignado
+                    'ud.d_nombre as nombre_departamento_usuario_asignado' 
+                )
+                ->where('t.id_proyecto', $proyecto->id_proyecto)
+                ->whereRaw("TRIM(t_estatus) = ?", ['Completada'])
+
+                ->get();
+
+            $proyectosConTareas[] = [
+                'proyecto' => $proyecto,
+                'tareas' => $tareas
+            ];
+        }
+
+        // 4. Devolver la respuesta (sin cambios)
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectosConTareas
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 public function tareasCompletadasDepartamento(Request $request)
 {
     $idUsuario = $request->query('usuario');

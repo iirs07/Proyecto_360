@@ -25,7 +25,7 @@ Route::post('/RegistroPaso1/invitado', [RegistroPaso1Controller::class, 'validar
 Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']);
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
-
+    
 
 
 Route::get('/departamentos', [DepartamentoController::class, 'index']);
@@ -53,14 +53,13 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
     Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
     Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
-
+Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 'tareasPendientesUsuario']);
     Route::get('/CatalogoDepartamentos', [DepartamentoDirectorController::class, 'CatalogoDepartamentos']);
-    Route::get('/proyectos/usuario', [DirectorController::class, 'MostrarProyectos']);
     Route::get('/proyectos/{idProyecto}/tareas-activas', [TareasDirectorController::class, 'tareasActivasPorProyecto']);
-    Route::get('/proyectos/lista/modificar', [NuevoProyectoController::class, 'ListaProyectosModificar']);
+    Route::get('/proyectos/{idProyecto}/lista-tareas', [TareasDirectorController::class, 'ListaDeTareas']);
     Route::get('/proyecto/{idProyecto}', [NuevoProyectoController::class, 'show']);
     Route::put('/modificar/proyecto/{idProyecto}', [NuevoProyectoController::class, 'update']);
-    Route::get('/proyectos/sin-tareas', [NuevoProyectoController::class, 'ProyectosSinTareas']);
+    Route::get('/proyectos/general', [NuevoProyectoController::class, 'Proyectos']);
     Route::delete('/proyectos/{idProyecto}/eliminar', [NuevoProyectoController::class, 'EliminarProyecto']);
     Route::put('/proyectos/{id}/completar', [NuevoProyectoController::class, 'completar']);
     Route::put('/proyectos/{id}/finalizar', [NuevoProyectoController::class, 'CambiarStatusProyecto']);
@@ -70,7 +69,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/tareas/{id}/completar', [TareasDirectorController::class, 'completarTarea']);
     Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
     Route::get('tareasCompletadas/jefe', [TareasDirectorController::class, 'tareasCompletadasDepartamento']);
-    Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 'tareasPendientesUsuario']);
+Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
     Route::put('/tareas/{id}/cambiar-estatus-enproceso', [TareasDirectorController::class, 'cambiarStatusTareaEnProceso']);
     Route::get('/tareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
     Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);

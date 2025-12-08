@@ -227,51 +227,52 @@ public function update(Request $request, $idProyecto)
     }
 }
 
-public function ProyectosSinTareas(Request $request)
-    {
-        try {
-            $idUsuario = $request->query('usuario');
+public function Proyectos(Request $request)
+{
+    try {
+        $idUsuario = $request->query('usuario');
 
-            if (!$idUsuario) {
-                return response()->json([
-                    'success' => false,
-                    'mensaje' => 'No se recibió el ID de usuario'
-                ], 400);
-            }
-
-            $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
-
-            if (!$usuario) {
-                return response()->json([
-                    'success' => false,
-                    'mensaje' => 'Usuario no encontrado'
-                ], 404);
-            }
-
-            $idDepartamento = $usuario->id_departamento;
-
-            // Obtener proyectos sin tareas
-            $proyectosSinTareas = DB::table('proyectos as p')
-                ->leftJoin('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
-                ->select('p.*')
-                ->where('p.id_departamento', $idDepartamento)
-                ->where('p.p_estatus', 'En proceso')
-                ->groupBy('p.id_proyecto')
-                ->havingRaw('COUNT(t.id_tarea) = 0')
-                ->get();
-
-            return response()->json([
-                'success' => true,
-                'proyectos' => $proyectosSinTareas
-            ]);
-
-        } catch (\Exception $e) {
+        if (!$idUsuario) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage()
-            ], 500);
+                'mensaje' => 'No se recibió el ID de usuario'
+            ], 400);
         }
+
+        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Usuario no encontrado'
+            ], 404);
+        }
+
+        $idDepartamento = $usuario->id_departamento;
+
+        // Obtener proyectos con el conteo de tareas y su estatus
+        $proyectos = DB::table('proyectos as p')
+            ->leftJoin('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
+            ->select('p.*', 'p.p_estatus', DB::raw('COUNT(t.id_tarea) as total_tareas'))
+            ->where('p.id_departamento', $idDepartamento)
+            ->whereIn('p.p_estatus', ['En proceso', 'Finalizado'])
+            ->groupBy('p.id_proyecto', 'p.p_nombre', 'p.id_departamento', 'p.p_estatus') // agrupa por columnas de proyecto
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectos
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
+    
     public function EliminarProyecto($idProyecto)
 {
     try {

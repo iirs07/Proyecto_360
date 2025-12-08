@@ -1,195 +1,568 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* ================================================= */
+/* ============== ESTRUCTURA PRINCIPAL ============= */
+/* ================================================= */
 
-/* --- CONTENEDOR PRINCIPAL --- */
-.lt-card-principal {
-  background: #fff;
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 900px;
-  margin: 30px auto;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-  border-top: 5px solid #861542; 
-   position: relative;
-  z-index: 4;
+.ltp-tareas-contenedor {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
-.lt-titulo-proyecto {
-  font-size: 21px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 25px;
-  color: #0B0C10;
-  padding: 10px;
-  position: relative;
-  text-transform: uppercase;
+.ltp-proyecto-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.08); 
+    border: 1px solid #e5e7eb;
+    margin-bottom: 30px; 
+    overflow: hidden; 
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 3;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.lt-contador-tareas {
-  text-align: center;
-  color: #1f2937;
-  font-weight: 500;
-  margin-bottom: 30px;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+.ltp-proyecto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-
-.lt-contador-tareas svg {
-  color: #861542; 
-  font-size: 1.2rem;
+.ltp-proyecto-header {
+    padding: 20px 32px;
+    border-bottom: 2px solid rgba(134, 21, 66, 0.1); 
+    box-sizing: border-box;
 }
 
-/* --- GRID DE LA LISTA --- */
-.lt-lista-tareas-grid {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.ltp-proyecto-info {
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* --- TARJETA DE TAREA (BASE) --- */
-.lt-tarea-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  border: 1px solid #e2e8f0;
-  border-left: 6px solid transparent; 
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  z-index: 4;
+.ltp-proyecto-nombre {
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    line-height: 1.3;
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    text-transform: uppercase;
 }
 
-.lt-tarea-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+.ltp-proyecto-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
 }
 
-/* --- ESTRUCTURA INTERNA --- */
-.lt-tarea-contenido-izq {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex: 1;
+.ltp-proyecto-meta-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem; 
 }
 
-.lt-tarea-contenido-der {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  min-width: 140px;
+.ltp-proyecto-tareas-count {
+    font-weight: 600; 
+    font-size: 0.9rem;
+    padding: 0.35rem 0.75rem; 
+    border-radius: 9999px; 
+    transition: all 0.2s ease;
 }
 
-.lt-tarea-nombre {
-  font-weight: 600;
-  color: #334155;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  text-transform: uppercase;
+/* ================================================= */
+/* ============== LISTA DE TAREAS ================== */
+/* ================================================= */
+
+.ltp-tareas-lista {
+    padding: 16px 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.lt-tarea-fecha {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  font-weight: 500;
+.ltp-tarea-item {
+    margin: 0 24px 14px 24px; 
+    border-radius: 10px; 
+    border: 1px solid #e5e7eb;
+    background: white;
+    transition: all 0.2s ease;
+    width: calc(100% - 48px);
+    box-sizing: border-box;
+    overflow: visible;
+    cursor: pointer;
+    border-left-width: 6px;
+    border-left-style: solid;
 }
 
-/* --- ICONOS --- */
-.lt-icono-estado {
-  font-size: 1.5rem;
+.ltp-tarea-item:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03); 
+    border-color: #d1d5db; 
 }
 
-/* --- BADGES (ETIQUETAS) --- */
-.lt-tarea-badge {
-  padding: 5px 12px;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.ltp-tarea-item.active {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: #f1f5f9; 
 }
 
-/* =========================================================
-   ESTILOS POR ESTADO 
-   ========================================================= */
-
-/* 1. FINALIZADO (Verde Fijo) */
-.lt-tarea-card.lt-item-finalizado {
-  border-left-color: #10b981; 
-  background: #f0fff4;
-  z-index: 4;
+.ltp-tarea-header {
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    border-bottom: 1px solid transparent; 
 }
-.lt-icono-finalizado { color: #10b981; }
-.lt-badge-finalizado { background: #d1fae5; color: #047857; }
 
+.ltp-tarea-item.active .ltp-tarea-header {
+    border-bottom-color: #e5e7eb; 
+}
 
-/* 2. EN PROCESO (Amarillo Fijo) */
-.lt-tarea-card.lt-item-proceso {
-  border-left-color: #f59e0b; 
-  background: #fffbeb;
+.ltp-tarea-estado-container {
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ltp-tarea-estado-indicador {
+    font-size: 1.2rem; 
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ltp-tarea-info-contenido {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    align-self: center; 
+}
+
+.ltp-tarea-titulo-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+    width: 100%;
+}
+
+.ltp-tarea-nombre {
+    font-size: 1.05rem; 
+    font-weight: 700;
+    color: #1f2937;
+    white-space: normal; 
+    text-transform: uppercase;
+}
+
+.ltp-tarea-estatus-header {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem; 
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    max-width: fit-content;
+    white-space: nowrap;
+}
+
+.ltp-tarea-acciones-header {
+    display: flex;
+    align-items: center;
+    gap: 12px; 
+    flex-shrink: 0;
+    margin-left: auto; 
+    align-self: center; 
+}
+
+.ltp-tarea-info-dias {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    font-size: 0.9rem;
+    padding: 8px 14px;
+    border-radius: 8px; 
+    border: 2px solid; 
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 130px;
+}
+
+.ltp-tarea-dias-restantes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.ltp-dias-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.ltp-dias-texto {
+    font-size: 0.9rem;
+    font-weight: 800; 
+    text-align: center;
+}
+
+.ltp-tarea-expand-icon {
+    font-size: 0.8rem; 
+}
+
+.ltp-tarea-item.active .ltp-tarea-expand-icon {
+    color: #861542; 
+}
+
+/* ================================================= */
+/* ============== DETALLES EXPANDIDOS ============== */
+/* ================================================= */
+
+.ltp-tarea-detalles-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.ltp-tarea-detalles {
+    padding: 12px 24px; 
+    animation: ltp-slideDown 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@keyframes ltp-slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ltp-detalles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    padding: 12px 16px; 
+    background: #f8fafc; 
+    border-radius: 10px;
+    border: 1px solid #eef1f4;
+    gap: 16px; 
+}
+
+.ltp-detalle-item {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center;
+    padding: 10px 0; 
+    border-right: 1px solid #e5e7eb;
+}
+
+.ltp-detalle-item:last-child {
+    border-right: none;
+}
+
+.ltp-detalle-icono-container-column {
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; 
+    flex-shrink: 0;
+    margin-bottom: 8px; 
+}
+
+.ltp-detalle-icono {
+    font-size: 1.1rem; 
+    color: #4b5563;
+}
+
+.ltp-detalle-label {
+    font-size: 0.75rem;
+    font-weight: 600; 
+    color: #6b7280;
+    text-transform: uppercase;
+    margin: 0; 
+    line-height: 1.2;
+}
+
+.ltp-detalle-value {
+    font-size: 1rem;
+    font-weight: 700; 
+    color: #1f2937;
+    word-break: break-word; 
+    white-space: normal;
+    line-height: 1.2;
+    margin: 0; 
+    padding-top: 2px;
+}
+
+/* ================================================= */
+/* ============== FILTROS ========================== */
+/* ================================================= */
+
+.ltp-filtros-container {
+    background: white;
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e9ecef;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
     z-index: 4;
-}
-.lt-icono-proceso { color: #f59e0b; }
-.lt-badge-proceso { background: #fef3c7; color: #b45309; }
-
-
-/* 3. PENDIENTE (Lógica de 4 colores) */
-
-/* A) TIEMPO (Verde/Gris suave - Falta mucho) */
-.lt-tarea-card.lt-item-pendiente.tiempo {
-  border-left-color: #94a3b8; 
-  background: #fff;
-}
-.lt-icono-pendiente.tiempo { color: #94a3b8; }
-.lt-badge-pendiente.tiempo { background: #f1f5f9; color: #475569; }
-
-/* B) ALERTA (Amarillo suave - 1 a 3 días) */
-.lt-tarea-card.lt-item-pendiente.alerta {
-  border-left-color: #ecc94b;
-  background: linear-gradient(to right, #fffff0, #fff);
-}
-.lt-icono-pendiente.alerta { color: #d69e2e; }
-.lt-badge-pendiente.alerta { background: #fefcbf; color: #975a16; }
-
-/* C) HOY (Naranja - Urgente) */
-.lt-tarea-card.lt-item-pendiente.hoy {
-  border-left-color: #ed8936;
-  background: linear-gradient(to right, #fffaf0, #fff);
-}
-.lt-icono-pendiente.hoy { color: #dd6b20; animation: pulse 2s infinite; }
-.lt-badge-pendiente.hoy { background: #feebc8; color: #c05621; }
-
-/* D) VENCIDA (Rojo - Pasado) */
-.lt-tarea-card.lt-item-pendiente.vencida {
-  border-left-color: #ef4444;
-  background: linear-gradient(to right, #fef2f2, #fff);
-}
-.lt-icono-pendiente.vencida { color: #ef4444; animation: bounce 2s infinite; }
-.lt-badge-pendiente.vencida { background: #fee2e2; color: #991b1b; }
-
-
-/* --- ANIMACIONES --- */
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+    box-sizing: border-box;
 }
 
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .lt-tarea-card { flex-direction: column; align-items: flex-start; gap: 15px; }
-  .lt-tarea-contenido-der { align-items: flex-start; width: 100%; flex-direction: row; justify-content: space-between;}
+.ltp-search-filter-wrapper {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ltp-search-box {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.ltp-search-input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    box-sizing: border-box;
+}
+
+.ltp-search-input:focus {
+    outline: none;
+    border-color: #861542;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(134, 21, 66, 0.1);
+}
+
+.ltp-search-icon {
+    position: absolute;
+    left: 0.9rem;
+    color: #861542;
+    font-size: 1rem;
+}
+
+.ltp-search-clear-btn {
+    position: absolute;
+    right: 0.9rem;
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ltp-search-clear-btn:hover {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+.ltp-filter-box {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: auto;
+}
+
+.ltp-filter-icon {
+    color: #861542;
+    font-size: 1rem;
+}
+
+.ltp-search-results-info {
+    text-align: center;
+    padding: 0.6rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.ltp-results-count {
+    background: #861542;
+    color: white;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-right: 0.4rem;
+}
+
+/* ================================================= */
+/* ============== ESTADOS SIN RESULTADOS =========== */
+/* ================================================= */
+
+.ltp-no-resultados {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.ltp-no-resultados-icon {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.ltp-no-resultados h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.ltp-no-resultados p {
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+/* ================================================= */
+/* ============== RESPONSIVE ======================= */
+/* ================================================= */
+
+@media (max-width: 768px) {
+    .ltp-proyecto-header {
+        padding: 16px 20px;
+    }
+    
+    .ltp-tarea-item {
+        margin: 0 16px 14px 16px; 
+        width: calc(100% - 32px);
+    }
+
+    .ltp-tarea-header {
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        gap: 10px;
+    }
+
+    .ltp-tarea-acciones-header {
+        margin-left: 0; 
+        width: auto;
+        justify-content: flex-end;
+    }
+
+    .ltp-tarea-info-dias {
+        min-width: 120px;
+        padding: 6px 10px;
+    }
+    
+    .ltp-detalles-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .ltp-tarea-item {
+        width: 100% !important;
+        margin: 0 0 14px 0 !important;
+        border-left-width: 5px;
+        box-sizing: border-box;
+    }
+
+    .ltp-tarea-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 12px;
+        padding: 14px 16px !important;
+        position: relative;
+    }
+
+    .ltp-tarea-expand-icon {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        font-size: 1rem;
+        color: #861542;
+    }
+
+    .ltp-tarea-info-contenido {
+        width: 100% !important;
+    }
+
+    .ltp-tarea-acciones-header {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+        gap: 8px;
+    }
+
+    .ltp-tarea-info-dias {
+        width: 100% !important;
+        min-width: unset !important;
+        margin-top: 8px;
+        justify-content: flex-start !important;
+        flex-direction: row !important;
+    }
+
+    .ltp-detalles-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+
+    .ltp-detalle-item {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        padding: 12px 16px !important;
+        border-bottom: 1px solid #e5e7eb !important;
+        border-right: none !important;
+    }
+
+    .ltp-detalle-item:last-child {
+        border-bottom: none !important;
+    }
+
+    .ltp-detalle-label, .ltp-detalle-value {
+        text-align: left !important;
+        width: 100% !important;
+    }
 }
 
 

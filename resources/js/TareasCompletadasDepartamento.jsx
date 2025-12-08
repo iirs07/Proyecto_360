@@ -1,194 +1,372 @@
 import React, { useState, useEffect } from "react";
-import '../css/global.css';
-import "../css/TareasCJ.css"; 
+import "../css/global.css";
+import "../css/TareasCJ.css";
 import logo3 from "../imagenes/logo3.png";
+import {
+    FaSearch,
+    FaCalendarAlt,
+    FaUser,
+    FaBuilding,
+    FaEye,
+    FaFilter,
+    FaListUl,
+    FaChevronDown,
+    FaChevronRight,
+    FaCheckCircle
+} from "react-icons/fa";
 import { FiX } from "react-icons/fi";
-import { FaBars,FaSearch, FaCheckCircle, FaInfoCircle } from "react-icons/fa";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
+import SelectDinamico from "../components/SelectDinamico";
 import { useRolNavigation } from "./utils/navigation";
 
+// Color principal del header de la app
+const PRIMARY_COLOR = "#861542";
+const PRIMARY_LIGHT_BG = "#fef0f8"; // Fondo muy claro para el proyecto-header
 
-function TareasCompletadasDepartamento() {
-  const [busqueda, setBusqueda] = useState("");
-  const [tareas, setTareas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [mensajeAPI, setMensajeAPI] = useState("");
-  const { volverSegunRol } = useRolNavigation();
+// Opciones de orden alfabético
+const OPCIONES_FILTRO = [
+    { value: "az", label: "A-Z" },
+    { value: "za", label: "Z-A" },
+];
 
-  useEffect(() => {
-  const fetchTareasCompletadas = async () => {
-    try {
-      const usuario = JSON.parse(sessionStorage.getItem("usuario"));
-      const token = sessionStorage.getItem("jwt_token");
+// Color para estado "Finalizado"
+const ESTADO_FINALIZADO = {
+    icon: <FaCheckCircle />,
+    color: "#059669",        // VERDE fuerte (Green-600)
+    bgColor: "#d1fae5",      // Fondo verde muy claro
+    texto: "Finalizado"
+};
 
-      if (!usuario?.id_usuario) {
-        setMensajeAPI("Usuario no logeado");
-        setLoading(false);
-        return;
-      }
+function TareasFinalizadas() {
+    const [busqueda, setBusqueda] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("az");
+    const [proyectos, setProyectos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [tareaExpandida, setTareaExpandida] = useState(null);
 
-      if (!token) {
-        setMensajeAPI("Token no encontrado");
-        setLoading(false);
-        return;
-      }
+    const { volverSegunRol } = useRolNavigation();
 
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/tareasCompletadas/jefe?usuario=${usuario.id_usuario}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`, 
-          },
-        }
-      );
+    useEffect(() => {
+        const fetchTareasFinalizadas = async () => {
+            try {
+                const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+                const token = sessionStorage.getItem("jwt_token");
 
-      const data = await res.json();
+                if (!usuario?.id_usuario || !token) {
+                    setLoading(false);
+                    return;
+                }
 
-      if (data.success && data.proyectos.length > 0) {
-        const tareasPlanas = data.proyectos.flatMap(p => 
-  p.tareas.map(t => ({ ...t, p_nombre: p.proyecto?.p_nombre || '', t_nombre: t.t_nombre || '' }))
-);
+                const res = await fetch(
+                    `http://127.0.0.1:8000/api/tareasFinalizadas/departamento?usuario=${usuario.id_usuario}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
 
+                if (res.status === 401) {
+                    sessionStorage.removeItem("jwt_token");
+                    sessionStorage.removeItem("usuario");
+                    window.location.href = "/Login";
+                    return;
+                }
 
-        setTareas(tareasPlanas);
-        setMensajeAPI("");
-      } else {
-        setTareas([]);
-        setMensajeAPI(data.mensaje || "No hay tareas completadas para este usuario");
-      }
-    } catch (error) {
-      setMensajeAPI("Error al cargar tareas");
-      setTareas([]);
-      console.error("Error al cargar tareas:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+                const data = await res.json();
+                if (data.success) {
+                    setProyectos(data.proyectos || []);
+                } else {
+                    console.error("Error al cargar proyectos y tareas finalizadas:", data.mensaje);
+                }
+            } catch (error) {
+                console.error("Error al cargar proyectos y tareas finalizadas:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  fetchTareasCompletadas();
-}, []);
+        fetchTareasFinalizadas();
+    }, []);
 
+    const getFechaCompletada = (fechaFin) => {
+        if (!fechaFin) return "—";
+        return new Date(fechaFin)
+            .toLocaleDateString("es-ES", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            });
+    };
 
+    const proyectosFiltradosYBuscados = proyectos
+        .map(({ proyecto, tareas }) => {
+            if (!proyecto || !tareas) return { proyecto: null, tareas: [] };
 
-  // --- CAMBIO 1: Filtro más seguro ---
-  // Guardamos el término de búsqueda en minúsculas una sola vez
-  const terminoBusqueda = busqueda.toLowerCase();
-  
-  const tareasFiltradas = tareas.filter(
-    (tarea) => {
-      const nombreTarea = String(tarea.t_nombre || '').toLowerCase();
-      const nombreProyecto = String(tarea.p_nombre || '').toLowerCase();
-      
-      return nombreTarea.includes(terminoBusqueda) || nombreProyecto.includes(terminoBusqueda);
-    }
-  );
+            const termino = busqueda.trim().toLowerCase();
+            if (!termino) return { proyecto, tareas };
 
-  // Agrupamiento de tareas por proyecto
-  const proyectosAgrupados = tareasFiltradas.reduce((proyectos, tarea) => {
-    const proyectoExistente = proyectos.find((p) => p.p_nombre === tarea.p_nombre);
-    if (proyectoExistente) {
-      proyectoExistente.tareas.push(tarea);
-    } else {
-      proyectos.push({ p_nombre: tarea.p_nombre, tareas: [tarea] });
-    }
-    return proyectos;
-  }, []);
+            const proyectoCoincide = proyecto.p_nombre?.toLowerCase().includes(termino);
+            const tareasCoinciden = tareas.filter(t =>
+                proyectoCoincide || t.t_nombre?.toLowerCase().includes(termino)
+            );
 
-  return (
-    <Layout
-          titulo="TAREAS COMPLETADAS"
-          sidebar={<MenuDinamico activeRoute="enproceso" />}
-        >
+            return { proyecto, tareas: tareasCoinciden };
+        })
+        .filter(({ proyecto, tareas }) => proyecto && tareas.length > 0)
+        .map(({ proyecto, tareas }) => {
+            // Ordenar tareas alfabéticamente
+            const tareasOrdenadas = [...tareas].sort((a, b) => {
+                if (filtroEstado === "az") return a.t_nombre.localeCompare(b.t_nombre);
+                if (filtroEstado === "za") return b.t_nombre.localeCompare(a.t_nombre);
+                return 0;
+            });
+            return { proyecto, tareas: tareasOrdenadas };
+        })
+        // Ordenar proyectos alfabéticamente también
+        .sort((a, b) => {
+            if (!a.proyecto || !b.proyecto) return 0;
+            if (filtroEstado === "az") return a.proyecto.p_nombre.localeCompare(b.proyecto.p_nombre);
+            if (filtroEstado === "za") return b.proyecto.p_nombre.localeCompare(a.proyecto.p_nombre);
+            return 0;
+        });
 
-          <div className="container my-4">
-           {tareas.length > 0 && (
-  <div className="barra-busqueda-global-container mb-4">
-    <div className="barra-busqueda-global-wrapper">
-      <FaSearch className="barra-busqueda-global-icon" />
-      <input
-        type="text"
-        placeholder="Buscar tareas ..."
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        className="barra-busqueda-global-input"
-      />
-      {busqueda && (
-        <button
-          className="buscador-clear-global"
-          onClick={() => setBusqueda("")}
-        >
-          <FiX />
-        </button>
-      )}
-    </div>
+    const totalResultados = proyectosFiltradosYBuscados.reduce(
+        (acc, cur) => acc + cur.tareas.length,
+        0
+    );
 
-    {busqueda && (
-      <div className="buscador-resultados-global">
-        {tareasFiltradas.length} resultado(s) para "{busqueda}"
-      </div>
-    )}
-  </div>
-)}
+    const handleSelectChange = (label) => {
+        const opcion = OPCIONES_FILTRO.find((o) => o.label === label);
+        if (opcion) setFiltroEstado(opcion.value);
+    };
 
-            <div className="tcj-proyectos-filtros">
-              
-              {/* --- CAMBIO 2: Lógica de renderizado corregida --- */}
-              <div className="tcj-container">
-                {loading ? (
-                  // ESTADO 1: Cargando
-                  <div className="loader-container">
-                    <div className="loader-logo">
-                      <img src={logo3} alt="Cargando" />
+    const handleVerTarea = (tareaId) => {
+        console.log(`Ver detalles de tarea finalizada: ${tareaId}`);
+    };
+
+    return (
+        <Layout titulo="TAREAS FINALIZADAS" sidebar={<MenuDinamico activeRoute="enproceso" />}>
+            <div className="container my-4">
+
+                {loading && (
+                    <div className="loader-container">
+                        <div className="loader-logo">
+                            <img src={logo3} alt="Cargando" />
+                        </div>
+                        <div className="loader-texto">CARGANDO TAREAS FINALIZADAS...</div>
+                        <div className="loader-spinner"></div>
                     </div>
-                    <div className="loader-texto">CARGANDO TAREAS COMPLETADAS...</div>
-                    <div className="loader-spinner"></div>
-                  </div>
-                ) : tareas.length === 0 ? (
-                  <EmptyState
-    titulo="TAREAS COMPLETADAS"
-    mensaje="No hay tareas completadas."
-    botonTexto="Volver al Tablero"
-    onVolver={volverSegunRol} 
-    icono={logo3}
-  />
-                )  : (
-                  proyectosAgrupados.map(({ p_nombre, tareas: tareasDelProyecto }) => (
-                    <div key={p_nombre} className="tcj-card">
-                      <h3 className="tcj-proj-name">{p_nombre}</h3>
-                      <ul className="tcj-task-list">
-                        {tareasDelProyecto.map((tarea) => (
-                          <li key={tarea.id_tarea} className="tcj-task-item">
-                            <div className="tcj-task-info">
-                              <div className="tcj-task-header">
-                                <FaCheckCircle className="tcj-icon" />
-                                <label className="tcj-task-name"> {tarea.t_nombre}</label>
-                              </div>
-                              <div className="tcj-task-footer">
-                                <span className="tcj-task-status">{tarea.t_estatus}</span>
-                                <span className="tcj-task-date">
-                                  Vence: {tarea.tf_fin || tarea.fechaVencimiento}
-                                </span>
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))
                 )}
-              </div>
+
+                {!loading && proyectos.length === 0 && (
+                    <EmptyState
+                        titulo="TAREAS FINALIZADAS"
+                        mensaje="No hay tareas finalizadas en tu departamento."
+                        botonTexto="Volver al Tablero"
+                        onVolver={volverSegunRol}
+                        icono={logo3}
+                    />
+                )}
+
+                {!loading && proyectos.length > 0 && (
+                    <>
+                        {/* CONTENEDOR DE FILTROS */}
+                        <div className="tf-filtros-container mb-4">
+                            <div className="tf-search-filter-wrapper">
+                                <div className="tf-search-box">
+                                    <FaSearch className="tf-search-icon" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar tarea o proyecto..."
+                                        value={busqueda}
+                                        onChange={(e) => setBusqueda(e.target.value)}
+                                        className="tf-search-input"
+                                    />
+                                    {busqueda && (
+                                        <button
+                                            className="tf-search-clear-btn"
+                                            onClick={() => setBusqueda("")}
+                                            aria-label="Limpiar búsqueda"
+                                        >
+                                            <FiX />
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="tf-filter-box">
+                                    <FaFilter className="tf-filter-icon" />
+                                    <SelectDinamico
+                                        opciones={OPCIONES_FILTRO.map((o) => o.label)}
+                                        valor={OPCIONES_FILTRO.find((o) => o.value === filtroEstado)?.label}
+                                        setValor={handleSelectChange}
+                                    />
+                                </div>
+                            </div>
+
+                            {busqueda && (
+                                <div className="tf-search-results-info">
+                                    <span className="tf-results-count">{totalResultados}</span>{" "}
+                                    {totalResultados === 1 ? "tarea" : "tareas"} encontrada(s).
+                                </div>
+                            )}
+                        </div>
+
+                        {/* LISTADO DE PROYECTOS Y TAREAS */}
+                        <div className="tf-tareas-contenedor">
+                            {proyectosFiltradosYBuscados.length === 0 ? (
+                                
+                                    null
+                            ) : (
+                                proyectosFiltradosYBuscados.map(({ proyecto, tareas }) => {
+                                    const proyectoColor = PRIMARY_COLOR;
+                                    const proyectoBg = PRIMARY_LIGHT_BG;
+
+                                    return (
+                                        <div key={proyecto.id_proyecto} className="tf-proyecto-card">
+                                            {/* HEADER DEL PROYECTO */}
+                                            <div className="tf-proyecto-header" style={{ backgroundColor: proyectoBg }}>
+                                                <div className="tf-proyecto-info">
+                                                    <h3 className="tf-proyecto-nombre" style={{ color: proyectoColor }}>{proyecto.p_nombre}</h3>
+                                                    <div className="tf-proyecto-meta">
+                                                        <div className="tf-proyecto-meta-icon" style={{ color: proyectoColor }}>
+                                                            <FaListUl />
+                                                        </div>
+                                                        <span className="tf-proyecto-tareas-count" style={{ color: proyectoColor, backgroundColor: 'rgba(134, 21, 66, 0.1)' }}>
+                                                            {tareas.length} {tareas.length === 1 ? "tarea finalizada" : "tareas finalizadas"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* LISTA DE TAREAS */}
+                                            <div className="tf-tareas-lista">
+                                                {tareas.map((tarea) => {
+                                                    const fechaCompletada = getFechaCompletada(tarea.tf_fin || tarea.fechaFinalizacion);
+                                                    const isExpanded = tareaExpandida === tarea.id_tarea;
+
+                                                    return (
+                                                        <div
+                                                            key={tarea.id_tarea}
+                                                            className={`tf-tarea-item ${isExpanded ? "active" : ""}`}
+                                                            style={{ borderLeftColor: ESTADO_FINALIZADO.color }}
+                                                        >
+                                                            {/* HEADER DE TAREA */}
+                                                            <div 
+                                                                className="tf-tarea-header"
+                                                                onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
+                                                            >
+                                                                {/* ÍCONO DE ESTADO FINALIZADO */}
+                                                                <div className="tf-tarea-estado-container">
+                                                                    <div
+                                                                        className="tf-tarea-estado-indicador"
+                                                                        style={{ color: ESTADO_FINALIZADO.color, backgroundColor: ESTADO_FINALIZADO.bgColor }}
+                                                                    >
+                                                                        {ESTADO_FINALIZADO.icon}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* TÍTULO Y ESTATUS */}
+                                                                <div className="tf-tarea-info-contenido">
+                                                                    <div className="tf-tarea-titulo-wrapper">
+                                                                        <h4 className="tf-tarea-nombre">{tarea.t_nombre}</h4>
+                                                                        <span
+                                                                            className="tf-tarea-estatus-header"
+                                                                            style={{
+                                                                                backgroundColor: ESTADO_FINALIZADO.bgColor,
+                                                                                color: ESTADO_FINALIZADO.color,
+                                                                            }}
+                                                                        >
+                                                                            {ESTADO_FINALIZADO.texto}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* FECHA Y ACCIONES */}
+                                                                <div className="tf-tarea-acciones-header">
+                                                                    <div className="tf-tarea-info-fecha" style={{ borderColor: ESTADO_FINALIZADO.color, backgroundColor: ESTADO_FINALIZADO.bgColor }}>
+                                                                        <div className="tf-tarea-fecha-completada">
+                                                                            <span className="tf-fecha-label">COMPLETADA:</span>
+                                                                            <div
+                                                                                className="tf-fecha-texto"
+                                                                                style={{ color: ESTADO_FINALIZADO.color }}
+                                                                            >
+                                                                                {fechaCompletada}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="tf-tarea-expand-icon">
+                                                                        {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* DETALLES EXPANDIBLES */}
+                                                            {isExpanded && (
+                                                                <div className="tf-tarea-detalles-wrapper">
+                                                                    <div className="tf-tarea-detalles">
+                                                                        <div className="tf-detalles-grid">
+                                                                            {/* Asignado a */}
+                                                                            <div className="tf-detalle-item">
+                                                                                <div className="tf-detalle-icono-container-column">
+                                                                                    <FaUser className="tf-detalle-icono" />
+                                                                                </div>
+                                                                                <div className="tf-detalle-content">
+                                                                                    <p className="tf-detalle-label">Completada por</p>
+                                                                                    <p className="tf-detalle-value">{tarea.nombre_usuario_asignado || "No asignado"}</p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Fecha de finalización */}
+                                                                            <div className="tf-detalle-item">
+                                                                                <div className="tf-detalle-icono-container-column">
+                                                                                    <FaCalendarAlt className="tf-detalle-icono" />
+                                                                                </div>
+                                                                                <div className="tf-detalle-content">
+                                                                                    <p className="tf-detalle-label">Fecha de finalización</p>
+                                                                                    <div className="tf-fecha-detalle">
+                                                                                        <p className="tf-detalle-value">{fechaCompletada}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Departamento */}
+                                                                            {tarea.nombre_departamento_usuario_asignado && (
+                                                                                <div className="tf-detalle-item">
+                                                                                    <div className="tf-detalle-icono-container-column">
+                                                                                        <FaBuilding className="tf-detalle-icono" />
+                                                                                    </div>
+                                                                                    <div className="tf-detalle-content">
+                                                                                        <p className="tf-detalle-label">Departamento</p>
+                                                                                        <p className="tf-detalle-value">{tarea.nombre_departamento_usuario_asignado}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
-          </div>
-    </Layout>
-  );
+        </Layout>
+    );
 }
 
-export default TareasCompletadasDepartamento;
-
+export default TareasFinalizadas;
 
 
 
