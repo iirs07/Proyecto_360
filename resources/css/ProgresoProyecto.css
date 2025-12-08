@@ -1,8 +1,9 @@
-/* ProgresoProyecto.css */
+/* =========================================== */
+/* 1. CONTENEDORES PRINCIPALES Y LAYOUT        */
+/* =========================================== */
 
-/* Contenedor principal - CENTRADO */
+/* Contenedor principal - TRANSPARENTE */
 .prog-proy-contenedor-progreso-moderno {
-  background: transparent;
   position: relative;
   overflow: visible;
   margin: 0 auto;
@@ -12,22 +13,61 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 15px;
 }
 
-/* Layout horizontal para gráfica circular - INVERTIDO */
+/* Layout para GRÁFICA CIRCULAR */
 .prog-proy-contenedor-progreso-moderno.circular {
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 30px;
+  max-width: 800px;
 }
 
-/* Gráfica a la IZQUIERDA (primero) */
+/* Layout para BARRA DE PROGRESO */
+.prog-proy-contenedor-progreso-moderno.barra {
+  align-items: center;
+  max-width: 800px;
+}
+
+/* =========================================== */
+/* 2. HOVER PARA TODOS LOS CONTENEDORES       */
+/* =========================================== */
+
+
+/* Efecto activo (al hacer click) */
+.prog-proy-contenedor-progreso-moderno:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+  transition: transform 0.1s ease;
+}
+
+/* Layout para GRÁFICA CIRCULAR */
+.prog-proy-contenedor-progreso-moderno.circular {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  max-width: 800px;
+}
+
+/* Layout para BARRA DE PROGRESO */
+.prog-proy-contenedor-progreso-moderno.barra {
+  align-items: center;
+  max-width: 800px;
+}
+
+/* =========================================== */
+/* 3. GRÁFICA CIRCULAR - COMPONENTE COMPLETO   */
+/* =========================================== */
+
+/* Posicionamiento de elementos en layout circular */
 .prog-proy-contenedor-progreso-moderno.circular .prog-proy-contenedor-circular-mejorado {
   order: 1;
 }
 
-/* Estadísticas a la DERECHA (después) */
 .prog-proy-contenedor-progreso-moderno.circular .prog-proy-estadisticas-modernas {
   order: 2;
   display: flex;
@@ -36,45 +76,56 @@
   align-self: center;
 }
 
-/* Barra centrada y más ancha */
-.prog-proy-contenedor-progreso-moderno.barra {
-  align-items: center;
-}
-
-.prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-/* ===== GRÁFICA CIRCULAR MEJORADA ===== */
+/* Contenedor de la gráfica circular - CON HOVER */
 .prog-proy-contenedor-circular-mejorado {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0;
   position: relative;
   flex-shrink: 0;
+  background: transparent;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 10px;
 }
 
-/* MARCO CIRCULAR - ELIMINADA LA SOMBRA EXTERIOR */
+/* Hover para contenedor circular - EFECTO DE GLOW */
+.prog-proy-contenedor-circular-mejorado:hover {
+  transform: scale(1.02);
+  background-color: rgba(0, 123, 255, 0.03);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.1);
+}
+
+/* Marco circular - CON HOVER */
 .prog-proy-marco-circular {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: transparent; /* FONDO TRANSPARENTE */
-  /* ELIMINADO: box-shadow externa */
-  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03); /* SOLO SOMBRA INTERIOR */
+  background: transparent;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
 }
 
-/* Efectos de destello para el círculo - MÁS SUTILES */
+/* Hover para marco circular - BRILLO AZUL */
+.prog-proy-marco-circular:hover {
+  border-color: rgba(0, 123, 255, 0.3);
+  box-shadow: 
+    inset 0 1px 4px rgba(0, 0, 0, 0.03),
+    0 0 15px rgba(0, 123, 255, 0.2);
+  transform: scale(1.01);
+}
+
+/* Efectos de destello - CÍRCULO */
 .prog-proy-destello-circular {
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
   opacity: 0.3;
@@ -83,12 +134,16 @@
   animation: prog-proy-destello-rotacion 8s linear infinite;
 }
 
+.prog-proy-marco-circular:hover .prog-proy-destello-circular {
+  opacity: 0.5;
+}
+
 .prog-proy-destello-trazo {
   position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
+  top: -5%;
+  left: -5%;
+  width: 110%;
+  height: 110%;
   border-radius: 50%;
   background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.15), transparent);
   opacity: 0.15;
@@ -97,52 +152,57 @@
   animation: prog-proy-destello-rotacion 6s linear infinite reverse;
 }
 
-@keyframes prog-proy-destello-rotacion {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.prog-proy-marco-circular:hover .prog-proy-destello-trazo {
+  opacity: 0.25;
 }
 
-/* SVG de la gráfica circular - BARRA MÁS GRUESA */
+/* SVG de la gráfica circular */
 .prog-proy-grafica-circular-mejorada {
   transform: rotate(0.1deg);
-  /* ELIMINADO: filter: drop-shadow - esta era la sombra exterior */
+  display: block;
+  overflow: visible;
 }
 
-/* CÍRCULOS MÁS GRUESOS - AUMENTADO EL GROSOR */
+/* Hover para SVG - AUMENTA BRILLO */
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-grafica-circular-mejorada {
+  filter: brightness(1.05);
+}
+
+/* Círculos de progreso */
 .prog-proy-circulo-fondo {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  stroke-width: 14px; /* AUMENTADO de ~8-10px a 14px */
 }
 
 .prog-proy-circulo-progreso-mejorado {
   transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: prog-proy-ligero-pulso 3s ease-in-out infinite;
-  stroke-width: 14px; /* AUMENTADO de ~8-10px a 14px */
 }
 
-/* Aseguramos que el círculo de progreso sea visible incluso en 0% */
-.prog-proy-circulo-progreso-mejorado[stroke-dashoffset="100%"] {
-  opacity: 0.3;
+/* Hover para círculo de progreso */
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-circulo-progreso-mejorado {
+  filter: brightness(1.1);
+  animation: prog-proy-ligero-pulso 2s ease-in-out infinite;
 }
 
-@keyframes prog-proy-ligero-pulso {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.95; }
-}
-
-/* Punto indicador animado - VISIBLE INCLUSO EN 0% */
+/* Punto indicador */
 .prog-proy-punto-indicador {
   animation: prog-proy-punto-latido 2s ease-in-out infinite;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
-  opacity: 0.5;
+  opacity: 1;
+  transform-origin: center;
 }
 
-@keyframes prog-proy-punto-latido {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+/* Punto indicador en 100% - posición fija en la parte superior */
+.prog-proy-circulo-progreso-mejorado[stroke-dashoffset="0"] ~ .prog-proy-punto-indicador {
+  transform: translate(0, 0) !important;
 }
 
-/* Texto central mejorado - SIEMPRE VISIBLE */
+/* Hover para punto indicador */
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-punto-indicador {
+  animation: prog-proy-punto-latido 1.5s ease-in-out infinite;
+}
+
+/* Texto central del círculo */
 .prog-proy-texto-circular-mejorado {
   position: absolute;
   top: 50%;
@@ -166,12 +226,459 @@
   margin-bottom: 4px;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover para texto */
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-porcentaje-circular-mejorado {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+/* Grosor del círculo - DEFINIDO POR JS, pero con respaldo */
+.prog-proy-circulo-fondo,
+.prog-proy-circulo-progreso-mejorado {
+  stroke-width: var(--stroke-width, 14px);
+}
+
+/* Punto indicador proporcional al grosor */
+.prog-proy-punto-indicador {
+  r: var(--punto-size, 6px);
+}
+
+/* Responsive para círculo */
+@media (max-width: 768px) {
+  .prog-proy-contenedor-progreso-moderno.circular {
+    flex-direction: column;
+    gap: 25px;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.circular .prog-proy-estadisticas-modernas {
+    order: 2;
+  }
+  
+  .prog-proy-contenedor-circular-mejorado {
+    order: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .prog-proy-contenedor-circular-mejorado {
+    padding: 8px;
+  }
+  
+  .prog-proy-texto-circular-mejorado {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+/* =========================================== */
+/* 4. BARRA DE PROGRESO - COMPONENTE COMPLETO  */
+/* =========================================== */
+
+/* Contenedor de barra de progreso - CON HOVER */
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.prog-proy-contenedor-barra-moderna {
+  padding: 0;
+  position: relative;
+  width: 100%;
+  background: transparent;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+/* Hover para contenedor barra - EFECTO DE FONDO */
+.prog-proy-contenedor-barra-moderna:hover {
+  background-color: rgba(0, 123, 255, 0.03);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.prog-proy-barra-contenedor-moderno {
+  width: 100%;
+  position: relative;
+  background: transparent;
+}
+
+/* Barra de fondo - CON HOVER */
+.prog-proy-barra-fondo-moderna {
+  width: 100%;
+  background: transparent;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Hover para barra de fondo - RESALTADO */
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-barra-fondo-moderna {
+  border-color: rgba(0, 123, 255, 0.4);
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 0 10px rgba(0, 123, 255, 0.2);
+}
+
+/* Barra de progreso - EFECTO EN HOVER */
+.prog-proy-barra-progreso-moderna {
+  position: relative;
+  border-radius: 50px;
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  width: 0%;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover para barra de progreso - MÁS BRILLANTE */
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-barra-progreso-moderna {
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 2px 10px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.1);
+}
+
+/* Efectos de luz - BARRA (más intensos en hover) */
+.prog-proy-luz-corrediza {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+  animation: prog-proy-luz-deslizante 3s ease-in-out infinite;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-luz-corrediza {
+  opacity: 0.9;
+  animation: prog-proy-luz-deslizante 2s ease-in-out infinite;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 123, 255, 0.3) 50%, 
+    transparent 100%);
+}
+
+.prog-proy-luz-secundaria {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.2) 100%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-luz-secundaria {
+  opacity: 0.4;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 123, 255, 0.2) 100%);
+}
+
+/* Elementos de la barra de progreso */
+.prog-proy-punto-progreso-moderno {
+  position: absolute;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  animation: prog-proy-punto-brillante 2s ease-in-out infinite;
+  z-index: 2;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-punto-progreso-moderno {
+  opacity: 0.7;
+  animation: prog-proy-punto-brillante 1.5s ease-in-out infinite;
+  background: rgba(255, 255, 255, 1);
+}
+
+.prog-proy-indicador-porcentaje {
+  position: absolute;
+  right: 20px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+  animation: prog-proy-texto-flotante 3s ease-in-out infinite;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-indicador-porcentaje {
+  opacity: 0.9;
+  animation: prog-proy-texto-flotante 2s ease-in-out infinite;
+  text-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+}
+
+/* Marcadores de progreso - CON HOVER MEJORADO */
+.prog-proy-marcadores-progreso {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 0 2px;
+  transition: all 0.3s ease;
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-marcadores-progreso {
+  transform: translateY(-2px);
+}
+
+.prog-proy-marcador {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.prog-proy-marcador:hover {
+  transform: translateY(-3px);
+}
+
+.prog-proy-punto-marcador {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
   position: relative;
 }
 
-/* Badge de estado */
+/* Hover para punto marcador - EFECTO DE PULSO */
+.prog-proy-punto-marcador:hover {
+  transform: scale(1.4);
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+  border-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.2);
+  animation: prog-proy-punto-brillante 1s ease-in-out infinite;
+}
+
+.prog-proy-porcentaje-marcador {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #8d9aa6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================== */
+/* 5. ESTADÍSTICAS - CON HOVER MEJORADO       */
+/* =========================================== */
+
+/* Contenedor de estadísticas - CON HOVER */
+.prog-proy-estadisticas-modernas {
+  padding: 0;
+  width: auto;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+/* Estadísticas para BARRA */
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-estadisticas-modernas {
+  margin-top: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Estadísticas para CIRCULAR */
+.prog-proy-contenedor-progreso-moderno.circular .prog-proy-grid-estadisticas {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Tarjetas de estadística - HOVER COMPLETO */
+.prog-proy-tarjeta-estadistica {
+  background: transparent;
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  min-width: 110px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Efecto de fondo deslizante en tarjetas */
+.prog-proy-tarjeta-estadistica::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 123, 255, 0.1), 
+    transparent);
+  transition: left 0.6s ease;
+  z-index: 0;
+}
+
+/* Icono con círculo de color */
+.prog-proy-icono-estadistica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+/* SVG dentro del icono */
+.prog-proy-icono-estadistica svg {
+  width: 16px;
+  height: 16px;
+  transition: all 0.3s ease;
+  stroke: currentColor;
+}
+
+/* Primera tarjeta (completados) - Verde */
+.prog-proy-tarjeta-estadistica:nth-child(1) .prog-proy-icono-estadistica {
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.prog-proy-tarjeta-estadistica:nth-child(1) .prog-proy-icono-estadistica svg {
+  stroke: #28a745;
+}
+
+/* Segunda tarjeta (pendientes) - Rojo */
+.prog-proy-tarjeta-estadistica:nth-child(2) .prog-proy-icono-estadistica {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.prog-proy-tarjeta-estadistica:nth-child(2) .prog-proy-icono-estadistica svg {
+  stroke: #dc3545;
+}
+
+/* Tercera tarjeta (en progreso) - Naranja */
+.prog-proy-tarjeta-estadistica:nth-child(3) .prog-proy-icono-estadistica {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.prog-proy-tarjeta-estadistica:nth-child(3) .prog-proy-icono-estadistica svg {
+  stroke: #000000;
+}
+
+/* Hover para iconos - efecto de escala */
+.prog-proy-tarjeta-estadistica:hover .prog-proy-icono-estadistica {
+  transform: scale(1.1);
+}
+
+.prog-proy-tarjeta-estadistica:hover .prog-proy-icono-estadistica svg {
+  transform: scale(1.2);
+}
+
+/* Efecto especial para primera tarjeta (completados) en hover */
+.prog-proy-tarjeta-estadistica:nth-child(1):hover .prog-proy-icono-estadistica {
+  background-color: rgba(40, 167, 69, 0.2);
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+/* Efecto especial para segunda tarjeta (pendientes) en hover */
+.prog-proy-tarjeta-estadistica:nth-child(2):hover .prog-proy-icono-estadistica {
+  background-color: rgba(220, 53, 69, 0.2);
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+/* Efecto especial para tercera tarjeta (en progreso) en hover */
+.prog-proy-tarjeta-estadistica:nth-child(3):hover .prog-proy-icono-estadistica {
+  background-color: rgba(255, 193, 7, 0.2);
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+.prog-proy-contenido-estadistica {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  z-index: 1;
+}
+
+.prog-proy-valor {
+  font-weight: 700;
+  line-height: 1;
+  color: #2c3e50;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+/* Colores para los valores que coincidan con los iconos */
+.prog-proy-tarjeta-estadistica:nth-child(1) .prog-proy-valor {
+  color: #000000;
+}
+
+.prog-proy-tarjeta-estadistica:nth-child(2) .prog-proy-valor {
+  color: #000000;
+}
+
+.prog-proy-tarjeta-estadistica:nth-child(3) .prog-proy-valor {
+  color: #000000;
+}
+
+.prog-proy-etiqueta {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  color: #6c757d;
+  font-weight: 500;
+  margin-top: 3px;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+/* Badge de estado - HOVER ANIMADO */
 .prog-proy-estado-contenedor {
   margin-top: 2px;
+  transition: all 0.3s ease;
+}
+
+.prog-proy-contenedor-progreso-moderno:hover .prog-proy-estado-contenedor {
+  transform: translateY(-2px);
 }
 
 .prog-proy-badge-estado {
@@ -181,11 +688,33 @@
   text-transform: uppercase;
   letter-spacing: 0.2px;
   font-size: 0.6rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Efecto de fondo deslizante en badge */
+.prog-proy-badge-estado::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.prog-proy-badge-estado:hover::before {
+  left: 100%;
+}
+
+/* Colores de badges - MÁS VIBRANTES EN HOVER */
 .prog-proy-badge-estado.prog-proy-sin-progreso {
   background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
   color: white;
@@ -211,82 +740,91 @@
   color: white;
 }
 
-/* ===== BARRA DE PROGRESO MODERNA - CON PROFUNDIDAD ===== */
-.prog-proy-contenedor-barra-moderna {
-  padding: 0;
-  position: relative;
-  width: 100%;
+/* Responsive para estadísticas */
+@media (max-width: 768px) {
+  .prog-proy-contenedor-progreso-moderno.circular .prog-proy-grid-estadisticas {
+    flex-direction: row;
+    gap: 15px;
+  }
+  
+  .prog-proy-tarjeta-estadistica {
+    min-width: 100px;
+    padding: 10px 12px;
+  }
+  
+  .prog-proy-icono-estadistica {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .prog-proy-icono-estadistica svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .prog-proy-valor {
+    font-size: 0.85rem;
+  }
+  
+  .prog-proy-etiqueta {
+    font-size: 0.7rem;
+  }
 }
 
-.prog-proy-barra-contenedor-moderno {
-  width: 100%;
-  position: relative;
+@media (max-width: 480px) {
+  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
+    gap: 10px;
+  }
+  
+  .prog-proy-tarjeta-estadistica {
+    min-width: 85px;
+    padding: 8px 10px;
+  }
+  
+  .prog-proy-icono-estadistica {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .prog-proy-icono-estadistica svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .prog-proy-valor {
+    font-size: 0.8rem;
+  }
+  
+  .prog-proy-etiqueta {
+    font-size: 0.65rem;
+  }
 }
 
-/* Barra de fondo - CON SOMBRA INTERIOR PARA PROFUNDIDAD */
-.prog-proy-barra-fondo-moderna {
-  width: 100%;
-  background: #ffffff;
-  border-radius: 50px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 
-    inset 0 3px 6px rgba(0, 0, 0, 0.1),
-    inset 0 1px 2px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e9ecef;
+/* =========================================== */
+/* 7. ANIMACIONES MEJORADAS                    */
+/* =========================================== */
+
+@keyframes prog-proy-destello-rotacion {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Barra de progreso con efectos de luz */
-.prog-proy-barra-progreso-moderna {
-  position: relative;
-  border-radius: 50px;
-  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-  width: 0%;
-  box-shadow: 
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+@keyframes prog-proy-ligero-pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
 }
 
-/* EFECTO ESPECIAL PARA 0% - BARRA COMPLETAMENTE VACÍA */
-.prog-proy-barra-progreso-moderna[style*="width: 0%"],
-.prog-proy-barra-progreso-moderna[style*="width: 0%;"] {
-  min-width: 0 !important;
-  width: 0% !important;
-  opacity: 0;
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-circulo-progreso-mejorado {
+  animation: prog-proy-ligero-pulso 1.5s ease-in-out infinite;
 }
 
-/* Efectos de luz agregados */
-.prog-proy-luz-corrediza {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.4) 50%, 
-    transparent 100%);
-  animation: prog-proy-luz-deslizante 3s ease-in-out infinite;
-  pointer-events: none;
+@keyframes prog-proy-punto-latido {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
-.prog-proy-luz-secundaria {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 30%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.2) 100%);
-  pointer-events: none;
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-punto-indicador {
+  animation: prog-proy-punto-latido 1s ease-in-out infinite;
 }
 
 @keyframes prog-proy-luz-deslizante {
@@ -295,23 +833,8 @@
   100% { left: 150%; opacity: 0; }
 }
 
-/* Punto de progreso moderno - OCULTO EN 0% */
-.prog-proy-punto-progreso-moderno {
-  position: absolute;
-  right: 6px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  animation: prog-proy-punto-brillante 2s ease-in-out infinite;
-  z-index: 2;
-  opacity: 0;
-}
-
-.prog-proy-barra-progreso-moderna[style*="width: 0%"] .prog-proy-punto-progreso-moderno,
-.prog-proy-barra-progreso-moderna[style*="width: 0%;"] .prog-proy-punto-progreso-moderno {
-  display: none;
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-luz-corrediza {
+  animation: prog-proy-luz-deslizante 1.5s ease-in-out infinite;
 }
 
 @keyframes prog-proy-punto-brillante {
@@ -320,22 +843,59 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
   50% { 
-    transform: scale(1.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    transform: scale(1.3);
+    box-shadow: 0 3px 6px rgba(0, 123, 255, 0.4);
   }
 }
 
-/* Indicador de porcentaje - OCULTO EN 0% */
-.prog-proy-indicador-porcentaje {
-  position: absolute;
-  right: 20px;
-  color: white;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  z-index: 3;
-  animation: prog-proy-texto-flotante 3s ease-in-out infinite;
+.prog-proy-punto-marcador:hover {
+  animation: prog-proy-punto-brillante 0.8s ease-in-out infinite;
+}
+
+@keyframes prog-proy-texto-flotante {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.prog-proy-contenedor-barra-moderna:hover .prog-proy-indicador-porcentaje {
+  animation: prog-proy-texto-flotante 1.5s ease-in-out infinite;
+}
+
+@keyframes prog-proy-entrada-suave {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================== */
+/* 8. ESTADOS ESPECIALES                       */
+/* =========================================== */
+
+/* Estado para 0% en círculo - MÁS VISIBLE EN HOVER */
+.prog-proy-circulo-progreso-mejorado[stroke-dashoffset="100%"] {
+  opacity: 0.3;
+}
+
+.prog-proy-contenedor-circular-mejorado:hover .prog-proy-circulo-progreso-mejorado[stroke-dashoffset="100%"] {
+  opacity: 0.5;
+}
+
+/* Estado para 0% en barra - MÁS VISIBLE EN HOVER */
+.prog-proy-barra-progreso-moderna[style*="width: 0%"],
+.prog-proy-barra-progreso-moderna[style*="width: 0%;"] {
+  min-width: 0 !important;
+  width: 0% !important;
   opacity: 0;
+}
+
+.prog-proy-barra-progreso-moderna[style*="width: 0%"] .prog-proy-punto-progreso-moderno,
+.prog-proy-barra-progreso-moderna[style*="width: 0%;"] .prog-proy-punto-progreso-moderno {
+  display: none;
 }
 
 .prog-proy-barra-progreso-moderna[style*="width: 0%"] .prog-proy-indicador-porcentaje,
@@ -343,177 +903,30 @@
   display: none;
 }
 
-@keyframes prog-proy-texto-flotante {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-1px); }
-}
-
-/* Marcadores de progreso */
-.prog-proy-marcadores-progreso {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-  padding: 0 2px;
-}
-
-.prog-proy-marcador {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.prog-proy-punto-marcador {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1px solid #e9ecef;
-  background: #e9ecef;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-}
-
-.prog-proy-punto-marcador:hover {
-  transform: scale(1.2);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
-.prog-proy-porcentaje-marcador {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: #8d9aa6;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.prog-proy-marcador:hover .prog-proy-porcentaje-marcador {
-  color: #6c757d;
-  transform: translateY(-1px);
-}
-
-/* ===== ESTADÍSTICAS MODERNAS ===== */
-.prog-proy-estadisticas-modernas {
-  padding: 0;
-  width: auto;
-}
-
-/* Para barra: estadísticas en línea horizontal centradas */
-.prog-proy-contenedor-progreso-moderno.barra .prog-proy-estadisticas-modernas {
-  margin-top: 15px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-}
-
-/* Para circular: estadísticas en vertical a la DERECHA */
-.prog-proy-contenedor-progreso-moderno.circular .prog-proy-grid-estadisticas {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-/* Tarjetas de estadística compactas - SIN BORDE SUPERIOR */
-.prog-proy-tarjeta-estadistica {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #e9ecef;
-  position: relative;
-  min-width: 110px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.prog-proy-tarjeta-estadistica:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: #d1d5db;
-}
-
+/* Variantes de tarjetas de estadística - MÁS VIBRANTES EN HOVER */
 .prog-proy-tarjeta-estadistica.prog-proy-completada {
   color: #28a428;
 }
+
+
 
 .prog-proy-tarjeta-estadistica.prog-proy-pendiente {
   color: #ff6b6b;
 }
 
+
 .prog-proy-tarjeta-estadistica.prog-proy-total {
   color: #495057;
 }
 
-.prog-proy-icono-estadistica {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
 
-.prog-proy-contenido-estadistica {
-  display: flex;
-  flex-direction: column;
-  margin-left: 10px;
-}
 
-.prog-proy-valor {
-  font-weight: 700;
-  line-height: 1;
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
+/* =========================================== */
+/* 9. RESPONSIVE                               */
+/* =========================================== */
 
-.prog-proy-etiqueta {
-  font-size: 0.75rem;
-  opacity: 0.8;
-  color: #6c757d;
-  font-weight: 500;
-  margin-top: 3px;
-}
-
-/* Estado sin datos */
-.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 30px 20px;
-  color: #6c757d;
-  background: #ffffff;
-  border: 1px dashed #e0e0e0;
-  border-radius: 12px;
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-.prog-proy-icono-sin-datos {
-  margin-bottom: 12px;
-  opacity: 0.4;
-}
-
-.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos p {
-  margin: 0 0 6px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #6c757d;
-}
-
-.prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos small {
-  font-size: 0.8rem;
-  opacity: 0.6;
-}
-
-/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  /* CIRCULAR */
   .prog-proy-contenedor-progreso-moderno.circular {
     flex-direction: column;
     gap: 25px;
@@ -524,19 +937,31 @@
     gap: 12px;
   }
   
+  /* BARRA */
   .prog-proy-contenedor-progreso-moderno.barra .prog-proy-grid-estadisticas {
     flex-wrap: wrap;
     gap: 12px;
   }
   
+  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
+  /* TARJETAS */
   .prog-proy-tarjeta-estadistica {
     min-width: 100px;
     padding: 10px 12px;
   }
   
-  .prog-proy-contenedor-progreso-moderno.barra .prog-proy-contenedor-barra-moderna {
-    max-width: 100%;
-    padding: 0 15px;
+  /* AJUSTES HOVER PARA MÓVIL */
+  .prog-proy-contenedor-progreso-moderno:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.1);
+  }
+  
+  .prog-proy-tarjeta-estadistica:hover {
+    transform: translateY(-3px) scale(1.02);
   }
 }
 
@@ -562,25 +987,22 @@
   .prog-proy-etiqueta {
     font-size: 0.7rem;
   }
-}
-
-/* ===== ANIMACIONES DE ENTRADA ===== */
-.prog-proy-contenedor-progreso-moderno {
-  animation: prog-proy-entrada-suave 0.4s ease-out;
-}
-
-@keyframes prog-proy-entrada-suave {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+  
+  /* REDUCIR EFECTOS HOVER EN MÓVIL PEQUEÑO */
+  .prog-proy-contenedor-progreso-moderno:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.08);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .prog-proy-tarjeta-estadistica:hover {
+    transform: translateY(-2px);
   }
 }
 
-/* ===== MEJORAS DE ACCESIBILIDAD ===== */
+/* =========================================== */
+/* 10. MEJORAS DE ACCESIBILIDAD               */
+/* =========================================== */
+
 @media (prefers-reduced-motion: reduce) {
   .prog-proy-contenedor-progreso-moderno,
   .prog-proy-tarjeta-estadistica,
@@ -590,51 +1012,189 @@
   .prog-proy-punto-progreso-moderno,
   .prog-proy-indicador-porcentaje,
   .prog-proy-punto-marcador,
-  .prog-proy-porcentaje-marcador {
+  .prog-proy-porcentaje-marcador,
+  .prog-proy-badge-estado,
+  .prog-proy-destello-circular,
+  .prog-proy-destello-trazo,
+  .prog-proy-luz-corrediza,
+  .prog-proy-luz-secundaria {
     transition: none !important;
     animation: none !important;
   }
+  
+  /* Mantener hover de color pero sin animaciones */
+  .prog-proy-contenedor-progreso-moderno:hover {
+    background-color: rgba(248, 249, 250, 0.7);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.1);
+  }
+  
+  .prog-proy-tarjeta-estadistica:hover {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.05);
+  }
 }
 
-/* Modo oscuro opcional */
+/* =========================================== */
+/* 11. MODO OSCURO                            */
+/* =========================================== */
+
 @media (prefers-color-scheme: dark) {
+  /* Elementos generales - HOVER EN MODO OSCURO */
+  .prog-proy-contenedor-progreso-moderno:hover {
+    background-color: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  }
+  
+  /* Gráfica circular - HOVER EN MODO OSCURO */
+  .prog-proy-contenedor-circular-mejorado:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  
+  .prog-proy-marco-circular:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 
+      inset 0 1px 4px rgba(255, 255, 255, 0.05),
+      0 0 15px rgba(59, 130, 246, 0.2);
+  }
+  
+  .prog-proy-marco-circular:hover .prog-proy-destello-circular {
+    background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.3) 0%, transparent 60%);
+  }
+  
+  .prog-proy-marco-circular:hover .prog-proy-destello-trazo {
+    background: conic-gradient(from 0deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+  }
+  
+  /* Texto en modo oscuro hover */
+  .prog-proy-contenedor-circular-mejorado:hover .prog-proy-porcentaje-circular-mejorado {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Barra de progreso - HOVER EN MODO OSCURO */
+  .prog-proy-contenedor-barra-moderna:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 5px 15px rgba(59, 130, 246, 0.1);
+  }
+  
+  .prog-proy-contenedor-barra-moderna:hover .prog-proy-barra-fondo-moderna {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 
+      inset 0 3px 6px rgba(0, 0, 0, 0.2),
+      inset 0 1px 2px rgba(0, 0, 0, 0.25),
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      0 0 10px rgba(59, 130, 246, 0.2);
+  }
+  
+  .prog-proy-contenedor-barra-moderna:hover .prog-proy-luz-corrediza {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(59, 130, 246, 0.3) 50%, 
+      transparent 100%);
+  }
+  
+  .prog-proy-contenedor-barra-moderna:hover .prog-proy-luz-secundaria {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(59, 130, 246, 0.2) 100%);
+  }
+  
+  /* Tarjetas de estadística - HOVER EN MODO OSCURO */
   .prog-proy-tarjeta-estadistica {
-    background: #374151;
-    border-color: #4b5563;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
   }
   
-  .prog-proy-tarjeta-estadistica.prog-proy-completada {
-    background: #1f3a1f;
+  .prog-proy-tarjeta-estadistica::before {
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(59, 130, 246, 0.1), 
+      transparent);
   }
   
-  .prog-proy-tarjeta-estadistica.prog-proy-pendiente {
-    background: #3a1f1f;
+  .prog-proy-tarjeta-estadistica:hover {
+    border-color: #60a5fa;
+    background-color: rgba(59, 130, 246, 0.08);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
   }
   
-  .prog-proy-tarjeta-estadistica.prog-proy-total {
-    background: #374151;
+  .prog-proy-tarjeta-estadistica:hover .prog-proy-valor {
+    color: #60a5fa;
+  }
+  
+  .prog-proy-tarjeta-estadistica:hover .prog-proy-etiqueta {
+    color: #93c5fd;
   }
   
   .prog-proy-valor {
     color: #f9fafb;
   }
   
-  .prog-proy-barra-fondo-moderna {
-    background: #374151;
-    border-color: #4b5563;
-    box-shadow: 
-      inset 0 3px 6px rgba(0, 0, 0, 0.2),
-      inset 0 1px 2px rgba(0, 0, 0, 0.25),
-      0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .prog-proy-marco-circular {
-    background: transparent; /* MANTENER TRANSPARENTE EN MODO OSCURO TAMBIÉN */
-    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
-  }
-  
+  /* Estado sin datos - HOVER EN MODO OSCURO */
   .prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos {
-    background: #374151;
-    border-color: #4b5563;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    color: #d1d5db;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos:hover {
+    border-color: #60a5fa;
+    border-style: solid;
+    background-color: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1);
+    color: #93c5fd;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos:hover p {
+    color: #60a5fa;
+  }
+  
+  .prog-proy-contenedor-progreso-moderno.prog-proy-sin-datos:hover small {
+    color: #93c5fd;
+  }
+  
+  /* Puntos marcadores - HOVER EN MODO OSCURO */
+  .prog-proy-punto-marcador {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+  }
+  
+  .prog-proy-punto-marcador:hover {
+    border-color: #60a5fa;
+    background-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  }
+  
+  .prog-proy-marcador:hover .prog-proy-porcentaje-marcador {
+    color: #60a5fa;
+  }
+  
+  .prog-proy-porcentaje-marcador {
+    color: #9ca3af;
+  }
+  
+  /* Badges - SHADOWS EN MODO OSCURO */
+  .prog-proy-badge-estado.prog-proy-sin-progreso:hover {
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+  
+  .prog-proy-badge-estado.prog-proy-inicio:hover {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  }
+  
+  .prog-proy-badge-estado.prog-proy-progreso:hover {
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+  }
+  
+  .prog-proy-badge-estado.prog-proy-casi-listo:hover {
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  }
+  
+  .prog-proy-badge-estado.prog-proy-completado:hover {
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
   }
 }

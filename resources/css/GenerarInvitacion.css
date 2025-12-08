@@ -1,229 +1,1108 @@
-.geninv-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
+/* ==================== ESTRUCTURA PRINCIPAL COMPACTA ==================== */
+.geninv-app {
+    min-height: 100vh;
+    background: #fcfcfc;
+    padding: 15px;
+    position: relative;
+    z-index: 1;
+    overflow-x: hidden;
+    animation: fadeIn 0.5s ease-out;
 }
 
-.geninv-card {
-    width: 480px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== HEADER DEL USUARIO ==================== */
+.user-header-container {
+    background: linear-gradient(90deg, #861542, #9a1c4a);
+    color: white;
+    padding: 20px 25px;
+    border-radius: 14px;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 20px rgba(134, 21, 66, 0.15);
+    position: relative;
+    z-index: 1;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-greeting h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    position: relative;
     z-index: 1;
 }
 
-.geninv-card h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
-    font-weight: 700;
+/* ==================== TEXTO CENTRADO HERO ==================== */
+.geninv-hero {
     text-align: center;
-}
-
-/* ----- SELECT BASE ----- */
-
-label {
-    font-weight: 600;
-    margin-top: 10px;
-    display: block;
-}
-
-.gi-select {
+    margin-bottom: 25px;
+    padding: 0 15px;
     position: relative;
-    margin-bottom: 18px;
-    width: 100%;
-}
-
-.gi-select-btn {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 20px;
-    background-color: #f7f7f7;
-    border: 1px solid #ddd;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    position: relative;
-    color: #861542;
-}
-
-.gi-select-btn.gi-placeholder {
-    color: #777 !important;
-}
-
-/* Flecha */
-.gi-arrow {
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #861542;
-    font-size: 11px;
-}
-
-.gi-options {
-    position: absolute;
-    top: calc(100% + 5px);
-    width: 100%;
-    background: #fff;
-    border-radius: 20px;
-    border: 1px solid #ccc;
-    padding: 10px 0;
-    z-index: 50;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-/* Scroll interno */
-.gi-options-scroll {
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 0 10px;
-}
-
-.gi-options-scroll::-webkit-scrollbar {
-    width: 8px;
-}
-
-.gi-options-scroll::-webkit-scrollbar-thumb {
-    background: #861542;
-    border-radius: 10px;
-}
-
-/* Opciones */
-.gi-option {
-    padding: 12px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
-.gi-option:hover {
-    background-color: rgba(178,35,78,0.12);
-}
-
-.gi-option-active {
-    background-color: rgba(178,35,78,0.23);
-    color: #861542;
-    font-weight: 700;
-}
-
-
-/* INPUT */
-.gi-input {
-    width: 91%;
-    padding: 14px 20px;
-    border-radius: 20px;
-    background-color: #f7f7f7;
-    font-size: 0.95rem;
-    font-weight: 700;
-    border: none;
-    margin-bottom: 18px;
-    color: #861542;
-    outline: none;
-    box-shadow: 0 0 0 2px #cfcfcf; 
-}
-
-.gi-input:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-
-/* BOTONES */
-.gi-buttons-row {
+    z-index: 1;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    align-items: center;
+    min-height: 60px;
 }
 
-.gi-btn {
-    background-color: #861542;
-    color: #fff;
-    padding: 10px 30px;
-    border-radius: 10px;
+.geninv-subtitle {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
+    max-width: 700px;
+    line-height: 1.6;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== CONTENEDOR PRINCIPAL COMPACTO ==================== */
+.geninv-grid-wrapper {
+    background: linear-gradient(145deg, #f9f5f7 0%, #f4ecef 100%);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(134, 21, 66, 0.06);
+    border: 1px solid rgba(134, 21, 66, 0.06);
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== GRIDS ==================== */
+.geninv-grid-top {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-bottom {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== SEPARADOR VISUAL ==================== */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(134, 21, 66, 0.15), transparent);
+    margin: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+.section-divider::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f9f5f7;
+    padding: 0 15px;
+    color: #861542;
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+/* ==================== ANIMACIONES PARA LOS 4 BOTONES PRINCIPALES ==================== */
+.geninv-grid-top .geninv-card:nth-child(1) {
+    animation: cardSlideIn 0.5s ease-out 0.1s both;
+}
+
+.geninv-grid-top .geninv-card:nth-child(2) {
+    animation: cardSlideIn 0.5s ease-out 0.2s both;
+}
+
+.geninv-grid-bottom .geninv-card:nth-child(1) {
+    animation: cardSlideIn 0.5s ease-out 0.3s both;
+}
+
+.geninv-grid-bottom .geninv-card:nth-child(2) {
+    animation: cardSlideIn 0.5s ease-out 0.4s both;
+}
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== CARDS ==================== */
+.geninv-grid-top .geninv-card,
+.geninv-grid-bottom .geninv-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1.5px solid transparent;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-top .geninv-card:hover,
+.geninv-grid-bottom .geninv-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
+    z-index: 2;
+}
+
+.geninv-grid-top .geninv-card.active,
+.geninv-grid-bottom .geninv-card.active {
+    border-color: #861542;
+    box-shadow: 0 8px 25px rgba(134, 21, 66, 0.2);
+    z-index: 2;
+    animation: pulseBorder 2s infinite;
+}
+
+@keyframes pulseBorder {
+    0% {
+        border-color: #861542;
+        box-shadow: 0 8px 25px rgba(134, 21, 66, 0.2);
+    }
+    50% {
+        border-color: #9a1c4a;
+        box-shadow: 0 8px 25px rgba(154, 28, 74, 0.3);
+    }
+    100% {
+        border-color: #861542;
+        box-shadow: 0 8px 25px rgba(134, 21, 66, 0.2);
+    }
+}
+
+/* ==================== BOTÓN INTERNO DE LA CARTA ==================== */
+.geninv-grid-top .geninv-card-btn,
+.geninv-grid-bottom .geninv-card-btn {
+    width: 100%;
+    padding: 14px 16px;
+    background: none;
     border: none;
     cursor: pointer;
-    font-weight: 600;
-    text-align: center;
-    width: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
 }
 
-.gi-btn:hover {
-    opacity: 0.85;
+/* ==================== HEADER DE LA CARTA ==================== */
+.geninv-grid-top .geninv-card-header,
+.geninv-grid-bottom .geninv-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
 }
 
-
-/* -------------------- */
-/* ERRORES LOCALIZADOS */
-/* -------------------- */
-
-.gi-field-error {
-    padding: 8px 15px;
+/* ==================== ICONO ==================== */
+.geninv-grid-top .geninv-icon-container,
+.geninv-grid-bottom .geninv-icon-container {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #861542, #9a1c4a);
     border-radius: 8px;
-    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: 2px;
+    transition: all 0.3s ease;
+}
+
+.geninv-grid-top .geninv-card:hover .geninv-icon-container,
+.geninv-grid-bottom .geninv-card:hover .geninv-icon-container {
+    transform: scale(1.1) rotate(5deg);
+    background: linear-gradient(135deg, #761242, #861542);
+}
+
+/* ==================== TEXTO ==================== */
+.geninv-grid-top .geninv-text-content,
+.geninv-grid-bottom .geninv-text-content {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-top .geninv-name,
+.geninv-grid-bottom .geninv-name {
+    margin: 0 0 6px 0;
+    color: #861542;
+    font-size: 0.95rem;
     font-weight: 600;
-    margin-top: -10px; /* Acercar al campo de arriba */
-    margin-bottom: 15px; /* Separación del campo de abajo */
-}
-
-.gi-alert-error {
-    color: #721c24; /* Rojo oscuro */
-}
-
-
-/* -------------------- */
-/* ALERTA DE ÉXITO (GLOBAL, ABAJO DEL BOTÓN GENERAR) */
-/* -------------------- */
-
-.gi-alert {
-    padding: 10px;
-    margin-top: 15px; /* Separar del botón "Generar Link" */
-    margin-bottom: 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: #333;
-    border: 1px solid transparent;
-    text-align: center; 
-}
-
-.gi-alert-success {
-    color: #155724; /* Verde oscuro */
-}
-
-
-/* -------------------- */
-/* LINK Y BOTÓN COPIAR (CONSOLIDADO) */
-/* -------------------- */
-
-.gi-link-box {
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    text-align: center; /* Centrar elementos */
-}
-
-.gi-link-box p {
-    margin: 0 0 8px 0; /* Ajuste de párrafo */
-}
-
-.gi-link-box a {
-    display: block; 
-    max-width: 100%;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #861542;
-    font-weight: 600;
-    margin-bottom: 10px; /* Espacio antes del botón copiar */
-    /* Se elimina word-break: break-all; para usar text-overflow: ellipsis; */
 }
 
-.gi-btn-copy {
-    margin-top: 0; /* Asegurar que no haya margen extra */
-    background-color: #861542; 
-    padding: 8px 25px; /* Ajuste para que sea más pequeño */
+.geninv-grid-top .geninv-selected,
+.geninv-grid-bottom .geninv-selected {
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+    max-height: 3.9em;
+    word-break: break-word;
+}
+
+.geninv-grid-top .geninv-card.placeholder .geninv-selected,
+.geninv-grid-bottom .geninv-card.placeholder .geninv-selected {
+    color: #999;
+    font-style: italic;
+    -webkit-line-clamp: 1;
+    max-height: 1.3em;
+}
+
+.geninv-grid-top .geninv-chevron,
+.geninv-grid-bottom .geninv-chevron {
+    color: #861542;
     font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    margin-left: 8px;
+    position: relative;
+    z-index: 1;
+    margin-top: 2px;
+}
+
+.geninv-grid-top .geninv-card:hover .geninv-chevron,
+.geninv-grid-bottom .geninv-card:hover .geninv-chevron {
+    transform: translateX(3px);
+    color: #9a1c4a;
+}
+
+.geninv-grid-top .geninv-card.active .geninv-chevron,
+.geninv-grid-bottom .geninv-card.active .geninv-chevron {
+    transform: rotate(180deg);
+}
+
+/* ==================== INPUT CANTIDAD ==================== */
+.geninv-grid-top .input-card,
+.geninv-grid-bottom .input-card {
+    padding: 14px 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-top .cantidad-input-wrapper,
+.geninv-grid-bottom .cantidad-input-wrapper {
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-top .cantidad-input,
+.geninv-grid-bottom .cantidad-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 7px;
+    font-size: 0.95rem;
+    color: #333;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.geninv-grid-top .cantidad-input:focus,
+.geninv-grid-bottom .cantidad-input:focus {
+    outline: none;
+    border-color: #861542;
+    box-shadow: 0 0 0 3px rgba(134, 21, 66, 0.15);
+}
+
+.geninv-grid-top .cantidad-info,
+.geninv-grid-bottom .cantidad-info {
+    text-align: right;
+    color: #666;
+    font-size: 0.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== DROPDOWNS REDUCIDOS ==================== */
+.options-dropdown {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 10px;
+    position: relative;
+    z-index: 1000;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.option-item {
+    padding: 10px 12px;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.option-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    background-color: #fff5f8;
+}
+
+.option-item.selected {
+    background: #861542;
+    color: white;
+    box-shadow: 0 3px 8px rgba(134, 21, 66, 0.3);
+    border-color: #861542;
+    transform: translateY(-1px);
+}
+
+/* Texto en blanco con negritas para la opción seleccionada */
+.option-item.selected .option-text {
+    font-weight: 200;
+    color: white;
+}
+
+/* Asegurar que cualquier texto dentro de la opción seleccionada sea blanco */
+.option-item.selected * {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Para íconos o elementos adicionales en la opción seleccionada */
+.option-item.selected .option-icon,
+.option-item.selected .option-check {
+    font-weight: 700;
+}
+
+.option-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Para mejor visibilidad cuando hay muchas opciones */
+.option-item.highlighted {
+    background-color: #ffeff5;
+    border-left: 2px solid #861542;
+}
+
+/* ==================== ERRORES ==================== */
+.error-message {
+    background: linear-gradient(90deg, #ffeaea, #ffd6d6);
+    color: #8b0000;
+    padding: 10px 14px;
+    margin: 10px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    animation: slideIn 0.25s ease;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== BOTONES DE ACCIÓN ==================== */
+.action-buttons-container {
+    background: linear-gradient(145deg, #f9f5f7 0%, #f4ecef 100%);
+    border-radius: 16px;
+    padding: 25px;
+    margin: 30px 0;
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(134, 21, 66, 0.06);
+    border: 1px solid rgba(134, 21, 66, 0.06);
+    position: relative;
+    z-index: 1;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+/* Botón primario (ROJO - para Generar Link) */
+.btn-primary {
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #861542, #9a1c4a);
+    color: white;
+    box-shadow: 0 5px 15px rgba(134, 21, 66, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #761242, #861542);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(134, 21, 66, 0.25);
+    z-index: 2;
+}
+
+/* Botón secundario (GRIS - para Limpiar Formulario) */
+.btn-secondary {
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #6c757d;
+    color: white;
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.2);
+    position: relative;
+    z-index: 100;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(90, 98, 104, 0.25);
+    position: relative;
+    z-index: 100;
+}
+
+/* ==================== MENSAJES ==================== */
+.success-message {
+    max-width: 700px;
+    margin: 25px auto;
+    padding: 16px 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: fadeInMessage 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes fadeInMessage {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mensaje de éxito - VERDE */
+.success-message.success {
+    background: linear-gradient(90deg, #d4edda, #c3e6cb);
+    color: #155724;
+    position: relative;
+    z-index: 100;
+}
+
+.success-message.error {
+    background: linear-gradient(90deg, #ffeaea, #ffd6d6);
+    color: #8b0000;
+}
+
+.success-message.warning {
+    background: linear-gradient(90deg, #fff7e6, #ffeacc);
+    color: #8a6600;
+}
+
+/* ==================== LINK GENERADO ==================== */
+.link-container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border: 1.5px solid #f5e1e9;
+    position: relative;
+    z-index: 1;
+}
+
+.link-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: #861542;
+    position: relative;
+    z-index: 1;
+}
+
+.link-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.link-box {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.link-box a {
+    display: block;
+    padding: 16px;
+    background: #fcf8f9;
+    border-radius: 8px;
+    color: #333;
+    text-decoration: none;
+    word-break: break-all;
+    border: 1.5px solid #f5e1e9;
+    transition: all 0.25s ease;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+}
+
+.link-box a:hover {
+    border-color: #861542;
+    color: #861542;
+    transform: translateY(-1px);
+    z-index: 2;
+}
+
+.copy-btn {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #861542, #9a1c4a);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.copy-btn:hover {
+    background: linear-gradient(90deg, #761242, #861542);
+    transform: translateY(-1px);
+    z-index: 2;
+}
+
+.copy-btn.copied {
+    background: linear-gradient(90deg, #006341, #008557) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 99, 65, 0.3);
+}
+
+/* ==================== INSTRUCCIONES ==================== */
+.instructions {
+    margin-top: 25px;
+    padding: 16px;
+    background: #f8f0f3;
+    border-radius: 8px;
+    border-left: 3px solid #861542;
+    position: relative;
+    z-index: 1;
+}
+
+.instructions h4 {
+    color: #861542;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.instructions ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #333;
+    font-size: 0.9rem;
+    position: relative;
+    z-index: 1;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .geninv-app {
+        padding: 12px;
+        z-index: 1;
+    }
+    
+    .user-header-container {
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        z-index: 1;
+    }
+    
+    .user-greeting h1 {
+        font-size: 1.3rem;
+        z-index: 1;
+    }
+    
+    .geninv-hero {
+        margin-bottom: 20px;
+        padding: 0 10px;
+        min-height: 50px;
+    }
+    
+    .geninv-subtitle {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+    
+    .geninv-grid-wrapper {
+        padding: 20px;
+        border-radius: 14px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top,
+    .geninv-grid-bottom {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        z-index: 1;
+    }
+    
+    .section-divider {
+        margin: 15px 0;
+        z-index: 1;
+    }
+    
+    .section-divider::before {
+        font-size: 0.75rem;
+        padding: 0 10px;
+        z-index: 2;
+    }
+    
+    .geninv-grid-top .geninv-card-btn,
+    .geninv-grid-bottom .geninv-card-btn {
+        padding: 12px 14px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-card-header,
+    .geninv-grid-bottom .geninv-card-header {
+        gap: 10px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-icon-container,
+    .geninv-grid-bottom .geninv-icon-container {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+        border-radius: 7px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-selected,
+    .geninv-grid-bottom .geninv-selected {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+        max-height: 2.6em;
+    }
+    
+    .option-item {
+        min-height: 48px;
+        padding: 8px 10px;
+    }
+    
+    .option-name {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 2;
+        max-height: 2.6em;
+        line-height: 1.2;
+    }
+    
+    .action-buttons-container {
+        padding: 20px;
+        margin: 25px 0;
+        border-radius: 14px;
+        z-index: 1;
+    }
+    
+    .action-buttons {
+        gap: 12px;
+        z-index: 1;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        min-width: auto;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        z-index: 1;
+    }
+    
+    .link-container {
+        padding: 20px;
+        margin: 25px auto;
+        border-radius: 12px;
+        z-index: 1;
+    }
+    
+    .link-box a {
+        padding: 14px;
+        font-size: 0.85rem;
+        z-index: 1;
+    }
+    
+    .copy-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        z-index: 1;
+    }
+    
+    .instructions {
+        padding: 14px;
+        z-index: 1;
+    }
+    
+    .instructions h4 {
+        font-size: 0.95rem;
+        z-index: 1;
+    }
+    
+    .instructions li {
+        font-size: 0.85rem;
+        z-index: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .geninv-app {
+        padding: 10px;
+        z-index: 1;
+    }
+    
+    .user-header-container {
+        padding: 14px 16px;
+        border-radius: 10px;
+        z-index: 1;
+    }
+    
+    .user-greeting h1 {
+        font-size: 1.2rem;
+        z-index: 1;
+    }
+    
+    .geninv-hero {
+        margin-bottom: 15px;
+        min-height: 40px;
+    }
+    
+    .geninv-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.4;
+        padding: 0 10px;
+    }
+    
+    .geninv-grid-wrapper {
+        padding: 16px;
+        border-radius: 12px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top,
+    .geninv-grid-bottom {
+        gap: 10px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-card-btn,
+    .geninv-grid-bottom .geninv-card-btn {
+        padding: 10px 12px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-icon-container,
+    .geninv-grid-bottom .geninv-icon-container {
+        width: 34px;
+        height: 34px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        z-index: 1;
+    }
+    
+    .geninv-grid-top .geninv-name,
+    .geninv-grid-bottom .geninv-name {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    
+    .geninv-grid-top .geninv-selected,
+    .geninv-grid-bottom .geninv-selected {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 2;
+        max-height: 2.4em;
+        line-height: 1.2;
+    }
+    
+    .option-item {
+        min-height: 44px;
+        padding: 6px 8px;
+    }
+    
+    .option-name {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 2;
+        max-height: 2.4em;
+        line-height: 1.1;
+    }
+    
+    .action-buttons-container {
+        padding: 16px;
+        border-radius: 12px;
+        z-index: 1;
+    }
+    
+    .action-buttons {
+        gap: 10px;
+        z-index: 1;
+    }
+    
+    .btn-primary, .btn-secondary {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        z-index: 1;
+    }
+    
+    .link-container {
+        padding: 16px;
+        border-radius: 10px;
+        z-index: 1;
+    }
+    
+    .link-box a {
+        padding: 12px;
+        font-size: 0.8rem;
+        z-index: 1;
+    }
+    
+    .copy-btn {
+        padding: 9px 16px;
+        font-size: 0.9rem;
+        border-radius: 7px;
+        z-index: 1;
+    }
+    
+    .section-divider::before {
+        font-size: 0.7rem;
+        padding: 0 8px;
+        z-index: 2;
+    }
+    
+    .options-dropdown {
+        max-height: 220px;
+        padding: 8px 10px;
+    }
+    
+}
+/* ==================== ESTILOS PARA CAMPOS DESHABILITADOS ==================== */
+.geninv-card.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    /* REMOVER: pointer-events: none; */
+}
+
+.geninv-card.disabled .geninv-card-btn {
+    cursor: not-allowed;
+    /* REMOVER: pointer-events: none; */
+}
+
+.geninv-card.disabled:hover {
+    transform: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    border-color: transparent !important;
+}
+
+.geninv-card.disabled .geninv-icon-container {
+    background: linear-gradient(135deg, #cccccc, #aaaaaa) !important;
+    transform: none !important;
+    /* REMOVER: pointer-events: none; */
+}
+
+.geninv-card.disabled .geninv-name {
+    color: #999 !important;
+}
+
+.geninv-card.disabled .geninv-selected {
+    color: #bbb !important;
+}
+
+.geninv-card.disabled .geninv-chevron {
+    color: #ccc !important;
+    transform: none !important;
+}
+
+.geninv-card.disabled .cantidad-input {
+    background: #f5f5f5 !important;
+    border-color: #ddd !important;
+    color: #999 !important;
+    cursor: not-allowed !important;
+    /* REMOVER: pointer-events: none; */
+}
+
+.geninv-card.disabled .cantidad-input:focus {
+    border-color: #ddd !important;
+    box-shadow: none !important;
+}
+
+.geninv-card.disabled .cantidad-info {
+    color: #aaa !important;
+}
+
+/* ==================== BOTÓN DESHABILITADO ==================== */
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    /* REMOVER: pointer-events: none; */
+}
+
+.btn-primary:disabled:hover {
+    background: linear-gradient(90deg, #861542, #9a1c4a);
+    box-shadow: 0 5px 15px rgba(134, 21, 66, 0.2);
+}
+
+/* ==================== MENSAJE INFORMATIVO ==================== */
+.success-message.info {
+    background: linear-gradient(90deg, #e6f3ff, #d6eaff);
+    color: #004085;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.success-message.info::before {
+    margin-right: 20px;
+    font-size: 1.9rem;
+}
+
+
+/* ==================== RESPONSIVE PARA ESTADOS DESHABILITADOS ==================== */
+@media (max-width: 768px) {
+    .geninv-card.disabled .geninv-icon-container {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .geninv-card.disabled .geninv-selected {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .geninv-card.disabled .geninv-icon-container {
+        width: 34px;
+        height: 34px;
+    }
+    
+    .geninv-card.disabled .geninv-selected {
+        font-size: 0.75rem;
+    }
 }

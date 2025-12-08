@@ -38,6 +38,7 @@ import EliminarTareas from "./EliminarTareas";
 import EditarTareas from "./EditarTareas";
 import Reporte from "./Reporte";
 import EliminarUsuario from "./EliminarUsuario";
+import GenerarInvitaciones from './GenerarInvitaciones';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
         <Route path="/ChangePassword" element={<ChangePassword />} />
         <Route path="/RegistroPaso2" element={<RegistroPaso2 />} />
         <Route path="/GenerarInvitacion" element={<GenerarInvitacion />} />
+        <Route path="/GenerarInvitaciones" element={<GenerarInvitaciones />} />
         <Route path="/RegistroPaso1/:token" element={<RegistroPaso1 />} />
 
 

@@ -50,60 +50,107 @@ const rol = sessionStorage.getItem('rol') || localStorage.getItem('rol') || 'Sup
                 { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
             ],
         },
-      Jefe: {
-  principal: [
-    {
-      key: 'GestionProyectos',
-      label: 'INICIO',
-      icon: FaHome,
-      path: '/GestionProyectos'
-    },
-    {
-      key: 'proyectos',
-      label: "PROYECTOS",
-      icon: FaFolder,
-      subMenu: [
-        { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
-        { key: 'ver', label: "Ver Proyectos", path: "/ListaProyectos", icon: FaEye },
-        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosPorModificar", icon: FaEdit },
-        { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
-        { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
-      ],
-    },
-    {
-      key: 'tareas',
-      label: "TAREAS",
-      icon: FaTasks,
-      subMenu: [
-        { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
-        { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
-        { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
-        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
-        { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
-        { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
-      ],
-    },
-    {
-      key: 'usuarios',
-      label: "Usuarios",
-      icon: FiUsers,
-      subMenu: [
-        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
-         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
-      ],
-    },
-    { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
-    { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
-  ]
-},
-Usuario: {
-  principal: [
-    { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
-    { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaTasks },
-    { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
-    { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
-  ],
-},
+        // 🆕 AGREGAR MENÚ PARA ADMINISTRADOR
+        Administrador: {
+            principal: [
+                {
+                    key: 'GestionProyectos',
+                    label: 'INICIO',
+                    icon: FaHome,
+                    path: '/GestionProyectos'
+                },
+                {
+                    key: 'proyectos',
+                    label: "PROYECTOS",
+                    icon: FaFolder,
+                    subMenu: [
+                        { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
+                        { key: 'ver', label: "Ver Proyectos", path: "/ListaProyectos", icon: FaEye },
+                        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosPorModificar", icon: FaEdit },
+                        { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
+                        { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
+                    ],
+                },
+                {
+                    key: 'tareas',
+                    label: "TAREAS",
+                    icon: FaTasks,
+                    subMenu: [
+                        { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
+                        { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
+                        { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
+                        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
+                        { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
+                        { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
+                    ],
+                },
+                {
+                    key: 'usuarios',
+                    label: "Usuarios",
+                    icon: FiUsers,
+                    subMenu: [
+                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
+                        { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
+                    ],
+                },
+                { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
+                { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
+            ]
+        },
+        Jefe: {
+            principal: [
+                {
+                    key: 'GestionProyectos',
+                    label: 'INICIO',
+                    icon: FaHome,
+                    path: '/GestionProyectos'
+                },
+                {
+                    key: 'proyectos',
+                    label: "PROYECTOS",
+                    icon: FaFolder,
+                    subMenu: [
+                        { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
+                        { key: 'ver', label: "Ver Proyectos", path: "/ListaProyectos", icon: FaEye },
+                        { key: 'modificar', label: "Modificar Proyectos", path: "/ProyectosPorModificar", icon: FaEdit },
+                        { key: 'estatus', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
+                        { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
+                    ],
+                },
+                {
+                    key: 'tareas',
+                    label: "TAREAS",
+                    icon: FaTasks,
+                    subMenu: [
+                        { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
+                        { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
+                        { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
+                        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
+                        { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
+                        { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
+                    ],
+                },
+                {
+                    key: 'usuarios',
+                    label: "Usuarios",
+                    icon: FiUsers,
+                    subMenu: [
+                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitaciones", icon: FaUserPlus },
+                        { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
+                    ],
+                },
+                { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
+                { key: 'logout', label: "CERRAR SESIÓN", path: "/logout", icon: FaSignOutAlt, action: onLogout }
+            ]
+        },
+        Usuario: {
+            principal: [
+                { key: 'inicio', label: "INICIO", path: "/GestionProyectosUsuario", icon: FaHome },
+                { key: 'tareas', label: "MIS TAREAS", path: "/ListaDeProyectos", icon: FaTasks },
+                { key: 'reportes_tareas_completadas', label: "REPORTES", path: "/ReportesTareasCompletadas", icon: FaFileAlt },
+                { key: 'logout', label: "CERRAR SESIÓN", icon: FaSignOutAlt, action: onLogout },
+            ],
+        },
     };
 
     // Detectar tipo de menú según URL

@@ -154,11 +154,15 @@ export default function DepProProceso() {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             
-            // Usando case-insensitive para mayor seguridad
+            // Filtrado más flexible para "En Proceso"
             const proyectosEnProceso = data.filter(
-                p => p.p_estatus.toLowerCase().trim() === "en proceso" && 
+                p => p.p_estatus && 
+                    p.p_estatus.toLowerCase().includes("proceso") && 
                     (p.total_tareas === 0 || p.tareas_completadas < p.total_tareas)
             );
+            
+            console.log("Proyectos en proceso encontrados:", proyectosEnProceso.length);
+            console.log("Estatus encontrados:", [...new Set(data.map(p => p.p_estatus))]);
             
             setProyectos(proyectosEnProceso);
         } catch (err) {
@@ -313,11 +317,15 @@ export default function DepProProceso() {
                             const slugProyecto = slugify(proyecto.p_nombre);
                             const porcentaje = proyecto.porcentaje || 0;
                             const progressClass = getColorClassByProgress(porcentaje);
+                            // Asegurar que el estatus se muestre correctamente
+                            const estadoMostrar = proyecto.p_estatus || "En Proceso";
+                            // IMPORTANTE: El data-estado debe ser "En proceso" (con minúscula 'p') para que coincida con el CSS
+                            const dataEstado = "En proceso";
                             
                             return (
                                 <div 
                                     key={proyecto.id_proyecto} 
-                                    className={`proyecto-proceso-item ${progressClass}`}
+                                    className={`proyecto-enprogreso-item ${progressClass}`}
                                     data-progreso={porcentaje}
                                     data-estado="en-proceso"
                                     style={{ 
@@ -338,47 +346,50 @@ export default function DepProProceso() {
                                     }
                                 >
                                     {/* HEADER DEL PROYECTO */}
-                                    <div className="proyecto-proceso-header">
-                                        <div className="proyecto-proceso-nombre">
-                                            <span className="proyecto-proceso-valor">{proyecto.p_nombre}</span>
+                                    <div className="proyecto-enprogreso-header">
+                                        <div className="proyecto-enprogreso-nombre">
+                                            <span className="proyecto-enprogreso-valor">{proyecto.p_nombre}</span>
                                         </div>
-                                        <div className="proyecto-proceso-badges">
-                                            <span className="badgeS-estado-proceso" data-estado={proyecto.p_estatus.toLowerCase().replace(/\s+/g, '-')}>
-                                                {proyecto.p_estatus}
+                                        <div className="proyecto-enprogreso-badges">
+                                            <span 
+                                                className="badge-estado-enprogreso" 
+                                                data-estado={dataEstado} // Usamos el valor fijo "En proceso"
+                                            >
+                                                {estadoMostrar} 
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* INFORMACIÓN DEL PROYECTO */}
-                                    <div className="proyecto-proceso-columnas">
-                                        <div className="proyecto-proceso-columna">
-                                            <span className="proyecto-proceso-label">
-                                                <FaCalendarAlt className="proyecto-proceso-icon" />
+                                    <div className="proyecto-enprogreso-columnas">
+                                        <div className="proyecto-enprogreso-columna">
+                                            <span className="proyecto-enprogreso-label">
+                                                <FaCalendarAlt className="proyecto-enprogreso-icon" />
                                                 Inicio
                                             </span>
-                                            <span className="proyecto-proceso-valor">{proyecto.pf_inicio}</span>
+                                            <span className="proyecto-enprogreso-valor">{proyecto.pf_inicio}</span>
                                         </div>
-                                        <div className="proyecto-proceso-columna">
-                                            <span className="proyecto-proceso-label">
-                                                <FaFlagCheckered className="proyecto-proceso-icon" />
+                                        <div className="proyecto-enprogreso-columna">
+                                            <span className="proyecto-enprogreso-label">
+                                                <FaFlagCheckered className="proyecto-enprogreso-icon" />
                                                 Fin
                                             </span>
-                                            <span className="proyecto-proceso-valor">{proyecto.pf_fin}</span>
+                                            <span className="proyecto-enprogreso-valor">{proyecto.pf_fin}</span>
                                         </div>
-                                        <div className="proyecto-proceso-columna">
-                                            <span className="proyecto-proceso-label">
-                                                <FaUser className="proyecto-proceso-icon" />
+                                        <div className="proyecto-enprogreso-columna">
+                                            <span className="proyecto-enprogreso-label">
+                                                <FaUser className="proyecto-enprogreso-icon" />
                                                 Encargado
                                             </span>
-                                            <span className="proyecto-proceso-valor">{proyecto.responsable}</span>
+                                            <span className="proyecto-enprogreso-valor">{proyecto.responsable}</span>
                                         </div>
-                                        <div className="proyecto-proceso-columna">
-                                            <span className="proyecto-proceso-label">
-                                                <FaChartLine className="proyecto-proceso-icon" />
+                                        <div className="proyecto-enprogreso-columna">
+                                            <span className="proyecto-enprogreso-label">
+                                                <FaChartLine className="proyecto-enprogreso-icon" />
                                                 Progreso
                                             </span>
                                             <span 
-                                                className="proyecto-proceso-valor" 
+                                                className="proyecto-enprogreso-valor" 
                                                 style={{ color: getColorPorcentaje(porcentaje), fontWeight: 'bold' }}
                                             >
                                                 {porcentaje}%
