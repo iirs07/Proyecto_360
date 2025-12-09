@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
-// IMPORTANTE: Agregamos useLocation
 import { useNavigate, useLocation } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
@@ -20,6 +19,7 @@ function TareasAsignadas() {
   const [nombreProyecto, setNombreProyecto] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [open, setOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
   
   const refs = useRef({});
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ function TareasAsignadas() {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
+  `${API_URL}/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
       );
 
@@ -87,7 +87,7 @@ function TareasAsignadas() {
     }
   };
 
-  // Este efecto reacciona cuando "proyectoActual" se establece exitosamente en el primer useEffect
+  
   useEffect(() => {
     if (proyectoActual) {
       setLoading(true);

@@ -27,7 +27,6 @@
     <div class="rd-divider"></div>
 </div>
 
-<!-- Contenido -->
 <div class="rd-contenido-principal">
     <h2>
         @if($tipo === 'vencidas')
@@ -49,33 +48,41 @@
         @endif
     </h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Proyecto</th>
-                <th>Tarea</th>
-                <th>Fecha Vencimiento</th>
-                <th>Usuario</th>
-                <th>Departamento</th> 
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($tareas as $tarea)
+    @if($tareas->isEmpty())
+        <div style="text-align: center; margin-top: 50px; padding: 20px;">
+            <p style="font-size: 16px; font-weight: bold; color: #000;">
+                No se encontraron tareas que coincidan con los criterios de filtro seleccionados.
+            </p>
+        </div>
+    @else
+        <table>
+            <thead>
                 <tr>
-                    <td>{!! strtoupper($tarea->proyecto->p_nombre) !!}</td>
-                    <td>{!! strtoupper($tarea->t_nombre) !!}</td>
-                    <td>{!! $tarea->tf_fin !!}</td>
-                    <td>
-                        {!! $tarea->usuario ? strtoupper($tarea->usuario->u_nombre . ' ' . $tarea->usuario->a_paterno . ' ' . $tarea->usuario->a_materno) : 'Sin asignar' !!}
-                    </td>
-                    <td>
-                        {!! $tarea->usuario ? strtoupper($tarea->usuario->departamento->d_nombre ?? 'Sin departamento') : '-' !!}
-                    </td>
+                    <th>Proyecto</th>
+                    <th>Tarea</th>
+                    <th>Fecha Vencimiento</th>
+                    <th>Usuario</th>
+                    <th>Departamento</th> 
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach($tareas as $tarea)
+                    <tr>
+                        <td>{!! strtoupper($tarea->proyecto->p_nombre) !!}</td>
+                        <td>{!! strtoupper($tarea->t_nombre) !!}</td>
+                        <td>{!! $tarea->tf_fin !!}</td>
+                        <td>
+                            {!! $tarea->usuario ? strtoupper($tarea->usuario->u_nombre . ' ' . $tarea->usuario->a_paterno . ' ' . $tarea->usuario->a_materno) : 'Sin asignar' !!}
+                        </td>
+                        <td>
+                            {!! $tarea->usuario ? strtoupper($tarea->usuario->departamento->d_nombre ?? 'Sin departamento') : '-' !!}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+    </div>
 
 
 

@@ -27,17 +27,22 @@ Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
 
-//ADMINISTRADOR
-    Route::prefix('departamentos')->group(function () {
-        Route::get('/', [NuevoDepartamentoController::class, 'listar']);
-        Route::get('/areas', [NuevoDepartamentoController::class, 'listarAreas']);
-        Route::get('/areas-con-departamentos', [NuevoDepartamentoController::class, 'listarAreasConDepartamentos']);
-        Route::post('/areas/crear', [NuevoDepartamentoController::class, 'crearArea']);
-        Route::post('/gestion', [NuevoDepartamentoController::class, 'departamentos']);
-    });
+// ADMINISTRADOR - Gestión de departamentos y áreas
+Route::prefix('departamentos')->group(function () {
+    Route::get('/', [NuevoDepartamentoController::class, 'listar']);
+    Route::get('/areas', [NuevoDepartamentoController::class, 'listarAreas']);
+    Route::get('/areas-con-departamentos', [NuevoDepartamentoController::class, 'listarAreasConDepartamentos']);
+    Route::post('/areas/crear', [NuevoDepartamentoController::class, 'crearArea']);
+    Route::post('/gestion', [NuevoDepartamentoController::class, 'departamentos']);
+});
+
+// DIRECTOR - Consultar usuarios de un departamento
+Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
 
 Route::get('/departamentos', [DepartamentoController::class, 'index']);
-Route::get('/login', function () { return response()->json(['error' => 'No autenticado'], 401); })->name('login');
+Route::get('/login', function () {
+    return response()->json(['error' => 'No autenticado'], 401);
+})->name('login');
 
 
 /* 2. Rutas Protegidas por JWT (Requieren un token de acceso) */
@@ -45,32 +50,31 @@ Route::middleware(['jwt.auth'])->group(function () {
     // PROYECTOS
     Route::get('/proyectos', [ProyectoController::class, 'index']); 
     Route::get('/departamentos/{depId}/progresos', [ProgresoController::class, 'obtenerProgresosPorDepartamento']);
+
     // TAREAS
     Route::get('/proyectos/{idProyecto}/tareas', [TareasController::class, 'obtenerPorProyecto']);
     Route::get('/reporte', [ReporteController::class, 'generarPDF']);
 
-    //JEFE
+    // JEFE
     Route::get('/proyectos/jefe', [JefeController::class, 'ProyectosDeUsuario']);
     Route::get('tareas/{idProyecto}/usuario/{idUsuario}', [JefeController::class, 'obtenerTareasPendientes']);
     Route::post('/evidencias', [JefeController::class, 'subirEvidencia']);
     Route::get('/usuario/tareas', [JefeController::class, 'tareasPorUsuario']);
     Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarReporteCompletadas']);
 
-    
-    //DIRECTOR
+    // DIRECTOR
     Route::get('/dashboard-departamento', [TareasDirectorController::class, 'dashboardDepartamento']);
     Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
     Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
     Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
-    Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
 
+    Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 'tareasPendientesUsuario']);
     Route::get('/CatalogoDepartamentos', [DepartamentoDirectorController::class, 'CatalogoDepartamentos']);
-    Route::get('/proyectos/usuario', [DirectorController::class, 'MostrarProyectos']);
     Route::get('/proyectos/{idProyecto}/tareas-activas', [TareasDirectorController::class, 'tareasActivasPorProyecto']);
-    Route::get('/proyectos/lista/modificar', [NuevoProyectoController::class, 'ListaProyectosModificar']);
+    Route::get('/proyectos/{idProyecto}/lista-tareas', [TareasDirectorController::class, 'ListaDeTareas']);
     Route::get('/proyecto/{idProyecto}', [NuevoProyectoController::class, 'show']);
     Route::put('/modificar/proyecto/{idProyecto}', [NuevoProyectoController::class, 'update']);
-    Route::get('/proyectos/sin-tareas', [NuevoProyectoController::class, 'ProyectosSinTareas']);
+    Route::get('/proyectos/general', [NuevoProyectoController::class, 'Proyectos']);
     Route::delete('/proyectos/{idProyecto}/eliminar', [NuevoProyectoController::class, 'EliminarProyecto']);
     Route::put('/proyectos/{id}/completar', [NuevoProyectoController::class, 'completar']);
     Route::put('/proyectos/{id}/finalizar', [NuevoProyectoController::class, 'CambiarStatusProyecto']);
@@ -80,15 +84,14 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/tareas/{id}/completar', [TareasDirectorController::class, 'completarTarea']);
     Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
     Route::get('tareasCompletadas/jefe', [TareasDirectorController::class, 'tareasCompletadasDepartamento']);
-    Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 'tareasPendientesUsuario']);
+    Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
     Route::put('/tareas/{id}/cambiar-estatus-enproceso', [TareasDirectorController::class, 'cambiarStatusTareaEnProceso']);
     Route::get('/tareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
-    Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
+    Route::get('/agregar/tareas', [TareasDirectorController::class, 'AgregarTareasDepartamento']);
+    Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'EliminarTareasPorDepartamento']);
     Route::delete('EliminarTarea/{idTarea}', [TareasDirectorController::class, 'eliminarTarea']);
     Route::get('/tareas/{idTarea}', [TareasDirectorController::class, 'show']);
     Route::put('/tareas/{id}', [TareasDirectorController::class, 'update']);
     Route::delete('/usuarios/{id_usuario}', [DepartamentoDirectorController::class, 'eliminarUsuario']);
     Route::get('/usuarios/departamento/{id_usuario}', [DepartamentoDirectorController::class, 'usuariosDeDepartamento']);
-
-
 });

@@ -1,0 +1,188 @@
+/* Contenedor principal - versión mejorada */
+.select-global-container-inline {
+  position: relative;
+  display: inline-flex;
+  width: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  z-index: 10;
+}
+
+/* Botón principal - diseño moderno */
+.select-global-custom {
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Efectos de interacción */
+.select-global-custom:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.select-global-custom:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.select-global-custom:focus {
+  outline: none;
+  border-color: #861542;
+  box-shadow: 0 0 0 3px rgba(134, 21, 66, 0.12);
+}
+
+
+.select-global-custom.open {
+  border-color: #861542;
+  background: linear-gradient(135deg, #fff5f7 0%, #fff 100%);
+}
+
+.select-toggle-icon {
+color: #4a5568;
+font-size: 1.2rem;
+font-weight: 600;
+line-height: 44px; 
+display: block; 
+  text-align: center;
+transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.select-global-custom.open .select-toggle-icon {
+  color: #861542;
+}
+
+.select-global-options-inline {
+  position: absolute;
+  width: 260px;
+  top: calc(100% + 6px);
+  right: 0;
+  border-radius: 10px;
+  background: white;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  z-index: 100;
+  border: none;
+  transform: translateY(-8px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Dropdown abierto */
+.select-global-options-inline.open {
+  max-height: 320px;
+  opacity: 1;
+  border: 1px solid #f1f5f9;
+  transform: translateY(0);
+  overflow-y: auto;
+ 
+}
+
+/* Opciones individuales - diseño moderno */
+.select-global-options-inline div {
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid #f7fafc;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 15;
+}
+
+.select-global-options-inline div:last-child {
+  border-bottom: none;
+}
+
+/* Efecto hover con gradiente sutil */
+.select-global-options-inline div:hover {
+  background: linear-gradient(90deg, rgba(255, 245, 247, 0.7), rgba(255, 240, 245, 0.9));
+  color: #861542;
+  padding-left: 22px;
+}
+
+/* Indicador de selección */
+.select-global-options-inline div.selected {
+  background: linear-gradient(90deg, #ffd9d9, #ffc0c0be);
+  color: #861542;
+  font-weight: 600;
+}
+
+.select-global-options-inline div.selected::before {
+  content: "✓";
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+/* Efecto ripple sutil */
+.select-global-options-inline div::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(134, 21, 66, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.select-global-options-inline div:hover::after {
+  width: 120px;
+  height: 120px;
+}
+
+/* Scrollbar elegante (cuando hay muchas opciones) */
+.select-global-options-inline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.select-global-options-inline::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 10px;
+}
+
+.select-global-options-inline::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.select-global-options-inline::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+.select-global-options-inline {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 #f7fafc;
+}
+
+/* Estado deshabilitado */
+.select-global-custom.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.select-global-custom.disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: #e2e8f0;
+}
+
+

@@ -1,139 +1,211 @@
 /* ==========================
-   CONTENEDOR PRINCIPAL
+    CONTENEDOR PRINCIPAL
 ========================== */
 .reportes-d {
-  padding: 20px;
-  text-align: center;
-  width: 100%;
-  max-width: 800px;
-  border-radius: 8px;
-  z-index: 1;
-  
+    width: 100%;
+    max-width: 900px;
+    border-radius: 8px;
+    z-index: 1;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (max-width: 576px) {
-  .reportes-d {
-    padding: 15px;
-  }
+    .reportes-d {
+        padding: 15px;
+    }
 }
+.btn-calendario {
+    height: 38px; /* Altura más estándar */
+    font-size: 0.95rem; /* Fuente ligeramente más pequeña */
+    padding: 0.5rem 0.75rem; /* Padding más compacto */
+
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.btn-calendario .text {
+    font-size: 0.9rem; /* Asegura que el placeholder también sea compacto */
+}
+.btn-calendario:hover {
+    border-color: #861542;
+}
+
 .reportes-d-form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #374151;
-  font-family: 'Inter', sans-serif;
-  line-height: 1.25;
-  transition: color 0.2s ease;
-  z-index: 2;
-  position: relative;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.25;
+    transition: color 0.2s ease;
+    z-index: 2;
+    position: relative;
+}
+
+.btn-secondary.btn-sm-custom,
+.btn-primary.btn-sm-custom {
+    font-size: 1rem; /* Tamaño de fuente estándar */
+    padding: 0.5rem 1.5rem; /* Padding más compacto */
+    font-weight: 600;
+}
+
+.btn-primary.btn-sm-custom {
+    background-color: #861542;
+    border-color: #861542;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary.btn-sm-custom:hover:not(:disabled) {
+    background-color: #861542; /* Color de hover */
+    border-color: #861542;
+}
+
+
+.btn-calendario:hover {
+    border-color: #861542;
 }
 
 /* ==========================
-   BARRA DE PROGRESO
+    BARRA DE PROGRESO
 ========================== */
 .reportes-d-progress-contenedor {
-  margin-top: 30px;
-  max-width: 500px;
-  height: 8px;
+    margin-top: 30px;
+    max-width: 500px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .reportes-d-progress {
-  height: 12px;
-  border-radius: 10px;
-  background-color: #f0f0f0;
-  overflow: hidden;
+    height: 15px; 
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    position: relative; 
 }
 
 .reportes-d-progress-bar {
-  background: linear-gradient(90deg, #861542, #a75877);
-  border-radius: 10px;
-  transition: width 0.3s ease;
-  position: relative;
-  z-index: 2;
+    background: linear-gradient(90deg, #861542, #a75877);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    height: 100%; 
+    display: block;
+    position: absolute; 
+    top: 0;
+    left: 0;
+    z-index: 2; 
 }
 
 .reportes-d-progress-bar-mejorada::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.2) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 20px 20px;
-  animation: move 1s linear infinite;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255, 255, 255, 0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 20px 20px;
+    animation: move 1s linear infinite;
 }
 
 @keyframes move {
-  0% { background-position: 0 0; }
-  100% { background-position: 20px 0; }
+    0% { background-position: 0 0; }
+    100% { background-position: 20px 0; }
 }
 
 .reportes-d-text {
-  color: #999;
+    color: #999;
 }
+
+/* Los estilos de .reportes-d-boton-form ya no se usan directamente, pero mantenemos los relacionados al progreso y z-index */
 .reportes-d-boton-wrapper {
-  margin-top: 30px; /* Ajusta la distancia que quieras */
-}
-/* ==========================
-   BOTON PRINCIPAL
-========================== */
-.reportes-d-boton-form {
-  width: auto;
-  max-width: 100%;
-  padding: 15px;
-  font-size: 16px;
-  border: none;
-  margin-top: 40px; 
-  border-radius: 3px;
-  box-sizing: border-box;
-  color: #fff;
-  background-color: #861542;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.reportes-d-progress-contenedor{
-  margin-top: 30px;
-  max-width: 500px;
-  width: 100%;
-}
-
-.reportes-d-progress {
-  height: 15px; 
-  border-radius: 10px;
-  background-color: #f0f0f0;
-  overflow: hidden;
-  position: relative; 
-}
-
-.reportes-d-progress-bar {
-  background: linear-gradient(90deg, #861542, #a75877);
-  border-radius: 10px;
-  transition: width 0.3s ease;
-  height: 100%; 
-  display: block;
-  position: absolute; 
-  top: 0;
-  left: 0;
-  z-index: 2; 
+    margin-top: 30px;
 }
 
 
-@keyframes move {
-  0% { background-position: 0 0; }
-  100% { background-position: 20px 0; }
+.form-check-input {
+    position: relative; 
+    z-index: 999 !important; 
+}
+.form-check-bordered {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem !important;
+    transition: border-color 0.2s ease;
+    display: flex;
+    align-items: center; 
+}
+.form-check-bordered:hover {
+    border-color: #a75877;
+}
+.form-check-bordered {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem !important;
+    transition: border-color 0.2s ease;
+    
+    display: flex;
+    align-items: center; 
+}
+.form-check-bordered:hover {
+    border-color: #a75877;
+}
+
+.form-check-input {
+    position: relative; 
+    z-index: 999 !important; 
+    margin-left: 0 !important; 
+    left: 0 !important; 
+    transform: translateY(0); 
+    margin-right: 0.75rem; 
+    margin-top: 0; 
+    border: 1px solid #ced4da;
+    background-color: #fff;
+    background-image: none; 
+}
+.form-check-input:focus {
+    border-color: #861542 !important; 
+    box-shadow: 0 0 0 0.25rem rgba(134, 21, 66, 0.25) !important;
+    filter: none !important; 
+}
+
+/* 2. CORRECCIÓN de :hover (Al pasar el ratón) */
+.form-check-input:hover {
+    /* Mantenemos un borde de tu color de marca para indicar interactividad */
+    border-color: #861542 !important; 
+    
+    /* Eliminamos la sombra al hacer hover si no la quieres, o puedes poner una más sutil */
+    box-shadow: none !important;
+    
+    /* Sobrescribimos el filtro de color de hover de Bootstrap */
+    filter: none !important;
+}
+
+
+/* 3. ESTILO CUANDO ESTÁ MARCADO */
+.form-check-input:checked {
+    background-color: #861542 !important; /* Importante para que el fondo sea el correcto */
+    border-color: #861542 !important; /* Importante para que el borde sea el correcto */
+    
+    /* El background-image con el SVG blanco debe ser !important si Bootstrap lo sobrescribe */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e") !important;
+}
+.form-check-label {
+    align-self: center;
+    margin-bottom: 0; 
+    margin-left: 0; 
 }

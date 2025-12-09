@@ -18,7 +18,7 @@ function VerTareasPendientes() {
   const [tareaActual, setTareaActual] = useState(null); 
   const [evidencias, setEvidencias] = useState([]);
   const [modalVisible, setModalVisible] = useState(false); 
-  
+  const API_URL = import.meta.env.VITE_API_URL;
   // 2. Estados para el Modal de Confirmación
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [tareaAFinalizar, setTareaAFinalizar] = useState(null); 
@@ -47,7 +47,7 @@ function VerTareasPendientes() {
     try {
       setCargandoProyecto(true);
       const response = await fetch(
-        `http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
+  `${API_URL}/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -122,7 +122,8 @@ function VerTareasPendientes() {
     try {
       setCargando(true);
 
-      const response = await fetch(`http://127.0.0.1:8000/api/tareas/${idTarea}/completar`, 
+      const response = await fetch(
+  `${API_URL}/api/tareas/${idTarea}/completar`,
         {
           method: 'PUT',
           headers: { 

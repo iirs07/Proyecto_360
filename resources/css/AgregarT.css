@@ -1,314 +1,256 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-.agregar-tareas-card {
-  border: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 24px;
-  margin: 16px 0;
-  width: 100%;
-  box-sizing: border-box;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(134, 21, 66, 0.1);
-  z-index: 3;
+
+/* ================================
+   FUENTES Y CONFIGURACIÓN GLOBAL
+================================ */
+body, input, button, select {
+  font-family: 'Poppins', sans-serif;
+  color: #2d3748;
+  margin: 0;
+  padding: 0;
 }
-.agregar-tareas-info-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-}
-.agregar-tareas-info-icon {
-  color: #861542;
-  font-size: 1.1rem;
-}
-/* LISTA DE PROYECTOS */
-.agregar-tareas-lista {
+
+.contenedor-global {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 0 16px;
+  gap: 20px;
+  padding: 10px 15px;
 }
 
-/* TARJETA */
-.agregar-tareas-card {
-  border: 1px solid #e0e0e0;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  padding: 24px;
-  margin: 16px 0;
+/* ================================
+   TARJETAS DE PROYECTOS (AGREGAR TAREAS)
+================================ */
+.at-card {
+  background: #ffffff;
+  border-radius: 12px; 
+  padding: 20px;
+  margin: 20px auto;
   width: 100%;
-  box-sizing: border-box;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
   box-shadow: 0 4px 15px rgba(134, 21, 66, 0.1);
+  position: relative;
+  border: 1px solid #e6e2e8;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 3;
 }
 
-.agregar-tareas-card::before {
+.at-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(134, 21, 66, 0.2);
+}
+
+.at-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
+  width: 6px; 
   height: 100%;
-  background: #861542;
-  transition: all 0.3s ease;
+  background: linear-gradient(180deg, #861542, #a83267);
+  border-radius: 12px 0 0 12px;
 }
 
-.agregar-tareas-card:hover::before {
-  width: 6px;
-}
-
-.agregar-tareas-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
-}
-
-/* NOMBRE DEL PROYECTO */
-.agregar-tareas-nombre {
-  font-weight: bold;
-  font-size: 1.4rem;
+/* ================================
+   TITULARES (AGREGAR TAREAS)
+================================ */
+.at-nombre-proyecto {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 15px;
+  color:#000;
   text-transform: uppercase;
-  color: #861542;
-  margin-bottom: 12px;
-  position: relative;
-  padding-bottom: 8px;
+  text-align: center;
 }
 
-.agregar-tareas-nombre::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 2px;
-  background: #861542;
-  transition: width 0.3s ease;
-}
-
-.agregar-tareas-card:hover .modificar-proyectos-nombre::after {
-  width: 80px;
-}
-
-/* INFORMACIÓN DEL PROYECTO */
-.proyectos-info {
+/* ================================
+   INFO DE TARJETA (AGREGAR TAREAS)
+================================ */
+/* ================================
+   INFO DE TARJETA (AGREGAR TAREAS)
+================================ */
+.at-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
+  gap: 10px; /* Aumentado a 10px para más separación vertical entre fechas */
+  margin-bottom: 25px; /* Aumentado a 25px para separar más el bloque de fechas del botón */
+  padding: 10px 0; /* Agregamos padding para un poco de aire con el nombre del proyecto */
+  border-top: 1px solid #f0f0f0; /* Línea de separación sutil */
+  border-bottom: 1px solid #f0f0f0; /* Línea de separación sutil */
 }
 
-.proyectos-info div {
+.at-info-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 0;
-}
-
-/* BOTONES */
-.agregar-tareas-botones {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px; /* Ajuste sutil */
+  font-size: 16px;
+  color: #000;
   justify-content: center;
 }
 
-.agregar-tareas-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.at-info-icon {
+  font-size: 1.5rem;
+  color: #861542;
+}
+
+/* El botón puede quedar igual, ya que el margen del at-info lo separará. */
+.at-botones {
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
-  min-width: 180px;
+  margin-top: 15px; /* Podrías reducir esto a 0 si la separación de at-info es suficiente */
+}
+
+.at-btn-agregar-tarea {
+  padding: 8px 16px;
+  background: #861542;
   color: white;
-  background: linear-gradient(135deg, #861542, #a52c5c);
-  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.25);
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
 }
 
-.agregar-tareas-btn:hover {
-  background: linear-gradient(135deg, #a52c5c, #c2185b);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(134, 21, 66, 0.35);
+.at-btn-agregar-tarea:hover {
+  background: linear-gradient(90deg, #861542, #a83267);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(134,21,66,0.3);
 }
 
-.agregar-tareas-btn:active {
-  transform: translateY(0);
-}
-
-/* BUSCADOR */
-.agregar-tareas-buscador {
+/* ================================
+   CONTENEDOR DE FILTROS (AGREGAR TAREAS)
+================================ */
+.at-filtros-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto 30px auto;
-  position: relative;
+  padding: 0 15px;
 }
 
-.agregar-tareas-input-buscar {
+.at-search-filter-wrapper {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.at-search-box {
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.at-search-icon {
+  position: absolute;
+  left: 15px;
+  color: #861542;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+.at-search-input {
   width: 100%;
-  padding: 15px 50px 15px 50px;
-  border: 2px solid rgba(134, 21, 66, 0.1);
+  padding: 12px 45px 12px 45px;
+  border: 2px solid rgba(134, 21, 66, 0.15);
   border-radius: 50px;
   background: #ffffff;
-  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.08);
+  box-shadow: 0 4px 12px rgba(134, 21, 66, 0.1);
   font-size: 16px;
   transition: all 0.3s ease;
   color: #2d3748;
   font-family: 'Poppins', sans-serif;
 }
 
-.agregar-tareas-input-buscar:focus {
+.at-search-input:focus {
   outline: none;
-  box-shadow: 0 8px 25px rgba(134, 21, 66, 0.15);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(134, 21, 66, 0.2);
   border-color: #861542;
 }
 
-.agregar-tareas-input-buscar::placeholder {
-  color: #a0a0a0;
-  font-weight: 400;
-}
-
-/* SELECT PERSONALIZADO */
-.agregar-tareas-custom-select-container-inline {
-  position: relative;
-  width: 220px;
-  margin: 0 auto 20px auto;
-  font-size: 0.95rem;
-  font-weight: 500;
-  z-index: 10;
-}
-
-.agregar-tareas-custom-select {
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  padding: 10px 15px;
-  text-align: left;
+.at-search-clear-btn {
+  position: absolute;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #861542;
   cursor: pointer;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  padding: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  user-select: none;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
+.at-search-clear-btn:hover {
+  color: #a83267;
+  transform: scale(1.1);
+}
 
-.dropdown-icon {
-  transition: transform 0.3s ease;
+.at-filter-box {
+  position: relative;
+  min-width: 250px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.at-filter-icon {
   color: #861542;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
-.dropdown-icon.open {
-  transform: rotate(180deg);
+.at-search-results-info {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  padding: 8px 0;
+  border-top: 1px solid rgba(134, 21, 66, 0.1);
 }
 
-.agregar-tareas-custom-options-inline {
-  border-radius: 10px;
-  margin-top: 6px;
-  background: #fff;
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
-  z-index: 10px;
-}
-
-.agregar-tareas-custom-options-inline.open {
-  max-height: 300px;
-}
-
-.agregar-tareas-custom-options-inline div {
-  padding: 12px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.agregar-tareas-custom-options-inline div:last-child {
-  border-bottom: none;
-}
-
-.agregar-tareas-custom-options-inline div:hover {
-  background: linear-gradient(90deg, #ffd9d9, #ffc0c0);
+.at-results-count {
+  font-weight: 700;
   color: #861542;
+  font-size: 1.1em;
 }
 
 
-/* ANIMACIONES */
+/* ================================
+   ANIMACIONES
+================================ */
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* RESPONSIVE */
+/* ================================
+   RESPONSIVE (AGREGAR TAREAS)
+================================ */
 @media (max-width: 768px) {
-  .agregar-tareas-lista {
-    padding: 0 12px;
-    max-width: 100%;
-  }
-
-  .agregar-tareas-card {
-    padding: 20px;
-    margin: 12px 0;
-  }
-
-  .agregar-tareas-nombre {
-    font-size: 1.2rem;
-  }
-
-  .agregar-tareas-btn {
-    min-width: 140px;
-    padding: 10px 20px;
-    font-size: 0.85rem;
-  }
-
-  .agregar-tareas-input-buscar {
-    padding: 12px 15px 12px 45px;
-    font-size: 14px;
-  }
-
-  .agregar-tareas-custom-select-container-inline {
-    width: 200px;
-  }
-}
-
-@media (max-width: 480px) {
-  .agregar-tareas-card {
-    padding: 16px;
-  }
-
-  .agregar-tareas-nombre {
-    font-size: 1.1rem;
-  }
-
-  .agregar-tareas-botones {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .agregar-tareas-btn {
-    width: 100%;
-    min-width: auto;
-  }
-
-  .agregar-tareas-info {
-    font-size: 0.9rem;
-  }
+  .at-card { padding: 15px; }
+  .at-nombre-proyecto { font-size: 18px; }
+  .at-search-input { font-size: 13px; padding: 10px 40px 10px 40px; }
+  .at-search-filter-wrapper { flex-direction: column; }
+  .at-search-box { min-width: 100%; max-width: 100%; }
+  .at-filter-box { min-width: 100%; }
+  .at-btn-agregar-tarea { padding: 6px 12px; font-size: 12px; }
 }
