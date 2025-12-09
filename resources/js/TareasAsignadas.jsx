@@ -19,6 +19,7 @@ function TareasAsignadas() {
   const [nombreProyecto, setNombreProyecto] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("todas");
   const [open, setOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
   
   const refs = useRef({});
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ function TareasAsignadas() {
 
     try {
       const res = await fetch(
-        `http://127.0.0.1:8000/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
+  `${API_URL}/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
       );
 
@@ -86,7 +87,7 @@ function TareasAsignadas() {
     }
   };
 
-  // Este efecto reacciona cuando "proyectoActual" se establece exitosamente en el primer useEffect
+  
   useEffect(() => {
     if (proyectoActual) {
       setLoading(true);

@@ -74,7 +74,6 @@ transition: transform 0.3s ease, color 0.3s ease;
   overflow: hidden;
   max-height: 0;
   opacity: 0;
-  
   z-index: 100;
   border: none;
   transform: translateY(-8px);
@@ -88,6 +87,7 @@ transition: transform 0.3s ease, color 0.3s ease;
   border: 1px solid #f1f5f9;
   transform: translateY(0);
   overflow-y: auto;
+ 
 }
 
 /* Opciones individuales - diseño moderno */
@@ -102,7 +102,7 @@ transition: transform 0.3s ease, color 0.3s ease;
   align-items: center;
   position: relative;
   overflow: hidden;
-  z-index: 10;
+  z-index: 15;
 }
 
 .select-global-options-inline div:last-child {

@@ -81,6 +81,8 @@ const nombreProyectoFinal = p_nombre || nombre || "Proyecto";
   const [proyectoActual, setProyectoActual] = useState(null);
   const [nombreProyecto, setNombreProyecto] = useState("");
   const [usuarioSeleccionadoInfo, setUsuarioSeleccionadoInfo] = useState(null);
+const API_URL = import.meta.env.VITE_API_URL;
+
 
   const ajustarAltura = (ref) => {
     if (ref.current) {
@@ -140,10 +142,11 @@ useEffect(() => {
       try {
         setLoadingInicial(true);
 
-        const [fechasRes, depRes] = await Promise.all([
-          fetch(`/api/proyectos/${proyectoActual.id_proyecto}/fechasProyecto`, { headers }),
-          fetch("/api/CatalogoDepartamentos", { headers })
-        ]);
+       const [fechasRes, depRes] = await Promise.all([
+  fetch(`${API_URL}/api/proyectos/${proyectoActual.id_proyecto}/fechasProyecto`, { headers }),
+  fetch(`${API_URL}/api/CatalogoDepartamentos`, { headers })
+]);
+
 
         if (fechasRes.status === 401 || depRes.status === 401) {
           sessionStorage.removeItem("jwt_token");
@@ -182,7 +185,8 @@ useEffect(() => {
         setDepartamentoSeleccionado(depFinal);
 
         if (depFinal) {
-          const usuariosRes = await fetch(`/api/departamentos/${depFinal}/usuarios`, { headers });
+       const usuariosRes = await fetch(`${API_URL}/api/departamentos/${depFinal}/usuarios`, { headers });
+
 
           if (usuariosRes.status === 401) {
             sessionStorage.removeItem("jwt_token");
@@ -212,7 +216,11 @@ useEffect(() => {
       if (!headers) return;
 
       try {
-        const res = await fetch(`/api/departamentos/${departamentoSeleccionado}/usuarios`, { headers });
+        const res = await fetch(
+  `${API_URL}/api/departamentos/${departamentoSeleccionado}/usuarios`,
+  { headers }
+);
+
 
         if (res.status === 401) {
           sessionStorage.removeItem("jwt_token");
@@ -277,11 +285,11 @@ useEffect(() => {
 
     try {
       setLoadingTarea(true);
-      const res = await fetch("http://127.0.0.1:8000/api/AgregarTareas", {
-        method: "POST",
-        headers,
-        body: JSON.stringify(nuevaTarea),
-      });
+      const res = await fetch(`${API_URL}/api/AgregarTareas`, {
+  method: "POST",
+  headers,
+  body: JSON.stringify(nuevaTarea),
+});
 
       if (res.status === 401) {
         sessionStorage.removeItem("jwt_token");
@@ -296,6 +304,10 @@ useEffect(() => {
         setTareaGuardada(true);
         setIdTareaRecienCreada(data.tarea.id_tarea);
         limpiarCampos(true);
+setCamposModificados({}); 
+timer = setTimeout(() => {
+        setTareaGuardada(false);
+      }, 3000);
       } else {
         console.error("Error al crear tarea:", data.message);
       }
@@ -327,6 +339,7 @@ useEffect(() => {
       const confirmar = window.confirm("Tienes cambios sin guardar. ¿Seguro que quieres cancelar?");
       if (!confirmar) return;
     }
+setCamposModificados({}); 
     navigate(-1);
   };
 
@@ -361,13 +374,16 @@ useEffect(() => {
   }
 
   const calcularDuracion = () => {
-    if (fechaInicio && fechaFin) {
-      const diffTime = Math.abs(fechaFin - fechaInicio);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays;
-    }
-    return 0;
-  };
+   if (fechaInicio && fechaFin) {
+     // Calcula la diferencia en milisegundos
+     const diffTime = Math.abs(fechaFin - fechaInicio);
+     // Convierte a días (redondea para obtener un número entero de días)
+     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+     // Suma 1 para incluir el día de inicio
+     return diffDays + 1; 
+   }
+   return 0;
+ };
 
   return (
    <Layout titulo="NUEVA TAREA" sidebar={<MenuDinamico activeRoute="Nueva tarea" />}>

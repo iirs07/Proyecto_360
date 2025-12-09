@@ -31,6 +31,7 @@ function EliminarProyectos() {
   const [proyectoAEliminar, setProyectoAEliminar] = useState(null);
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const opciones = [
     { value: "alfabetico", label: "Orden alfabético (A-Z)" },
@@ -68,7 +69,7 @@ function EliminarProyectos() {
       return;
     }
 
-    fetch(`http://127.0.0.1:8000/api/proyectos/general?usuario=${idUsuario}`, {
+    fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -107,7 +108,7 @@ function EliminarProyectos() {
     if (!proyectoAEliminar) return;
     const token = sessionStorage.getItem("jwt_token");
 
-    fetch(`http://127.0.0.1:8000/api/proyectos/${proyectoAEliminar.id_proyecto}/eliminar`, {
+    fetch(`${API_URL}/api/proyectos/${proyectoAEliminar.id_proyecto}/eliminar`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -277,24 +278,14 @@ function EliminarProyectos() {
                         </div>
                       </div>
                     ) : esProximo && diasRestantes <= 3 ? (
-                      <div className="eliminar-info-item">
-                        <FaExclamationTriangle className="eliminar-alert-icon warning" />
-                        <div className="eliminar-info-content">
-                          <div className="eliminar-info-label eliminar-alert-label">Vence</div>
-                          <div className="eliminar-info-value eliminar-alert-text warning">
-                            {diasRestantes === 0 
-                              ? "Hoy" 
-                              : `En ${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
-                          </div>
-                        </div>
-                      </div>
+                      null
                     ) : null}
                   </div>
 
                   {/* ACCIONES - BOTÓN ELIMINAR */}
                   <div className="eliminar-proyecto-actions">
                     <button
-                      className="btn btn-danger eliminar-btn-icon"
+                      className="eliminar-btn-icon"
                       onClick={() => confirmarEliminar(p)}
                     >
                       <FaTrash />
@@ -319,7 +310,7 @@ function EliminarProyectos() {
         <ConfirmModal
           isOpen={modalOpen}
           title="Confirmar eliminación"
-          message={`¿Estás seguro que deseas eliminar el proyecto "${proyectoAEliminar?.p_nombre}"?`}
+         message="¿Estás seguro de que deseas eliminar el proyecto? Todas las tareas relacionadas también se eliminarán."
           onConfirm={eliminarProyecto}
           onCancel={() => setModalOpen(false)}
         />

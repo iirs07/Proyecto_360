@@ -13,9 +13,11 @@ class ReporteDirectorController extends Controller
 {
     public function generarPDF(Request $request)
     {
-        $tipo = $request->query('tipo', 'vencidas'); 
-        $fechaInicio = $request->query('fechaInicio'); 
-        $fechaFin = $request->query('fechaFin');    
+        $tipo = $request->query('tipos', 'vencidas'); 
+        // Renombramos las variables para ser más claros:
+        $fechaInicioFiltro = $request->query('fechaInicio'); 
+        $fechaFinFiltro = $request->query('fechaFin');       
+        
         date_default_timezone_set('America/Mexico_City');   
         $hoy = date('Y-m-d');
         $hora = date('h:i:s A');
@@ -44,15 +46,24 @@ class ReporteDirectorController extends Controller
         $inicioTrimestreActual = Carbon::create($hoyCarbon->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
 
         $tareas = collect();
-        
-        // CORRECCIÓN 1: Inicializar variables por defecto
         $movimientos = collect(); 
-        $vistaPDF = 'pdf.ReportesDirector'; 
+        $vistaPDF = 'pdf.ReportesDirector';
+
+        // Variables de fecha que se pasan a la VISTA/PDF para mostrar el rango
+        $inicio = null;
+        $fin = null;
+        
+        // Variables de fecha que se usan para la CONSULTA a la DB
+        $inicio_db = null;
+        $fin_db = null;
 
         switch ($tipo) {
             case 'modificaciones':
-                $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->startOfDay() : Carbon::now()->startOfDay();
-                $fin = $fechaFin ? Carbon::parse($fechaFin)->endOfDay() : Carbon::now()->endOfDay();
+                // Para historial, usamos el rango de filtro o HOY por defecto
+                $inicio = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->startOfDay() : Carbon::now()->startOfDay();
+                $fin = $fechaFinFiltro ? Carbon::parse($fechaFinFiltro)->endOfDay() : Carbon::now()->endOfDay();
+                $inicio_db = $inicio;
+                $fin_db = $fin;
 
                 $query = HistorialModificacion::join('proyectos', 'historial_modificaciones.id_proyecto', '=', 'proyectos.id_proyecto')
                     ->join('c_usuario', 'historial_modificaciones.id_usuario', '=', 'c_usuario.id_usuario')
@@ -65,9 +76,8 @@ class ReporteDirectorController extends Controller
                         'c_usuario.a_materno',
                         'tareas.t_nombre as tarea'
                     )
-                    ->whereBetween('historial_modificaciones.created_at', [$inicio, $fin]);
+                    ->whereBetween('historial_modificaciones.created_at', [$inicio_db, $fin_db]);
 
-                // Filtrar por departamento si existe
                 if ($idDepartamento) {
                     $query->where('proyectos.id_departamento', $idDepartamento);
                 }
@@ -75,93 +85,116 @@ class ReporteDirectorController extends Controller
                 $movimientos = $query->orderBy('historial_modificaciones.created_at', 'DESC')->get();
                 
                 $nombreArchivo = 'Reporte_Historial_Modificaciones.pdf';
-                
-                // CORRECCIÓN 2: Cambiar la vista a usar
-                $vistaPDF = 'pdf.ReporteModificaciones'; 
+                $vistaPDF = 'pdf.ReporteModificaciones';
                 break;
 
             case 'proximas':
-                $inicio = $fechaInicio ?? $hoy;
-                $fin = $fechaFin ?? date('Y-m-d', strtotime('+7 days'));
+                // 💡 CORRECCIÓN: Usamos el filtro para el título, y HOY para la consulta.
+                
+                // Rango para la VISTA (PDF Title): Usamos el rango del filtro o el default.
+                $inicio = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->toDateString() : $hoy;
+                $fin = $fechaFinFiltro ? Carbon::parse($fechaFinFiltro)->toDateString() : date('Y-m-d', strtotime('+7 days'));
+                
+                // Rango para la CONSULTA (Database Query): Siempre debe comenzar desde HOY para "Próximas".
+                $inicio_db = $hoy;
+                $fin_db = $fin; // El fin es el fin del filtro
 
-                if ($fin >= $inicioTrimestreActual->toDateString()) {
-                    $inicioPrincipal = max($inicio, $inicioTrimestreActual->toDateString());
-                    $tareas = $tareas->merge(
+                // Lógica de Base de Datos para el trimestre actual (pgsql)
+                if ($fin_db >= $inicioTrimestreActual->toDateString()) {
+                     // El inicio principal es el máximo entre $hoy (inicio_db) y el inicio del trimestre
+                     $inicioPrincipal = max($inicio_db, $inicioTrimestreActual->toDateString());
+                     $tareas = $tareas->merge(
                         Tarea::on('pgsql')
                                  ->with('proyecto', 'usuario.departamento')
-                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin])
+                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin_db])
                                  ->get()
-                    );
-                }
-                if ($inicio < $inicioTrimestreActual->toDateString()) {
-                    $finHistorico = min($fin, $inicioTrimestreActual->copy()->subSecond()->toDateString());
-                    $tareas = $tareas->merge(
+                     );
+                 }
+                 
+                 // Lógica de Base de Datos para el trimestre anterior (pgsql_second)
+                 $inicio_for_second_db = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->toDateString() : null;
+
+                 if ($inicio_for_second_db && $inicio_for_second_db < $inicioTrimestreActual->toDateString()) {
+                     $finHistorico = min($fin_db, $inicioTrimestreActual->copy()->subSecond()->toDateString());
+                     
+                     $tareas = $tareas->merge(
                         Tarea::on('pgsql_second')
                                  ->with('proyecto', 'usuario.departamento')
-                                 ->whereBetween('tf_fin', [$inicio, $finHistorico])
+                                 // Buscamos tareas en el trimestre anterior cuya fecha de fin es >= $hoy (futuras).
+                                 ->whereDate('tf_fin', '>=', $hoy)
+                                 ->whereDate('tf_fin', '<=', $finHistorico)
                                  ->get()
-                    );
-                }
+                     );
+                 }
 
                 $nombreArchivo = 'Reporte_tareas_proximas_a_vencer.pdf';
+                $vistaPDF = 'pdf.ReportesDirector';
                 break;
 
             case 'completadas':
-                $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->toDateString() : null;
-                $fin = $fechaFin ? Carbon::parse($fechaFin)->toDateString() : null;
+                // Lógica de obtención de tareas completadas...
+                $inicio = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->toDateString() : null;
+                $fin = $fechaFinFiltro ? Carbon::parse($fechaFinFiltro)->toDateString() : null;
+                $inicio_db = $inicio;
+                $fin_db = $fin;
 
-                if ($fin && $fin >= $inicioTrimestreActual->toDateString()) {
-                    $inicioPrincipal = $inicio && $inicio >= $inicioTrimestreActual->toDateString() ? $inicio : $inicioTrimestreActual->toDateString();
-                    $tareas = $tareas->merge(
+                 if ($fin_db && $fin_db >= $inicioTrimestreActual->toDateString()) {
+                     $inicioPrincipal = $inicio_db && $inicio_db >= $inicioTrimestreActual->toDateString() ? $inicio_db : $inicioTrimestreActual->toDateString();
+                     $tareas = $tareas->merge(
                         Tarea::on('pgsql')
                                  ->with('proyecto', 'usuario.departamento')
                                  ->where('t_estatus', 'Completado')
-                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin])
+                                 ->whereBetween('tf_fin', [$inicioPrincipal, $fin_db])
                                  ->get()
-                    );
-                }
-                if ($inicio && $inicio < $inicioTrimestreActual->toDateString()) {
-                    $finHistorico = $fin && $fin < $inicioTrimestreActual->toDateString() ? $fin : $inicioTrimestreActual->copy()->subSecond()->toDateString();
-                    $inicioHistorico = $inicio;
-                    $tareas = $tareas->merge(
+                     );
+                 }
+                 if ($inicio_db && $inicio_db < $inicioTrimestreActual->toDateString()) {
+                     $finHistorico = $fin_db && $fin_db < $inicioTrimestreActual->toDateString() ? $fin_db : $inicioTrimestreActual->copy()->subSecond()->toDateString();
+                     $inicioHistorico = $inicio_db;
+                     $tareas = $tareas->merge(
                         Tarea::on('pgsql_second')
                                  ->with('proyecto', 'usuario.departamento')
                                  ->where('t_estatus', 'Completado')
                                  ->whereBetween('tf_fin', [$inicioHistorico, $finHistorico])
                                  ->get()
-                    );
-                }
+                     );
+                 }
 
                 $nombreArchivo = 'Reporte_tareas_completadas.pdf';
+                $vistaPDF = 'pdf.ReportesDirector';
                 break;
 
             case 'vencidas':
             default:
-                $inicio = $fechaInicio ? Carbon::parse($fechaInicio)->toDateString() : null;
-                $fin = $fechaFin ? Carbon::parse($fechaFin)->toDateString() : Carbon::now()->toDateString();
+                // TAREAS VENCIDAS: Rango siempre histórico. $fin nunca es futuro.
+                $inicio = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->toDateString() : null;
+                $fin = $fechaFinFiltro ? Carbon::parse($fechaFinFiltro)->toDateString() : Carbon::now()->toDateString();
+                $inicio_db = $inicio;
+                $fin_db = $fin;
 
-                if ($fin >= $inicioTrimestreActual->toDateString()) {
-                    $inicioPrincipal = $inicio && $inicio >= $inicioTrimestreActual->toDateString() ? $inicio : $inicioTrimestreActual->toDateString();
+                if ($fin_db >= $inicioTrimestreActual->toDateString()) {
+                    $inicioPrincipal = $inicio_db && $inicio_db >= $inicioTrimestreActual->toDateString() ? $inicio_db : $inicioTrimestreActual->toDateString();
                     $tareas = $tareas->merge(
                         Tarea::on('pgsql')
-                                 ->with('proyecto', 'usuario.departamento')
-                                 ->whereDate('tf_fin', '<=', $fin)
-                                 ->when($inicioPrincipal, fn($q) => $q->whereDate('tf_fin', '>=', $inicioPrincipal))
-                                 ->get()
+                                ->with('proyecto', 'usuario.departamento')
+                                ->whereDate('tf_fin', '<=', $fin_db)
+                                ->when($inicioPrincipal, fn($q) => $q->whereDate('tf_fin', '>=', $inicioPrincipal))
+                                ->get()
                     );
                 }
-                if ($inicio && $inicio < $inicioTrimestreActual->toDateString()) {
-                    $finHistorico = min($fin, $inicioTrimestreActual->copy()->subSecond()->toDateString());
+                if ($inicio_db && $inicio_db < $inicioTrimestreActual->toDateString()) {
+                    $finHistorico = min($fin_db, $inicioTrimestreActual->copy()->subSecond()->toDateString());
                     $tareas = $tareas->merge(
                         Tarea::on('pgsql_second')
-                                 ->with('proyecto', 'usuario.departamento')
-                                 ->whereDate('tf_fin', '<=', $finHistorico)
-                                 ->whereDate('tf_fin', '>=', $inicio)
-                                 ->get()
+                                ->with('proyecto', 'usuario.departamento')
+                                ->whereDate('tf_fin', '<=', $finHistorico)
+                                ->whereDate('tf_fin', '>=', $inicio_db)
+                                ->get()
                     );
                 }
 
                 $nombreArchivo = 'Reporte_tareas_vencidas.pdf';
+                $vistaPDF = 'pdf.ReportesDirector';
                 break;
         }
 
@@ -185,27 +218,26 @@ class ReporteDirectorController extends Controller
             $mpdf->WriteHTML($css, \Mpdf\HTMLParserMode::HEADER_CSS);
         }
 
-        // CORRECCIÓN 3: Usar la variable $vistaPDF en lugar del string fijo
         $html = view($vistaPDF, [
             'tareas' => $tareas,
-            'movimientos' => $movimientos, // CORRECCIÓN 4: Pasar los movimientos a la vista
+            'movimientos' => $movimientos, 
             'hoy' => $hoy,
             'hora' => $hora,
             'usuario' => $usuario,
             'tipo' => $tipo,
-            'inicio' => $inicio,
-            'fin' => $fin
+            'inicio' => $inicio, // Ahora usa el rango del filtro/default para el título del PDF
+            'fin' => $fin        // Ahora usa el rango del filtro/default para el título del PDF
         ])->render();
 
         $mpdf->SetHTMLFooter(
             '<div style="text-align:center; font-size:11px; color:#666;">
-                Sistema de Gestión de Proyectos - H. Ayuntamiento de Minatitlán
+                 Sistema de Gestión de Proyectos - H. Ayuntamiento de Minatitlán
             </div>',
             'FIRST'
         );
         $mpdf->SetHTMLFooter(
             '<div style="text-align:center; font-size:11px; color:#666;">
-                Sistema de Gestión de Proyectos - H. Ayuntamiento de Minatitlán - Página {PAGENO} de {nbpg}
+                 Sistema de Gestión de Proyectos - H. Ayuntamiento de Minatitlán - Página {PAGENO} de {nbpg}
             </div>',
             'OTHER'
         );
@@ -221,5 +253,3 @@ class ReporteDirectorController extends Controller
             ->header('Expires', '0');
     }
 }
-
-

@@ -20,6 +20,7 @@ function ProyectosListaModificar() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
+const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
@@ -31,8 +32,7 @@ function ProyectosListaModificar() {
       return;
     }
 
-    fetch(
-      `http://127.0.0.1:8000/api/proyectos/general?usuario=${idUsuario}`,
+    fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,8 +95,8 @@ function ProyectosListaModificar() {
     });
 
   const opciones = [
-    { value: "alfabetico", label: "Nombre (A-Z)" },
-    { value: "alfabetico_desc", label: "Nombre (Z-A)" },
+    { value: "alfabetico", label: "Orden alfabético (A-Z)" },
+    { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
     { value: "fecha_proxima", label: "Fecha más próxima" },
     { value: "fecha_lejana", label: "Fecha más lejana" },
   ];

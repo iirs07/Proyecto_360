@@ -37,9 +37,8 @@ function DesbloquearProyectos() {
   const [indiceActual, setIndiceActual] = useState(0);
   const [imagenCargando, setImagenCargando] = useState(true);
   const [errorCarga, setErrorCarga] = useState(false);
-
   const { volverSegunRol } = useRolNavigation();
-
+  const API_URL = import.meta.env.VITE_API_URL;
   const currentYear = new Date().getFullYear();
   const startYear = 2025; 
   const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i);
@@ -64,9 +63,11 @@ function DesbloquearProyectos() {
       const token = sessionStorage.getItem("jwt_token");
 
       try {
-        let url = `http://127.0.0.1:8000/api/proyectos/completados?usuario_id=${usuario.id_usuario}`;
-        if (anio) url += `&anio=${anio}`;
-        if (mes) url += `&mes=${mes}`;
+        let url = `${API_URL}/api/proyectos/completados?usuario_id=${usuario.id_usuario}`;
+
+if (anio) url += `&anio=${anio}`;
+if (mes) url += `&mes=${mes}`;
+
 
         const res = await fetch(url, {
           method: "GET",
@@ -150,7 +151,9 @@ function DesbloquearProyectos() {
     const tareasParaAbrir = tareasSeleccionadas[idProyectoAReactivar] || [];
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/${idProyectoAReactivar}/cambiar-status`, {
+        const res = await fetch(
+  `${API_URL}/api/proyectos/${idProyectoAReactivar}/cambiar-status`,
+  {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",

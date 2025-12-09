@@ -29,6 +29,7 @@ function ListaProyectos() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
+const API_URL = import.meta.env.VITE_API_URL;
 
   const opciones = [
     { value: "alfabetico", label: "Orden alfabético (A-Z)" },
@@ -82,7 +83,7 @@ function ListaProyectos() {
       try {
         setLoading(true);
         const res = await fetch(
-          `http://127.0.0.1:8000/api/proyectos/general?usuario=${idUsuario}`,
+  `${API_URL}/api/proyectos/general?usuario=${idUsuario}`,
           {
             headers: {
               "Content-Type": "application/json",

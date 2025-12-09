@@ -18,7 +18,7 @@ export default function EliminarUsuario() {
   const { volverSegunRol } = useRolNavigation();
   const [modalOpen, setModalOpen] = useState(false);
   const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
-
+const API_URL = import.meta.env.VITE_API_URL;
   const usuarioLogueado = JSON.parse(sessionStorage.getItem("usuario"));
   const idUsuario = usuarioLogueado?.id_usuario;
 
@@ -38,7 +38,8 @@ export default function EliminarUsuario() {
       }
 
       try {
-        const res = await axios.get(`/api/usuarios/departamento/${idUsuario}`, {
+       const res = await axios.get(
+  `${API_URL}/api/usuarios/departamento/${idUsuario}`,{
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -64,7 +65,7 @@ export default function EliminarUsuario() {
 
     try {
       setLoadingEliminar(id_usuario);
-      await axios.delete(`http://localhost:8000/api/usuarios/${id_usuario}`, {
+      await axios.delete(`${API_URL}/api/usuarios/${id_usuario}`,  {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsuarios(usuarios.filter((u) => u.id_usuario !== id_usuario));

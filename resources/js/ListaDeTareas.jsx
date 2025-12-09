@@ -124,7 +124,7 @@ function ListaDeTareasProyecto() {
     const [tareaExpandida, setTareaExpandida] = useState(null);
     const [nombreProyecto, setNombreProyecto] = useState("");
     const location = useLocation();
-
+ const API_URL = import.meta.env.VITE_API_URL;
     useEffect(() => {
         const cargarTareas = async () => {
             let idProyecto = location.state?.id_proyecto || sessionStorage.getItem("id_proyecto");
@@ -138,8 +138,8 @@ function ListaDeTareasProyecto() {
 
             setLoading(true);
             try {
-                const res = await fetch(
-                    `http://127.0.0.1:8000/api/proyectos/${idProyecto}/lista-tareas`,
+               const res = await fetch(
+  `${API_URL}/api/proyectos/${idProyecto}/lista-tareas`,
                     {
                         headers: {
                             "Content-Type": "application/json",

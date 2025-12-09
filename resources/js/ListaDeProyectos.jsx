@@ -17,6 +17,7 @@ function ListaDeProyectos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('fecha');
   const { volverSegunRol } = useRolNavigation();
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const formatFecha = (fecha) => {
     if (!fecha) return '';
@@ -66,7 +67,8 @@ function ListaDeProyectos() {
       }
 
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/proyectos/jefe?usuario=${idUsuario}`, {
+        const res = await fetch(
+  `${API_URL}/api/proyectos/jefe?usuario=${idUsuario}`,{
           headers: { 
             Authorization: `Bearer ${token}`,
             Accept: "application/json",

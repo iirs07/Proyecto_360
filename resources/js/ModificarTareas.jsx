@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/ModificarTareas.css";
-import { FaClock, FaSearch, FaTasks, FaCalendarAlt,  FaEdit} from "react-icons/fa";
+import { FaClock, FaSearch, FaTasks, FaCalendarAlt,  FaEdit,FaFilter} from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
@@ -15,16 +15,14 @@ import SelectDinamico from "../components/SelectDinamico";
 function ModificarTareas() {
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
-
+const API_URL = import.meta.env.VITE_API_URL;
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("alfabetico");
   const opciones = [
-  { value: "alfabetico", label: "Nombre (A-Z)" },
-  { value: "alfabetico_desc", label: "Nombre (Z-A)" },
-  { value: "fecha_proxima", label: "Fecha más próxima" },
-  { value: "fecha_lejana", label: "Fecha más lejana" },
+  { value: "alfabetico", label: "Orden alfabético (A-Z)" },
+  { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
 ];
 
   // --- 1. CARGA DE DATOS ---
@@ -40,7 +38,7 @@ function ModificarTareas() {
       }
 
       const res = await fetch(
-        `http://127.0.0.1:8000/api/tareasPorDepartamento?usuario=${usuario.id_usuario}`,
+  `${API_URL}/api/tareasPorDepartamento?usuario=${usuario.id_usuario}`,
         {
           headers: {
             Authorization: `Bearer ${token}`, 
@@ -107,41 +105,52 @@ function ModificarTareas() {
   <div className="contenedor-global">
     {/* Barra de búsqueda y select */}
     {proyectos.length > 0 && (
-      <div className="barra-busqueda-global-container mb-4">
-        <div className="barra-busqueda-global-wrapper">
-          <FaSearch className="barra-busqueda-global-icon" />
-          <input
-            type="text"
-            placeholder="Buscar proyectos o tareas..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className="barra-busqueda-global-input"
-          />
-          {busqueda && (
-            <button className="buscador-clear-global" onClick={() => setBusqueda("")}>
-              <FiX />
-            </button>
-          )}
-        </div>
-        {busqueda && (
-                <div className="buscador-verproyectos-resultados-info">
-                  {proyectos.length} resultado(s) para "{busqueda}"
-                </div>
-              )}
-        {proyectosFiltrados.length > 0 && (
-          <div style={{ marginTop: "10px" }}>
-            <SelectDinamico
-              opciones={opciones.map((o) => o.label)}
-              valor={opciones.find((o) => o.value === filtro)?.label}
-              setValor={(labelSeleccionado) => {
-                const opcion = opciones.find((o) => o.label === labelSeleccionado);
-                if (opcion) setFiltro(opcion.value);
-              }}
-              placeholder="Selecciona un filtro"
-            />
-          </div>
-        )}
-      </div>
+      <div className="tp-filtros-container mb-4">
+  <div className="tp-search-filter-wrapper">
+    {/* Input de búsqueda */}
+    <div className="tp-search-box">
+      <FaSearch className="tp-search-icon" />
+      <input
+        type="text"
+        placeholder="Buscar proyectos o tareas..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="tp-search-input"
+      />
+      {busqueda && (
+        <button
+          className="tp-search-clear-btn"
+          onClick={() => setBusqueda("")}
+          aria-label="Limpiar búsqueda"
+        >
+          <FiX />
+        </button>
+      )}
+    </div>
+
+    {/* Select de filtros */}
+    <div className="tp-filter-box">
+      <FaFilter className="tp-filter-icon" />
+      <SelectDinamico
+        opciones={opciones.map((o) => o.label)}
+        valor={opciones.find((o) => o.value === filtro)?.label}
+        setValor={(labelSeleccionado) => {
+          const opcion = opciones.find((o) => o.label === labelSeleccionado);
+          if (opcion) setFiltro(opcion.value);
+        }}
+      />
+    </div>
+  </div>
+
+  {/* Info de resultados */}
+  {(busqueda || filtro !== "alfabetico") && (
+    <div className="tp-search-results-info">
+      <span className="tp-results-count">{proyectosFiltrados.length}</span>{" "}
+      {proyectosFiltrados.length === 1 ? "resultado" : "resultados"} encontrado(s)
+    </div>
+  )}
+</div>
+
     )}
 
     {loading ? (
@@ -171,7 +180,7 @@ function ModificarTareas() {
         <div className="mt-info-item">
           <FaTasks className="mt-info-icon" />
           <span>
-            <strong>Tareas:</strong> {tareas.length}
+            <strong>Tareas: {tareas.length}</strong>
           </span>
         </div>
       </div>

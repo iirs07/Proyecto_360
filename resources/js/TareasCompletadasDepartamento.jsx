@@ -45,6 +45,7 @@ function TareasFinalizadas() {
     const [proyectos, setProyectos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [tareaExpandida, setTareaExpandida] = useState(null);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const { volverSegunRol } = useRolNavigation();
 
@@ -60,7 +61,7 @@ function TareasFinalizadas() {
                 }
 
                 const res = await fetch(
-                    `http://127.0.0.1:8000/api/tareasFinalizadas/departamento?usuario=${usuario.id_usuario}`,
+  `${API_URL}/api/tareasFinalizadas/departamento?usuario=${usuario.id_usuario}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

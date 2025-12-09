@@ -43,7 +43,7 @@ function NuevoProyecto() {
   const nombreProyectoRef = useRef(null);
   const descripcionProyectoRef = useRef(null);
   const menuRef = useRef(null);
-  
+  const API_URL = import.meta.env.VITE_API_URL;
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const [isOpen, setIsOpen] = useState(false);
@@ -155,7 +155,7 @@ function NuevoProyecto() {
 
     try {
         setLoading(true); 
-        const res = await fetch("http://127.0.0.1:8000/api/GuardarNuevoProyecto", {
+        const res = await fetch(`${API_URL}/api/GuardarNuevoProyecto`, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",

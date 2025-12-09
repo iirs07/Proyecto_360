@@ -94,6 +94,7 @@ function GestionProyectos() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const agregarTarea = (idProyecto, nombreProyecto) => {
     navigate("/agregarTareas", { state: { id_proyecto: idProyecto, nombre_proyecto: nombreProyecto } });
@@ -120,8 +121,8 @@ function GestionProyectos() {
         setLoading(true);
         const token = sessionStorage.getItem("jwt_token");
 
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/dashboard-departamento?usuario=${user.id_usuario}`,
+       const res = await fetch(
+  `${API_URL}/api/dashboard-departamento?usuario=${user.id_usuario}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

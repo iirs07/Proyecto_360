@@ -37,6 +37,7 @@ function ReportesTareasCompletadas() {
   const [cargando, setCargando] = useState(false);
   const [progreso, setProgreso] = useState(0);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
   
   // REFS PARA CANCELACIÓN
   const abortControllerRef = useRef(null);
@@ -92,7 +93,7 @@ function ReportesTareasCompletadas() {
       return;
     }
 
-    let url = `/generar-pdf-completadas-jefe?id_usuario=${usuario.id_usuario}&tipo=completadas`;
+    let url = `${API_URL}/generar-pdf-completadas-jefe?id_usuario=${usuario.id_usuario}&tipo=completadas`;
     if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split("T")[0]}`;
     if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split("T")[0]}`;
 

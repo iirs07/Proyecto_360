@@ -83,6 +83,7 @@ const calcularDiasRestantes = (fechaFin) => {
 
 function GestionProyectosUsuario() {
   const navigate = useNavigate();
+   const API_URL = import.meta.env.VITE_API_URL;
   const [proyectos, setProyectos] = useState([]);
   const [conteos, setConteos] = useState({
     completadas: 0,
@@ -106,9 +107,8 @@ function GestionProyectosUsuario() {
         setLoading(true);
         const token = sessionStorage.getItem("jwt_token");
 
-        // Ajusta la URL de tu API según corresponda
-        const res = await fetch(
-          `http://127.0.0.1:8000/api/usuario/tareas?usuario=${userData.id_usuario}`,
+       const res = await fetch(
+  `${API_URL}/api/usuario/tareas?usuario=${userData.id_usuario}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

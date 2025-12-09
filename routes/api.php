@@ -26,7 +26,7 @@ Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
     
-
+ Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
 
 Route::get('/departamentos', [DepartamentoController::class, 'index']);
 Route::get('/login', function () { return response()->json(['error' => 'No autenticado'], 401); })->name('login');
@@ -52,7 +52,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'GuardarNuevoProyecto']);
     Route::get('/GuardarNuevoProyecto', [NuevoProyectoController::class, 'index']); 
     Route::get('/proyectos/{id}/fechasProyecto', [NuevoProyectoController::class, 'fechasProyecto']);
-    Route::get('/departamentos/{id}/usuarios', [DepartamentoDirectorController::class, 'usuariosPorDepartamento']);
+   
 Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 'tareasPendientesUsuario']);
     Route::get('/CatalogoDepartamentos', [DepartamentoDirectorController::class, 'CatalogoDepartamentos']);
     Route::get('/proyectos/{idProyecto}/tareas-activas', [TareasDirectorController::class, 'tareasActivasPorProyecto']);
@@ -69,10 +69,11 @@ Route::get('tareasPendientes/departamento', [TareasDirectorController::class, 't
     Route::put('/tareas/{id}/completar', [TareasDirectorController::class, 'completarTarea']);
     Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
     Route::get('tareasCompletadas/jefe', [TareasDirectorController::class, 'tareasCompletadasDepartamento']);
-Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
+    Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
     Route::put('/tareas/{id}/cambiar-estatus-enproceso', [TareasDirectorController::class, 'cambiarStatusTareaEnProceso']);
     Route::get('/tareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
-    Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
+    Route::get('/agregar/tareas', [TareasDirectorController::class, 'AgregarTareasDepartamento']);
+    Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'EliminarTareasPorDepartamento']);
     Route::delete('EliminarTarea/{idTarea}', [TareasDirectorController::class, 'eliminarTarea']);
     Route::get('/tareas/{idTarea}', [TareasDirectorController::class, 'show']);
     Route::put('/tareas/{id}', [TareasDirectorController::class, 'update']);

@@ -21,6 +21,7 @@ function TareasenProceso() {
   const [modalOpen, setModalOpen] = useState(false);
   const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
    const { volverSegunRol } = useRolNavigation();
+   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
@@ -33,7 +34,7 @@ function TareasenProceso() {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
+  `${API_URL}/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
           {
             method: "GET",
             headers: {
@@ -69,8 +70,8 @@ function TareasenProceso() {
     setCargando(true);
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/proyectos/${idProyecto}/finalizar`,
+     const res = await fetch(
+  `${API_URL}/api/proyectos/${idProyecto}/finalizar`,
         {
           method: "PUT",
           headers: {

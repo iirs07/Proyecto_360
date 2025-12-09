@@ -295,19 +295,9 @@
   background:#861542 ;
   border: 1px solid #861542;
   border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+ 
 }
 
-.eliminar-btn-icon:hover {
-  background: linear-gradient(135deg, #c82333, #bd2130);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.eliminar-btn-icon:active {
-  transform: translateY(0);
-}
 
 /* ======= MEDIA QUERIES ======= */
 @media (min-width: 992px) {
