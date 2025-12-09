@@ -40,6 +40,9 @@ import Reporte from "./Reporte";
 import EliminarUsuario from "./ModificarUsuario";
 import ModificarUsuario from "./EliminarUsuario";
 import GenerarInvitaciones from './GenerarInvitaciones';
+import NuevoDepartamento from './NuevoDepartamento';
+import ListaDepartamento from './ListaDepartamento';
+import ModificarDepartamento from './ModificarDepartamento';
 
 function App() {
   return (
@@ -80,6 +83,12 @@ function App() {
           <Route path="/ListaDeProyectos" element={<ListaDeProyectos />} />
           <Route path="/TareasAsignadas" element={<TareasAsignadas />} />
           <Route path="/ReportesTareasCompletadas" element={<ReportesTareasCompletadas />} />
+
+          {/* INTERFACES PARA EL ROL DE UN ADMINISTRADOR*/}
+          <Route path="/NuevoDepartamento" element={<NuevoDepartamento />} />
+          <Route path="/ListaDepartamento" element={<ListaDepartamento />} />
+          <Route path="/ModificarDepartamento" element={<ModificarDepartamento />} />
+
           {/*DIRECTOR*/}
            <Route path="/GestionProyectos" element={<GestionProyectos />} />
            <Route path="/NuevoProyecto" element={<NuevoProyecto />} />

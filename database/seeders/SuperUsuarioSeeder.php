@@ -26,7 +26,7 @@ class SuperUsuarioSeeder extends Seeder
             'id_usuario_login' => $superId,  // <- CORRECTO
             'correo' => 'ramossantiagoitzelivonne@gmail.com',
             'contrasena' => bcrypt('12345678'),
-            'rol' => 'Superusuario',
+            'rol' => 'Administrador',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

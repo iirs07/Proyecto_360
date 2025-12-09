@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react'; // 👈 Importamos useRef
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/Login1.css';
 import logo1 from '../imagenes/logo1.png';
 import logo2 from '../imagenes/logo4.png';
 import logo3 from '../imagenes/logo3.png';
 
+// USO DE .ENV
+const API_URL = import.meta.env.VITE_API_URL;
+
 function RegistroPaso2() {
   const location = useLocation();
   const navigate = useNavigate();
   const { correo, password, token: tokenInvitacion } = location.state || {};
 
-  // 1. Crear referencias para todos los inputs y el botón
   const nombreRef = useRef(null);
   const apPaternoRef = useRef(null);
   const apMaternoRef = useRef(null);
@@ -20,10 +22,8 @@ function RegistroPaso2() {
 
   useEffect(() => {
     if (!correo || !password || !tokenInvitacion) {
-      alert('Debes completar primero el Paso 1');
       navigate(`/RegistroPaso1/${tokenInvitacion || ''}`);
     }
-    // Opcional: enfocar el primer campo cuando el componente se carga
     nombreRef.current?.focus();
   }, [correo, password, tokenInvitacion, navigate]);
 
@@ -41,23 +41,18 @@ function RegistroPaso2() {
   const [errorToken, setErrorToken] = useState('');
   const [errorGeneral, setErrorGeneral] = useState('');
 
-  // Función para mostrar errores temporalmente
   const mostrarErrorTemporal = (setError, mensaje, tiempo = 3000) => {
     setError(mensaje);
     setTimeout(() => setError(''), tiempo);
   };
 
-  // Función para validar y formatear nombres/apellidos
   const validarTexto = (texto) => texto.toUpperCase().replace(/[^A-ZÁÉÍÓÚÜÑ\s]/g, '');
-
-  // Función para validar teléfono
   const validarTelefono = (texto) => texto.replace(/\D/g, '').slice(0, 10);
 
   const handleRegistroFinal = async (e) => {
-    e && e.preventDefault(); // Asegúrate de prevenir el comportamiento por defecto si se llama desde un evento
+    e?.preventDefault();
     let hasError = false;
 
-    // Limpiar errores previos
     setErrorNombre('');
     setErrorApellidoP('');
     setErrorApellidoM('');
@@ -65,13 +60,13 @@ function RegistroPaso2() {
     setErrorToken('');
     setErrorGeneral('');
 
-    if (!nombre) { mostrarErrorTemporal(setErrorNombre, '❌ Ingresa tu nombre'); hasError = true; }
-    if (!apellidoPaterno) { mostrarErrorTemporal(setErrorApellidoP, '❌ Ingresa tu apellido paterno'); hasError = true; }
-    if (!apellidoMaterno) { mostrarErrorTemporal(setErrorApellidoM, '❌ Ingresa tu apellido materno'); hasError = true; }
-    if (!telefono) { mostrarErrorTemporal(setErrorTelefono, '❌ Ingresa tu teléfono'); hasError = true; }
-    if (!tokenVerificacion) { mostrarErrorTemporal(setErrorToken, '❌ Ingresa el token'); hasError = true; }
+    if (!nombre) { mostrarErrorTemporal(setErrorNombre, 'Ingresa tu nombre'); hasError = true; }
+    if (!apellidoPaterno) { mostrarErrorTemporal(setErrorApellidoP, 'Ingresa tu apellido paterno'); hasError = true; }
+    if (!apellidoMaterno) { mostrarErrorTemporal(setErrorApellidoM, 'Ingresa tu apellido materno'); hasError = true; }
+    if (!telefono) { mostrarErrorTemporal(setErrorTelefono, 'Ingresa tu teléfono'); hasError = true; }
+    if (!tokenVerificacion) { mostrarErrorTemporal(setErrorToken, 'Ingresa el token'); hasError = true; }
     else if (!/^[A-Za-z0-9]{8}$/.test(tokenVerificacion.trim())) {
-      mostrarErrorTemporal(setErrorToken, '❌ El token debe tener 8 caracteres alfanuméricos');
+      mostrarErrorTemporal(setErrorToken, 'El token debe tener 8 caracteres alfanuméricos');
       hasError = true;
     }
 
@@ -79,7 +74,7 @@ function RegistroPaso2() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/RegistroPaso2/invitado', {
+      const res = await fetch(`${API_URL}/api/RegistroPaso2/invitado`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
@@ -93,28 +88,28 @@ function RegistroPaso2() {
           token_invitacion: tokenInvitacion,
         }),
       });
+
       const data = await res.json();
-      if (!res.ok) { mostrarErrorTemporal(setErrorGeneral, data.message || '❌ Error desconocido'); setLoading(false); return; }
+      if (!res.ok) {
+        mostrarErrorTemporal(setErrorGeneral, data.message || 'Error desconocido');
+        setLoading(false);
+        return;
+      }
 
       setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       console.error('Error de conexión:', error);
-      mostrarErrorTemporal(setErrorGeneral, '❌ Error de conexión con el servidor');
-    } finally { setLoading(false); }
+      mostrarErrorTemporal(setErrorGeneral, 'Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 2. Manejador para la tecla Enter
   const handleKeyDown = (event, nextRef) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Evita el envío por defecto
-
-      if (nextRef && nextRef.current) {
-        // Si hay una referencia siguiente, mueve el foco
-        nextRef.current.focus();
-      } else {
-        // Si no hay referencia siguiente (estamos en el último campo), envía
-        handleRegistroFinal();
-      }
+      event.preventDefault();
+      if (nextRef?.current) nextRef.current.focus();
+      else handleRegistroFinal();
     }
   };
 
@@ -134,7 +129,6 @@ function RegistroPaso2() {
           <input type="text" value={correo || ''} className="login-input" disabled />
         </div>
 
-        {/* Nombre(s) -> Siguiente: Apellido Paterno */}
         <div className="login-campo">
           <label>Nombre(s):</label>
           <input
@@ -144,13 +138,12 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setNombre(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu nombre"
             className="login-input"
-            ref={nombreRef} // 3. Asignar referencia
-            onKeyDown={(e) => handleKeyDown(e, apPaternoRef)} // 4. Mover a Apellido Paterno
+            ref={nombreRef}
+            onKeyDown={(e) => handleKeyDown(e, apPaternoRef)}
           />
           {errorNombre && <div className="login-error-msg">{errorNombre}</div>}
         </div>
 
-        {/* Apellido Paterno -> Siguiente: Apellido Materno */}
         <div className="login-campo">
           <label>Apellido Paterno:</label>
           <input
@@ -160,13 +153,12 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setApellidoPaterno(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu apellido paterno"
             className="login-input"
-            ref={apPaternoRef} // 3. Asignar referencia
-            onKeyDown={(e) => handleKeyDown(e, apMaternoRef)} // 4. Mover a Apellido Materno
+            ref={apPaternoRef}
+            onKeyDown={(e) => handleKeyDown(e, apMaternoRef)}
           />
           {errorApellidoP && <div className="login-error-msg">{errorApellidoP}</div>}
         </div>
 
-        {/* Apellido Materno -> Siguiente: Teléfono */}
         <div className="login-campo">
           <label>Apellido Materno:</label>
           <input
@@ -176,13 +168,12 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setApellidoMaterno(validarTexto(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu apellido materno"
             className="login-input"
-            ref={apMaternoRef} // 3. Asignar referencia
-            onKeyDown={(e) => handleKeyDown(e, telefonoRef)} // 4. Mover a Teléfono
+            ref={apMaternoRef}
+            onKeyDown={(e) => handleKeyDown(e, telefonoRef)}
           />
           {errorApellidoM && <div className="login-error-msg">{errorApellidoM}</div>}
         </div>
 
-        {/* Teléfono -> Siguiente: Token de verificación */}
         <div className="login-campo">
           <label>Teléfono:</label>
           <input
@@ -192,13 +183,12 @@ function RegistroPaso2() {
             onPaste={(e) => { e.preventDefault(); setTelefono(validarTelefono(e.clipboardData.getData('text'))); }}
             placeholder="Ingresa tu teléfono (10 dígitos)"
             className="login-input"
-            ref={telefonoRef} // 3. Asignar referencia
-            onKeyDown={(e) => handleKeyDown(e, tokenRef)} // 4. Mover a Token
+            ref={telefonoRef}
+            onKeyDown={(e) => handleKeyDown(e, tokenRef)}
           />
           {errorTelefono && <div className="login-error-msg">{errorTelefono}</div>}
         </div>
 
-        {/* Token de verificación -> Siguiente: Enviar (handleRegistroFinal) */}
         <div className="login-campo">
           <label>Token de verificación (8 dígitos):</label>
           <input
@@ -209,8 +199,8 @@ function RegistroPaso2() {
             maxLength={8}
             placeholder="Ingresa el token recibido por correo"
             className="login-input"
-            ref={tokenRef} // 3. Asignar referencia
-            onKeyDown={(e) => handleKeyDown(e, botonFinalRef)} // 4. Mover a Enviar (Llamará handleRegistroFinal)
+            ref={tokenRef}
+            onKeyDown={(e) => handleKeyDown(e, botonFinalRef)}
           />
           {errorToken && <div className="login-error-msg">{errorToken}</div>}
         </div>
@@ -223,7 +213,7 @@ function RegistroPaso2() {
             className="login-button" 
             onClick={handleRegistroFinal} 
             disabled={loading}
-            ref={botonFinalRef} // 3. Asignar referencia al botón
+            ref={botonFinalRef}
           >
             {loading ? <div className="spinner"></div> : 'COMPLETAR REGISTRO'}
           </button>
