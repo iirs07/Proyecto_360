@@ -3,7 +3,13 @@ import React, { useState } from "react";
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, FaLayerGroup,
-  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt,
+  FaBuilding,FaSitemap,         // Estructura organizacional
+  FaUserFriends,     // Grupo de usuarios (para asignar)
+  FaListAlt,         // Para listar
+  FaCity,            // Para organizaciones grandes
+  FaNetworkWired,    // Para estructuras
+  FaObjectGroup      // Para grupos
 } from "react-icons/fa";
 
 import { FiUsers } from "react-icons/fi";
@@ -46,14 +52,14 @@ export default function MenuDinamico({
             principal: [
                 { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'reportes', label: 'Reportes', icon: FaFileAlt, path: '/ReporteSuperUsuario' },
-                { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
+                { key: 'logout', label: 'Cerrar sesión', icon: FaSignOutAlt, action: onLogout },
             ],
 
             departamento: [
                 { key: 'inicio', label: 'Inicio', icon: FaHome, path: '/PrincipalSuperusuario' },
                 { key: 'proceso', label: 'Proyectos en proceso', icon: FaTasks, path: slug ? `/proyectosenproceso/${slug}` : '#' },
                 { key: 'finalizados', label: 'Proyectos finalizados', icon: FaProjectDiagram, path: slug ? `/proyectoscompletados/${slug}` : '#' },
-                { key: 'logout', label: 'Cerrar sesión', icon: FaUsers, action: onLogout },
+                { key: 'logout', label: 'Cerrar sesión', icon: FaSignOutAlt, action: onLogout },
             ],
         },
 
@@ -97,11 +103,21 @@ export default function MenuDinamico({
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                     ],
                 },
+                {
+                    key: 'departamentos',
+                    label: "Departamentos",
+                    icon: FaBuilding,
+                    subMenu: [
+                        { key: 'nuevodepartamento', label: "Nuevo Área / departamento", path: "/NuevoDepartamento", icon: FaPlus },
+                        { key: 'modificardepartamento', label: "Modificar Área / departamento", path: "/ModificarDepartamento", icon: FaEdit },
+                    ],
+                },
 
                 { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
                 { key: 'logout', label: "CERRAR SESIÓN", path: "/login", icon: FaSignOutAlt, action: onLogout },
             ]
         },
+        
 
 
         Jefe: {
@@ -140,7 +156,7 @@ export default function MenuDinamico({
                     label: "Usuarios",
                     icon: FiUsers,
                     subMenu: [
-                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
+                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitaciones", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                     ],
                 },
@@ -277,7 +293,6 @@ export default function MenuDinamico({
             );
         });
     };
-
 
     return (
         <ul className={`menu-dinamico-list ${collapsed ? 'collapsed' : ''}`}>

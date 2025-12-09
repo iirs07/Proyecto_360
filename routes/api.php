@@ -16,6 +16,7 @@ use App\Http\Controllers\NuevoProyectoController;
 use App\Http\Controllers\DirectorController;
 use App\Http\Controllers\TareasDirectorController;
 use App\Http\Controllers\DepartamentoDirectorController;
+use App\Http\Controllers\NuevoDepartamentoController;
 
 /* 1. Rutas Públicas (Contenido sin necesidad de autenticación) */
 // Invitaciones y Registro
@@ -26,10 +27,18 @@ Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
 
-
+//ADMINISTRADOR
+    Route::prefix('departamentos')->group(function () {
+        Route::get('/', [NuevoDepartamentoController::class, 'listar']);
+        Route::get('/areas', [NuevoDepartamentoController::class, 'listarAreas']);
+        Route::get('/areas-con-departamentos', [NuevoDepartamentoController::class, 'listarAreasConDepartamentos']);
+        Route::post('/areas/crear', [NuevoDepartamentoController::class, 'crearArea']);
+        Route::post('/gestion', [NuevoDepartamentoController::class, 'departamentos']);
+    });
 
 Route::get('/departamentos', [DepartamentoController::class, 'index']);
 Route::get('/login', function () { return response()->json(['error' => 'No autenticado'], 401); })->name('login');
+
 
 /* 2. Rutas Protegidas por JWT (Requieren un token de acceso) */
 Route::middleware(['jwt.auth'])->group(function () {
@@ -46,6 +55,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::post('/evidencias', [JefeController::class, 'subirEvidencia']);
     Route::get('/usuario/tareas', [JefeController::class, 'tareasPorUsuario']);
     Route::get('generar-pdf-completadas-jefe', [JefeController::class, 'generarReporteCompletadas']);
+
     
     //DIRECTOR
     Route::get('/dashboard-departamento', [TareasDirectorController::class, 'dashboardDepartamento']);
