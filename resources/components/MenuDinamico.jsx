@@ -95,6 +95,7 @@ export default function MenuDinamico({
                     subMenu: [
                         { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
+                         { key: 'ModificarUsuario', label: "Modificar usuarios", path: "/ModificarUsuario", icon: FaUserMinus },
                     ],
                 },
 

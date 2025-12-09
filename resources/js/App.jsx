@@ -37,7 +37,8 @@ import ModificarTareas from "./ModificarTareas";
 import EliminarTareas from "./EliminarTareas";
 import EditarTareas from "./EditarTareas";
 import Reporte from "./Reporte";
-import EliminarUsuario from "./EliminarUsuario";
+import EliminarUsuario from "./ModificarUsuario";
+import ModificarUsuario from "./EliminarUsuario";
 import GenerarInvitaciones from './GenerarInvitaciones';
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <Route path="/GenerarInvitacion" element={<GenerarInvitacion />} />
         <Route path="/GenerarInvitaciones" element={<GenerarInvitaciones />} />
         <Route path="/RegistroPaso1/:token" element={<RegistroPaso1 />} />
+         <Route path="/ModificarUsuario" element={<ModificarUsuario />} />
 
 
         {/* =======================================================
@@ -98,6 +100,7 @@ function App() {
            <Route path="/EditarTareas" element={<EditarTareas />} />
            <Route path="/Reporte" element={<Reporte />} />
            <Route path="/EliminarUsuario" element={<EliminarUsuario />} />
+          
 
         </Route>
 

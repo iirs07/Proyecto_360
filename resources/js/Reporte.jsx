@@ -56,7 +56,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     { value: "mesAnio", label: "Por Mes y Año" }
   ];
 
-  // ... (CalendarButton se mantiene igual) ...
+  
   const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
     <button
       type="button"
@@ -219,28 +219,31 @@ const API_URL = import.meta.env.VITE_API_URL;
     const usuario = JSON.parse(sessionStorage.getItem('usuario'));
     
     const tiposReporteUrl = reporteSeleccionado; 
-    let url = `${API_URL}/generar-pdf?tipos=${tiposReporteUrl}`;
+let url = `${API_URL}/generar-pdf?tipos=${tiposReporteUrl}&id_usuario=${usuario.id_usuario}`;
+
 
     
-    if (usuario) {
-      url += `&nombre=${encodeURIComponent(usuario.nombre)}&a_paterno=${encodeURIComponent(usuario.a_paterno)}&a_materno=${encodeURIComponent(usuario.a_materno)}`;
-      url += `&id_departamento=${usuario.id_departamento}`;
-    }
-
     // AGREGAR PARÁMETROS DE TIEMPO
-    if (metodoFiltrado === 'mesAnio') {
-      url += `&mes=${mesSeleccionado + 1}&anio=${anioSeleccionado}`;
-    } 
-    else if (metodoFiltrado === 'rango') {
-      const requiereRango = ['vencidas', 'completadas', 'modificaciones'].includes(reporteSeleccionado);
-      
-      if (requiereRango && fechaInicio) { 
-        url += `&fechaInicio=${fechaInicio.toISOString().split('T')[0]}`;
-      }
-      if (fechaFin) {
-        url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
-      }
-    }
+if (metodoFiltrado === 'mesAnio') {
+    url += `&mes=${mesSeleccionado + 1}&anio=${anioSeleccionado}`;
+} 
+else if (metodoFiltrado === 'rango') {
+
+   
+    const requiereRango = ['vencidas', 'completadas', 'modificaciones', 'proximas']
+        .includes(reporteSeleccionado);
+
+    if (requiereRango && fechaInicio) { 
+        url += `&fechaInicio=${fechaInicio.toISOString().split('T')[0]}`;
+    }
+
+    if (fechaFin) {
+        url += `&fechaFin=${fechaFin.toISOString().split('T')[0]}`;
+    }
+}
+
+console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", anioSeleccionado);
+
 
     console.log("URL de solicitud:", url);
 
@@ -523,7 +526,7 @@ const API_URL = import.meta.env.VITE_API_URL;
               
               <button 
                 type="button"
-                className="btn btn-primary btn-md-custom px-4 py-2" 
+              className="btn btn-md-custom mi-boton"
                 onClick={generarPDF}
                 disabled={cargando || !reporteSeleccionado || metodoFiltrado === 'ninguno'}
                 onMouseEnter={() => setBotonHover(true)}
