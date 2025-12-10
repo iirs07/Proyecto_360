@@ -26,17 +26,18 @@
 </div>
 
 <div class="rd-contenido-principal">
-    <h2>
-        Reporte de Historial de Modificaciones
-        <br>
-        @if(!empty($inicio) && !empty($fin))
-            <span style="font-size: 14px; color: #000; font-weight: bold;">
-                del {{ \Carbon\Carbon::parse($inicio)->format('d/m/Y') }} 
-                al {{ \Carbon\Carbon::parse($fin)->format('d/m/Y') }}
-            </span>
-        @endif
-    </h2>
+   <h2>
+    Reporte de Historial de Modificaciones
+    <br>
+    @if(!empty($inicio) && !empty($fin))
+        <span style="font-size: 14px; color: #000; font-weight: bold;">
+            del {{ \Carbon\Carbon::parse($inicio)->format('d/m/Y') }} 
+            al {{ \Carbon\Carbon::parse($fin)->format('d/m/Y') }}
+        </span>
+    @endif
+</h2>
 
+@if($movimientos->isNotEmpty())
     <table>
         <thead>
             <tr>
@@ -50,50 +51,28 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($movimientos as $mov)
+            @foreach($movimientos as $mov)
                 <tr>
-                    <td>
-                        {{ \Carbon\Carbon::parse($mov->created_at)->format('d/m/Y') }}
-                    </td>
-
-                    <td>
-                        {{ \Carbon\Carbon::parse($mov->created_at)->format('h:i A') }}
-                    </td>
-
-                    <td>
-            
-                        {!! strtoupper($mov->usuario_nombre . ' ' . $mov->a_paterno . ' ' . ($mov->a_materno ?? '')) !!}
-                    </td>
-
-                    <td style="text-align: left;">
-                        {!! strtoupper($mov->proyecto) !!}
-                    </td>
-
+                    <td>{{ \Carbon\Carbon::parse($mov->created_at)->format('d/m/Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($mov->created_at)->format('h:i A') }}</td>
+                    <td>{!! strtoupper($mov->usuario_nombre . ' ' . $mov->a_paterno . ' ' . ($mov->a_materno ?? '')) !!}</td>
+                    <td style="text-align: left;">{!! strtoupper($mov->proyecto) !!}</td>
                     <td style="text-align: left;">
                         @if($mov->tarea)
                             {!! strtoupper($mov->tarea) !!}
                         @else
-                            <span >NO APLICA</span>
+                            <span>NO APLICA</span>
                         @endif
                     </td>
-
-                    <td>
-                       
-                            {!! strtoupper($mov->accion) !!}
-                     
-                    </td>
-
-                    <td style="text-align: justify;">
-                        {!! strtoupper($mov->detalles) !!}
-                    </td>
+                    <td>{!! strtoupper($mov->accion) !!}</td>
+                    <td style="text-align: justify;">{!! strtoupper($mov->detalles) !!}</td>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 20px;">
-                        No se encontraron registros de modificaciones en este periodo.
-                    </td>
-                </tr>
-            @endforelse
+            @endforeach
         </tbody>
     </table>
-</div>
+@else
+    <div style="text-align: center; padding: 20px;">
+        <p style="font-size: 16px; font-weight: bold; color: #000;">
+        No se encontraron registros de modificaciones en este periodo.
+    </div>
+@endif

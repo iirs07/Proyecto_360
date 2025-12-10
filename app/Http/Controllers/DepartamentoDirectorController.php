@@ -62,6 +62,31 @@ public function usuariosDeDepartamento($id_usuario)
 }
 
 
+public function obtenerUsuario($id_usuario)
+{
+    // Buscar usuario con join a c_usuario para traer nombres
+    $usuario = DB::table('usuario')
+        ->join('c_usuario', 'usuario.id_usuario', '=', 'c_usuario.id_usuario')
+        ->select(
+            'usuario.id_usuario',
+            'usuario.rol',
+            'usuario.correo',
+            'c_usuario.u_nombre',
+            'c_usuario.a_paterno',
+            'c_usuario.a_materno',
+            'c_usuario.telefono'
+        )
+        ->where('usuario.id_usuario', $id_usuario)
+        ->first();
+
+    if (!$usuario) {
+        return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
+    }
+
+    return response()->json($usuario);
+}
+
+
 
 public function eliminarUsuario($id_usuario)
 {
@@ -85,6 +110,34 @@ public function eliminarUsuario($id_usuario)
     }
 }
 
+public function actualizarCorreo(Request $request, $id_usuario)
+{
+    // Validar que el correo sea obligatorio y tenga formato válido
+    $request->validate([
+        'correo' => 'required|email|unique:usuario,correo,' . $id_usuario,
+    ]);
+
+    // Buscar al usuario
+    $usuario = DB::table('usuario')->where('id_usuario', $id_usuario)->first();
+    if (!$usuario) {
+        return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
+    }
+
+    try {
+        // Actualizar el correo
+        DB::table('usuario')->where('id_usuario', $id_usuario)->update([
+            'correo' => $request->correo,
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['mensaje' => 'Correo actualizado correctamente']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'mensaje' => 'Error al actualizar correo',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 
 

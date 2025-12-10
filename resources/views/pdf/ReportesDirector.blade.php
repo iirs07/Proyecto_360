@@ -15,7 +15,7 @@
 </div>
 
         <div class="rd-subtitulo">Fecha: {!! $hoy ?? '' !!} | Hora: {!! $hora ?? '' !!}</div>
-        <div class="rd-subtitulo">
+      <div class="rd-subtitulo">
     Reporte generado por:
     {{ ucwords(strtolower($usuario['nombre'] ?? '')) }}
     {{ ucwords(strtolower($usuario['a_paterno'] ?? '')) }}
@@ -29,27 +29,38 @@
 
 <div class="rd-contenido-principal">
     <h2>
-        @if($tipo === 'vencidas')
-            Reporte de Tareas Vencidas
-        @elseif($tipo === 'proximas')
-            Reporte de Tareas Próximas a Vencer
-        @elseif($tipo === 'completadas')
-            Reporte de Tareas Completadas
-        @else
-            Reporte de Tareas
-        @endif
+    @if($tipo === 'vencidas')
+        Reporte de Tareas Vencidas
+    @elseif($tipo === 'proximas')
+        Reporte de Tareas Próximas a Vencer
+    @elseif($tipo === 'completadas')
+        Reporte de Tareas Completadas
+    @else
+        Reporte de Tareas
+    @endif
 
-        @if(!empty($inicio) && !empty($fin))
-            del {!! $inicio !!} al {!! $fin !!}
-        @elseif(!empty($fin))
-            hasta {!! $fin !!}
-        @elseif(!empty($inicio))
-            desde {!! $inicio !!}
-        @endif
-    </h2>
+    @if(!empty($inicio) && !empty($fin))
+        <br>
+        <span style="font-size: 14px; color: #000; font-weight: bold;">
+            del {{ \Carbon\Carbon::parse($inicio)->format('d/m/Y') }} 
+            al {{ \Carbon\Carbon::parse($fin)->format('d/m/Y') }}
+        </span>
+    @elseif(!empty($fin))
+        <br>
+        <span style="font-size: 14px; color: #000; font-weight: bold;">
+            hasta {{ \Carbon\Carbon::parse($fin)->format('d/m/Y') }}
+        </span>
+    @elseif(!empty($inicio))
+        <br>
+        <span style="font-size: 14px; color: #000; font-weight: bold;">
+            desde {{ \Carbon\Carbon::parse($inicio)->format('d/m/Y') }}
+        </span>
+    @endif
+</h2>
+
 
     @if($tareas->isEmpty())
-        <div style="text-align: center; margin-top: 50px; padding: 20px;">
+       <div style="text-align: center; padding: 20px;">
             <p style="font-size: 16px; font-weight: bold; color: #000;">
                 No se encontraron tareas que coincidan con los criterios de filtro seleccionados.
             </p>

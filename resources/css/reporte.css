@@ -47,28 +47,30 @@
     position: relative;
 }
 
-.btn-secondary.btn-sm-custom,
-.btn-primary.btn-sm-custom {
-    font-size: 1rem; /* Tamaño de fuente estándar */
-    padding: 0.5rem 1.5rem; /* Padding más compacto */
-    font-weight: 600;
+.mi-boton {
+  background-color: #861542;
+  color: #fff; /* texto blanco */
+  border: 2px solid #861542;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
 }
 
-.btn-primary.btn-sm-custom {
-    background-color: #861542;
-    border-color: #861542;
-    transition: all 0.2s ease-in-out;
+.mi-boton:hover:not(:disabled) {
+  background-color: #a0195c;
+  border-color: #a0195c;
+  color: #fff; 
 }
 
-.btn-primary.btn-sm-custom:hover:not(:disabled) {
-    background-color: #861542; /* Color de hover */
-    border-color: #861542;
+.mi-boton:active,
+.mi-boton:focus {
+  background-color: #861542; /* color de fondo al hacer clic */
+  border-color: #861542;     /* borde consistente */
+  color: #fff;               /* texto blanco */
+  outline: none;             /* opcional, quita el borde de enfoque predeterminado */
 }
 
-
-.btn-calendario:hover {
-    border-color: #861542;
-}
 
 /* ==========================
     BARRA DE PROGRESO
@@ -90,7 +92,7 @@
 }
 
 .reportes-d-progress-bar {
-    background: linear-gradient(90deg, #861542, #a75877);
+    background: linear-gradient(90deg, #861542, #9b184c);
     border-radius: 10px;
     transition: width 0.3s ease;
     height: 100%; 
