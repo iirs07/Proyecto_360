@@ -43,6 +43,7 @@ import GenerarInvitaciones from './GenerarInvitaciones';
 import NuevoDepartamento from './NuevoDepartamento';
 import ListaDepartamento from './ListaDepartamento';
 import ModificarDepartamento from './ModificarDepartamento';
+import Admin from './Admin';
 
 function App() {
   return (
@@ -88,6 +89,8 @@ function App() {
           <Route path="/NuevoDepartamento" element={<NuevoDepartamento />} />
           <Route path="/ListaDepartamento" element={<ListaDepartamento />} />
           <Route path="/ModificarDepartamento" element={<ModificarDepartamento />} />
+          <Route path="/Admin" element={<Admin />} />
+
 
           {/*DIRECTOR*/}
            <Route path="/GestionProyectos" element={<GestionProyectos />} />

@@ -125,7 +125,7 @@ function Login() {
       const rol = data.usuario.rol;
       switch (rol) {
         case "Administrador":
-          navigate("/GestionProyectos");
+          navigate("/Admin");
           break;
         case "Jefe":
           navigate("/GestionProyectos");

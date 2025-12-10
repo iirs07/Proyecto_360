@@ -65,35 +65,7 @@ export default function MenuDinamico({
 
         Administrador: {
             principal: [
-                { key: 'GestionProyectos', label: 'INICIO', icon: FaHome, path: '/GestionProyectos' },
-
-                {
-                    key: 'proyectos',
-                    label: "PROYECTOS",
-                    icon: FaFolder,
-                    subMenu: [
-                        { key: 'Nuevo proyecto', label: "Nuevo Proyecto", path: "/Nuevoproyecto", icon: FaPlus },
-                        { key: 'ver', label: "Ver Proyectos", path: "/ListaProyectos", icon: FaEye },
-                        { key: 'modificar', label: "Proyectos por modificar", path: "/ProyectosPorModificar", icon: FaEdit },
-                        { key: 'desbloquear', label: "Cambiar estatus del proyecto", path: "/DesbloquearProyectos", icon: FaToggleOn },
-                        { key: 'eliminar', label: "Eliminar Proyectos", path: "/EliminarProyectos", icon: FaTrash },
-                    ],
-                },
-
-                {
-                    key: 'tareas',
-                    label: "TAREAS",
-                    icon: FaTasks,
-                    subMenu: [
-                        { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
-                        { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
-                        { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
-                        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
-                        { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
-                        { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
-                    ],
-                },
-
+                { key: 'Admin', label: 'Inicio', icon: FaHome, path: '/Admin' },
                 {
                     key: 'usuarios',
                     label: "Usuarios",
@@ -104,7 +76,7 @@ export default function MenuDinamico({
                          { key: 'ModificarUsuario', label: "Modificar usuarios", path: "/ModificarUsuario", icon: FaUserMinus },
                     ],
                 },
-                {
+                {    
                     key: 'departamentos',
                     label: "Departamentos",
                     icon: FaBuilding,
@@ -114,7 +86,6 @@ export default function MenuDinamico({
                     ],
                 },
 
-                { key: 'reportes', label: "REPORTES", path: "/reporte", icon: FaFileAlt },
                 { key: 'logout', label: "CERRAR SESIÓN", path: "/login", icon: FaSignOutAlt, action: onLogout },
             ]
         },

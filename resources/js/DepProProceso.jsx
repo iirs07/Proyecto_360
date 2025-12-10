@@ -214,7 +214,7 @@ export default function DepProProceso() {
                                     {proyectosOrdenados.length}
                                 </span>
                                 <span className="conteo-label">
-                                    EN PROCESO
+                                    TOTAL
                                 </span>
                             </div>
                         </div>
@@ -322,6 +322,20 @@ export default function DepProProceso() {
                             // IMPORTANTE: El data-estado debe ser "En proceso" (con minúscula 'p') para que coincida con el CSS
                             const dataEstado = "En proceso";
                             
+                            // FUNCIÓN DE NAVEGACIÓN
+                            const handleNavigateToProject = () => {
+                                navigate(`/proyecto/${slugProyecto}`, {
+                                    state: {
+                                        idProyecto: proyecto.id_proyecto,
+                                        nombreProyecto: proyecto.p_nombre,
+                                        descripcionProyecto: proyecto.descripcion,
+                                        porcentaje: porcentaje,
+                                        totalTareas: proyecto.total_tareas,
+                                        tareasCompletadas: proyecto.tareas_completadas,
+                                    },
+                                });
+                            };
+
                             return (
                                 <div 
                                     key={proyecto.id_proyecto} 
@@ -332,18 +346,6 @@ export default function DepProProceso() {
                                         zIndex: 10 + index,
                                         animationDelay: `${index * 0.1}s` 
                                     }}
-                                    onClick={() =>
-                                        navigate(`/proyecto/${slugProyecto}`, {
-                                            state: {
-                                                idProyecto: proyecto.id_proyecto,
-                                                nombreProyecto: proyecto.p_nombre,
-                                                descripcionProyecto: proyecto.descripcion,
-                                                porcentaje: porcentaje,
-                                                totalTareas: proyecto.total_tareas,
-                                                tareasCompletadas: proyecto.tareas_completadas,
-                                            },
-                                        })
-                                    }
                                 >
                                     {/* HEADER DEL PROYECTO */}
                                     <div className="proyecto-enprogreso-header">
@@ -400,7 +402,11 @@ export default function DepProProceso() {
                                     {/* COMPONENTE DE PROGRESO */}
                                     <div className="proyecto-proceso-progreso-container">
                                         {proyecto.total_tareas > 0 ? (
-                                            <div className="proyecto-proceso-progreso">
+                                            <div 
+                                                className="proyecto-proceso-progreso"
+                                                onClick={handleNavigateToProject}
+                                                style={{ cursor: 'pointer' }} 
+                                            >
                                                 <ProgresoProyecto
                                                     progresoInicial={porcentaje}
                                                     tareasTotales={proyecto.total_tareas}

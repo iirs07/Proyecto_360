@@ -198,7 +198,7 @@ export default function DepProCompletados() {
                                     {proyectosOrdenados.length}
                                 </span>
                                 <span className="conteo-label">
-                                    FINALIZADOS
+                                    TOTAL
                                 </span>
                             </div>
                         </div>
@@ -302,6 +302,20 @@ export default function DepProCompletados() {
                             const porcentaje = proyecto.porcentaje || 0;
                             const progressClass = getColorClassByProgress(porcentaje);
                             
+                            // FUNCIÓN DE NAVEGACIÓN
+                            const handleNavigateToProject = () => {
+                                navigate(`/proyecto/${slugProyecto}`, {
+                                    state: {
+                                        idProyecto: proyecto.id_proyecto,
+                                        nombreProyecto: proyecto.p_nombre,
+                                        descripcionProyecto: proyecto.descripcion,
+                                        porcentaje: porcentaje,
+                                        totalTareas: proyecto.total_tareas,
+                                        tareasCompletadas: proyecto.tareas_completadas,
+                                    },
+                                });
+                            };
+                            
                             return (
                                 <div 
                                     key={proyecto.id_proyecto} 
@@ -312,18 +326,6 @@ export default function DepProCompletados() {
                                         zIndex: 10 + index,
                                         animationDelay: `${index * 0.1}s` 
                                     }}
-                                    onClick={() =>
-                                        navigate(`/proyecto/${slugProyecto}`, {
-                                            state: {
-                                                idProyecto: proyecto.id_proyecto,
-                                                nombreProyecto: proyecto.p_nombre,
-                                                descripcionProyecto: proyecto.descripcion,
-                                                porcentaje: porcentaje,
-                                                totalTareas: proyecto.total_tareas,
-                                                tareasCompletadas: proyecto.tareas_completadas,
-                                            },
-                                        })
-                                    }
                                 >
                                     {/* HEADER DEL PROYECTO */}
                                     <div className="proyecto-completado-header">
@@ -371,10 +373,14 @@ export default function DepProCompletados() {
                                         </div>
                                     </div>
 
-                                    {/* COMPONENTE DE PROGRESO */}
+                                    {/* COMPONENTE DE PROGRESO - AÑADIMOS EL ONCLICK AQUÍ */}
                                     <div className="proyecto-completado-progreso-container">
                                         {proyecto.total_tareas > 0 ? (
-                                            <div className="proyecto-completado-progreso">
+                                            <div 
+                                                className="proyecto-completado-progreso"
+                                                onClick={handleNavigateToProject} 
+                                                style={{ cursor: 'pointer' }} 
+                                            >
                                                 <ProgresoProyecto
                                                     progresoInicial={porcentaje}
                                                     tareasTotales={proyecto.total_tareas}

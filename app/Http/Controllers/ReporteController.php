@@ -16,7 +16,7 @@ class ReporteController extends Controller
         $nombreArchivo = 'reporte_superusuario.pdf';
         ignore_user_abort(false);
 
-        // 🔹 1. Parámetros de filtro
+        // 1. Parámetros de filtro
         $departamentosString = $request->query('departamentos');
         $tipoProyecto        = $request->query('tipoProyecto', 'Ambos');
         $fechaInicio         = $request->query('fechaInicio');
@@ -31,7 +31,7 @@ class ReporteController extends Controller
         $depIds = explode(',', $departamentosString);
         $mesNumero = $mes ? (int) substr($mes, 0, 2) : null;
 
-        // 🔹 2. Usuario que genera el reporte
+        // 2. Usuario que genera el reporte
         $usuarioGeneraNombre = 'Desconocido';
         if (Auth::check()) {
             $usuario = Auth::user();
@@ -41,7 +41,7 @@ class ReporteController extends Controller
             }
         }
 
-        // 🔹 3. Jefes de cada departamento
+        // 3. Jefes de cada departamento
         $jefesPorDepartamento = DB::table('usuario as u')
             ->join('c_usuario as cu', 'u.id_usuario', '=', 'cu.id_usuario')
             ->where('u.rol', 'Jefe')
@@ -49,7 +49,7 @@ class ReporteController extends Controller
             ->select('cu.id_departamento', DB::raw("CONCAT(cu.u_nombre, ' ', cu.a_paterno, ' ', cu.a_materno) as nombre"))
             ->pluck('nombre', 'cu.id_departamento');
 
-        // 🔹 4. Construcción de fechas según filtro
+        // 4. Construcción de fechas según filtro
         try {
             if ($anio && !$mes) {
                 $fechaInicioObj = Carbon::create($anio, 1, 1)->startOfDay();
@@ -67,14 +67,14 @@ class ReporteController extends Controller
 
         $proyectos = collect();
 
-        // 🔹 5. Determinar el trimestre actual de la BD principal
+        // 5. Determinar el trimestre actual de la BD principal
         $hoy = Carbon::now();
         $mesActual = $hoy->month;
         $trimestreActual = ceil($mesActual / 3);
         $inicioTrimestreActual = Carbon::create($hoy->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
         $finTrimestreActual    = Carbon::create($hoy->year, $trimestreActual * 3, 1)->endOfMonth()->endOfDay();
 
-        // 🔹 6. CONSULTA BD PRINCIPAL (Trimestre actual)
+        // 6. CONSULTA BD PRINCIPAL (Trimestre actual)
         if ($fechaFinObj >= $inicioTrimestreActual) {
             $inicio = max($fechaInicioObj, $inicioTrimestreActual);
             $fin    = $fechaFinObj;
@@ -94,7 +94,7 @@ class ReporteController extends Controller
             );
         }
 
-        // 🔹 7. CONSULTA BD HISTÓRICA (Trimestres anteriores)
+        // 7. CONSULTA BD HISTÓRICA (Trimestres anteriores)
         if ($fechaInicioObj < $inicioTrimestreActual) {
             $inicio = $fechaInicioObj;
             $fin    = min($fechaFinObj, $inicioTrimestreActual->copy()->subSecond());
@@ -127,7 +127,7 @@ class ReporteController extends Controller
             ], 400);
         }
 
-        // 🔹 8. Procesar resultados
+        // 8. Procesar resultados
         $proyectosAgrupados = [];
 
         foreach ($proyectos as $p) {
@@ -152,7 +152,7 @@ class ReporteController extends Controller
             }
         }
 
-        // 🔹 9. Preparar datos para la vista PDF
+        // 9. Preparar datos para la vista PDF
         $data = [
             'proyectosAgrupados' => $proyectosAgrupados,
             'filtros' => compact('tipoProyecto', 'fechaInicio', 'fechaFin', 'anio', 'mes'),
@@ -171,7 +171,7 @@ class ReporteController extends Controller
             ], 400);
         }
 
-        // 🔹 10. Generar PDF
+        // 10. Generar PDF
         try {
             $mpdf = new Mpdf([
                 'format' => 'Letter',
