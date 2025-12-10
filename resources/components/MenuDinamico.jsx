@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { 
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, FaLayerGroup,
-  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt,
+  FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt,FaUserEdit,
   FaBuilding,FaSitemap,         // Estructura organizacional
   FaUserFriends,     // Grupo de usuarios (para asignar)
   FaListAlt,         // Para listar
@@ -157,8 +157,9 @@ export default function MenuDinamico({
                     label: "Usuarios",
                     icon: FiUsers,
                     subMenu: [
-                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitaciones", icon: FaUserPlus },
+                         { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
+                         { key: 'ModificarUsuario', label: "Modificar usuarios", path: "/ModificarUsuario", icon: FaUserEdit },
                     ],
                 },
 

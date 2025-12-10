@@ -354,37 +354,38 @@ public function completarTarea($id)
     try {
         $usuarioId = $request->query('usuario_id'); 
         
-        // 1. Recibir los nuevos filtros
+        // 1. Recibir los nuevos filtros, incluyendo el término de BÚSQUEDA
         $anio = $request->query('anio');
         $mes = $request->query('mes');
+        $busqueda = $request->query('busqueda'); // <--- NUEVO
 
         $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
-
-        if (!$usuario) {
-            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
-        }
+        // ... (manejo de error si no hay usuario) ...
 
         $idDepartamento = $usuario->id_departamento;
 
-        // 2. Pasamos $anio y $mes al "use" para poder usarlos dentro
-        $construirConsulta = function($query) use ($idDepartamento, $anio, $mes) {
+        // 2. Pasamos $busqueda a la closure
+        $construirConsulta = function($query) use ($idDepartamento, $anio, $mes, $busqueda) { // <--- NUEVO
             $query->where('id_departamento', $idDepartamento)
                 ->whereIn('p_estatus', ['Finalizado']);
 
-            // 3. APLICAR FILTROS DE FECHA SI EXISTEN
+            // 3. APLICAR FILTROS DE FECHA
             if ($anio) {
                 $query->whereYear('pf_fin', $anio);
             }
-            
             if ($mes) {
                 $query->whereMonth('pf_fin', $mes);
             }
-                
+            
+            // 4. APLICAR FILTRO DE BÚSQUEDA POR NOMBRE (Si existe)
+            if ($busqueda) { // <--- NUEVO
+                $query->where('p_nombre', 'ILIKE', '%' . $busqueda . '%'); 
+                // Usamos ILIKE (PostgreSQL case-insensitive LIKE)
+            }
+            
             // El resto de la consulta sigue igual...
             return $query->whereHas('tareas')
-                ->whereDoesntHave('tareas', function($q) {
-                    $q->where('t_estatus', 'NOT ILIKE', 'Completada');
-                })
+                // ... (el resto de las condiciones de tareas)
                 ->with(['tareas' => function($q) {
                     $q->where('t_estatus', 'ILIKE', 'Completada')
                       ->with('evidencias');
@@ -411,6 +412,57 @@ public function completarTarea($id)
     }
 }
 
+
+
+public function obtenerProyectosCompletadosRecientes(Request $request)
+{
+    try {
+         $usuarioId = $request->query('usuario_id'); 
+        
+        // 1. Recibir los nuevos filtros
+        $anio = $request->query('anio');
+        $mes = $request->query('mes');
+
+        $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
+
+        if (!$usuario) {
+            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
+        }
+
+        $idDepartamento = $usuario->id_departamento;
+
+
+        $construirConsultaRapida = function($query) use ($idDepartamento) {
+            
+            // Criterios Fijos para la Carga Rápida
+            $query->where('id_departamento', $idDepartamento)
+                ->whereIn('p_estatus', ['Finalizado']); // Solo nos basamos en el estatus del proyecto
+
+            // Excluimos las condiciones whereHas / whereDoesntHave para aligerar la carga.
+            // PERO, sí necesitamos el conteo y las tareas completadas:
+            return $query->with(['tareas' => function($q) {
+                 // Traemos solo las tareas que fueron marcadas como Completadas
+                 $q->where('t_estatus', 'ILIKE', 'Completada')
+                   ->with('evidencias');
+             }])
+             ->withCount(['tareas as total_tareas']) // Esto es importante
+             ->withCount(['tareas as tareas_completadas' => function($q) {
+                 $q->where('t_estatus', 'ILIKE', 'Completada');
+             }]);
+        };
+
+        // CONSULTA SOLO LA BD PRINCIPAL ('pgsql')
+        $proyectos = $construirConsultaRapida(\App\Models\Proyecto::on('pgsql'))->get();
+
+        return response()->json([
+            'success' => true,
+            'proyectos' => $proyectos
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+}
 
 
 public function tareasPendientesUsuario(Request $request)

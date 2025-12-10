@@ -12,33 +12,34 @@ use App\Notifications\TareaAsignada;
 
 class DepartamentoDirectorController extends Controller
 {
-        //METODO PARA OBTENER LOS DEPARTAMENTOS
     public function CatalogoDepartamentos()
     {
         $departamentos = DB::table('c_departamento')->get();
         return response()->json($departamentos);
     }
     
-    public function usuariosPorDepartamento($id_departamento)
+public function usuariosPorDepartamento($id_departamento)
 {
     $usuarios = \DB::table('c_usuario')
         ->join('usuario', 'c_usuario.id_usuario', '=', 'usuario.id_usuario')
         ->where('c_usuario.id_departamento', $id_departamento)
         ->where('usuario.rol', 'Usuario')
         ->select(
-    'usuario.id_usuario', 
-    'c_usuario.u_nombre as nombre',
-    'c_usuario.a_paterno as apaterno',
-    'c_usuario.a_materno as amaterno',
-    'usuario.rol'
-)
+            'usuario.id_usuario', 
+            'c_usuario.u_nombre as nombre',
+            'c_usuario.a_paterno as apaterno',
+            'c_usuario.a_materno as amaterno',
+            'usuario.correo',
+            'usuario.rol'
+        )
         ->get();
 
     return response()->json($usuarios);
 }
+
+
 public function usuariosDeDepartamento($id_usuario)
 {
-    // Obtener el departamento del usuario
     $usuario = DB::table('c_usuario')->where('id_usuario', $id_usuario)->first();
     if (!$usuario) {
         return response()->json([], 404);
@@ -64,7 +65,6 @@ public function usuariosDeDepartamento($id_usuario)
 
 public function obtenerUsuario($id_usuario)
 {
-    // Buscar usuario con join a c_usuario para traer nombres
     $usuario = DB::table('usuario')
         ->join('c_usuario', 'usuario.id_usuario', '=', 'c_usuario.id_usuario')
         ->select(
@@ -112,12 +112,10 @@ public function eliminarUsuario($id_usuario)
 
 public function actualizarCorreo(Request $request, $id_usuario)
 {
-    // Validar que el correo sea obligatorio y tenga formato válido
     $request->validate([
-        'correo' => 'required|email|unique:usuario,correo,' . $id_usuario,
+        'correo' => 'required|email|unique:usuario,correo,' . $id_usuario . ',id_usuario',
     ]);
 
-    // Buscar al usuario
     $usuario = DB::table('usuario')->where('id_usuario', $id_usuario)->first();
     if (!$usuario) {
         return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
