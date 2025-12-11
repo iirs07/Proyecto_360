@@ -59,7 +59,7 @@ CREATE TABLE usuario (
 CREATE TABLE proyectos (
     id_proyecto SERIAL PRIMARY KEY,
     id_departamento INT NOT NULL,
-    p_nombre VARCHAR(100) NULL,
+    p_nombre TEXT NULL,
     pf_inicio DATE NULL,
     pf_fin DATE NULL,
     p_estatus VARCHAR(50) DEFAULT 'EN PROCESO',
@@ -94,7 +94,7 @@ CREATE TABLE tareas (
     id_tarea SERIAL PRIMARY KEY,
     id_proyecto INT NOT NULL,
     id_usuario INT NOT NULL,
-    t_nombre VARCHAR(100) NOT NULL,
+    t_nombre TEXT NOT NULL,
     t_estatus VARCHAR(50) DEFAULT 'PENDIENTE',
     tf_inicio DATE NULL,
     tf_completada DATE NULL,

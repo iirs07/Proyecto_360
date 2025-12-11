@@ -73,6 +73,7 @@ const nombreProyectoFinal = p_nombre || nombre || "Proyecto";
 
   const [loadingInicial, setLoadingInicial] = useState(false);
   const [loadingTarea, setLoadingTarea] = useState(false);
+const [mostrarMensaje, setMostrarMensaje] = useState(false);
 
   const [idTareaRecienCreada, setIdTareaRecienCreada] = useState(null);
   const [minFecha, setMinFecha] = useState(null);
@@ -301,16 +302,22 @@ useEffect(() => {
       const data = await res.json();
 
       if (data.success) {
-        setTareaGuardada(true);
-        setIdTareaRecienCreada(data.tarea.id_tarea);
-        limpiarCampos(true);
-setCamposModificados({}); 
-timer = setTimeout(() => {
-        setTareaGuardada(false);
-      }, 3000);
-      } else {
-        console.error("Error al crear tarea:", data.message);
-      }
+  setTareaGuardada(true); // 🔥 mantiene visible el botón
+  setMostrarMensaje(true); // 🔥 muestra el mensaje temporalmente
+
+  setIdTareaRecienCreada(data.tarea.id_tarea);
+  limpiarCampos(true);
+  setCamposModificados({});
+
+  // 🔥 Solo oculta el mensaje después de 3 segundos
+  timer = setTimeout(() => {
+    setMostrarMensaje(false);
+  }, 3000);
+
+} else {
+  console.error("Error al crear tarea:", data.message);
+}
+
     } catch (err) {
       console.error("Error al guardar tarea:", err);
     } finally {
@@ -400,7 +407,7 @@ setCamposModificados({});
       </div>
 
 
-      {tareaGuardada && (
+      {mostrarMensaje && (
       <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
               <FaSave />
               <div>
