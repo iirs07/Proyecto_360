@@ -3,13 +3,14 @@ import React, { useEffect, useState } from "react";
 export default function ListaDepartamento() {
     const [departamentos, setDepartamentos] = useState([]);
     const [mensaje, setMensaje] = useState("");
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         cargarDepartamentos();
     }, []);
 
     const cargarDepartamentos = () => {
-        fetch("http://127.0.0.1:8000/api/departamentos/listar")
+        fetch(`${API_URL}/api/departamentos/listar`)
             .then(res => res.json())
             .then(data => setDepartamentos(data))
             .catch(() => setMensaje("Error al cargar departamentos"));
