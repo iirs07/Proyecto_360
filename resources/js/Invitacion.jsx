@@ -17,7 +17,7 @@ const ROLES_PERMITIDOS_PARA_JEFES = [
     { value: 'Usuario', name: 'Usuario' }
 ];
 
-function GenerarInvitaciones() {
+function Invitacion() {
     const navigate = useNavigate();
     const token = sessionStorage.getItem("jwt_token");
     const API_URL = import.meta.env.VITE_API_URL;
@@ -765,4 +765,4 @@ function GenerarInvitaciones() {
     );
 }
 
-export default GenerarInvitaciones;
+export default Invitacion;

@@ -30,8 +30,9 @@ import { useAutoRefresh } from '../hooks/useAutoRefresh';
 // Obtener la URL base desde las variables de entorno de Vite
 const API_URL = import.meta.env.VITE_API_URL;
 
-// --- Dropdown de Ordenamiento Mejorado ---
+// --- Dropdown de Ordenamiento Mejorado (Sin cambios) ---
 const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) => {
+    // ... Código sin cambios ...
     const sortOptions = [
         ["Nombre (A-Z)", "nombre", "asc", FaSortAlphaDown],
         ["Nombre (Z-A)", "nombre", "desc", FaSortAlphaUp],
@@ -62,14 +63,14 @@ const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) =
     );
 };
 
-// Función para determinar la clase según el porcentaje de progreso
+// Función para determinar la clase según el porcentaje de progreso (Sin cambios)
 const getColorClassByProgress = (porcentaje) => {
     if (porcentaje < 30) return 'proyecto-bajo';
     if (porcentaje < 70) return 'proyecto-medio';
     return 'proyecto-alto';
 };
 
-// Función para obtener el color del porcentaje (para el texto)
+// Función para obtener el color del porcentaje (para el texto) (Sin cambios)
 const getColorPorcentaje = (porcentaje) => {
     if (porcentaje < 30) return "#dc3545"; // Rojo
     if (porcentaje < 70) return "#ffc107"; // Amarillo
@@ -81,21 +82,22 @@ export default function DepProProceso() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // --- Persistencia del departamento ---
+    // Persistencia del departamento: USANDO SOLO sessionStorage ---
     const stateDepId = location.state?.depId;
     const stateDepNombre = location.state?.nombre;
-    const savedDepId = localStorage.getItem("last_depId");
-    const savedDepNombre = localStorage.getItem("last_depNombre");
-    const savedDepSlug = localStorage.getItem("last_depSlug");
+    const savedDepId = sessionStorage.getItem("last_depId");
+    const savedDepNombre = sessionStorage.getItem("last_depNombre");
+    const savedDepSlug = sessionStorage.getItem("last_depSlug");
 
     const depId = stateDepId || savedDepId;
     const departamentoNombre = stateDepNombre || depNombreSlug?.replace(/-/g, " ") || savedDepNombre || "Departamento";
     const currentDepartamentoSlug = slugify(departamentoNombre) || savedDepSlug || "departamento";
 
     useEffect(() => {
-        if (depId) localStorage.setItem('last_depId', depId);
-        if (departamentoNombre) localStorage.setItem('last_depNombre', departamentoNombre);
-        if (currentDepartamentoSlug) localStorage.setItem('last_depSlug', currentDepartamentoSlug);
+        // Guardar en sessionStorage
+        if (depId) sessionStorage.setItem('last_depId', depId);
+        if (departamentoNombre) sessionStorage.setItem('last_depNombre', departamentoNombre);
+        if (currentDepartamentoSlug) sessionStorage.setItem('last_depSlug', currentDepartamentoSlug);
     }, [depId, departamentoNombre, currentDepartamentoSlug]);
 
     const [proyectos, setProyectos] = useState([]);
@@ -103,7 +105,7 @@ export default function DepProProceso() {
     const [tipoVisualizacionGlobal, setTipoVisualizacionGlobal] = useState("barra");
     const [showVisualizacionDropdown, setShowVisualizacionDropdown] = useState(false);
 
-    // --- Hook de ordenamiento ---
+    // --- Hook de ordenamiento  ---
     const {
         proyectosOrdenados,
         sortBy,
@@ -131,7 +133,8 @@ export default function DepProProceso() {
 
     // --- Función para obtener proyectos ---
     const fetchDatos = async (initialLoad = false) => {
-        const token = localStorage.getItem("jwt_token");
+        const token = sessionStorage.getItem("jwt_token"); 
+
         if (!token) {
             navigate("/", { replace: true });
             return;
@@ -173,7 +176,7 @@ export default function DepProProceso() {
         }
     };
 
-    // --- Carga inicial ---
+    // --- Carga inicial y Actualización automática (Sin cambios) ---
     useEffect(() => {
         fetchDatos(true);
     }, [depId, navigate]);
@@ -181,6 +184,7 @@ export default function DepProProceso() {
     // --- Actualización automática cada 5s ---
     useAutoRefresh(() => fetchDatos(false), 5000);
 
+    // --- Lógica de renderizado (Sin cambios) ---
     if (loading) {
         return (
             <div className="loader-container" style={{ zIndex: 50 }}>
@@ -317,12 +321,9 @@ export default function DepProProceso() {
                             const slugProyecto = slugify(proyecto.p_nombre);
                             const porcentaje = proyecto.porcentaje || 0;
                             const progressClass = getColorClassByProgress(porcentaje);
-                            // Asegurar que el estatus se muestre correctamente
                             const estadoMostrar = proyecto.p_estatus || "En Proceso";
-                            // IMPORTANTE: El data-estado debe ser "En proceso" (con minúscula 'p') para que coincida con el CSS
-                            const dataEstado = "En proceso";
+                            const dataEstado = "en-proceso";
                             
-                            // FUNCIÓN DE NAVEGACIÓN
                             const handleNavigateToProject = () => {
                                 navigate(`/proyecto/${slugProyecto}`, {
                                     state: {
@@ -355,7 +356,7 @@ export default function DepProProceso() {
                                         <div className="proyecto-enprogreso-badges">
                                             <span 
                                                 className="badge-estado-enprogreso" 
-                                                data-estado={dataEstado} // Usamos el valor fijo "En proceso"
+                                                data-estado={dataEstado}
                                             >
                                                 {estadoMostrar} 
                                             </span>

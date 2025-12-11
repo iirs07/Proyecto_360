@@ -804,3 +804,30 @@
     font-size: 0.65rem;
   }
 }
+/* =================================================================
+   AJUSTES PARA FORZAR MAYÚSCULAS EN EL DISEÑO COMPLETO
+   ================================================================= */
+.visualizacion-texto {
+    text-transform: uppercase !important;
+}
+
+.procom-sort-button {
+    text-transform: uppercase !important;
+}
+
+.procom-dropdown-item-sort {
+    text-transform: uppercase !important;
+}
+
+.proyecto-completado-nombre .proyecto-completado-valor {
+    text-transform: uppercase;
+}
+
+.proyecto-completado-label {
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em; /* Un poco más de espacio para mayúsculas */
+}
+
+.proyecto-completado-valor {
+    text-transform: uppercase;
+}

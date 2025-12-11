@@ -209,14 +209,14 @@
     justify-content: center;
 }
 
-/* LISTAS COMPACTAS */
+/* LISTAS COMPACTAS - SIN SCROLL */
 .modep-list-container {
     background: white;
     border-radius: 10px;
     border: 1px solid #e9ecef;
-    overflow: hidden;
-    max-height: 400px;
-    overflow-y: auto;
+    overflow: visible; /* Cambiado de hidden a visible */
+    /* max-height: 400px; */ /* Eliminado */
+    /* overflow-y: auto; */ /* Eliminado */
     position: relative;
     z-index: 10;
 }
@@ -237,6 +237,8 @@
 
 .modep-list-content {
     padding: 0.75rem;
+    /* max-height: none; */ /* Eliminado si existe */
+    /* overflow-y: visible; */ /* Eliminado si existe */
 }
 
 .modep-list-item {
@@ -552,6 +554,10 @@
     .modep-title-icon {
         font-size: 1.125rem;
     }
+    
+    .modep-list-container {
+        overflow: visible; 
+    }
 }
 
 /* MÓVILES GRANDES (576px - 768px) */
@@ -627,6 +633,10 @@
     .modep-list-item button {
         width: 100%;
         justify-content: center;
+    }
+    
+    .modep-list-container {
+        overflow: visible; 
     }
 }
 
@@ -787,25 +797,6 @@
     100% { transform: rotate(360deg); }
 }
 
-/* AJUSTES DE SCROLL SUAVE */
-.modep-list-container {
-    scrollbar-width: thin;
-    scrollbar-color: #861542 #f1f1f1;
-}
-
-.modep-list-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.modep-list-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.modep-list-container::-webkit-scrollbar-thumb {
-    background: #861542;
-    border-radius: 3px;
-}
 
 /* GRID PARA ELEMENTOS EN MÓVIL */
 @media (max-width: 768px) {

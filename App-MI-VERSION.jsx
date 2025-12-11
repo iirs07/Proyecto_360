@@ -32,7 +32,7 @@ import TareasenProceso from "./TareasenProceso";
 import TareasPendientes from "./TareasPendientes";
 import VerTareasPendientes from "./VerTareasPendientes";
 import TareasCompletadasDepartamento from "./TareasCompletadasDepartamento";
-import TareasPorAgregar from "./TareasPorAgregar";
+import AgregarT from "./AgregarT";
 import ModificarTareas from "./ModificarTareas";
 import EliminarTareas from "./EliminarTareas";
 import EditarTareas from "./EditarTareas";
@@ -106,7 +106,7 @@ function App() {
            <Route path="/TareasPendientes" element={<TareasPendientes />} />
            <Route path="/VerTareasPendientes" element={<VerTareasPendientes />} />
            <Route path="/TareasCompletadasDepartamento" element={<TareasCompletadasDepartamento />} />
-           <Route path="/TareasPorAgregar" element={<TareasPorAgregar />} />
+           <Route path="/AgregarT" element={<AgregarT />} />
            <Route path="/ModificarTareas" element={<ModificarTareas />} />
            <Route path="/EliminarTareas" element={<EliminarTareas />} />
            <Route path="/EditarTareas" element={<EditarTareas />} />

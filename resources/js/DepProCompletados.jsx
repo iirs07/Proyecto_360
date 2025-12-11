@@ -30,7 +30,7 @@ import { useAutoRefresh } from '../hooks/useAutoRefresh';
 // Obtener la URL base desde las variables de entorno de Vite
 const API_URL = import.meta.env.VITE_API_URL;
 
-// --- Dropdown de Ordenamiento Mejorado ---
+// --- Dropdown de Ordenamiento Mejorado (Texto en mayúsculas) ---
 const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) => {
     const sortOptions = [
         ["Nombre (A-Z)", "nombre", "asc", FaSortAlphaDown],
@@ -55,16 +55,16 @@ const SortDropdown = ({ sortBy, sortDirection, handleSelectSort, isMenuOpen }) =
                     style={{ zIndex: 1001 }}
                 >
                     <Icon className="procom-sort-icon" />
-                    {text}
+                    {text.toUpperCase()}
                 </button>
             ))}
         </div>
     );
 };
 
-// Función para determinar la clase según el porcentaje de progreso (para finalizados siempre verde)
+// Función para determinar la clase según el porcentaje de progreso
 const getColorClassByProgress = (porcentaje) => {
-    // Como son proyectos finalizados, siempre serán verde
+    // Para proyectos completados (finalizados), la clase es fija.
     return 'proyecto-completado';
 };
 
@@ -73,21 +73,24 @@ export default function DepProCompletados() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // --- Persistencia del departamento ---
+    // --- Persistencia del departamento (USANDO SOLO sessionStorage) ---
     const stateDepId = location.state?.depId;
     const stateDepNombre = location.state?.nombre;
-    const savedDepId = localStorage.getItem("last_depId");
-    const savedDepNombre = localStorage.getItem("last_depNombre");
-    const savedDepSlug = localStorage.getItem("last_depSlug");
+    
+    // USAMOS sessionStorage.getItem para leer los datos del departamento
+    const savedDepId = sessionStorage.getItem("last_depId");
+    const savedDepNombre = sessionStorage.getItem("last_depNombre");
+    const savedDepSlug = sessionStorage.getItem("last_depSlug");
 
     const depId = stateDepId || savedDepId;
     const departamentoNombre = stateDepNombre || depNombreSlug?.replace(/-/g, " ") || savedDepNombre || "Departamento";
     const currentDepartamentoSlug = slugify(departamentoNombre) || savedDepSlug || "departamento";
 
     useEffect(() => {
-        if (depId) localStorage.setItem('last_depId', depId);
-        if (departamentoNombre) localStorage.setItem('last_depNombre', departamentoNombre);
-        if (currentDepartamentoSlug) localStorage.setItem('last_depSlug', currentDepartamentoSlug);
+        // USAMOS sessionStorage.setItem para persistir los datos del departamento
+        if (depId) sessionStorage.setItem('last_depId', depId);
+        if (departamentoNombre) sessionStorage.setItem('last_depNombre', departamentoNombre);
+        if (currentDepartamentoSlug) sessionStorage.setItem('last_depSlug', currentDepartamentoSlug);
     }, [depId, departamentoNombre, currentDepartamentoSlug]);
 
     const [proyectos, setProyectos] = useState([]);
@@ -109,6 +112,7 @@ export default function DepProCompletados() {
     // --- Cerrar dropdown al hacer clic fuera ---
     useEffect(() => {
         const handleClickOutside = (event) => {
+            
             if (isMenuOpen && !event.target.closest('.procom-sort-button-wrapper')) {
                 setIsMenuOpen(false);
             }
@@ -123,7 +127,7 @@ export default function DepProCompletados() {
 
     // --- Función para obtener proyectos ---
     const fetchDatos = async (initialLoad = false) => {
-        const token = localStorage.getItem("jwt_token");
+        const token = sessionStorage.getItem("jwt_token"); 
         if (!token) {
             navigate("/", { replace: true });
             return;
@@ -174,6 +178,23 @@ export default function DepProCompletados() {
             </div>
         );
     }
+    
+    // Función de navegación para el proyecto
+    const handleNavigateToProject = (proyecto) => {
+        const slugProyecto = slugify(proyecto.p_nombre);
+        const porcentaje = proyecto.porcentaje || 0;
+        
+        navigate(`/proyecto/${slugProyecto}`, {
+            state: {
+                idProyecto: proyecto.id_proyecto,
+                nombreProyecto: proyecto.p_nombre,
+                descripcionProyecto: proyecto.descripcion,
+                porcentaje: porcentaje,
+                totalTareas: proyecto.total_tareas,
+                tareasCompletadas: proyecto.tareas_completadas,
+            },
+        });
+    };
 
     return (
         <Layout
@@ -214,7 +235,7 @@ export default function DepProCompletados() {
                                 {/* CONTENIDO PRINCIPAL DEL BOTÓN */}
                                 <div className="visualizacion-contenido">
                                     <div className="visualizacion-icon-texto">
-                                        {/* ICONO DINÁMICO - MANTIENE TAMAÑO CONSISTENTE */}
+                                        {/* ICONO DINÁMICO */}
                                         <div className="visualizacion-icon-wrapper">
                                             {tipoVisualizacionGlobal === 'barra' ? 
                                                 <FaChartBar className="visualizacion-icon fa-chart-bar" /> : 
@@ -270,7 +291,7 @@ export default function DepProCompletados() {
                                         style={{ zIndex: 101 }}
                                     >
                                         <FaSortAlphaDown className="procom-sort-button-icon" />
-                                        {getSortButtonText()} 
+                                        {getSortButtonText().toUpperCase()} 
                                         <FaCaretDown className={`procom-caret-icon ${isMenuOpen ? 'procom-rotate' : ''}`} />
                                     </button>
                                     
@@ -293,28 +314,13 @@ export default function DepProCompletados() {
                             <div className="sin-tareas-icon">
                                 <FaChartLine className="no-data-icon" />
                             </div>
-                            <p>No hay proyectos finalizados en este departamento</p>
-                            <small>Todos los proyectos están en proceso o no han sido completados</small>
+                            <p>{"No hay proyectos finalizados en este departamento".toUpperCase()}</p>
+                            <small>{"Todos los proyectos están en proceso o no han sido completados".toUpperCase()}</small>
                         </div>
                     ) : (
                         proyectosOrdenados.map((proyecto, index) => {
-                            const slugProyecto = slugify(proyecto.p_nombre);
                             const porcentaje = proyecto.porcentaje || 0;
                             const progressClass = getColorClassByProgress(porcentaje);
-                            
-                            // FUNCIÓN DE NAVEGACIÓN
-                            const handleNavigateToProject = () => {
-                                navigate(`/proyecto/${slugProyecto}`, {
-                                    state: {
-                                        idProyecto: proyecto.id_proyecto,
-                                        nombreProyecto: proyecto.p_nombre,
-                                        descripcionProyecto: proyecto.descripcion,
-                                        porcentaje: porcentaje,
-                                        totalTareas: proyecto.total_tareas,
-                                        tareasCompletadas: proyecto.tareas_completadas,
-                                    },
-                                });
-                            };
                             
                             return (
                                 <div 
@@ -324,7 +330,8 @@ export default function DepProCompletados() {
                                     data-estado="finalizado"
                                     style={{ 
                                         zIndex: 10 + index,
-                                        animationDelay: `${index * 0.1}s` 
+                                        animationDelay: `${index * 0.1}s`,
+                                        // Mantenemos el cursor: 'pointer' en el contenedor de progreso para el click
                                     }}
                                 >
                                     {/* HEADER DEL PROYECTO */}
@@ -334,7 +341,7 @@ export default function DepProCompletados() {
                                         </div>
                                         <div className="proyecto-completado-badges">
                                             <span className="badge-estado-completado" data-estado={proyecto.p_estatus}>
-                                                {proyecto.p_estatus} ✓
+                                                {proyecto.p_estatus.toUpperCase()} ✓
                                             </span>
                                         </div>
                                     </div>
@@ -344,28 +351,28 @@ export default function DepProCompletados() {
                                         <div className="proyecto-completado-columna">
                                             <span className="proyecto-completado-label">
                                                 <FaCalendarAlt className="proyecto-completado-icon" />
-                                                Inicio
+                                                INICIO
                                             </span>
                                             <span className="proyecto-completado-valor">{proyecto.pf_inicio}</span>
                                         </div>
                                         <div className="proyecto-completado-columna">
                                             <span className="proyecto-completado-label">
                                                 <FaFlagCheckered className="proyecto-completado-icon" />
-                                                Fin
+                                                FIN
                                             </span>
                                             <span className="proyecto-completado-valor">{proyecto.pf_fin}</span>
                                         </div>
                                         <div className="proyecto-completado-columna">
                                             <span className="proyecto-completado-label">
                                                 <FaUser className="proyecto-completado-icon" />
-                                                Encargado
+                                                ENCARGADO
                                             </span>
                                             <span className="proyecto-completado-valor">{proyecto.responsable}</span>
                                         </div>
                                         <div className="proyecto-completado-columna">
                                             <span className="proyecto-completado-label">
                                                 <FaChartLine className="proyecto-completado-icon" />
-                                                Progreso
+                                                PROGRESO
                                             </span>
                                             <span className="proyecto-completado-valor" style={{ color: '#15803d', fontWeight: 'bold' }}>
                                                 {porcentaje}% ✓
@@ -373,13 +380,14 @@ export default function DepProCompletados() {
                                         </div>
                                     </div>
 
-                                    {/* COMPONENTE DE PROGRESO - AÑADIMOS EL ONCLICK AQUÍ */}
+                                    {/* COMPONENTE DE PROGRESO - APLICAMOS EL CLICK AQUÍ */}
                                     <div className="proyecto-completado-progreso-container">
                                         {proyecto.total_tareas > 0 ? (
                                             <div 
                                                 className="proyecto-completado-progreso"
-                                                onClick={handleNavigateToProject} 
-                                                style={{ cursor: 'pointer' }} 
+                                                // APLICAMOS EL CLICK SOLO EN ESTE CONTENEDOR DE PROGRESO
+                                                onClick={() => handleNavigateToProject(proyecto)}
+                                                style={{ cursor: 'pointer' }}
                                             >
                                                 <ProgresoProyecto
                                                     progresoInicial={porcentaje}
@@ -392,7 +400,7 @@ export default function DepProCompletados() {
                                         ) : (
                                             <div className="proyecto-completado-sin-tareas">
                                                 <FaTasks className="sin-tareas-mini-icon" />
-                                                <span>Sin tareas asignadas</span>
+                                                <span>{"SIN TAREAS ASIGNADAS"}</span>
                                             </div>
                                         )}
                                     </div>

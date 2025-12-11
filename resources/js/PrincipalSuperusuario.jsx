@@ -12,6 +12,12 @@ import {
 } from "react-icons/fa";
 import { slugify } from "./utils/slugify";
 
+// -------------------- FUNCIONES AUXILIARES DE SESIÓN --------------------
+// Reemplazamos localStorage por sessionStorage para la lectura y escritura
+const getSessionItem = (key) => sessionStorage.getItem(key);
+const setSessionItem = (key, value) => sessionStorage.setItem(key, value);
+const removeSessionItem = (key) => sessionStorage.removeItem(key);
+
 export default function PrincipalSuperusuario() {
   const [areas, setAreas] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -19,7 +25,9 @@ export default function PrincipalSuperusuario() {
   const [userName, setUserName] = useState('');
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("jwt_token"); 
+  
+  // Lectura del token de autenticación (Cambiado de localStorage a sessionStorage)
+  const token = getSessionItem("jwt_token"); 
   
   // OBTENER URL DESDE .env
   const API_URL = import.meta.env.VITE_API_URL;
@@ -30,12 +38,13 @@ export default function PrincipalSuperusuario() {
       return;
     }
 
-    // OBTENER DATOS CON LOS NOMBRES CORRECTOS DE localStorage
-    const storedUsuario = localStorage.getItem("usuario");
+    // OBTENER DATOS CON LOS NOMBRES CORRECTOS DE sessionStorage
+    const storedUsuario = getSessionItem("usuario");
     
     if (storedUsuario) {
       try {
         const usuarioData = JSON.parse(storedUsuario);
+        // Construir el nombre completo
         const fullName = `${usuarioData.nombre} ${usuarioData.a_paterno} ${usuarioData.a_materno || ''}`.trim();
         setUserName(fullName);
         
@@ -46,12 +55,10 @@ export default function PrincipalSuperusuario() {
       }
     } else {
       // Si no hay datos, usar el rol para determinar el nombre
-      const userRole = localStorage.getItem("rol");
+      const userRole = getSessionItem("rol"); // Leer rol de sessionStorage
       const roleNames = {
         'Administrador': 'Administrador del Sistema',
         'Superusuario': 'Superusuario Municipal', 
-        'Jefe': 'Jefe de Departamento',
-        'Usuario': 'Usuario del Sistema'
       };
       setUserName(roleNames[userRole] || 'Usuario del Sistema');
     }
@@ -68,9 +75,10 @@ export default function PrincipalSuperusuario() {
         });
 
         if (res.status === 401) {
-          localStorage.removeItem("jwt_token");
-          localStorage.removeItem("rol");
-          localStorage.removeItem("usuario");
+          // Limpieza total usando sessionStorage
+          removeSessionItem("jwt_token");
+          removeSessionItem("rol");
+          removeSessionItem("usuario");
           navigate("/", { replace: true });
           return;
         }
@@ -97,9 +105,11 @@ export default function PrincipalSuperusuario() {
 
   const handleSelect = (depId, depNombre) => {
     const departamentoSlug = slugify(depNombre);
-    localStorage.setItem("last_depId", depId);
-    localStorage.setItem("last_depNombre", depNombre);
-    localStorage.setItem("last_depSlug", departamentoSlug);
+    // Persistencia del departamento en sessionStorage
+    setSessionItem("last_depId", depId);
+    setSessionItem("last_depNombre", depNombre);
+    setSessionItem("last_depSlug", departamentoSlug);
+    
     navigate(`/proyectosenproceso/${departamentoSlug}`, { 
       state: { nombre: depNombre, depId } 
     });
@@ -128,7 +138,8 @@ export default function PrincipalSuperusuario() {
         <div className="loader-logo">
           <img src={logo3} alt="Cargando" />
         </div>
-        <div className="loader-texto">CARGANDO DEPARTAMENTOS..</div>
+        {/* TEXTO DEL LOADER EN MAYÚSCULAS */}
+        <div className="loader-texto">CARGANDO DEPARTAMENTOS...</div>
         <div className="loader-spinner"></div>
       </div>
     );
@@ -144,14 +155,15 @@ export default function PrincipalSuperusuario() {
         <div className="user-header-container">
           <div className="user-greeting">
             <FaUser className="user-icon" />
-            <h1>¡Hola!</h1>
-            <div className="user-name">{userName}</div>
+            <h1>¡HOLA!</h1>
+            {/* Nombre del usuario en MAYÚSCULAS */}
+            <div className="user-name">{userName.toUpperCase()}</div>
           </div>
         </div>
         
         <div className="areas-hero">
           <p className="areas-subtitle">
-            Selecciona un departamento para gestionar sus proyectos
+            SELECCIONA UN DEPARTAMENTO PARA GESTIONAR SUS PROYECTOS
           </p>
         </div>
         
@@ -173,9 +185,10 @@ export default function PrincipalSuperusuario() {
                       {area.icon}
                     </div>
                     <div className="area-text-content">
-                      <h3 className="area-name">{area.nombre}</h3>
+                      {/* Nombre del área en MAYÚSCULAS */}
+                      <h3 className="area-name">{area.nombre.toUpperCase()}</h3>
                       <span className="area-department-count">
-                        {area.departamentos.length} {area.departamentos.length === 1 ? 'depto' : 'deptos'}
+                        {area.departamentos.length} {area.departamentos.length === 1 ? 'DEPTO' : 'DEPTOS'}
                       </span>
                     </div>
                   </div>
@@ -193,7 +206,8 @@ export default function PrincipalSuperusuario() {
                           className="department-item"
                           onClick={() => handleSelect(dep.id_departamento, dep.d_nombre)}
                         >
-                          <span className="department-name">{dep.d_nombre}</span>
+                          {/* Nombre del departamento en MAYÚSCULAS */}
+                          <span className="department-name">{dep.d_nombre.toUpperCase()}</span>
                         </div>
                       ))}
                     </div>
