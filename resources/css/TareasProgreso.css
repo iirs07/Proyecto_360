@@ -1,6 +1,6 @@
 /* =========================================================================
-   CONTENEDORES DE TAREAS (DISEÑO FINAL, OPTIMIZADO Y RESPONSIVO)
-   ========================================================================= */
+    CONTENEDORES DE TAREAS (DISEÑO FINAL, OPTIMIZADO Y RESPONSIVO)
+    ========================================================================= */
 
 /* ==== CONTENEDOR GENERAL ==== */
 .tareas-acordeon {
@@ -9,20 +9,21 @@
     gap: 12px;
     align-items: center;
     width: 100%;
-    padding: 0 20px; 
+    padding: 0 20px;
     font-family: "Poppins", "Segoe UI", sans-serif;
-    background-color: #ffffff; 
+    background-color: #ffffff;
     box-sizing: border-box;
-    position: relative; 
-    z-index: 2; 
+    position: relative;
+    z-index: 2;
 }
 
 /* =========================================================================
-   CONTENEDOR DEL NOMBRE DEL PROYECTO - DISEÑO MINIMALISTA TIPO HEADER
-   ========================================================================= */
+    CONTENEDOR DEL NOMBRE DEL PROYECTO - DISEÑO MINIMALISTA TIPO HEADER (AJUSTADO)
+    ========================================================================= */
 .proyecto-nombre-contenedor {
     background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-    padding: 18px 25px;
+    /* Aumentar el padding vertical */
+    padding: 22px 30px; 
     border-radius: 0 0 16px 16px;
     margin: 0 auto 20px auto;
     max-width: 1000px;
@@ -64,27 +65,30 @@
     text-align: left;
 }
 
-.proyecto-label {
-    font-size: 0.9rem;
+.proyecto-labels {
+    /* Aumentar ligeramente el tamaño del label */
+    font-size: 1rem; 
     font-weight: 700;
     opacity: 0.9;
     background: rgba(255, 255, 255, 0.15);
-    padding: 4px 12px;
+    padding: 4px 14px; /* Ajustar padding */
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     display: inline-block;
     color: white;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    align-self: flex-start; /* Asegura que el badge no ocupe todo el ancho */
 }
 
 .proyecto-nombre-texto {
-    font-size: 1.2rem;
-    font-weight: 700;
+    /* Aumentar significativamente el tamaño del texto */
+    font-size: 1.5rem; 
+    font-weight: 800; /* Más peso */
     margin: 0;
     letter-spacing: -0.01em;
     line-height: 1.3;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     color: white;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -100,10 +104,11 @@
     box-shadow: 0 6px 25px rgba(134, 21, 66, 0.4);
 }
 
-/* ==== DESCRIPCIÓN DEL PROYECTO (ESTILO MODERNO IGUAL A TARJETAS) ==== */
+/* ==== DESCRIPCIÓN DEL PROYECTO (ESTILO MODERNO IGUAL A TARJETAS) (AJUSTADO) ==== */
 .proyecto-descripcions-contenedor {
-    padding: 18px 25px;
-    border-radius: 16px; /* Cambiado de 0 0 16px 16px a 16px */
+    /* Aumentar el padding vertical */
+    padding: 22px 30px; 
+    border-radius: 16px;
     margin: 0 auto 20px auto;
     max-width: 1000px;
     width: 95%;
@@ -118,14 +123,16 @@
     border-right: 1px solid #86154230;
     border-bottom: 1px solid #86154230;
 
-    font-size: 15px;
-    line-height: 1.5;
+    /* Aumentar la fuente base */
+    font-size: 16px; 
+    line-height: 1.6; /* Aumentar interlineado para legibilidad */
     color: #1a1a1a;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
     overflow: hidden;
     font-family: "Poppins", "Segoe UI", sans-serif;
+    transition: all 0.3s ease;
 }
 
 .proyecto-descripcion-contenedor:hover {
@@ -135,12 +142,13 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-.proyecto-descripcion-contenedor strong {
+.proyecto-descripcions-contenedor strong { 
     display: block;
-    color: #861542; 
+    color: #861542;
     font-weight: 700;
-    font-size: 16px;
-    margin-bottom: 6px;
+    /* Aumentar la fuente del strong */
+    font-size: 17px; 
+    margin-bottom: 8px; /* Más espacio */
 }
 
 /* ==== TARJETA DE TAREA ==== */
@@ -195,74 +203,76 @@
 /* ==== FONDO DE HOVER Y ABIERTO ==== */
 .tarea-item.completada .tarea-titulo:hover,
 .tarea-item.completada.tarea-abierta .tarea-titulo {
-    background-color: #E3F9E7; 
+    background-color: #E3F9E7;
 }
 
 .tarea-item.pendiente .tarea-titulo:hover,
 .tarea-item.pendiente.tarea-abierta .tarea-titulo {
-    background-color: #FDE2E2; 
+    background-color: #FDE2E2;
 }
 
 /* NUEVO: Hover para tareas EN PROCESO - AMARILLO CLARO */
 .tarea-item.en-proceso .tarea-titulo:hover,
 .tarea-item.en-proceso.tarea-abierta .tarea-titulo {
-    background-color: #FFF3CD; 
+    background-color: #FFF3CD;
 }
 
-/* ==== CABECERA / TÍTULO ==== */
+/* ==== CABECERA / TÍTULO (AJUSTADO) ==== */
 .tarea-titulo {
-    padding: 14px 20px;
-    font-weight: 700; 
+    /* Aumentar el padding y el tamaño de fuente */
+    padding: 18px 25px; 
+    font-weight: 700;
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     justify-content: space-between;
-    align-items: center; 
-    font-size: 15px; 
-    letter-spacing: 0; 
+    align-items: center;
+    font-size: 1.1rem; /* Aumentado de 15px a 1.1rem */
+    letter-spacing: 0;
     border-bottom: 1px solid rgba(237, 240, 243, 0.6);
     transition: background-color 0.3s ease;
-    color: #1a1a1a; 
+    color: #1a1a1a;
 }
 
 .tarea-titulo-derecha {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex-shrink: 0; 
+    gap: 8px; /* Más espacio */
+    flex-shrink: 0;
 }
 
 /* Badge de estatus */
 .tarea-estatus {
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700; 
+    /* Aumentar ligeramente el badge */
+    padding: 4px 10px; 
+    border-radius: 15px; 
+    font-size: 13px; /* Aumentado */
+    font-weight: 700;
     text-transform: uppercase;
 }
 
-.tarea-estatus.completada { 
-    background-color: #28A745; 
-    color: #ffffff; 
+.tarea-estatus.completada {
+    background-color: #28A745;
+    color: #ffffff;
 }
 
-.tarea-estatus.pendiente { 
-    background-color: #DC3545; 
-    color: #ffffff; 
+.tarea-estatus.pendiente {
+    background-color: #DC3545;
+    color: #ffffff;
 }
 
 /* NUEVO: ESTATUS EN PROCESO - AMARILLO CON LETRAS NEGRAS */
-.tarea-estatus.en-proceso { 
-    background-color: #FFC107; 
-    color: #ffffff; 
+.tarea-estatus.en-proceso {
+    background-color: #FFC107;
+    color: #1a1a1a; /* Cambiado a negro para mejor contraste con amarillo */
     border: 1px solid #E0A800;
 }
 
 /* Flecha acordeón */
 .flecha {
-    font-size: 16px;
+    font-size: 18px; /* Más grande */
     color: #000;
     transition: transform 0.3s ease, color 0.2s;
-    margin-left: 5px;
+    margin-left: 8px; /* Más espacio */
 }
 
 .flecha.abierta {
@@ -270,64 +280,67 @@
     color: #861542;
 }
 
-/* ==== CONTENIDO / DETALLES ==== */
+/* ==== CONTENIDO / DETALLES (AJUSTADO) ==== */
 .tarea-detalle {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
-    padding: 0 20px;
-    font-size: 14px;
+    /* Aumentar padding horizontal */
+    padding: 0 25px; 
+    font-size: 15px; /* Aumentado */
     color: #000000;
-    line-height: 1.5;
-    background-color: #fff; 
+    line-height: 1.6;
+    background-color: #fff;
 }
 
 .tarea-detalle.abierta {
-    max-height: 400px;
-    padding-top: 10px; 
-    padding-bottom: 10px; 
+    max-height: 600px; /* Aumentar el max-height */
+    padding-top: 15px; /* Aumentar padding vertical */
+    padding-bottom: 15px;
 }
 
 /* Columnas */
 .detalle-columna {
-    margin-bottom: 0; 
-    display: block; 
+    margin-bottom: 0;
+    display: block;
 }
 
 .detalle-label {
-    display: block; 
-    font-weight: 700; 
-    font-size: 15px; 
-    color: #861542; 
-    margin-bottom: 3px; 
+    display: block;
+    font-weight: 700;
+    /* Aumentar el tamaño de la etiqueta */
+    font-size: 16px; 
+    color: #861542;
+    margin-bottom: 4px; /* Más espacio */
 }
 
 .detalle-valor {
-    color: #333333; 
-    font-size: 14px;
-    line-height: 1.4;
+    color: #333333;
+    /* Aumentar el tamaño del valor */
+    font-size: 15px; 
+    line-height: 1.5;
     word-break: break-word;
 }
 
 /* ==== GRID DE DATOS ==== */
 .tarea-datos-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; 
-    gap: 10px 20px; 
-    margin-top: 15px; 
-    margin-bottom: 15px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 15px 25px; /* Aumentar el espacio */
+    margin-top: 20px; /* Más espacio */
+    margin-bottom: 20px;
     
-    border-top: 1px solid #eeeeee; 
-    padding-top: 15px; 
+    border-top: 1px solid #eeeeee;
+    padding-top: 20px; /* Más padding */
 }
 
 /* Evidencias */
 .detalle-evidencia-seccion {
-    grid-column: auto; 
-    display: flex; 
-    align-items: center; 
-    gap: 10px;
-    justify-content: flex-start; 
+    grid-column: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Más espacio */
+    justify-content: flex-start;
 }
 
 .detalle-Evidencia-galeria {
@@ -338,23 +351,24 @@
 }
 
 .detalle-Evidencia-galeria:hover {
-    transform: scale(1.05);
+    transform: scale(1.08); /* Más efecto */
 }
 
 .evidencia-icono {
-    width: 24px;
-    height: 24px;
+    /* Aumentar el tamaño del ícono */
+    width: 28px; 
+    height: 28px;
     object-fit: contain;
     margin-right: 5px;
 }
 
 .detalle-descripcion {
-    grid-column: 1 / -1; 
+    grid-column: 1 / -1;
 }
 
 /* =========================================================================
-   MODAL Y CARRUSEL
-   ========================================================================= */
+    MODAL Y CARRUSEL (ORIGINAL)
+    ========================================================================= */
 
 .modal-overlay {
     position: fixed;
@@ -362,7 +376,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.85); 
+    background-color: rgba(0, 0, 0, 0.85); /* Se revierte a 0.85 */
     z-index: 1000;
     display: flex;
     justify-content: center;
@@ -371,18 +385,18 @@
 
 .modal-content-carrusel {
     position: relative;
-    max-width: 75vw;
-    max-height: 85vh;
+    max-width: 75vw; /* Se revierte a 75vw */
+    max-height: 85vh; /* Se revierte a 85vh */
     width: auto;
     height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ffffff; 
-    padding: 15px; 
-    border-radius: 8px;
+    background-color: #ffffff;
+    padding: 15px; /* Se revierte a 15px */
+    border-radius: 8px; /* Se revierte a 8px */
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6); /* Se revierte a 0.6 */
 }
 
 .modal-img {
@@ -393,20 +407,20 @@
     object-fit: contain;
     display: block;
     border-radius: 4px;
-    background-color: #000; 
+    background-color: #000;
 }
 
 .modal-close {
-    position: fixed; 
-    top: 20px;       
-    right: 20px;     
-    background: #DC3545; 
+    position: fixed;
+    top: 20px; /* Se revierte a 20px */
+    right: 20px; /* Se revierte a 20px */
+    background: #DC3545;
     color: white;
-    border: 3px solid white; 
+    border: 3px solid white; /* Se revierte a 3px */
     border-radius: 50%;
-    width: 40px; 
-    height: 40px; 
-    font-size: 20px; 
+    width: 40px; /* Se revierte a 40px */
+    height: 40px; /* Se revierte a 40px */
+    font-size: 20px; /* Se revierte a 20px */
     font-weight: bold;
     cursor: pointer;
     z-index: 1010;
@@ -417,37 +431,37 @@
 }
 
 .modal-close:hover {
-    background-color: #861542; 
-    transform: rotate(90deg);
+    background-color: #861542;
+    transform: rotate(90deg); /* Se revierte a 90deg (sin scale) */
 }
 
 .modal-nav-btn {
-    position: fixed; 
+    position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(134, 21, 66, 0.9); 
+    background-color: rgba(134, 21, 66, 0.9);
     color: white;
     border: none;
-    font-size: 30px;
+    font-size: 30px; /* Se revierte a 30px */
     cursor: pointer;
-    z-index: 1006; 
-    width: 45px; 
-    height: 45px;
+    z-index: 1006;
+    width: 45px; /* Se revierte a 45px */
+    height: 45px; /* Se revierte a 45px */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%; 
+    border-radius: 50%;
     transition: all 0.3s ease;
     user-select: none;
 }
 
 .modal-nav-btn:hover {
-    background-color: #861542; 
-    transform: translateY(-50%) scale(1.1);
+    background-color: #861542;
+    transform: translateY(-50%) scale(1.1); /* Se revierte a 1.1 */
 }
 
-.modal-nav-btn.prev { left: 20px; }
-.modal-nav-btn.next { right: 20px; }
+.modal-nav-btn.prev { left: 20px; } /* Se revierte a 20px */
+.modal-nav-btn.next { right: 20px; } /* Se revierte a 20px */
 
 .carrusel-index {
     position: absolute;
@@ -457,42 +471,49 @@
     text-align: center;
     background: rgba(0, 0, 0, 0.6);
     color: #fff;
-    padding: 8px 0;
-    font-size: 15px;
+    padding: 8px 0; /* Se revierte a 8px */
+    font-size: 15px; /* Se revierte a 15px */
     letter-spacing: 0.5px;
     z-index: 1005;
 }
 
 /* =========================================================================
-   MEDIA QUERIES
-   ========================================================================= */
+    MEDIA QUERIES (AJUSTADO PARA MANTENER LA PROPORCIÓN)
+    ========================================================================= */
 
 @media (max-width: 768px) {
     .proyecto-nombre-contenedor {
-        padding: 14px 20px;
+        padding: 18px 25px; /* Ajuste basado en el tamaño grande */
         width: 92%;
         border-radius: 0 0 14px 14px;
+        margin-bottom: 18px;
     }
-    
+
     .proyecto-nombre-content {
         gap: 5px;
     }
-    
-    .proyecto-label {
-        font-size: 0.85rem;
-        padding: 3px 10px;
+
+    .proyecto-labels {
+        font-size: 0.9rem; /* Ajuste */
+        padding: 4px 12px;
     }
-    
+
     .proyecto-nombre-texto {
-        font-size: 1.1rem;
+        font-size: 1.3rem; /* Ajuste */
     }
 
-    .proyecto-descripcion-contenedor { padding: 15px 20px; }
+    .proyecto-descripcions-contenedor {
+        padding: 18px 25px;
+        font-size: 15px;
+    }
+    .proyecto-descripcions-contenedor strong {
+        font-size: 16px;
+    }
 
-    .tarea-titulo { 
-        padding: 14px 20px; 
-        font-size: 0.95rem; 
-        flex-direction: column; 
+    .tarea-titulo {
+        padding: 16px 20px; /* Ajuste */
+        font-size: 1rem; /* Ajuste */
+        flex-direction: column;
         align-items: flex-start;
         gap: 5px;
     }
@@ -501,19 +522,24 @@
         margin-top: 5px;
     }
 
-    .tarea-detalle.abierta { 
-        padding-top: 10px; 
-        padding-bottom: 10px; 
+    .tarea-detalle.abierta {
+        padding-top: 12px;
+        padding-bottom: 12px;
     }
+    
+    .detalle-label { font-size: 15px; } /* Ajuste */
+    .detalle-valor { font-size: 14px; } /* Ajuste */
+    
+    .evidencia-icono { width: 26px; height: 26px; } /* Ajuste de ícono grande */
 
     .tarea-datos-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
-        margin-top: 15px; 
+        gap: 12px;
+        margin-top: 15px;
         margin-bottom: 15px;
         padding-top: 15px;
     }
-
+    
     .modal-content-carrusel { max-width: 95vw; max-height: 85vh; padding: 10px; }
 
     .modal-close { 
@@ -535,31 +561,28 @@
 
 @media (max-width: 480px) {
     .proyecto-nombre-contenedor {
-        padding: 12px 18px;
-        border-radius: 0 0 12px 12px;
-        margin-bottom: 15px;
-    }
-    
-    .proyecto-nombre-content {
-        gap: 4px;
-    }
-    
-    .proyecto-label {
-        font-size: 0.8rem;
-        padding: 2px 8px;
+        padding: 14px 20px;
+        margin-bottom: 12px;
     }
     
     .proyecto-nombre-texto {
-        font-size: 1rem;
-        line-height: 1.2;
+        font-size: 1.15rem; /* Ajuste */
     }
 
     .proyecto-descripcion-contenedor,
     .tarea-item {
-        padding: 10px 12px;
+        padding: 12px 15px;
     }
 
-    .tarea-titulo { font-size: 0.9rem; padding: 12px; }
+    .tarea-titulo { 
+        font-size: 0.95rem; 
+        padding: 14px 15px; 
+    }
+    
     .detalle-label, .detalle-valor { font-size: 13px; }
-    .tarea-estatus { font-size: 10px; padding: 1px 5px; }
+    .tarea-estatus { font-size: 11px; padding: 2px 6px; }
+    .evidencia-icono { width: 24px; height: 24px; } /* Ajuste de ícono grande */
+
+    .modal-close { top: 10px; right: 10px; width: 30px; height: 30px; font-size: 12px; }
+    .modal-nav-btn { width: 35px; height: 35px; font-size: 20px; }
 }

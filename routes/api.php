@@ -6,7 +6,6 @@ use App\Http\Controllers\RegistroPaso1Controller;
 use App\Http\Controllers\RegistroPaso2Controller;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\DepartamentoController;
-use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\ProgresoController;
 use App\Http\Controllers\TareasController;
 use App\Http\Controllers\TareaController;
@@ -48,7 +47,6 @@ Route::get('/login', function () {
 /* 2. Rutas Protegidas por JWT (Requieren un token de acceso) */
 Route::middleware(['jwt.auth'])->group(function () {
     // PROYECTOS
-    Route::get('/proyectos', [ProyectoController::class, 'index']); 
     Route::get('/departamentos/{depId}/progresos', [ProgresoController::class, 'obtenerProgresosPorDepartamento']);
 
     // TAREAS

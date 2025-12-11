@@ -39,7 +39,7 @@ import EditarTareas from "./EditarTareas";
 import Reporte from "./Reporte";
 import EliminarUsuario from "./ModificarUsuario";
 import ModificarUsuario from "./EliminarUsuario";
-import GenerarInvitaciones from './GenerarInvitaciones';
+import Invitacion from './Invitacion';
 import NuevoDepartamento from './NuevoDepartamento';
 import ListaDepartamento from './ListaDepartamento';
 import ModificarDepartamento from './ModificarDepartamento';
@@ -58,7 +58,7 @@ function App() {
         <Route path="/ChangePassword" element={<ChangePassword />} />
         <Route path="/RegistroPaso2" element={<RegistroPaso2 />} />
         <Route path="/GenerarInvitacion" element={<GenerarInvitacion />} />
-        <Route path="/GenerarInvitaciones" element={<GenerarInvitaciones />} />
+        <Route path="/Invitacion" element={<Invitacion />} />
         <Route path="/RegistroPaso1/:token" element={<RegistroPaso1 />} />
          <Route path="/ModificarUsuario" element={<ModificarUsuario />} />
 

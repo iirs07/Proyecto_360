@@ -4,12 +4,7 @@ import {
   FaHome, FaFileAlt, FaUsers, FaTasks, FaProjectDiagram, FaPlus, FaFolder, 
   FaEye, FaEdit, FaToggleOn, FaTrash, FaSpinner, FaHourglassHalf, FaLayerGroup,
   FaCheckCircle, FaChevronDown, FaChevronRight, FaUserPlus, FaUserMinus, FaSignOutAlt,
-  FaBuilding,FaSitemap,         // Estructura organizacional
-  FaUserFriends,     // Grupo de usuarios (para asignar)
-  FaListAlt,         // Para listar
-  FaCity,            // Para organizaciones grandes
-  FaNetworkWired,    // Para estructuras
-  FaObjectGroup      // Para grupos
+  FaBuilding, FaSitemap, FaUserFriends, FaListAlt, FaCity, FaNetworkWired, FaObjectGroup 
 } from "react-icons/fa";
 
 import { FiUsers } from "react-icons/fi";
@@ -71,7 +66,7 @@ export default function MenuDinamico({
                     label: "Usuarios",
                     icon: FiUsers,
                     subMenu: [
-                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitacion", icon: FaUserPlus },
+                        { key: 'Invitacion', label: "Agregar usuarios", path: "/Invitacion", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                          { key: 'ModificarUsuario', label: "Modificar usuarios", path: "/ModificarUsuario", icon: FaUserMinus },
                     ],
@@ -128,7 +123,7 @@ export default function MenuDinamico({
                     label: "Usuarios",
                     icon: FiUsers,
                     subMenu: [
-                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/GenerarInvitaciones", icon: FaUserPlus },
+                        { key: 'generarInvitacion', label: "Agregar usuarios", path: "/Invitacion", icon: FaUserPlus },
                         { key: 'EliminarUsuario', label: "Eliminar usuarios", path: "/EliminarUsuario", icon: FaUserMinus },
                     ],
                 },

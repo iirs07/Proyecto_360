@@ -1,699 +1,901 @@
-/* ================================
-   Contenedor principal mejorado
-================================= */
-.departamentos-app {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  padding: 0;
-  position: relative;
-  overflow-x: hidden;
+/* =================================================================
+   1. ESTRUCTURA BASE Y CONTROL DE SCROLL (MODIFICAR DEPARTAMENTO)
+   ================================================================= */
+
+/* Contenedor principal: CRUCIAL para evitar el estiramiento vertical forzado. */
+.modep-container {
+    /* ELIMINAMOS height: 100% */
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start; /* CRUCIAL: Asegura que la tarjeta adopta su altura natural (height: auto) */
+    width: 100%;
+    min-height: 100vh; /* Asegura que el scroll del viewport funciona si el contenido es demasiado largo */
+    padding: 30px;
+    box-sizing: border-box;
+    /* overflow-y: auto; */ /* Se puede habilitar si se espera que el componente en sí (el formulario) desborde el viewport */
 }
-/* ================================
-   Header de usuario - DISEÑO MINIMALISTA
-================================= */
+
+/* Tarjeta principal (contenedor de modo 'seleccionar', 'departamentos', 'modificar_*'). */
+.modep-form-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 700px; 
+    
+    flex-grow: 0; /* ASEGURA que no se estira al 100% de la altura disponible */
+    height: auto; 
+    min-height: 0; 
+    max-height: calc(100vh - 60px); /* Límite para que la tarjeta no desborde completamente el viewport */
+    
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modep-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- TÍTULOS, CABECERAS Y FORMULARIO --- */
+.modep-form-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modep-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.modep-form-header {
+    padding: 20px 20px 10px;
+}
+
+.modep-current-name {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 10px 0 25px 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modep-current-icon {
+    color: #861542;
+}
+
+.modep-current-value {
+    font-weight: 700;
+    color: #333;
+    background-color: #f0f0f0;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.modep-form {
+    padding: 0 20px 20px;
+    /* Si el formulario de modificación es largo, permitir scroll aquí (opcional) */
+    /* overflow-y: auto; */ 
+}
+
+.modep-search-group {
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.modep-input-with-icon {
+    position: relative;
+}
+
+.modep-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.modep-form-input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modep-form-input:focus {
+    border-color: #861542;
+    box-shadow: 0 0 0 3px rgba(134, 21, 66, 0.1);
+    outline: none;
+}
+
+.modep-form-group {
+    margin-bottom: 20px;
+}
+
+.modep-form-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.modep-form-hints {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+.modep-warning {
+    color: #f39c12;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+/* --- ÁREA DE SCROLL DE LISTAS (Contenido flexible dentro de la tarjeta) --- */
+
+.modep-list-container {
+    flex-grow: 1; /* Esto permite que el contenedor de la lista ocupe el espacio restante dentro de la tarjeta */
+    min-height: 0; 
+    display: flex;
+    flex-direction: column;
+    padding: 0 20px;
+    margin-bottom: 10px;
+}
+
+.modep-list-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* EL CONTENIDO SCROLLABLE */
+.modep-list-content {
+    flex-grow: 1;
+    overflow-y: auto; /* APLICA EL SCROLL SÓLO EN ESTA ZONA */
+    padding-right: 15px; 
+}
+
+/* --- ITEMS DE LISTA --- */
+.modep-area-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    border-left: 5px solid #861542; 
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.modep-area-card:hover {
+    background: #f0f0f0;
+    transform: translateX(2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.modep-area-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.modep-area-subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.modep-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.modep-list-item:hover {
+    background: #f7f7f7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.modep-item-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #444;
+}
+
+/* --- BOTONES Y ACCIONES --- */
+.modep-btn-primary, .modep-btn-secondary {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.1s, opacity 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+}
+
+.modep-btn-primary {
+    background-color: #861542;
+    color: white;
+}
+
+.modep-btn-primary:hover:not(:disabled) {
+    background-color: #b2234e;
+    transform: translateY(-1px);
+}
+
+.modep-btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.modep-btn-secondary:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+.modep-btn-sm {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+}
+
+.modep-form-actions, .modep-footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    padding: 10px 20px 20px;
+    border-top: 1px solid #eee;
+}
+
+.modep-footer-actions {
+    padding-top: 15px;
+}
+
+.modep-message {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.modep-message-error {
+    background-color: #ffe5e5;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+}
+
+.modep-message-success {
+    background-color: #e5ffe5;
+    color: #008000;
+    border: 1px solid #008000;
+}
+
+/* --- ESTADOS VACÍOS Y CARGA --- */
+.modep-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.modep-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 15px;
+}
+
+.loader-logo img {
+    width: 80px;
+    animation: pulse 1.5s infinite;
+}
+
+.loader-texto {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #861542;
+}
+
+.loader-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #861542;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+
+/* =================================================================
+   2. CLASES DE DISEÑO AMPLIADO (DISEÑO GENERAL DE NAVEGACIÓN)
+   ================================================================= */
+
+/* --- Estructura y Header --- */
+.departamentos-app {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+}
+
 .user-header-container {
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  padding: 12px 20px;
-  border-radius: 0 0 12px 12px;
-  margin-bottom: 10px;
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    padding: 22px 30px; 
+    border-radius: 0 0 16px 16px; 
+    margin-bottom: 25px; 
 }
 
 .user-greeting {
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px; 
+    flex-wrap: wrap;
 }
 
 .user-icon {
-  font-size: 1.1rem;
-  opacity: 0.9;
+    font-size: 1.4rem; 
+    opacity: 0.9;
 }
 
 .user-greeting h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: -0.01em;
+    font-size: 1.6rem; 
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .user-greeting .user-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-  opacity: 0.9;
+    font-size: 1.3rem; 
+    font-weight: 500;
+    opacity: 0.95;
+    padding: 6px 16px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ================================
-   Responsive
-================================= */
-@media (max-width: 768px) {
-  .user-header-container {
-    padding: 10px 16px;
-  }
-  
-  .user-greeting {
-    gap: 6px;
-    justify-content: center;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.1rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .user-header-container {
-    padding: 8px 12px;
-  }
-  
-  .user-greeting {
-    flex-direction: column;
-    gap: 4px;
-    text-align: center;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 0.95rem;
-  }
-}
-/* ================================
-   Responsive para diseño compacto
-================================= */
-@media (max-width: 768px) {
-  .user-header-container {
-    padding: 14px 20px;
-    margin-bottom: 18px;
-  }
-  
-  .user-greeting {
-    gap: 8px;
-    flex-direction: column;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.2rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1.1rem;
-    padding: 5px 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .user-header-container {
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    border-radius: 0 0 12px 12px;
-  }
-  
-  .user-greeting {
-    gap: 6px;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.1rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1rem;
-    padding: 4px 12px;
-  }
-}
-
-/* ================================
-   Hero section mejorada y más compacta
-================================= */
+/* --- Sección Hero --- */
 .areas-hero {
-  text-align: center;
-  padding: 15px 20px 10px;
-  position: relative;
-  z-index: 1;
-  margin-top: 0;
+    text-align: center;
+    padding: 20px 30px 15px; 
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
 }
 
 .areas-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #2d3748;
-  margin-bottom: 6px;
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+    font-size: 2.5rem; 
+    font-weight: 800;
+    color: #2d3748;
+    margin-bottom: 8px; 
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 .areas-subtitle {
-  font-size: 1rem;
-  color: #718096;
-  font-weight: 500;
-  max-width: 500px;
-  margin: 0 auto;
-  line-height: .5;
+    font-size: 1.1rem; 
+    color: #718096;
+    font-weight: 500;
+    max-width: 600px; 
+    margin: 0 auto;
+    line-height: 1.4; 
 }
 
-/* ================================
-   Contenedor del grid más compacto
-================================= */
+/* --- Contenedor de Grids y Tarjetas --- */
 .areas-grid-container {
-  position: relative;
-  z-index: 1;
-  padding: 0 20px 25px;
-  max-width: 1000px;
-  margin: 0 auto;
-  margin-top: 5px;
+    position: relative;
+    z-index: 1;
+    padding: 0 30px 30px; 
+    max-width: 1200px; 
+    margin: 15px auto 0; 
 }
 
 .areas-grid-departamentos {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  align-items: start;
-  position: relative;
-  z-index: 1;
-  animation: fadeInUp 0.5s ease-out;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px; 
+    align-items: start;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.5s ease-out;
 }
 
-/* ================================
-   Tarjetas con tamaños optimizados
-================================= */
 .area-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-  border-radius: 16px;
-  box-shadow: 
-    0 2px 12px rgba(0, 0, 0, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(134, 21, 66, 0.1);
-  overflow: visible;
-  position: relative;
-  min-height: 85px;
-  display: flex;
-  flex-direction: column;
-  z-index: 1;
-  animation: fadeInUp 0.3s ease-out both;
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    border-radius: 20px; 
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.1),
+        0 2px 5px rgba(0, 0, 0, 0.05); 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(134, 21, 66, 0.1); 
+    overflow: visible;
+    position: relative;
+    min-height: 100px; 
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    animation: fadeInUp 0.3s ease-out both;
 }
 
 .area-card:nth-child(odd) {
-  animation-delay: 0.08s;
+    animation-delay: 0.08s;
 }
 
 .area-card:nth-child(even) {
-  animation-delay: 0.16s;
+    animation-delay: 0.16s;
 }
 
-/* Cuando el dropdown está activo, la tarjeta sube de nivel */
 .area-card.active {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 8px 30px rgba(134, 21, 66, 0.15),
-    0 4px 12px rgba(134, 21, 66, 0.1);
-  z-index: 100;
-  border-color: rgba(134, 21, 66, 0.2);
+    transform: translateY(-6px); 
+    box-shadow: 
+        0 10px 40px rgba(134, 21, 66, 0.2),
+        0 6px 15px rgba(134, 21, 66, 0.15);
+    z-index: 100;
+    border-color: rgba(134, 21, 66, 0.3);
 }
 
 .area-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  transform: scaleX(0);
-  transition: transform 0.4s ease;
-  z-index: 2;
-  border-radius: 16px 16px 0 0;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    z-index: 2;
+    border-radius: 20px 20px 0 0;
 }
 
 .area-card:hover::before,
 .area-card.active::before {
-  transform: scaleX(1);
+    transform: scaleX(1);
 }
 
 .area-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 
-    0 10px 35px rgba(134, 21, 66, 0.18),
-    0 6px 15px rgba(134, 21, 66, 0.12);
-  border-color: rgba(134, 21, 66, 0.25);
+    transform: translateY(-6px); 
+    box-shadow: 
+        0 12px 40px rgba(134, 21, 66, 0.25),
+        0 8px 20px rgba(134, 21, 66, 0.18);
+    border-color: rgba(134, 21, 66, 0.35);
 }
 
-/* ================================
-   Botones de área - TAMAÑOS OPTIMIZADOS
-================================= */
+/* --- Botones y Contenido de Área --- */
 .area-card-btn {
-  width: 100%;
-  padding: 18px 20px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  flex: 1;
-  position: relative;
-  z-index: 10;
-  border-radius: 16px;
+    width: 100%;
+    padding: 22px 25px; 
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    flex: 1;
+    position: relative;
+    z-index: 10;
+    border-radius: 20px;
 }
 
 .area-card-btn:hover {
-  background: linear-gradient(135deg, rgba(134, 21, 66, 0.03) 0%, rgba(178, 35, 78, 0.03) 100%);
+    background: linear-gradient(135deg, rgba(134, 21, 66, 0.03) 0%, rgba(178, 35, 78, 0.03) 100%);
 }
 
 .area-card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    flex: 1;
 }
 
 .area-icon-container {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  box-shadow: 
-    0 4px 15px rgba(134, 21, 66, 0.35),
-    0 2px 6px rgba(134, 21, 66, 0.2);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-  transform-origin: center;
+    width: 50px; 
+    height: 50px; 
+    border-radius: 14px; 
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.4rem; 
+    box-shadow: 
+        0 6px 20px rgba(134, 21, 66, 0.4),
+        0 3px 8px rgba(134, 21, 66, 0.25);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
 }
 
-/* Efecto de brillo en movimiento mejorado */
 .area-icon-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.6), 
-    transparent);
-  transition: left 0.8s ease;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.6), 
+        transparent);
+    transition: left 0.8s ease;
 }
 
 .area-card:hover .area-icon-container::before {
-  left: 100%;
+    left: 100%;
 }
 
 .area-card:hover .area-icon-container {
-  transform: scale(1.12) rotate(8deg);
-  box-shadow: 
-    0 6px 20px rgba(134, 21, 66, 0.5),
-    0 3px 10px rgba(134, 21, 66, 0.3);
+    transform: scale(1.15) rotate(10deg);
+    box-shadow: 
+        0 8px 25px rgba(134, 21, 66, 0.6),
+        0 4px 12px rgba(134, 21, 66, 0.4);
+    animation: iconPulse 2s ease-in-out infinite;
 }
 
 .area-text-content {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px; 
+    flex: 1;
 }
 
 .area-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #2d3748;
-  line-height: 1.3;
-  text-align: left;
-  margin: 0;
-  letter-spacing: -0.01em;
+    font-size: 1.2rem; 
+    font-weight: 700;
+    color: #2d3748;
+    line-height: 1.3;
+    text-align: left;
+    margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .area-department-count {
-  font-size: 0.8rem;
-  color: #718096;
-  font-weight: 600;
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-  padding: 3px 10px;
-  border-radius: 8px;
-  align-self: flex-start;
-  border: 1px solid #e2e8f0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    font-size: 0.9rem; 
+    color: #718096;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    padding: 4px 12px; 
+    border-radius: 10px; 
+    align-self: flex-start;
+    border: 1px solid #e2e8f0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Efecto hover mejorado para el contador */
 .area-card:hover .area-department-count {
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  color: white;
-  border-color: transparent;
-  transform: scale(1.05) translateY(-1px);
-  box-shadow: 
-    0 4px 12px rgba(134, 21, 66, 0.3),
-    0 2px 6px rgba(134, 21, 66, 0.2);
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    color: white;
+    border-color: transparent;
+    transform: scale(1.05) translateY(-1px);
+    box-shadow: 
+        0 4px 12px rgba(134, 21, 66, 0.3),
+        0 2px 6px rgba(134, 21, 66, 0.2);
 }
 
 .area-chevron {
-  color: #861542;
-  font-size: 0.9rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0.8;
-  flex-shrink: 0;
-  margin-left: 8px;
-  background: rgba(134, 21, 66, 0.1);
-  padding: 5px;
-  border-radius: 6px;
+    color: #861542;
+    font-size: 1.1rem; 
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.8;
+    flex-shrink: 0;
+    margin-left: 8px;
+    background: rgba(134, 21, 66, 0.1);
+    padding: 6px;
+    border-radius: 8px;
 }
 
 .area-card:hover .area-chevron {
-  opacity: 1;
-  transform: scale(1.2);
-  background: rgba(134, 21, 66, 0.15);
+    opacity: 1;
+    transform: scale(1.2);
+    background: rgba(134, 21, 66, 0.15);
 }
 
-/* ================================
-   Dropdown con diseño mejorado
-================================= */
+/* --- Dropdown y Departamentos --- */
 .departments-dropdown {
-  background: linear-gradient(135deg, #ffffff 0%, #fcfdfe 100%);
-  border-top: 1px solid rgba(134, 21, 66, 0.1);
-  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
-  flex-shrink: 0;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.2),
-    0 6px 15px rgba(134, 21, 66, 0.12);
-  border-radius: 0 0 16px 16px;
-  border: 1px solid rgba(134, 21, 66, 0.15);
-  border-top: none;
-  backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #ffffff 0%, #fcfdfe 100%);
+    border-top: 1px solid rgba(134, 21, 66, 0.1);
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 8px 20px rgba(134, 21, 66, 0.2);
+    border-radius: 0 0 20px 20px;
+    border: 1px solid rgba(134, 21, 66, 0.15);
+    border-top: none;
+    backdrop-filter: blur(10px);
 }
 
 .departments-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 5px;
-  padding: 14px 18px;
-  max-height: 220px;
-  overflow-y: auto;
-  position: relative;
-  z-index: 1001;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px; 
+    padding: 18px 22px; 
+    max-height: 280px; 
+    overflow-y: auto;
+    position: relative;
+    z-index: 1001;
 }
 
 /* Scroll personalizado mejorado */
 .departments-grid::-webkit-scrollbar {
-  width: 5px;
+    width: 6px;
 }
 
 .departments-grid::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .departments-grid::-webkit-scrollbar-track {
-  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-  border-radius: 3px;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 3px;
 }
 
-/* ================================
-   Items de departamento mejorados
-================================= */
 .department-item {
-  padding: 10px 14px;
-  cursor: pointer;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #f1f5f9 100%);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  align-items: center;
-  position: relative;
-  z-index: 1002;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 12px 18px; 
+    cursor: pointer;
+    border-radius: 10px; 
+    background: linear-gradient(135deg, #f8f9fa 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1002;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .department-item:hover {
-  background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
-  transform: translateX(4px) scale(1.01);
-  box-shadow: 
-    0 4px 15px rgba(134, 21, 66, 0.25),
-    0 2px 8px rgba(134, 21, 66, 0.15);
-  border-color: transparent;
+    background: linear-gradient(135deg, #861542 0%, #b2234e 100%);
+    transform: translateX(4px) scale(1.01);
+    box-shadow: 
+        0 4px 15px rgba(134, 21, 66, 0.25),
+        0 2px 8px rgba(134, 21, 66, 0.15);
+    border-color: transparent;
 }
 
 .department-name {
-  font-weight: 600;
-  color: #4a5568;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  flex: 1;
-  letter-spacing: -0.01em;
+    font-weight: 600;
+    color: #4a5568;
+    transition: all 0.3s ease;
+    font-size: 1rem; 
+    flex: 1;
+    letter-spacing: -0.01em;
 }
 
 .department-item:hover .department-name {
-  color: white;
-  font-weight: 700;
-  transform: translateX(2px);
+    color: white;
+    font-weight: 700;
+    transform: translateX(2px);
 }
 
-/* ================================
-   Animaciones mejoradas
-================================= */
+/* --- Animaciones --- */
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    max-height: 240px;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 280px; 
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes iconPulse {
-  0%, 100% { 
-    transform: scale(1.12) rotate(8deg); 
-    box-shadow: 
-      0 6px 20px rgba(134, 21, 66, 0.5),
-      0 3px 10px rgba(134, 21, 66, 0.3);
-  }
-  50% { 
-    transform: scale(1.15) rotate(10deg); 
-    box-shadow: 
-      0 7px 22px rgba(134, 21, 66, 0.6),
-      0 4px 12px rgba(134, 21, 66, 0.4);
-  }
+    0%, 100% { 
+        transform: scale(1.15) rotate(10deg); 
+    }
+    50% { 
+        transform: scale(1.18) rotate(12deg); 
+    }
 }
 
-.area-card:hover .area-icon-container {
-  animation: iconPulse 2s ease-in-out infinite;
-}
 
-/* ================================
-   Responsive Design Mejorado
-================================= */
-@media (max-width: 1200px) {
-  .areas-grid-container {
-    max-width: 900px;
-  }
-}
+/* =================================================================
+   3. RESPONSIVE DESIGN
+   ================================================================= */
 
 @media (max-width: 992px) {
-  .areas-grid-departamentos {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    max-width: 500px;
-    margin: 0 auto;
-  }
-  
-  .user-header-container {
-    padding: 18px 25px;
-    margin-bottom: 20px;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.6rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1.2rem;
-    padding: 7px 18px;
-  }
-  
-  .areas-hero {
-    padding: 12px 20px 8px;
-  }
-  
-  .areas-title {
-    font-size: 1.7rem;
-  }
+    .areas-grid-container {
+        max-width: 90%;
+        padding: 0 20px 25px;
+    }
+    .areas-grid-departamentos {
+        grid-template-columns: 1fr; 
+        gap: 15px; 
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .user-header-container {
+        padding: 20px 25px;
+        margin-bottom: 20px;
+    }
+    .user-greeting h1 {
+        font-size: 1.5rem;
+    }
+    .areas-title {
+        font-size: 2rem;
+    }
+    .area-card-btn {
+        padding: 20px 22px;
+    }
+    .area-icon-container {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+    }
 }
 
 @media (max-width: 768px) {
-  .departamentos-app {
-    padding: 0;
-  }
-  
-  .user-header-container {
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    border-radius: 0 0 16px 16px;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.4rem;
-    margin-bottom: 6px;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1.1rem;
-    padding: 6px 16px;
-  }
-  
-  .areas-hero {
-    padding: 10px 15px 6px;
-  }
-  
-  .areas-title {
-    font-size: 1.4rem;
-  }
-  
-  .areas-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .areas-grid-container {
-    padding: 0 15px 20px;
-  }
-  
-  .area-card-btn {
-    padding: 16px 18px;
-  }
-  
-  .area-card-header {
-    gap: 10px;
-  }
-  
-  .area-icon-container {
-    width: 40px;
-    height: 40px;
-    font-size: 1.1rem;
-  }
-  
-  .area-name {
-    font-size: 0.95rem;
-  }
-  
-  .departments-grid {
-    padding: 12px 16px;
-  }
+    /* Ajustes específicos para ModificarDepartamento */
+    .modep-container {
+        padding: 15px;
+    }
+    .modep-form-card {
+        max-width: 100%;
+    }
+    .modep-form-title, .modep-current-name {
+        font-size: 1.4rem;
+    }
+    .modep-form-actions, .modep-footer-actions {
+        flex-direction: column;
+    }
+    .modep-btn-primary, .modep-btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Ajustes generales de diseño */
+    .user-header-container {
+        padding: 16px 20px;
+        margin-bottom: 15px;
+        border-radius: 0 0 16px 16px;
+    }
+    .user-greeting h1 {
+        font-size: 1.4rem;
+    }
+    .user-greeting .user-name {
+        font-size: 1.1rem;
+        padding: 6px 14px;
+    }
+    .areas-title {
+        font-size: 1.7rem;
+    }
+    .areas-grid-container {
+        padding: 0 15px 20px;
+    }
+    .area-card-btn {
+        padding: 18px 20px;
+    }
+    .area-icon-container {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+    .area-name {
+        font-size: 1.05rem;
+    }
+    .departments-grid {
+        max-height: 240px;
+    }
 }
 
 @media (max-width: 480px) {
-  .user-header-container {
-    padding: 12px 15px;
-    margin-bottom: 12px;
-  }
-  
-  .user-greeting h1 {
-    font-size: 1.2rem;
-  }
-  
-  .user-greeting .user-name {
-    font-size: 1rem;
-    padding: 5px 14px;
-  }
-  
-  .areas-hero {
-    padding: 8px 10px 4px;
-  }
-  
-  .areas-title {
-    font-size: 1.2rem;
-  }
-  
-  .areas-subtitle {
-    font-size: 0.85rem;
-  }
-  
-  .areas-grid-container {
-    padding: 0 10px 15px;
-  }
-  
-  .area-card-btn {
-    padding: 14px 16px;
-  }
-  
-  .area-card-header {
-    gap: 8px;
-  }
-  
-  .area-icon-container {
-    width: 38px;
-    height: 38px;
-    font-size: 1rem;
-    border-radius: 10px;
-  }
-  
-  .area-name {
-    font-size: 0.9rem;
-  }
-  
-  .area-department-count {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-  }
-  
-  .departments-grid {
-    padding: 10px 12px;
-    max-height: 180px;
-  }
-  
-  .department-item {
-    padding: 8px 12px;
-  }
-  
-  .department-name {
-    font-size: 0.85rem;
-  }
-  
-  .area-chevron {
-    font-size: 0.85rem;
-  }
+    .user-header-container {
+        padding: 14px 15px;
+        margin-bottom: 12px;
+    }
+    .user-greeting {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+    }
+    .user-greeting h1 {
+        font-size: 1.3rem;
+    }
+    .areas-title {
+        font-size: 1.5rem;
+    }
+    .areas-grid-container {
+        padding: 0 10px 15px;
+    }
+    .area-card-btn {
+        padding: 16px;
+    }
+    .area-icon-container {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    .area-name {
+        font-size: 1rem;
+    }
+    .departments-grid {
+        max-height: 200px;
+        padding: 12px 14px;
+    }
 }
