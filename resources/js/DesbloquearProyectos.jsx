@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "../css/DesbloquearProyectos.css"; 
-import "../css/formulario.css"; 
+import "../css/DesbloquearProyectos.css";
+import "../css/formulario.css";
 import { FiX, FiChevronLeft, FiChevronRight, FiArchive, FiUnlock, FiCheck } from "react-icons/fi";
 import { FaTasks, FaCalendarAlt, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -8,8 +8,28 @@ import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
-import ConfirmModal from "../components/ConfirmModal"; // <--- 1. IMPORTAR EL MODAL
+import ConfirmModal from "../components/ConfirmModal";
 import { useRolNavigation } from "./utils/navigation";
+
+// --- FUNCIÓN AUXILIAR useDebounce (SOLUCIÓN AL PROBLEMA DE RENDIMIENTO) ---
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    // Establecer un temporizador (timeout) que actualizará el valor después de 'delay'
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    // Limpiar el temporizador si el valor cambia (el usuario sigue escribiendo)
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+// --- FIN FUNCIÓN AUXILIAR useDebounce ---
 
 function DesbloquearProyectos() {
   const [busqueda, setBusqueda] = useState("");
@@ -27,6 +47,15 @@ function DesbloquearProyectos() {
   // --- FILTROS ---
   const [anio, setAnio] = useState("");
   const [mes, setMes] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState(""); // lo que se envía al fetch
+
+  // Función que se llama cuando el usuario da clic al botón de buscar
+  const handleBuscarClick = () => {
+    setSearchTerm(busqueda); // actualiza el término de búsqueda que dispara el fetch
+  };
+
+  const debouncedBusqueda = useDebounce(busqueda, 500); // 500ms de retraso
   
   const navigate = useNavigate();
 
@@ -53,55 +82,71 @@ function DesbloquearProyectos() {
     return fechaFin < inicioTrimestre;
   };
 
-  // --- CARGA INICIAL DE PROYECTOS ---
   useEffect(() => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     if (!usuario?.id_usuario) return;
 
     const obtenerProyectosCompletados = async () => {
-      setLoading(true); 
-      const token = sessionStorage.getItem("jwt_token");
+        setLoading(true);
+        const token = sessionStorage.getItem("jwt_token");
 
-      try {
-        let url = `${API_URL}/api/proyectos/completados?usuario_id=${usuario.id_usuario}`;
+        try {
+            let url;
+            const usuarioIdQuery = `usuario_id=${usuario.id_usuario}`;
 
-if (anio) url += `&anio=${anio}`;
-if (mes) url += `&mes=${mes}`;
+            if (anio || mes || searchTerm) {  // <-- usamos searchTerm
+                url = `${API_URL}/api/proyectos/completados/buscar?${usuarioIdQuery}`;
+                if (anio) url += `&anio=${anio}`;
+                if (mes) url += `&mes=${mes}`;
+                if (searchTerm) url += `&busqueda=${searchTerm}`;
+            } else {
+                url = `${API_URL}/api/proyectos/completados/recientes?${usuarioIdQuery}`;
+            }
 
+            const res = await fetch(url, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
 
-        const res = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-        });
+            if (res.status === 401) {
+                sessionStorage.removeItem("jwt_token");
+                navigate("/Login", { replace: true });
+                return;
+            }
 
-        if (res.status === 401) {
-          sessionStorage.removeItem("jwt_token");
-          navigate("/Login", { replace: true });
-          return;
+            const data = await res.json();
+            if (data.success) {
+              setProyectos(data.proyectos);
+            }
+            else {
+              setProyectos([]);
+            }
+        } catch (error) {
+            console.error("Error al obtener proyectos:", error);
+            setProyectos([]);
+        } finally {
+            setLoading(false);
         }
-
-        const data = await res.json();
-        if (data.success) setProyectos(data.proyectos);
-        else setProyectos([]); 
-
-      } catch (error) {
-        console.error("Error al obtener proyectos:", error);
-      } finally {
-        setLoading(false);
-      }
     };
 
     obtenerProyectosCompletados();
-  }, [navigate, anio, mes]);
+  }, [anio, mes, searchTerm, navigate]);
 
+
+  // El filtrado en el frontend todavía es útil para una retroalimentación visual inmediata
+  // mientras se escribe.
   const proyectosFiltrados = proyectos.filter(p =>
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
+  
+  // Condición para mostrar el loader
+  const mostrarLoader = loading;
 
-  // --- NUEVA LÓGICA: MANEJO DE ESTADO LOCAL ---
+
+  // --- LÓGICA DE MANEJO DE ESTADO LOCAL (sin cambios) ---
 
   const handleExpandirProyecto = (idProyecto) => {
     if (!proyectosExpandidos.includes(idProyecto)) {
@@ -197,11 +242,20 @@ if (mes) url += `&mes=${mes}`;
   };
 
 
-  // --- MANEJO DE IMÁGENES ---
+  // --- MANEJO DE IMÁGENES (sin cambios) ---
   const handleVerEvidencias = (tarea, fechaFinProyecto) => {
     setTareaActual(tarea);
     setEvidencias(tarea.evidencias || []);
     setIndiceActual(0);
+    
+    const esProyectoArchivado = (fechaFinProyecto) => {
+      if (!fechaFinProyecto) return false;
+      const fechaFin = new Date(fechaFinProyecto);
+      const ahora = new Date();
+      const mesInicioTrimestre = Math.floor(ahora.getMonth() / 3) * 3;
+      const inicioTrimestre = new Date(ahora.getFullYear(), mesInicioTrimestre, 1);
+      return fechaFin < inicioTrimestre;
+    };
     
     const esAntiguo = esProyectoArchivado(fechaFinProyecto);
     if (esAntiguo) {
@@ -253,6 +307,8 @@ if (mes) url += `&mes=${mes}`;
   const limpiarFiltrosFecha = () => {
     setAnio("");
     setMes("");
+    setBusqueda(""); 
+    setSearchTerm(""); 
   };
 
   return (
@@ -263,7 +319,8 @@ if (mes) url += `&mes=${mes}`;
       <div className="contenedor-global">
 
         {/* --- BARRA DE BÚSQUEDA Y FILTROS --- */}
-        {(proyectos.length > 0 || anio !== "" || mes !== "") && (
+        {/* Muestra la barra si hay proyectos O si la búsqueda/filtros están activos */}
+        {(proyectos.length > 0 || anio !== "" || mes !== "" || searchTerm !== "") && (
           <div className="barra-busqueda-dp-container mb-4">
             <p className="subtitulo-global">Gestiona y reactiva proyectos finalizados e históricos</p>
             
@@ -304,44 +361,49 @@ if (mes) url += `&mes=${mes}`;
                )}
               </div>
 
-              {proyectos.length > 0 && (
-                <div className="barra-buscador-texto" >
-                    <FaSearch className="barra-busqueda-dp-icon" />
-                    <input
-                      type="text"
-                      placeholder="Buscar proyectos..."
-                      value={busqueda}
-                      onChange={(e) => setBusqueda(e.target.value)}
-                      className="barra-busqueda-dp-input"
-                    />
-                    {busqueda && (
-                      <button className="buscador-clear-dp" onClick={() => setBusqueda("")}>
-                        <FiX />
-                      </button>
-                    )}
-                </div>
-              )}
+            
+             <div className="barra-buscador-texto">
+    {/* ⬅️ AÑADE ESTE ÍCONO DE LUPA DECORATIVO */}
+    <span className="barra-busqueda-dp-icon">
+        <FaSearch /> 
+    </span>
+    {/* ------------------------------------------- */}
+    <input
+        type="text"
+        placeholder="Buscar proyectos..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="barra-busqueda-dp-input"
+    />
+    {busqueda && (
+        <button className="buscador-clear-dp" onClick={() => {
+            setBusqueda("");
+            setSearchTerm("");
+        }}>
+            <FiX />
+        </button>
+    )}
+</div>
+<button className="dp-btn-buscar" onClick={handleBuscarClick}>
+    <FaSearch />
+    <span>Buscar</span> 
+</button>
+                
+              </div>
             </div>
 
-            {busqueda && (
-                <div className="contenedor-resultados-centrado" >
-                    <div className="buscador-dp-resultados-info">
-                      {proyectosFiltrados.length} resultado(s) para "{busqueda}"
-                    </div>
-                </div>
-            )}
-          </div>
+       
         )}
 
         {/* Lista de proyectos */}
         <div className="dp-lista">
-          {loading ? (
+          {mostrarLoader ? ( // El loader solo se muestra en loading
             <div className="loader-container">
               <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
               <div className="loader-texto">CARGANDO...</div>
               <div className="loader-spinner"></div>
             </div>
-          ) : proyectosFiltrados.length > 0 ? (
+          ) : proyectos.length > 0 ? (
             
             proyectosFiltrados.map(p => {
               const estaExpandido = proyectosExpandidos.includes(p.id_proyecto);
@@ -452,16 +514,15 @@ if (mes) url += `&mes=${mes}`;
                 </div>
               );
             })
-
-          ) : busqueda !== "" ? (
-              null
-          ) : (anio !== "" || mes !== "") ? (
+          ) : (searchTerm !== "" || anio !== "" || mes !== "") ? (
+           
               <div style={{ textAlign: 'center', marginTop: '40px', width: '100%' }}>
                  <div className="buscador-dp-resultados-info">
-                    No se encontraron proyectos para la fecha seleccionada.
+                    No se encontraron proyectos que coincidan con los criterios seleccionados.
                  </div>
               </div>
           ) : (
+           
              <EmptyState
                 titulo="LISTA DE PROYECTOS"
                 mensaje="Actualmente no tienes proyectos finalizados."
@@ -473,13 +534,14 @@ if (mes) url += `&mes=${mes}`;
         </div>
       </div>
 
+
      {/* --- MODAL EVIDENCIAS --- */}
 {modalVisible && tareaActual && (
   <div className="dp-modal">
     <div className="dp-modal-content">
       
       <div className="dp-modal-header">
- 
+
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
           <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {tareaActual.t_nombre}

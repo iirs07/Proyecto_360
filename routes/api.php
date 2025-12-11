@@ -77,7 +77,9 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/proyectos/{id}/completar', [NuevoProyectoController::class, 'completar']);
     Route::put('/proyectos/{id}/finalizar', [NuevoProyectoController::class, 'CambiarStatusProyecto']);
     Route::put('/proyectos/{id}/cambiar-status', [NuevoProyectoController::class, 'CambiarStatusProyectoTerminado']);
-    Route::get('/proyectos/completados', [TareasDirectorController::class, 'obtenerProyectosCompletados']);
+    Route::get('proyectos/completados/buscar', [TareasDirectorController::class, 'obtenerProyectosCompletados']);
+    Route::get('proyectos/completados/recientes', [TareasDirectorController::class, 'obtenerProyectosCompletadosRecientes']);
+    
     Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);
     Route::put('/tareas/{id}/completar', [TareasDirectorController::class, 'completarTarea']);
     Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);

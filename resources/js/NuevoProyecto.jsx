@@ -204,6 +204,18 @@ function NuevoProyecto() {
     };
   }, [camposModificados, mostrarExtras]);
 
+   const calcularDuracion = () => {
+   if (fechaInicio && fechaFin) {
+     // Calcula la diferencia en milisegundos
+     const diffTime = Math.abs(fechaFin - fechaInicio);
+     // Convierte a días (redondea para obtener un número entero de días)
+     const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+     // Suma 1 para incluir el día de inicio
+     return diffDays + 1; 
+   }
+   return 0;
+ };
+
   return (
      <Layout
        titulo="NUEVO PROYECTO"
@@ -337,18 +349,18 @@ function NuevoProyecto() {
                 </div>
                  </div>
               </div>
-              {fechaInicio && fechaFin && (
-                <div className="col-12">
-                  <div className="nv-duracion-indicador p-3 mt-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className="text-muted">Duración estimada:</span>
-                      <span className="fw-bold">
-                        {Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24))} días
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
+             {fechaInicio && fechaFin && (
+  <div className="col-12">
+    <div className="nv-duracion-indicador p-3 mt-2">
+      <div className="d-flex justify-content-between align-items-center">
+        <span className="text-muted">Duración estimada:</span>
+        <span className="fw-bold">
+          {calcularDuracion()} días 
+        </span>
+      </div>
+    </div>
+  </div>
+)}
             </div>
    
        

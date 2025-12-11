@@ -18,6 +18,81 @@
     font-weight: bold;
 }
 
+.barra-buscador-texto .barra-busqueda-dp-input {
+    width: 100%;
+    padding: 14px 50px 14px 50px; 
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    z-index: 3;
+}
+
+.barra-buscador-texto .barra-busqueda-dp-icon {
+    position: absolute;
+    left: 18px; 
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+    font-size: 1.2rem;
+    z-index: 4; 
+}
+
+.buscador-clear-dp {
+    position: absolute;
+    right: 10px; 
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4; 
+}
+.dp-btn-buscar {
+    
+    background-color: #861542; 
+    color: white;
+    border: none;
+    border-radius: 12px; 
+    padding: 14px 20px; 
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex; 
+    align-items: center;
+    gap: 8px; 
+    flex-shrink: 0; 
+    margin-left: 15px; 
+    box-shadow: 0 4px 10px rgba(134, 21, 66, 0.3);
+}
+
+.dp-btn-buscar:hover {
+    background-color: #6e1136; 
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(134, 21, 66, 0.4);
+}
+
+.dp-btn-buscar svg {
+    font-size: 1.1rem; 
+}
+
+@media (max-width: 768px) {
+   
+    
+    .dp-btn-buscar {
+        width: 100%; 
+        margin-left: 0;
+        justify-content: center;
+    }
+}
 /* ==============================
     TARJETAS DE PROYECTO MEJORADAS
 ============================== */

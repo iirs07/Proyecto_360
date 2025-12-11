@@ -265,19 +265,7 @@ const API_URL = import.meta.env.VITE_API_URL;
                             <div className="lp-info-value lp-alert-text expired">¡Vencido!</div>
                           </div>
                         </>
-                      ) : esProximo && diasRestantes <= 3 ? (
-                        <>
-                          <FaExclamationTriangle className="lp-alert-icon warning" />
-                          <div className="lp-info-content">
-                            <div className="lp-info-label lp-alert-label">Vence</div>
-                            <div className="lp-info-value lp-alert-text warning">
-                              {diasRestantes === 0 
-                                ? "Hoy" 
-                                : `En ${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
-                            </div>
-                          </div>
-                        </>
-                      ) : null}
+                      ) :   null}
                     </div>
                 
 

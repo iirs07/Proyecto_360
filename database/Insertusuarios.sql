@@ -15,11 +15,11 @@ ALTER SEQUENCE invitaciones_id_invitacion_seq RESTART WITH 1;
 -- Insertar un solo usuario y persona, IDs coincidentes
 INSERT INTO c_usuario (id_departamento, u_nombre, a_paterno, a_materno, telefono)
 VALUES
-(3, 'ITZEL', 'RAMOS', 'SANTIAGO', '1234567890');
+(1, 'ITZEL', 'RAMOS', 'SANTIAGO', '1234567890');
 
 
 INSERT INTO usuario (id_usuario_login, rol, correo, contrasena)
-VALUES (1, 'Jefe', 'noviramos20@gmail.com', '$2y$12$1jGasv5F9cZQIJmVmekVjeS72nVFeHXKI660/8NJFsKgS6MvsvMzK');
+VALUES (1, 'Jefe', 'coralhr11@gmail.com', '$2y$12$1jGasv5F9cZQIJmVmekVjeS72nVFeHXKI660/8NJFsKgS6MvsvMzK');
 
 -- Insertar un proyecto
 INSERT INTO proyectos (id_departamento, p_nombre, pf_inicio, pf_fin, p_estatus, descripcion)

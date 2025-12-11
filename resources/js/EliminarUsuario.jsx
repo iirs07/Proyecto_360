@@ -79,13 +79,13 @@ const API_URL = import.meta.env.VITE_API_URL;
 
   if (loadingInicial) {
     return (
-      <div className="eliminarusuario-loader-container">
-        <div className="eliminarusuario-loader-logo">
-          <img src={logo3} alt="Cargando" />
-        </div>
-        <div className="eliminarusuario-loader-texto">CARGANDO...</div>
-        <div className="eliminarusuario-loader-spinner"></div>
-      </div>
+       <div className="loader-container">
+                 <div className="loader-logo">
+                   <img src={logo3} alt="Cargando" />
+                 </div>
+                 <div className="loader-texto">CARGANDO...</div>
+                 <div className="loader-spinner"></div>
+               </div>
     );
   }
 
