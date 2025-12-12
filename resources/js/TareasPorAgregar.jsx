@@ -11,7 +11,7 @@ import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import SelectDinamico from "../components/SelectDinamico";
 
-function AgregarT() {
+function TareasPorAgregar() {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
@@ -207,4 +207,4 @@ function AgregarT() {
   );
 }
 
-export default AgregarT;
+export default TareasPorAgregar;

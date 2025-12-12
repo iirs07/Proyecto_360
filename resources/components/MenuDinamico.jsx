@@ -117,7 +117,7 @@ export default function MenuDinamico({
                         { key: 'enproceso', label: "Tareas por revisar", path: "/TareasenProceso", icon: FaSpinner },
                         { key: 'pendientes', label: "Tareas pendientes", path: "/TareasPendientes", icon: FaHourglassHalf },
                         { key: 'completadas', label: "Tareas completadas", path: "/TareasCompletadasDepartamento", icon: FaCheckCircle },
-                        { key: 'agregar', label: "Agregar Tareas", path: "/AgregarT", icon: FaPlus },
+                        { key: 'agregar', label: "Agregar Tareas", path: "/TareasPorAgregar", icon: FaPlus },
                         { key: 'modificarT', label: "Modificar tarea", path: "/ModificarTareas", icon: FaEdit },
                         { key: 'eliminarT', label: "Eliminar tarea", path: "/EliminarTareas", icon: FaTrash },
                     ],

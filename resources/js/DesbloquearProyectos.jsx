@@ -579,7 +579,7 @@ function DesbloquearProyectos() {
                 <>
                   {imagenCargando && <div className="dp-imagen-cargando"></div>}
                   <img
-                    src={`http://127.0.0.1:8000/storage/${evidencias[indiceActual].ruta_archivo}`}
+                    src={`${API_URL}/storage/${evidencias[indiceActual].ruta_archivo}`}
                     alt="Evidencia"
                     className="dp-imagen-evidencia"
                     onLoad={handleImageLoad}

@@ -94,8 +94,6 @@ function GestionProyectosUsuario() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
-
-  // === Obtener proyectos y conteos del usuario ===
   useEffect(() => {
     const userData = JSON.parse(sessionStorage.getItem("usuario"));
     if (!userData?.id_usuario) return;
@@ -323,16 +321,9 @@ function GestionProyectosUsuario() {
                   : 0;
                 
                 const estatusGlobal = proyecto.p_estatus || "En proceso";
-                // === LÓGICA DE FECHAS ===
 const diasRestantes = calcularDiasRestantes(proyecto.fecha_fin);
 const esProyectoFinalizado = estatusGlobal === "Finalizado";
-
-// Proyecto vencido solo si NO está finalizado y ya pasó la fecha fin
 const esVencido = !esProyectoFinalizado && diasRestantes !== null && diasRestantes < 0;
-
-                
-                // --- LÓGICA DE ESTADOS Y COLORES ---
-                // SOLO 2 ESTADOS: Finalizado / En proceso
 let statusClass = estatusGlobal === "Finalizado"
   ? "finalizado"
   : "en-proceso";

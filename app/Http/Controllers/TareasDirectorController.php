@@ -826,71 +826,57 @@ public function AgregarTareasDepartamento(Request $request)
 {
     try {
         $idUsuario = $request->query('usuario');
+
         if (!$idUsuario) {
             return response()->json([
                 'success' => false,
                 'mensaje' => 'No se recibió el ID de usuario'
             ], 400);
         }
-        $usuario = DB::table('c_usuario')->where('id_usuario', $idUsuario)->first();
+
+        $usuario = DB::table('c_usuario')
+            ->where('id_usuario', $idUsuario)
+            ->first();
+
         if (!$usuario) {
             return response()->json([
                 'success' => false,
                 'mensaje' => 'Usuario no encontrado'
             ], 404);
         }
-        $idDepartamento = $usuario->id_departamento;
-       $tareas = DB::table('tareas as t')
-    ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
-    ->leftJoin('evidencias as e', function($join) {
-        $join->on('t.id_tarea', '=', 'e.id_tarea')
-             ->on('t.id_proyecto', '=', 'e.id_proyecto');
-    })
-    ->where('p.id_departamento', $idDepartamento)
-    ->where(function($query) {
-        $query->where('t.t_estatus', 'En proceso')
-              ->orWhere(function($q){
-                  $q->where('t.t_estatus', 'Pendiente')
-                    ->whereNull('e.id_evidencia'); 
-              });
-    })
-    ->select(
-        't.*',
-        'p.p_nombre',
-        'p.pf_inicio',
-        'p.pf_fin',
-        'p.p_estatus'
-    )
-    ->get();
 
-        if ($tareas->isEmpty()) {
+        $idDepartamento = $usuario->id_departamento;
+
+        // PROYECTOS DEL DEPARTAMENTO CON ESTATUS "En proceso"
+        $proyectos = DB::table('proyectos')
+            ->where('id_departamento', $idDepartamento)
+            ->where('p_estatus', 'En proceso')
+            ->select('id_proyecto', 'p_nombre', 'pf_inicio', 'pf_fin')
+            ->get();
+
+        if ($proyectos->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'mensaje' => 'No hay tareas para este departamento'
+                'mensaje' => 'No hay proyectos en proceso para este departamento'
             ]);
         }
 
-        $proyectosConTareas = $tareas
-            ->groupBy('id_proyecto')
-            ->map(function ($tareasProyecto, $idProyecto) {
-                $proyecto = $tareasProyecto->first();
-                return [
-                    'proyecto' => [
-                        'id_proyecto' => $idProyecto,
-                        'p_nombre' => $proyecto->p_nombre,
-                        'pf_inicio' => $proyecto->pf_inicio,
-                        'pf_fin' => $proyecto->pf_fin,
-                        'p_estatus' => $proyecto->p_estatus,
-                        'total_tareas' => $tareasProyecto->count(),
-                    ],
-                    'tareas' => $tareasProyecto
-                ];
-            })
-            ->values(); 
+        // FORMATO QUE ESPERA EL FRONT
+        $proyectosFormateados = $proyectos->map(function ($p) {
+            return [
+                'proyecto' => [
+                    'id_proyecto' => $p->id_proyecto,
+                    'p_nombre'    => $p->p_nombre,
+                    'pf_inicio'   => $p->pf_inicio,
+                    'pf_fin'      => $p->pf_fin
+                ],
+                'tareas' => []
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'proyectos' => $proyectosConTareas
+            'proyectos' => $proyectosFormateados
         ]);
 
     } catch (\Exception $e) {
@@ -900,6 +886,7 @@ public function AgregarTareasDepartamento(Request $request)
         ], 500);
     }
 }
+
 // OBTENER UNA TAREA POR ID
 public function show($idTarea)
 {

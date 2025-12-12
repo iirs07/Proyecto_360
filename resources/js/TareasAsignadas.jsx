@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaClipboardCheck } from "react-icons/fa";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/formulario.css";
@@ -32,21 +33,13 @@ function TareasAsignadas() {
   // VALIDACIÓN DE ACCESO Y CONFIGURACIÓN INICIAL
   // ---------------------------------------------------------
   useEffect(() => {
-    // 1. Verificamos Autenticación (Token)
-    // Buscamos en ambos storages por seguridad, priorizando sessionStorage como usas
     const token = sessionStorage.getItem("jwt_token");
     
     if (!token) {
       navigate("/Login", { replace: true });
       return;
     }
-
-    // 2. Verificamos Origen (Datos del Proyecto)
-    // location.state trae los datos enviados por navigate desde la lista.
-    // Si entran por URL directa, location.state es null.
     if (location.state && location.state.id_proyecto) {
-      
-      // Acceso Permitido: Cargamos los datos del estado
       setProyectoActual({ id_proyecto: location.state.id_proyecto });
       setNombreProyecto(location.state.nombre_proyecto || "Proyecto");
 
@@ -151,7 +144,7 @@ function TareasAsignadas() {
 
     try {
       setSubiendo(true);
-      const res = await fetch("http://127.0.0.1:8000/api/evidencias", {
+   const res = await fetch(`${API_URL}/api/evidencias`, {
         method: "POST",
         body: formData,
         headers: { Authorization: `Bearer ${token}` }
@@ -261,10 +254,35 @@ function TareasAsignadas() {
        titulo="TAREAS ASIGNADAS"
        sidebar={<MenuDinamico activeRoute="tareas-asignadas" />}
      >
+      {/* Asegúrate de tener el import arriba: import { FaClipboardCheck } from "react-icons/fa"; */}
+
+<div className="tu-banner-container">
+  <div className="tu-banner-icon-bg">
+    <FaClipboardCheck />
+  </div>
+
+  <div className="container"> 
+    <div className="tu-banner-content">
+      
+      {/* 2. TÍTULO CON FLEXBOX */}
+      <div className="tu-titulo-wrapper">
+        <h1 className="tu-banner-titulo">{nombreProyecto}</h1>
+        <span className="tu-icon-wrapper">
+          <FaClipboardCheck />
+        </span>
+      </div>
+
+      <p className="tu-banner-subtitulo">
+        Panel de seguimiento y entrega de evidencias
+      </p>
+    </div>
+  </div>
+</div>
        <div className="container my-4">
+      
          <div className="row justify-content-center">
            <div className="col-12 col-lg-10 col-xl-8">
-             <div className="tu-proyecto-header-section"><h1 className="tu-nombre-proyecto">{nombreProyecto}</h1></div>
+            
             <div className="tu-filtros-container">
               <div className="tu-filtros-inner">
                 <div className="tu-filtro-left">
