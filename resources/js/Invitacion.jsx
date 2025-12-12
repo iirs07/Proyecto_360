@@ -12,6 +12,9 @@ import {
     FaLock, FaClipboardCheck
 } from 'react-icons/fa';
 
+// CONSTANTE PARA EL LÍMITE MÁXIMO
+const MAX_USOS_INVITACION = 50; // <--- SE ESTABLECE EL LÍMITE DE 50
+
 // SOLO USUARIO - Los Jefes solo pueden agregar usuarios con rol "Usuario"
 const ROLES_PERMITIDOS_PARA_JEFES = [
     { value: 'Usuario', name: 'Usuario' }
@@ -251,32 +254,39 @@ function Invitacion() {
         }
     };
 
-
-    // Manejar cambio en cantidad
+    // Manejar cambio en cantidad (APLICACIÓN DEL LÍMITE DE 50)
     const handleCantidadChange = (e) => {
         if (!camposHabilitados) return;
 
         const value = e.target.value;
         
-        if (value === '') {
-            setCantidad(1);
-            setErrorCantidad('');
-            return;
-        }
+        setCantidad(value); // Permite la edición para manejar la interfaz
+
+        // La validación estricta y el ajuste del valor se harán en onBlur
+        setErrorCantidad('');
+    };
+
+    // Función para forzar el valor al mínimo (1) o al máximo (50) si se pierde el foco
+    const handleBlurCantidad = () => {
+        if (!camposHabilitados) return;
+
+        let finalValue = parseInt(cantidad);
         
-        const numValue = parseInt(value);
-        
-        if (isNaN(numValue) || numValue < 1) {
+        if (isNaN(finalValue) || finalValue < 1) {
             setCantidad(1);
-            setTimedError(setErrorCantidad, 'La cantidad debe ser al menos 1');
-        } else if (numValue > 100) {
-            setCantidad(100);
-            setTimedError(setErrorCantidad, 'La cantidad máxima es 100');
+            setTimedError(setErrorCantidad, 'La cantidad mínima de registros es 1.');
+        } else if (finalValue > MAX_USOS_INVITACION) { // APLICACIÓN DEL LÍMITE
+            setCantidad(MAX_USOS_INVITACION);
+            setTimedError(setErrorCantidad, `La cantidad máxima de registros es ${MAX_USOS_INVITACION}.`);
         } else {
-            setCantidad(numValue);
+            setCantidad(finalValue);
+        }
+        // Limpiar el error si el valor final es válido (entre 1 y 50)
+        if (finalValue >= 1 && finalValue <= MAX_USOS_INVITACION) {
             setErrorCantidad('');
         }
     };
+
 
     const handleGenerar = async () => {
         clearErrors();
@@ -307,10 +317,16 @@ function Invitacion() {
              setTimedError(setErrorDepartamento, "El departamento seleccionado no pertenece a su área.");
              hasError = true;
         }
-        
-        if (cantidad < 1) {
-            setTimedError(setErrorCantidad, "La cantidad mínima de registros es 1.");
-            hasError = true;
+
+        // VALIDACIÓN CLAVE: Asegurar que la cantidad sea numérica y entre 1 y MAX_USOS_INVITACION
+        const finalCantidad = parseInt(cantidad);
+
+        if (isNaN(finalCantidad) || finalCantidad < 1) {
+             setTimedError(setErrorCantidad, "La cantidad mínima de registros es 1. Por favor, ingresa un número válido.");
+             hasError = true;
+        } else if (finalCantidad > MAX_USOS_INVITACION) { // APLICACIÓN DEL LÍMITE
+             setTimedError(setErrorCantidad, `La cantidad máxima de registros es ${MAX_USOS_INVITACION}.`);
+             hasError = true;
         }
         
         // *** VALIDACIÓN DEL ID DEL JEFE ***
@@ -333,7 +349,7 @@ function Invitacion() {
                     rol: 'Usuario', // Forzamos rol Usuario para Jefes
                     id_departamento: idDepartamento, // Departamento SELECCIONADO del área
                     creado_por: creadoPorId, // *** CORREGIDO: USAMOS EL ID REAL DEL JEFE LOGUEADO ***
-                    max_usos: cantidad
+                    max_usos: finalCantidad // Usamos la cantidad validada
                 })
             });
 
@@ -597,12 +613,20 @@ function Invitacion() {
                                         <h3 className="geninv-name">Número de registros</h3>
                                         <div className="cantidad-input-wrapper">
                                             <input
-                                                type="number" min="1" max="100" step="1" className="cantidad-input"
-                                                value={cantidad} onChange={handleCantidadChange} disabled={!camposHabilitados}
-                                                onBlur={() => { if (cantidad < 1) setCantidad(1); if (cantidad > 100) setCantidad(100); }}
-                                                onKeyDown={(e) => { if (e.key === '-' || e.key === 'e' || e.key === 'E') { e.preventDefault(); }}}
+                                                type="number" 
+                                                min="1" 
+                                                max={MAX_USOS_INVITACION} // <--- CAMBIADO A 50
+                                                step="1" 
+                                                className="cantidad-input"
+                                                value={cantidad} 
+                                                onChange={handleCantidadChange} 
+                                                disabled={!camposHabilitados}
+                                                onBlur={handleBlurCantidad} // <--- USO DE onBlur PARA LA LÓGICA DE LÍMITES
+                                                onKeyDown={(e) => { 
+                                                     // Bloquea caracteres no deseados
+                                                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') { e.preventDefault(); }}}
                                             />
-                                            <div className="cantidad-info"><small>Mínimo: 1 | Máximo: 100 registros</small></div>
+                                            <div className="cantidad-info"><small>Mínimo: 1 | Máximo: {MAX_USOS_INVITACION} registros</small></div> {/* <--- CAMBIADO A 50 */}
                                         </div>
                                     </div>
                                 </div>
@@ -703,7 +727,7 @@ function Invitacion() {
                         <button 
                             className="btn-primary"
                             onClick={handleGenerar}
-                            disabled={!camposHabilitados || !idDepartamento || cantidad < 1 || cantidad > 100 || !creadoPorId}
+                            disabled={!camposHabilitados || !idDepartamento || cantidad < 1 || cantidad > MAX_USOS_INVITACION || !creadoPorId} // <--- CAMBIADO A 50
                             style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                         >
                             <FaPlus /> Generar Link de Invitación
@@ -752,10 +776,9 @@ function Invitacion() {
                         <div className="instructions">
                             <h4><FaExclamationTriangle /> Instrucciones:</h4>
                             <ul>
-                                <li><strong>Rol de los nuevos usuarios:</strong> Todos serán agregados con rol "Usuario"</li>
-                                <li><strong>Departamento asignado:</strong> Agregados a tu departamento <strong>{selectedDepText}</strong></li>
-                                <li>Comparte este link con las personas que deseas invitar</li>
-                                <li>Cada persona debe completar su registro individualmente</li>
+                                <li><strong>IMPORTANTE:</strong> 1 Día de validez</li>
+                                <li>Comparte este link con las personas que deseas invitar</li>
+                                <li>Cada persona debe completar su registro individualmente</li>
                             </ul>
                         </div>
                     </div>
