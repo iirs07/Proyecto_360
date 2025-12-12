@@ -622,16 +622,168 @@
 }
 
 
-/* === Responsivo (Media Queries) === */
-@media (max-width: 1200px) {
-  .tdu-proyecto-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+/* =======================  RESPONSIVIDAD GENERAL ======================= */
+@media (max-width: 992px) {
+  .tdu-seccion-bienvenida {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .tdu-bienvenido-stats {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 }
 
+/* =======================  RESPONSIVE PARA MOVILES ======================= */
 @media (max-width: 768px) {
-  .tdu-contenido { padding: 1rem; }
-  .tdu-seccion-bienvenida { flex-direction: column; gap: 1.5rem; text-align: center; }
-  .tdu-metrica-grid { grid-template-columns: 1fr; }
-  .tdu-proyecto-body { flex-direction: column; gap: 1rem; }
+  /* === AJUSTE PARA TÍTULO Y ESTATUS EN COLUMNA === */
+  .tdu-proyecto-titulo-badge {
+    display: flex;
+    flex-direction: column; /* Esto fuerza al estatus a bajar debajo del título */
+    align-items: flex-start; /* Alinea todo a la izquierda */
+    gap: 0.5rem; /* Espacio entre el título y el badge */
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+ .tdu-proyecto-badge {
+  margin-left: auto;
+  margin-right: auto;   /* Centra horizontalmente */
+  align-self: center;   /* Opcional, lo mantiene centrado en eje cruzado */
+  display: inline-block;
+}
+  /* === AJUSTE PARA TAREAS (META) EN SU PROPIA FILA === */
+  .tdu-project-header {
+    flex-direction: column; /* Coloca el bloque de título arriba y el bloque meta abajo */
+    align-items: center;
+  }
+
+  .tdu-proyecto-meta {
+    width: 100%;
+    align-items: center; /* Alinea el contador de tareas a la izquierda */
+    flex-direction: column; /* Pone las tareas y la prioridad uno debajo del otro */
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .tdu-contenido {
+    padding: 1rem;
+  }
+
+  /* === Sección Bienvenida === */
+  .tdu-seccion-bienvenida {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .tdu-bienvenido-stats {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .tdu-stat-item {
+    justify-content: center;
+  }
+
+  .tdu-bienvenida-content h1 {
+    font-size: 1.4rem;
+  }
+
+  /* === Métricas === */
+  .tdu-metrica-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tdu-metrica-numero {
+    font-size: 1.8rem;
+  }
+
+  .tdu-metrica-card {
+    padding: 1.2rem;
+    gap: 1rem;
+  }
+
+  /* === Progreso === */
+  .tdu-progreso-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .tdu-progreso-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tdu-progreso-general {
+    padding: 1.2rem;
+  }
+
+  /* === Mis Proyectos === */
+  .tdu-mis-proyectos {
+    padding: 1.2rem;
+  }
+
+  .tdu-mis-proyectos-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  /* === Cards de Proyecto === */
+  .tdu-proyecto-card-encabezado {
+    padding: 1.2rem;
+  }
+
+  .tdu-project-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .tdu-proyecto-body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .tdu-seccion-graficos {
+    margin-bottom: 1rem;
+  }
+
+  .tdu-proyecto-info {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* =======================  EXTRA SMALL (pantallas muy pequeñas) ======================= */
+@media (max-width: 480px) {
+
+  .tdu-bienvenida-content h1 {
+    font-size: 1.2rem;
+  }
+
+  .tdu-metrica-numero {
+    font-size: 1.6rem;
+  }
+
+  .tdu-grafica-circular {
+    width: 80px;
+    height: 80px;
+  }
+
+  .tdu-circular-center {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tdu-proyecto-titulo {
+    font-size: 1rem;
+  }
 }

@@ -108,7 +108,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     cargarProyectos();
   }, []);
 
-  // Calcular estadísticas
   const proyectosTotales = proyectos.length;
   const proyectosVencidos = proyectos.filter(p => {
     const fechaFin = new Date(p.pf_fin);
@@ -153,7 +152,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 {mostrarSelect && (
   <div className="lp-filter-box">
     <FaFilter className="lp-filter-icon" />
-    {/* Para móvil, mostrar un botón que active un modal/dropdown */}
     <div className="desktop-only">
       <SelectDinamico
         opciones={opciones.map((o) => o.label)}
@@ -254,22 +252,11 @@ const API_URL = import.meta.env.VITE_API_URL;
                         <div className="lp-info-value">{p.total_tareas || 0}</div>
                       </div>
                     </div>
-
-                    {/* ALERTAS */}
-                   
-                      {estaVencido ? (
-                        <>
-                          <FaExclamationTriangle className="lp-alert-icon expired" />
-                          <div className="lp-info-content">
-                            <div className="lp-info-label lp-alert-label">Estado</div>
-                            <div className="lp-info-value lp-alert-text expired">¡Vencido!</div>
-                          </div>
-                        </>
-                      ) :   null}
+   
+                     
                     </div>
                 
 
-                  {/* ACCIONES */}
                   <div className="lp-proyecto-actions">
                     {p.total_tareas === 0 ? (
                       <button

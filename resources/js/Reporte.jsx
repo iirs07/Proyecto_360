@@ -205,26 +205,25 @@ const API_URL = import.meta.env.VITE_API_URL;
     return Object.keys(nuevosErrores).length === 0;
   };
 
- const generarPDF = async () => {
-    if (!validarFormulario()) return;
+const generarPDF = async () => {
+    if (!validarFormulario()) return;
 
-    // Inicializar AbortController
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    const { signal } = controller;
+    // Inicializar AbortController
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const { signal } = controller;
 
-    setCargando(true);
-    setProgreso(0);
+    setCargando(true);
+    setProgreso(0);
 
-    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
-    
-    const tiposReporteUrl = reporteSeleccionado; 
-let url = `${API_URL}/generar-pdf?tipos=${tiposReporteUrl}&id_usuario=${usuario.id_usuario}`;
+    const usuario = JSON.parse(sessionStorage.getItem('usuario'));
+    const tiposReporteUrl = reporteSeleccionado; 
 
-
-    
-    // AGREGAR PARÁMETROS DE TIEMPO
-if (metodoFiltrado === 'mesAnio') {
+    let url = `${API_URL}/generar-pdf?tipos=${tiposReporteUrl}&id_usuario=${usuario.id_usuario}`;
+    if (usuario.id_departamento) {
+        url += `&id_departamento=${usuario.id_departamento}`;
+    }
+    if (metodoFiltrado === 'mesAnio') {
     url += `&mes=${mesSeleccionado + 1}&anio=${anioSeleccionado}`;
 } 
 else if (metodoFiltrado === 'rango') {
@@ -278,7 +277,6 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
       setPdfUrl(nuevaUrl);
       setMostrarVisor(true);
       
-      // Limpiar filtros solo si la operación fue exitosa
       limpiarFiltrosFecha();
       setMetodoFiltrado('ninguno');
       setReporteSeleccionado(''); 
@@ -286,9 +284,7 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
       setTimeout(() => setProgreso(0), 500);
       
     } catch (error) {
-      // Manejar la cancelación (AbortError)
       if (error.name === 'AbortError') {
-        // Si es cancelado por el usuario (vía botón Cancelar o antes de unload)
         console.log('Generación de PDF cancelada.');
         // No se muestra alert, ya que limpiarYCancelar ya limpia y el botón de Cancelar es una acción intencional.
       } else {

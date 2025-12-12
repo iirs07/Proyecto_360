@@ -137,15 +137,13 @@ function VerTareasPendientes() {
       const data = await response.json();
 
       if (data.success || response.ok) {
-        
-        // 1. Verificar si esta era la ÚLTIMA tarea pendiente
-        // Filtramos las que NO son la actual y que NO están completadas
+
         const tareasRestantes = proyecto.tareas.filter(t => 
              t.id_tarea !== idTarea && t.t_estatus !== "Completada"
         );
         const esLaUltimaTarea = tareasRestantes.length === 0;
 
-        // 2. Actualizar la interfaz (Estado Local)
+  
         setProyecto(prevProyecto => {
           if (!prevProyecto?.tareas) return prevProyecto;
           
@@ -166,12 +164,8 @@ function VerTareasPendientes() {
         setTareaAFinalizar(null);
         setTareaCompletada(true);
 
-        // 4. Lógica de Redirección
         if (esLaUltimaTarea) {
-            // Si ya no queda nada, esperamos 1 seg y nos vamos
-            setTimeout(() => {
-                navigate("/TareasenProceso");
-            }, 1000);
+            navigate("/TareasenProceso");
         } else {
             // Si quedan tareas, nos quedamos aquí y solo quitamos el mensaje de éxito
             setTimeout(() => setTareaCompletada(false), 3000); 
@@ -188,7 +182,6 @@ function VerTareasPendientes() {
     }
   };
 
-  // 4. Función para abrir el modal (se llama al dar click en el checkbox)
   const abrirModalConfirmacion = (tarea) => {
     setTareaAFinalizar(tarea);
     setConfirmModalOpen(true);
@@ -243,22 +236,19 @@ function VerTareasPendientes() {
       sidebar={<MenuDinamico activeRoute="enproceso" />}
     >
       <div className="vtp-contenedor-pagina">
-    {tareasFiltradas?.length > 0 && (
-        <div className="vtp-header-proyecto-banner">
-            <div className="vtp-banner-content">
-                <span className="vtp-badge-estado">
-                    <span className="vtp-dot-indicador"></span> Proyecto Activo
-                </span>
-                <h1 className="vtp-nombre-proyecto">
-                    {proyecto?.p_nombre}
-                </h1>
-                
-                {/* Opcional: Una descripción corta o fecha si la tienes */}
-                {/* <p className="vtp-descripcion-proyecto">Última actualización: Hoy</p> */}
-            </div>
-            <div className="vtp-banner-deco"></div>
-        </div>
-    )}
+    {proyecto && proyecto.tareas && proyecto.tareas.length > 0 && (
+  <div className="vtp-header-proyecto-banner">
+    <div className="vtp-banner-content">
+      <span className="vtp-badge-estado">
+        <span className="vtp-dot-indicador"></span> Proyecto Activo
+      </span>
+      <h1 className="vtp-nombre-proyecto">
+        {proyecto.p_nombre}
+      </h1>
+    </div>
+    <div className="vtp-banner-deco"></div>
+  </div>
+)}
         <div className="vtp-lista-tareas-container">
           <div className="vtp-lista-tareas">
             {tareasFiltradas?.length > 0 ? (
@@ -271,7 +261,7 @@ function VerTareasPendientes() {
                     </p>
                   </div>
 
-                  {/* ACCIONES */}
+       
                   <div className="vtp-acciones-tarea">
                     {t.t_estatus !== "Completada" && (
                       <div className="vtp-accion-finalizar">
@@ -289,7 +279,6 @@ function VerTareasPendientes() {
                     )}
                   </div>
 
-                  {/* FOOTER REDISEÑADO */}
                   <div className="vtp-tarea-footer">
                     <div className="vtp-info-adicional">
                       <span className={`vtp-badge-estatus ${getStatusClass(t.t_estatus)}`}>
@@ -339,7 +328,6 @@ function VerTareasPendientes() {
         </div>
       </div>
 
-      {/* LOS MODALES SE QUEDAN EXACTAMENTE IGUAL AQUÍ ABAJO */}
       {modalVisible && tareaActual && (
         <div className="vtp-modal">
           <div className="vtp-modal-content">

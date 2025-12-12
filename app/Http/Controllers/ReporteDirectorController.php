@@ -61,14 +61,13 @@ $authUsuario = \App\Models\CUsuario::with('departamento')->find($idUsuario);
     $inicio_db = null;
     $fin_db = null;
 
-    // Si viene mes y año, usamos rango completo del mes
     if ($mes && $anio) {
         $inicio = Carbon::create($anio, $mes, 1)->startOfDay();
         $fin = Carbon::create($anio, $mes, 1)->endOfMonth()->endOfDay();
         $inicio_db = $inicio;
         $fin_db = $fin;
     } elseif ($fechaInicioFiltro || $fechaFinFiltro) {
-        // Si vienen fechas de filtro
+
         $inicio = $fechaInicioFiltro ? Carbon::parse($fechaInicioFiltro)->startOfDay() : null;
         $fin = $fechaFinFiltro ? Carbon::parse($fechaFinFiltro)->endOfDay() : null;
         $inicio_db = $inicio;

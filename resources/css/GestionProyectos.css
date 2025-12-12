@@ -446,58 +446,7 @@
   margin: 0 auto;
 }
 
-/* ======== RESPONSIVE ======== */
-@media (max-width: 768px) {
-  .tdj-dashboard-content {
-    padding: 1rem;
-  }
-  
-  .tdj-metrica-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .tdj-proyecto-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .tdj-seccion-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.8rem;
-  }
-  
-  .header-global {
-    padding: 0.8rem 1rem;
-  }
-  
-  .tdj-form-titulo h1 {
-    font-size: 1.6rem;
-  }
-  
-  .tdj-proyecto-body {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .tdj-proyecto-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .tdj-proyecto-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .tdj-proyecto-meta {
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-  }
-}
+
 
 
 @keyframes spin {
@@ -649,17 +598,7 @@ transform: translateY(-3px);
   font-weight: 500;
 }
 
-/* Responsive: Si la pantalla es muy chica, que no se rompa */
-@media (max-width: 768px) {
-  .tdu-progreso-stats {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
-}
-/* ======== ESTILOS NUEVOS PARA PROYECTOS SIN TAREAS ======== */
 
-/* 1. Nueva Tarjeta Métrica Gris (Sin Definir) */
 .tdu-metrica-sin-definir {
   border-left-color: #fafafa; 
   background-color: #6c757d;
@@ -670,10 +609,9 @@ transform: translateY(-3px);
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* 2. Estilo para la tarjeta del proyecto en la lista */
 .tdj-proyecto-card-encabezado.sin-definir {
   border-left-color: #6c757d;
-  background-color: #fafafa; /* Fondo ligeramente grisaceo */
+  background-color: #fafafa; 
 }
 
 /* Hacemos el título un poco menos intenso en proyectos vacíos */
@@ -724,11 +662,147 @@ transform: translateY(-3px);
     border-left-color: #ffc107;
 }
 .tdj-proyecto-card-encabezado.pendiente {
-    border-left-color: #dc3545; /* O el color que uses para pendiente */
+    border-left-color: #dc3545; 
 }
 .tdj-proyecto-card-encabezado.vencido {
     border-left-color: #8b0000; /* Rojo oscuro */
 }
 .tdj-proyecto-card-encabezado.sin-definir {
     border-left-color: #6c757d; /* Gris */
+}
+/* ======== AJUSTES RESPONSIVOS (ESTRICTAMENTE VERTICAL) ======== */
+@media (max-width: 768px) {
+
+  /* 1. Tarjeta: Ajustes generales */
+  .tdj-proyecto-card-encabezado {
+    padding: 1rem;
+    height: auto;
+  }
+
+  /* 2. Encabezado Principal: Columna (Título arriba, Grupo Meta abajo) */
+  .tdj-proyecto-header {
+    display: flex;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  /* Título: Ocupa todo el ancho y permite saltos de línea */
+  .tdj-proyecto-titulo-seccion {
+    width: 100%;
+  }
+
+  .tdj-proyecto-titulo {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    white-space: normal;
+    word-wrap: break-word;
+    margin-bottom: 0.2rem;
+  }
+
+  /* 3. GRUPO META (Badge y Tareas): AQUÍ ESTÁ LA CLAVE */
+  /* Lo ponemos en COLUMNA para que el Badge quede arriba y las tareas abajo */
+  .tdj-proyecto-meta {
+    width: 100%;
+    display: flex;
+    flex-direction: column !important; /* <--- ESTO FUERZA UNO POR FILA */
+    align-items: flex-start !important; /* Alineados a la izquierda */
+    justify-content: flex-start;
+    gap: 0.6rem; /* Espacio vertical entre el badge y el texto de tareas */
+    margin-top: 0.2rem;
+    border-top: none; 
+  }
+
+  /* El Badge (Estado) */
+  .tdj-prioridad-badge {
+    align-self: flex-start; 
+    margin: 0;
+    font-size: 0.75rem;
+    display: inline-block; /* Asegura que respete su tamaño */
+  }
+  
+  /* El Contador de tareas (Debajo del badge) */
+  .tdj-total-tareas {
+    align-self: flex-start;
+    margin: 0;
+    font-size: 0.8rem;
+    color: #555;
+    background: transparent;
+    padding: 0;
+    /* Esto asegura que se lea todo el texto sin cortarse */
+    white-space: normal; 
+    text-align: left;
+  }
+
+  /* 4. Cuerpo (Gráfica + Métricas): Lado a lado */
+  .tdj-proyecto-body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.8rem 0;
+    margin-top: 0.5rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .tdj-seccion-graficos {
+    transform: scale(0.9);
+    margin: 0;
+  }
+
+  .tdj-detalles-metricas {
+    gap: 0.3rem;
+  }
+
+  .tdj-metrica-item {
+    font-size: 0.8rem;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    border-bottom: 1px dashed #eee;
+  }
+
+  /* 5. Info Inferior (Fechas) */
+  .tdj-proyecto-info {
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 0.8rem;
+  }
+
+  .tdj-dias {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .tdj-dias-item {
+    font-size: 0.75rem;
+  }
+
+  .tdj-tiempo-restante {
+    align-self: center;
+    font-size: 0.75rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* 6. Botones y Progreso */
+  .tdj-proyecto-footer {
+    margin-top: 1rem;
+  }
+  
+  .tdj-btn-primary {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem;
+  }
+
+  .tdu-progreso-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
 }

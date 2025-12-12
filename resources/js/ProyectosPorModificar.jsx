@@ -133,8 +133,6 @@ const API_URL = import.meta.env.VITE_API_URL;
                   </button>
                 )}
               </div>
-
-              {/* SELECT DE ORDENAMIENTO */}
               {mostrarSelect && (
                 <div className="pm-filter-box">
                   <FaFilter className="pm-filter-icon" />
@@ -150,7 +148,6 @@ const API_URL = import.meta.env.VITE_API_URL;
               )}
             </div>
 
-            {/* RESULTADOS */}
             {busqueda && (
               <div className="pm-search-results-info">
                 <span className="pm-results-count">
@@ -170,7 +167,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 
         <div className="pm-lista">
     {loading ? (
-        // LOADER
         <div className="loader-container">
             <div className="loader-logo">
                 <img src={logo3} alt="Cargando" />
@@ -179,7 +175,6 @@ const API_URL = import.meta.env.VITE_API_URL;
             <div className="loader-spinner"></div>
         </div>
     ) : !hayProyectos ? (
-        //  BACKEND NO DEVOLVIÓ NADA
         <EmptyState
             titulo="MODIFICAR PROYECTOS"
             mensaje="No hay proyectos disponibles."
