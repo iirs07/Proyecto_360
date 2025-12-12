@@ -111,7 +111,7 @@ function VerTareasPendientes() {
     ?.filter(t => t.t_estatus.toLowerCase() !== "completada")
     ?.filter(t => t.t_nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
-  const ejecutarFinalizacionTarea = async () => {
+ const ejecutarFinalizacionTarea = async () => {
    
     const idTarea = tareaAFinalizar?.id_tarea; 
     if (!idTarea) return;
@@ -123,7 +123,7 @@ function VerTareasPendientes() {
       setCargando(true);
 
       const response = await fetch(
-  `${API_URL}/api/tareas/${idTarea}/completar`,
+        `${API_URL}/api/tareas/${idTarea}/completar`,
         {
           method: 'PUT',
           headers: { 
@@ -137,6 +137,15 @@ function VerTareasPendientes() {
       const data = await response.json();
 
       if (data.success || response.ok) {
+        
+        // 1. Verificar si esta era la ÚLTIMA tarea pendiente
+        // Filtramos las que NO son la actual y que NO están completadas
+        const tareasRestantes = proyecto.tareas.filter(t => 
+             t.id_tarea !== idTarea && t.t_estatus !== "Completada"
+        );
+        const esLaUltimaTarea = tareasRestantes.length === 0;
+
+        // 2. Actualizar la interfaz (Estado Local)
         setProyecto(prevProyecto => {
           if (!prevProyecto?.tareas) return prevProyecto;
           
@@ -147,18 +156,26 @@ function VerTareasPendientes() {
           );
           
           const proyectoActualizado = { ...prevProyecto, tareas: tareasActualizadas };
-          
           sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyectoActualizado));
           
           return proyectoActualizado;
         });
         
-        // Cerramos el modal de confirmación y limpiamos
+        // 3. Cerrar modales
         setConfirmModalOpen(false);
         setTareaAFinalizar(null);
         setTareaCompletada(true);
-         navigate("/TareasenProceso");
-        setTimeout(() => setTareaCompletada(false), 3000); // Ocultar toast después
+
+        // 4. Lógica de Redirección
+        if (esLaUltimaTarea) {
+            // Si ya no queda nada, esperamos 1 seg y nos vamos
+            setTimeout(() => {
+                navigate("/TareasenProceso");
+            }, 1000);
+        } else {
+            // Si quedan tareas, nos quedamos aquí y solo quitamos el mensaje de éxito
+            setTimeout(() => setTareaCompletada(false), 3000); 
+        }
         
       } else {
         alert(`Error: ${data.mensaje || 'No se pudo completar la tarea'}`);
@@ -220,178 +237,169 @@ function VerTareasPendientes() {
 
   if (!proyecto) return null;
 
-  return (
+ return (
     <Layout
       titulo="TAREAS POR REVISAR"
       sidebar={<MenuDinamico activeRoute="enproceso" />}
     >
-      <div className="contenedor-global">
-        {/* TÍTULO DEL PROYECTO SOLO SI HAY TAREAS */}
-        {tareasFiltradas?.length > 0 && (
-          <div className="vtp-titulo-proyecto">
-            <span className="vtp-label-proyecto">Proyecto</span>
-            <h1 className="vtp-nombre-proyecto">{proyecto?.p_nombre}</h1>
-          </div>
-        )}
-
-        <div className="vtp-lista-tareas">
-          {tareasFiltradas?.length > 0 ? (
-            tareasFiltradas.map(t => (
-              <div key={t.id_tarea} className="vtp-item-tarea">
-                {/* HEADER SIMPLE */}
-                <div className="vtp-tarea-header">
-                  <h3 className="vtp-tarea-nombre">{t.t_nombre}</h3>
-                  <p className="vtp-tarea-descripcion">
-                    {t.descripcion || "Sin descripción detallada para esta tarea."}
-                  </p>
-                </div>
-
-                {/* ACCIONES */}
-                <div className="vtp-acciones-tarea">
-                  {t.t_estatus !== "Completada" && (
-                    <div className="vtp-accion-finalizar">
-                      <input
-                        type="checkbox"
-                        id={`check-${t.id_tarea}`}
-                        
-                        onChange={() => abrirModalConfirmacion(t)}
-                        checked={false} // Mantener desmarcado visualmente hasta que se confirme y desaparezca de la lista
-                        disabled={cargando}
-                      />
-                      <label htmlFor={`check-${t.id_tarea}`}>
-                        Marcar como finalizada
-                      </label>
-                    </div>
-                  )}
-                </div>
-
-                {/* FOOTER REDISEÑADO */}
-                <div className="vtp-tarea-footer">
-                  <div className="vtp-info-adicional">
-                    <span className={`vtp-badge-estatus ${getStatusClass(t.t_estatus)}`}>
-                      {t.t_estatus}
-                    </span>
-
-                    <span className="vtp-fecha-limpia">
-                      <FiCalendar className="vtp-icono-fecha" /> 
-                      Vence: {t.tf_fin || t.fechaVencimiento}
-                    </span>
+      <div className="vtp-contenedor-pagina">
+    {tareasFiltradas?.length > 0 && (
+        <div className="vtp-header-proyecto-banner">
+            <div className="vtp-banner-content">
+                <span className="vtp-badge-estado">
+                    <span className="vtp-dot-indicador"></span> Proyecto Activo
+                </span>
+                <h1 className="vtp-nombre-proyecto">
+                    {proyecto?.p_nombre}
+                </h1>
+                
+                {/* Opcional: Una descripción corta o fecha si la tienes */}
+                {/* <p className="vtp-descripcion-proyecto">Última actualización: Hoy</p> */}
+            </div>
+            <div className="vtp-banner-deco"></div>
+        </div>
+    )}
+        <div className="vtp-lista-tareas-container">
+          <div className="vtp-lista-tareas">
+            {tareasFiltradas?.length > 0 ? (
+              tareasFiltradas.map(t => (
+                <div key={t.id_tarea} className="vtp-item-tarea">
+                  <div className="vtp-tarea-header">
+                    <h3 className="vtp-tarea-nombre">{t.t_nombre}</h3>
+                    <p className="vtp-tarea-descripcion">
+                      {t.descripcion || "Sin descripción detallada para esta tarea."}
+                    </p>
                   </div>
 
-                  <button
-                    className="vtp-btn-evidencias"
-                    onClick={() => handleVerEvidencias(t)}
-                  >
-                    Ver Evidencias
-                    <span className="vtp-contador-evidencias">
-                      {t.evidencias?.length || 0}
-                    </span>
-                  </button>
+                  {/* ACCIONES */}
+                  <div className="vtp-acciones-tarea">
+                    {t.t_estatus !== "Completada" && (
+                      <div className="vtp-accion-finalizar">
+                        <input
+                          type="checkbox"
+                          id={`check-${t.id_tarea}`}
+                          onChange={() => abrirModalConfirmacion(t)}
+                          checked={false} 
+                          disabled={cargando}
+                        />
+                        <label htmlFor={`check-${t.id_tarea}`}>
+                          Marcar como finalizada
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* FOOTER REDISEÑADO */}
+                  <div className="vtp-tarea-footer">
+                    <div className="vtp-info-adicional">
+                      <span className={`vtp-badge-estatus ${getStatusClass(t.t_estatus)}`}>
+                        {t.t_estatus}
+                      </span>
+
+                      <span className="vtp-fecha-limpia">
+                        <FiCalendar className="vtp-icono-fecha" /> 
+                        Vence: {t.tf_fin || t.fechaVencimiento}
+                      </span>
+                    </div>
+
+                    <button
+                      className="vtp-btn-evidencias"
+                      onClick={() => handleVerEvidencias(t)}
+                    >
+                      Ver Evidencias
+                      <span className="vtp-contador-evidencias">
+                        {t.evidencias?.length || 0}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : busqueda ? (
+              <div className="vtp-no-tareas-mensaje">
+                <LuClock3
+                  style={{ fontSize: '3rem', color: '#861542', marginBottom: '15px' }}
+                />
+                <h3 style={{ color: '#861542', marginBottom: '10px' }}>
+                  No hay tareas que coincidan con la búsqueda
+                </h3>
+                <p style={{ color: '#6c757d' }}>
+                  Intenta con otros términos de búsqueda
+                </p>
+              </div>
+            ) : (
+              <EmptyState
+                titulo="TAREAS POR REVISAR"
+                mensaje="No hay tareas por revisar."
+                botonTexto="Volver al Tablero"
+                onVolver={volverSegunRol}
+                icono={logo3}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* LOS MODALES SE QUEDAN EXACTAMENTE IGUAL AQUÍ ABAJO */}
+      {modalVisible && tareaActual && (
+        <div className="vtp-modal">
+          <div className="vtp-modal-content">
+            <div className="vtp-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+                <h3 style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {tareaActual.t_nombre}
+                </h3>
+                <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
+                  {tareaActual.t_estatus}
+                </span>
+              </div>
+              <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
+                <FiX />
+              </button>
+            </div>
+
+            {evidencias.length > 0 ? (
+              <div className="vtp-evidencias-container">
+                <div className="vtp-evidencias-navegacion">
+                  {evidencias.length > 1 && (
+                    <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
+                      <FiChevronLeft size={24} />
+                    </button>
+                  )}
+                  <div className="vtp-imagen-container">
+                    {imagenCargando && <div className="vtp-imagen-cargando"></div>}
+                    <img
+                      src={evidencias[indiceActual].archivo_url}
+                      alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
+                      className="vtp-imagen-evidencia"
+                      onLoad={handleImageLoad}
+                      onError={handleImageError}
+                      style={{ display: imagenCargando ? 'none' : 'block' }}
+                    />
+                  </div>
+                  {evidencias.length > 1 && (
+                    <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
+                      <FiChevronRight size={24} />
+                    </button>
+                  )}
+                </div>
+                <div className="vtp-evidencias-info">
+                   {evidencias.length > 1 && (
+                     <span style={{fontWeight:'bold', marginRight:'10px'}}>
+                       {indiceActual + 1} / {evidencias.length}
+                     </span>
+                   )}
+                   <span className="vtp-tarea-fecha">
+                     Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
+                   </span>
                 </div>
               </div>
-            ))
-          ) : busqueda ? (
-            <div className="vtp-no-tareas-mensaje">
-              <LuClock3
-                style={{ fontSize: '3rem', color: '#861542', marginBottom: '15px' }}
-              />
-              <h3 style={{ color: '#861542', marginBottom: '10px' }}>
-                No hay tareas que coincidan con la búsqueda
-              </h3>
-              <p style={{ color: '#6c757d' }}>
-                Intenta con otros términos de búsqueda
-              </p>
-            </div>
-          ) : (
-            <EmptyState
-              titulo="TAREAS POR REVISAR"
-              mensaje="No hay tareas por revisar."
-              botonTexto="Volver al Tablero"
-              onVolver={volverSegunRol}
-              icono={logo3}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Modal de Evidencias (Interfaz VTP) */}
-{modalVisible && tareaActual && (
-  <div className="vtp-modal">
-    <div className="vtp-modal-content">
-      
-      {/* HEADER MODIFICADO: Botón ahora está dentro para alineación */}
-      <div className="vtp-modal-header">
-        
-        {/* Lado Izquierdo: Título y Estatus */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
-          <h3 style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {tareaActual.t_nombre}
-          </h3>
-          <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-            {tareaActual.t_estatus}
-          </span>
-        </div>
-
-        {/* Lado Derecho: Botón Cerrar (Con estilo nuevo) */}
-        <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
-          <FiX />
-        </button>
-      </div>
-
-      {/* BODY */}
-      {evidencias.length > 0 ? (
-        <div className="vtp-evidencias-container">
-          <div className="vtp-evidencias-navegacion">
-            
-            {/* Botón Anterior */}
-            {evidencias.length > 1 && (
-              <button className="vtp-btn-navegacion vtp-btn-prev" onClick={handlePrev}>
-                <FiChevronLeft size={24} />
-              </button>
-            )}
-
-            {/* Imagen Container */}
-            <div className="vtp-imagen-container">
-              {imagenCargando && <div className="vtp-imagen-cargando"></div>}
-              <img
-                src={evidencias[indiceActual].archivo_url}
-                alt={`Evidencia ${indiceActual + 1} de ${tareaActual.t_nombre}`}
-                className="vtp-imagen-evidencia"
-                onLoad={handleImageLoad}
-                onError={handleImageError}
-                style={{ display: imagenCargando ? 'none' : 'block' }}
-              />
-            </div>
-
-            {/* Botón Siguiente */}
-            {evidencias.length > 1 && (
-              <button className="vtp-btn-navegacion vtp-btn-next" onClick={handleNext}>
-                <FiChevronRight size={24} />
-              </button>
+            ) : (
+              <div className="vtp-sin-evidencias">No hay evidencias disponibles</div>
             )}
           </div>
-
-          {/* Footer Info Unificado */}
-          <div className="vtp-evidencias-info">
-             {evidencias.length > 1 && (
-               <span style={{fontWeight:'bold', marginRight:'10px'}}>
-                 {indiceActual + 1} / {evidencias.length}
-               </span>
-             )}
-             <span className="vtp-tarea-fecha">
-               Subido: {evidencias[indiceActual]?.created_at || 'Fecha no disponible'}
-             </span>
-          </div>
-
         </div>
-      ) : (
-        <div className="vtp-sin-evidencias">No hay evidencias disponibles</div>
       )}
-    </div>
-  </div>
-)}
 
-      {/* 6. Modal de Confirmación para Finalizar Tarea (Nuevo) */}
       <ConfirmModal
         isOpen={confirmModalOpen}
         title="Confirmar"
@@ -402,8 +410,6 @@ function VerTareasPendientes() {
           setTareaAFinalizar(null);
         }}
       />
-
-
     </Layout>
   );
 }

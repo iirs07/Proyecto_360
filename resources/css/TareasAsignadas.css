@@ -17,7 +17,7 @@
   font-size: 1.1rem;
 }
 .tu-nombre-proyecto {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   color: #1e293b;
   font-weight: 800;
   margin: 0;
@@ -612,7 +612,93 @@
   }
 }
 
+/* =========================== Banner Estilo "Mis Proyectos" ============================ */
 
+.tu-banner-container {
+  background: linear-gradient(135deg, #861542 0%, #a51e5c 100%);
+  border-radius: 0 0 20px 20px;
+  padding: 3rem 0; 
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 3;
+  overflow: hidden; 
+  width: 100%;
+  box-shadow: 0 15px 35px -5px rgba(134, 21, 66, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
+.tu-banner-icon-bg {
+  position: absolute;
+  right: 20px;       
+  bottom: -40px;   
+  font-size: 15rem;  
+  color: rgba(255, 255, 255, 0.09); 
+  transform: rotate(-15deg);
+  z-index: 1;       
+  pointer-events: none;
+}
 
+.tu-banner-content {
+  position: relative;
+  z-index: 2;
+}
 
+.tu-titulo-wrapper {
+  display: flex;
+  align-items: center; 
+  gap: 1rem;           
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;     
+}
+
+.tu-banner-titulo {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;          
+  color: white;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.tu-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  padding: 8px;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.5rem; 
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.tu-banner-subtitulo {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .tu-banner-container {
+    padding: 2rem 0;
+    text-align: center;
+  }
+
+  .tu-titulo-wrapper {
+    justify-content: center; 
+  }
+
+  .tu-banner-titulo {
+    font-size: 1.6rem;
+  }
+  
+  .tu-banner-icon-bg {
+    font-size: 10rem;
+    right: -20px;
+  }
+}

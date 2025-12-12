@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo3 from "../imagenes/logo3.png";
-import { FiX } from "react-icons/fi";
+import { FiX, FiCalendar, FiFilter } from "react-icons/fi";
+import { FaTasks, FaCalendarAlt, FaExclamationTriangle, FaSearch, FaRegClock, FaCheckCircle } from 'react-icons/fa';
+import { MdOutlineSort } from 'react-icons/md';
 import '../css/global.css';
 import '../css/ListaDeProyectos.css';
 import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
-import { FaTasks, FaCalendarAlt, FaExclamationTriangle, FaSearch } from 'react-icons/fa';
 
 function ListaDeProyectos() {
   const navigate = useNavigate(); 
@@ -16,21 +17,59 @@ function ListaDeProyectos() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('fecha');
+  const [showSortOptions, setShowSortOptions] = useState(false);
   const { volverSegunRol } = useRolNavigation();
   const API_URL = import.meta.env.VITE_API_URL;
 
   const formatFecha = (fecha) => {
     if (!fecha) return '';
     const f = new Date(fecha + "T00:00");
-    return f.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return f.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ');
   };
 
   const getProjectStatus = (proyecto) => proyecto.p_estatus || "En proceso";
 
-  const statusColors = {
-    "Finalizado": "#28a745", // verde
-    "En proceso": "#ffc107",  // amarillo
-    "En revisión": "#17a2b8"  // azul
+  const statusConfig = {
+    "Finalizado": { 
+      color: "#10b981", 
+      bgColor: "#ecfdf5",
+      icon: <FaCheckCircle />,
+      textColor: "#047857"
+    },
+    "En proceso": { 
+      color: "#f59e0b", 
+      bgColor: "#fffbeb",
+      icon: <FaRegClock />,
+      textColor: "#92400e"
+    },
+    "En revisión": { 
+      color: "#3b82f6", 
+      bgColor: "#eff6ff",
+      icon: <FaExclamationTriangle />,
+      textColor: "#1e40af"
+    }
+  };
+
+  const getDiasRestantes = (fechaFin) => {
+    if (!fechaFin) return { dias: 0, texto: 'Sin fecha', tipo: 'neutral' };
+    
+    const hoy = new Date();
+    const fin = new Date(fechaFin + "T00:00");
+    const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return { 
+        dias: Math.abs(diffDays), 
+        texto: `${Math.abs(diffDays)} días de retraso`,
+        tipo: 'danger'
+      };
+    } else if (diffDays === 0) {
+      return { dias: 0, texto: 'Vence hoy', tipo: 'warning' };
+    } else if (diffDays <= 3) {
+      return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'warning' };
+    } else {
+      return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'success' };
+    }
   };
 
   const contarTareas = (tareas) => {
@@ -68,12 +107,13 @@ function ListaDeProyectos() {
 
       try {
         const res = await fetch(
-  `${API_URL}/api/proyectos/jefe?usuario=${idUsuario}`,{
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
+          `${API_URL}/api/proyectos/jefe?usuario=${idUsuario}`, {
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
 
         if (res.status === 401) {
           sessionStorage.clear();
@@ -88,7 +128,8 @@ function ListaDeProyectos() {
         const proyectosConTareas = (data.proyectos || [])
           .map(p => ({
             ...p,
-            tieneVencidos: p.tareas?.some(t => new Date(t.tf_fin) < new Date())
+            tieneVencidos: p.tareas?.some(t => new Date(t.tf_fin) < new Date()),
+            diasInfo: getDiasRestantes(p.pf_fin)
           }))
           .sort((a,b) => new Date(a.pf_fin) - new Date(b.pf_fin));
 
@@ -114,6 +155,8 @@ function ListaDeProyectos() {
           return a.p_nombre.localeCompare(b.p_nombre);
         case 'tareas':
           return (b.tareas?.length || 0) - (a.tareas?.length || 0);
+        case 'prioridad':
+          return (a.diasInfo?.dias || 0) - (b.diasInfo?.dias || 0);
         default:
           return new Date(a.pf_fin) - new Date(b.pf_fin);
       }
@@ -122,73 +165,93 @@ function ListaDeProyectos() {
 
   const renderProyectoCard = (proyecto) => {
     const status = getProjectStatus(proyecto);
+    const statusInfo = statusConfig[status] || statusConfig["En proceso"];
     const tareasInfo = contarTareas(proyecto.tareas);
+    const diasInfo = proyecto.diasInfo || getDiasRestantes(proyecto.pf_fin);
+    const completionPercentage = proyecto.tareas?.length > 0 
+      ? Math.round((proyecto.tareas.filter(t => t.t_estatus === 'Finalizado').length / proyecto.tareas.length) * 100)
+      : 0;
 
     return (
-      <div className="ldp-proyecto-card-container" key={proyecto.id_proyecto}>
-        <div className="ldp-proyecto-card-usuario">
-          <div className="ldp-proyecto-header">
-            <div className="ldp-proyecto-icon-title">
-              <h3 className="ldp-proyecto-nombre">{proyecto.p_nombre}</h3>
+      <div className="ldp-proyecto-card" key={proyecto.id_proyecto}>
+        <div className="ldp-card-header">
+          <div className="ldp-title-section">
+            <div className="ldp-project-icon">
             </div>
-
-            <div className="ldp-header-badges">
-              <span 
-                className="ldp-status-badge" 
-                style={{ backgroundColor: statusColors[status] }}
-              >
-                {status}
-              </span>
+            <div className="ldp-title-wrapper">
+              <h3 className="ldp-project-title">{proyecto.p_nombre}</h3>
             </div>
           </div>
-
-          <div className="ldp-proyecto-stats">
-            <div className="ldp-stats-grid">
-              <div className="ldp-stat-item">
-                <FaTasks className="ldp-stat-icon" />
-                <div>
-                  <span className="ldp-stat-value">{tareasInfo.total}</span>
-                  <span className="ldp-stat-label">Total Tareas</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="ldp-proyecto-footer">
-            <div className="ldp-fecha-info">
-              <FaCalendarAlt className="ldp-calendar-icon" />
-              <div>
-                <span className="ldp-fecha-text" >
-                  Vence: {formatFecha(proyecto.pf_fin)}
-                </span>
-                {/* Aquí opcional: mostrar días restantes solo como info */}
-                {proyecto.pf_fin && (
-                  <span className="ldp-dias-restantes">
-                    {(() => {
-                      const hoy = new Date();
-                      const fin = new Date(proyecto.pf_fin + "T00:00");
-                      const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
-                      return diffDays < 0
-                        ? `${Math.abs(diffDays)} días de retraso`
-                        : diffDays === 0
-                          ? 'Vence hoy'
-                          : diffDays === 1
-                            ? '1 día restante'
-                            : `${diffDays} días restantes`;
-                    })()}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <button 
-              className="ldp-btn-ver-tareas"
-              onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
+          
+          <div className="ldp-status-section">
+            <span 
+              className="ldp-status-tag" 
+              style={{ 
+                backgroundColor: statusInfo.bgColor,
+                color: statusInfo.textColor,
+                borderColor: statusInfo.color
+              }}
             >
-              <FaTasks className="ldp-btn-icon" />
-              Ver Tareas
-            </button>
+              <span className="ldp-status-icon">{statusInfo.icon}</span>
+              {status}
+            </span>
           </div>
+        </div>
+
+        <div className="ldp-card-body">
+         
+
+          <div className="ldp-stats-grid">
+            <div className="ldp-stat-card">
+              <div className="ldp-stat-icon-wrapper">
+                <FaTasks style={{ color: statusInfo.color }} />
+              </div>
+              <div className="ldp-stat-content">
+                <div className="ldp-stat-number">{tareasInfo.total}</div>
+                <div className="ldp-stat-label">Total Tareas</div>
+              </div>
+            </div>
+
+           
+
+            <div className="ldp-stat-card">
+              <div className="ldp-stat-icon-wrapper">
+                <FaExclamationTriangle style={{ color: '#ef4444' }} />
+              </div>
+              <div className="ldp-stat-content">
+                <div className="ldp-stat-number">{tareasInfo.vencidas}</div>
+                <div className="ldp-stat-label">Vencidas</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="ldp-card-footer">
+          <div className="ldp-date-info">
+            <div className="ldp-date-icon">
+              <FiCalendar />
+            </div>
+            <div className="ldp-date-content">
+              <div className="ldp-date-label">Fecha de vencimiento</div>
+              <div className="ldp-date-value">{formatFecha(proyecto.pf_fin)}</div>
+            </div>
+          </div>
+
+          <div className={`ldp-days-info ldp-days-${diasInfo.tipo}`}>
+            <div className="ldp-days-icon">
+              <FaRegClock />
+            </div>
+            <div className="ldp-days-text">{diasInfo.texto}</div>
+          </div>
+
+          <button 
+            className="ldp-action-button"
+            onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
+            style={{ backgroundColor: statusInfo.color }}
+          >
+            <FaTasks className="ldp-btn-icon" />
+            Completar Tareas
+          </button>
         </div>
       </div>
     );
@@ -196,63 +259,121 @@ function ListaDeProyectos() {
 
   return (
     <Layout
-      titulo="PROYECTOS EN LOS QUE PARTICIPAS"
+      titulo="Proyectos Activos"
+      subtitle="Visualiza y gestiona todos tus proyectos en un solo lugar"
       sidebar={<MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
     >
       <div className="ldp-container">
 
-        {/* BUSCADOR */}
-        {proyectos.length > 0 && (
-          <div className="barra-busqueda-global-container mb-4">
-            <div className="barra-busqueda-global-wrapper">
-              <FaSearch className="barra-busqueda-global-icon" />
-              <input
-                type="text"
-                placeholder="Buscar proyectos..."
-                className="barra-busqueda-global-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button
-                  className="buscador-clear-global"
-                  onClick={() => setSearchTerm("")}
-                >
-                  <FiX />
-                </button>
-              )}
+        {/* Header con filtros */}
+        <div className="ldp-header">
+          <div className="ldp-header-content">
+            <div className="ldp-header-title">
+              <h1>Mis Proyectos</h1>
+              <p className="ldp-subtitle">
+                {proyectos.length} {proyectos.length === 1 ? 'proyecto activo' : 'proyectos activos'}
+              </p>
             </div>
 
-            {searchTerm && (
-              <div className="buscador-resultados-global">
-                {filteredAndSortedProyectos.length} resultado(s) para "{searchTerm}"
+            <div className="ldp-header-controls">
+              <div className="ldp-search-container">
+                <div className="ldp-search-wrapper">
+                  <FaSearch className="ldp-search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Buscar proyectos por nombre..."
+                    className="ldp-search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button
+                      className="ldp-search-clear"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <FiX />
+                    </button>
+                  )}
+                </div>
               </div>
-            )}
+
+              <div className="ldp-sort-container">
+                <button 
+                  className="ldp-sort-button"
+                  onClick={() => setShowSortOptions(!showSortOptions)}
+                >
+                  <MdOutlineSort />
+                  Ordenar por
+                </button>
+                
+                {showSortOptions && (
+                  <div className="ldp-sort-dropdown">
+                    <button 
+                      className={`ldp-sort-option ${sortBy === 'fecha' ? 'active' : ''}`}
+                      onClick={() => { setSortBy('fecha'); setShowSortOptions(false); }}
+                    >
+                      <FiCalendar /> Fecha de vencimiento
+                    </button>
+                    <button 
+                      className={`ldp-sort-option ${sortBy === 'nombre' ? 'active' : ''}`}
+                      onClick={() => { setSortBy('nombre'); setShowSortOptions(false); }}
+                    >
+                      <FiFilter /> Nombre
+                    </button>
+                    <button 
+                      className={`ldp-sort-option ${sortBy === 'tareas' ? 'active' : ''}`}
+                      onClick={() => { setSortBy('tareas'); setShowSortOptions(false); }}
+                    >
+                      <FaTasks /> Cantidad de tareas
+                    </button>
+                    <button 
+                      className={`ldp-sort-option ${sortBy === 'prioridad' ? 'active' : ''}`}
+                      onClick={() => { setSortBy('prioridad'); setShowSortOptions(false); }}
+                    >
+                      <FaExclamationTriangle /> Prioridad
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
         <div className="ldp-content">
           {loading ? (
             <div className="loader-container">
-              <div className="loader-logo"><img src={logo3} alt="Cargando proyectos" /></div>
-              <div className="loader-texto">CARGANDO...</div>
-              <div className="loader-spinner"></div>
-            </div>
+                          <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
+                          <div className="loader-texto">CARGANDO PROYECTOS...</div>
+                          <div className="loader-spinner"></div>
+                        </div>
           ) : proyectos.length === 0 ? (
             <EmptyState
-              titulo="TAREAS PENDIENTES POR REVISAR"
-              mensaje="No hay tareas por revisar."
+              titulo="No hay proyectos activos"
+              mensaje="Cuando se asignen proyectos, aparecerán aquí."
               botonTexto="Volver al Tablero"
               onVolver={volverSegunRol}
               icono={logo3}
             />
           ) : (
             <>
-              {filteredAndSortedProyectos.length > 0 && (
-                <div className="ldp-proyectos-list">
-                  {filteredAndSortedProyectos.map(renderProyectoCard)}
+              {searchTerm && (
+                <div className="ldp-search-results">
+                  <span className="ldp-results-count">
+                    {filteredAndSortedProyectos.length} {filteredAndSortedProyectos.length === 1 ? 'resultado' : 'resultados'} para "{searchTerm}"
+                  </span>
+                 
                 </div>
               )}
+
+              <div className="container">
+                <div className="row g-4">
+                  {filteredAndSortedProyectos.map(p => (
+                    <div key={p.id_proyecto} className="col-12">
+                      {renderProyectoCard(p)}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </>
           )}
         </div>
