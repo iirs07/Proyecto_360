@@ -256,131 +256,104 @@ function ListaDeProyectos() {
       </div>
     );
   };
+return (
+  <Layout
+    titulo={proyectos.length === 0 ? "" : "Proyectos Activos"}
+    subtitle={proyectos.length === 0 ? "" : "Visualiza y gestiona todos tus proyectos en un solo lugar"}
+    sidebar={proyectos.length === 0 ? null : <MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
+  >
+    <div className="ldp-container">
 
-  return (
-    <Layout
-      titulo="Proyectos Activos"
-      subtitle="Visualiza y gestiona todos tus proyectos en un solo lugar"
-      sidebar={<MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
-    >
-      <div className="ldp-container">
+      {loading ? (
+        <div className="loader-container">
+          <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
+          <div className="loader-texto">CARGANDO PROYECTOS...</div>
+          <div className="loader-spinner"></div>
+        </div>
+      ) : proyectos.length === 0 ? (
+        
+        <EmptyState
+          titulo="No hay proyectos activos"
+          mensaje="Cuando se asignen proyectos, aparecerán aquí."
+          botonTexto="Volver al Tablero"
+          onVolver={volverSegunRol}
+          icono={logo3}
+        />
 
-        {/* Header con filtros */}
-        <div className="ldp-header">
-          <div className="ldp-header-content">
-            <div className="ldp-header-title">
-              <h1>Mis Proyectos</h1>
-              <p className="ldp-subtitle">
-                {proyectos.length} {proyectos.length === 1 ? 'proyecto activo' : 'proyectos activos'}
-              </p>
-            </div>
+      ) : (
+        
+        // Se muestra TODO el diseño solo cuando SÍ hay proyectos
+        <>
+          <div className="ldp-header">
+            <div className="ldp-header-content">
+              <div className="ldp-header-title">
+                <h1>Mis Proyectos</h1>
+                <p className="ldp-subtitle">
+                  {proyectos.length} {proyectos.length === 1 ? 'proyecto activo' : 'proyectos activos'}
+                </p>
+              </div>
 
-            <div className="ldp-header-controls">
-              <div className="ldp-search-container">
-                <div className="ldp-search-wrapper">
-                  <FaSearch className="ldp-search-icon" />
-                  <input
-                    type="text"
-                    placeholder="Buscar proyectos por nombre..."
-                    className="ldp-search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  {searchTerm && (
-                    <button
-                      className="ldp-search-clear"
-                      onClick={() => setSearchTerm("")}
-                    >
-                      <FiX />
-                    </button>
+              <div className="ldp-header-controls">
+                <div className="ldp-search-container">
+                  <div className="ldp-search-wrapper">
+                    <FaSearch className="ldp-search-icon" />
+                    <input
+                      type="text"
+                      placeholder="Buscar proyectos por nombre..."
+                      className="ldp-search-input"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {searchTerm && (
+                      <button className="ldp-search-clear" onClick={() => setSearchTerm("")}>
+                        <FiX />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="ldp-sort-container">
+                  <button 
+                    className="ldp-sort-button"
+                    onClick={() => setShowSortOptions(!showSortOptions)}
+                  >
+                    <MdOutlineSort />
+                    Ordenar por
+                  </button>
+                  
+                  {showSortOptions && (
+                    <div className="ldp-sort-dropdown">
+                      <button className={`ldp-sort-option ${sortBy === 'fecha' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('fecha'); setShowSortOptions(false); }}>
+                        <FiCalendar /> Fecha de vencimiento
+                      </button>
+                      <button className={`ldp-sort-option ${sortBy === 'nombre' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('nombre'); setShowSortOptions(false); }}>
+                        <FiFilter /> Nombre
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
-
-              <div className="ldp-sort-container">
-                <button 
-                  className="ldp-sort-button"
-                  onClick={() => setShowSortOptions(!showSortOptions)}
-                >
-                  <MdOutlineSort />
-                  Ordenar por
-                </button>
-                
-                {showSortOptions && (
-                  <div className="ldp-sort-dropdown">
-                    <button 
-                      className={`ldp-sort-option ${sortBy === 'fecha' ? 'active' : ''}`}
-                      onClick={() => { setSortBy('fecha'); setShowSortOptions(false); }}
-                    >
-                      <FiCalendar /> Fecha de vencimiento
-                    </button>
-                    <button 
-                      className={`ldp-sort-option ${sortBy === 'nombre' ? 'active' : ''}`}
-                      onClick={() => { setSortBy('nombre'); setShowSortOptions(false); }}
-                    >
-                      <FiFilter /> Nombre
-                    </button>
-                    <button 
-                      className={`ldp-sort-option ${sortBy === 'tareas' ? 'active' : ''}`}
-                      onClick={() => { setSortBy('tareas'); setShowSortOptions(false); }}
-                    >
-                      <FaTasks /> Cantidad de tareas
-                    </button>
-                    <button 
-                      className={`ldp-sort-option ${sortBy === 'prioridad' ? 'active' : ''}`}
-                      onClick={() => { setSortBy('prioridad'); setShowSortOptions(false); }}
-                    >
-                      <FaExclamationTriangle /> Prioridad
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
-        </div>
 
-        <div className="ldp-content">
-          {loading ? (
-            <div className="loader-container">
-                          <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
-                          <div className="loader-texto">CARGANDO PROYECTOS...</div>
-                          <div className="loader-spinner"></div>
-                        </div>
-          ) : proyectos.length === 0 ? (
-            <EmptyState
-              titulo="No hay proyectos activos"
-              mensaje="Cuando se asignen proyectos, aparecerán aquí."
-              botonTexto="Volver al Tablero"
-              onVolver={volverSegunRol}
-              icono={logo3}
-            />
-          ) : (
-            <>
-              {searchTerm && (
-                <div className="ldp-search-results">
-                  <span className="ldp-results-count">
-                    {filteredAndSortedProyectos.length} {filteredAndSortedProyectos.length === 1 ? 'resultado' : 'resultados'} para "{searchTerm}"
-                  </span>
-                 
+          <div className="container">
+            <div className="row g-4">
+              {filteredAndSortedProyectos.map(p => (
+                <div key={p.id_proyecto} className="col-12">
+                  {renderProyectoCard(p)}
                 </div>
-              )}
+              ))}
+            </div>
+          </div>
 
-              <div className="container">
-                <div className="row g-4">
-                  {filteredAndSortedProyectos.map(p => (
-                    <div key={p.id_proyecto} className="col-12">
-                      {renderProyectoCard(p)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+        </>
+      )}
+    </div>
+  </Layout>
+);
 
-      </div>
-    </Layout>
-  );
 }
 
 export default ListaDeProyectos;
