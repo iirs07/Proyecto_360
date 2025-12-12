@@ -240,7 +240,7 @@ function EliminarProyectos() {
                       <FaCalendarAlt className="eliminar-info-icon" />
                       <div className="eliminar-info-content">
                         <div className="eliminar-info-label">Fecha límite</div>
-                        <div className="eliminar-info-value">{fechaFin.toLocaleDateString()}</div>
+                        <div className="eliminar-info-value">{p.pf_fin}</div>
                       </div>
                     </div>
 

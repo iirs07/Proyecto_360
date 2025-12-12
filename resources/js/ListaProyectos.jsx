@@ -224,7 +224,8 @@ const API_URL = import.meta.env.VITE_API_URL;
   <FaCalendarAlt className="lp-info-icon" />
   <div className="lp-info-content">
     <div className="lp-info-label">Fecha límite</div>
-    <div className="lp-info-value">{fechaFin.toLocaleDateString()}</div>
+    <div className="lp-info-value">{p.pf_fin}</div>
+
   </div>
 </div>
 

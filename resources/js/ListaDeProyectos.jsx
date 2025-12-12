@@ -233,7 +233,7 @@ function ListaDeProyectos() {
             </div>
             <div className="ldp-date-content">
               <div className="ldp-date-label">Fecha de vencimiento</div>
-              <div className="ldp-date-value">{formatFecha(proyecto.pf_fin)}</div>
+             <div className="ldp-date-value">{proyecto.pf_fin}</div>
             </div>
           </div>
 
