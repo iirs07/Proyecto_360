@@ -395,9 +395,8 @@ function DesbloquearProyectos() {
        
         )}
 
-        {/* Lista de proyectos */}
         <div className="dp-lista">
-          {mostrarLoader ? ( // El loader solo se muestra en loading
+          {mostrarLoader ? ( 
             <div className="loader-container">
               <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
               <div className="loader-texto">CARGANDO...</div>
@@ -440,7 +439,7 @@ function DesbloquearProyectos() {
                   </div>
 
                   {estaExpandido ? (
-                  /* --- SECCIÓN EXPANDIDA --- */
+                  
                   <div className="dp-tareas-section">
                     <div className="dp-tareas-header">
                       <h4 className="dp-tareas-titulo">Tareas para reabrir</h4>
@@ -480,27 +479,25 @@ function DesbloquearProyectos() {
                       ))}
                     </div>
                     
-                    <div className="dp-accion-container" style={{ display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
-                        
-                        <button 
-                            className="dp-btn-accion-secundaria"
-                            style={{ backgroundColor: '#f59e0b', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                            onClick={() => handleCancelarReapertura(p.id_proyecto)}
-                        >
-                             <FiX /> CANCELAR
-                        </button>
+                 
+<div className="dp-accion-container">
+    <button 
+        className="dp-btn-accion-secundaria"
+        onClick={() => handleCancelarReapertura(p.id_proyecto)}
+    >
+            <FiX /> CANCELAR
+    </button>
 
-                        <button 
-                            className="dp-btn-accion-principal dp-btn-desbloqueado"
-                            onClick={() => handlePedirConfirmacion(p.id_proyecto)}
-                        >
-                            <FiCheck className="dp-btn-icon" /> CONFIRMAR REACTIVACIÓN
-                        </button>
-                    </div>
+    <button 
+        className="dp-btn-accion-principal dp-btn-desbloqueado"
+        onClick={() => handlePedirConfirmacion(p.id_proyecto)}
+    >
+            <FiCheck className="dp-btn-icon" /> CONFIRMAR REACTIVACIÓN
+    </button>
+</div>
                     
                   </div>
                   ) : (
-                    /* --- ESTADO CONTRAÍDO --- */
                     <div className="dp-accion-container">
                         <button 
                           className="dp-btn-accion-principal dp-btn-bloqueado"
@@ -534,8 +531,6 @@ function DesbloquearProyectos() {
         </div>
       </div>
 
-
-     {/* --- MODAL EVIDENCIAS --- */}
 {modalVisible && tareaActual && (
   <div className="dp-modal">
     <div className="dp-modal-content">
@@ -546,9 +541,6 @@ function DesbloquearProyectos() {
           <h3 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {tareaActual.t_nombre}
           </h3>
-          <span className={`dp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-            {tareaActual.t_estatus}
-          </span>
         </div>
 
         <button className="dp-modal-cerrar" onClick={handleCerrarModal}>
@@ -556,19 +548,15 @@ function DesbloquearProyectos() {
         </button>
       </div>
 
-      {/* BODY */}
       {evidencias.length > 0 ? (
         <div className="dp-evidencias-container">
           <div className="dp-evidencias-navegacion">
             
-            {/* Botón Anterior */}
             {evidencias.length > 1 && (
               <button className="dp-btn-navegacion dp-btn-prev" onClick={handlePrev}>
                 <FiChevronLeft size={24} />
               </button>
             )}
-
-            {/* Imagen */}
             <div className="dp-imagen-container">
               {errorCarga ? (
                  <div className="dp-error-placeholder">
@@ -589,8 +577,6 @@ function DesbloquearProyectos() {
                 </>
               )}
             </div>
-
-            {/* Botón Siguiente */}
             {evidencias.length > 1 && (
               <button className="dp-btn-navegacion dp-btn-next" onClick={handleNext}>
                 <FiChevronRight size={24} />
@@ -598,7 +584,6 @@ function DesbloquearProyectos() {
             )}
           </div>
 
-          {/* Footer Info */}
           <div className="dp-evidencias-info">
              {evidencias.length > 1 && (
                <span style={{fontWeight:'bold', marginRight:'10px'}}>
