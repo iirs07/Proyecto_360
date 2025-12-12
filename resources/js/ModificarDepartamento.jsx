@@ -308,30 +308,30 @@ function ModificarDepartamento() {
         const EntityIcon = isArea ? FaFolder : FaBuilding
 
         return (
-            <div className="modep-form-card modep-hover-lift">
+            <div className="dmodi-form-card dmodi-hover-lift">
 
-                <div className="modep-form-header">
-                    <h2 className="modep-form-title">
-                        <FaEdit className="modep-title-icon" />
+                <div className="dmodi-form-header">
+                    <h2 className="dmodi-form-title">
+                        <FaEdit className="dmodi-title-icon" />
                         Modificar {entityName}
                     </h2>
 
-                    <p className="modep-current-name">
-                        <EntityIcon className="modep-current-icon" />
-                        Actual: <span className="modep-current-value">{currentName}</span>
+                    <p className="dmodi-current-name">
+                        <EntityIcon className="dmodi-current-icon" />
+                        Actual: <span className="dmodi-current-value">{currentName}</span>
                     </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="modep-form">
+                <form onSubmit={handleSubmit} className="dmodi-form">
 
                     {error && (
-                        <div className="modep-message modep-message-error">
+                        <div className="dmodi-message dmodi-message-error">
                             <span>{error}</span>
                         </div>
                     )}
 
-                    <div className="modep-form-group">
-                        <label className="modep-form-label">
+                    <div className="dmodi-form-group">
+                        <label className="dmodi-form-label">
                             Nuevo Nombre del {entityName}
                         </label>
 
@@ -342,27 +342,27 @@ function ModificarDepartamento() {
                                 setNuevoNombre(e.target.value)
                                 setError('')
                             }}
-                            className="modep-form-input"
+                            className="dmodi-form-input"
                             disabled={formLoading}
                         />
 
-                        <small className="modep-form-hints">
+                        <small className="dmodi-form-hints">
                             {isArea
                                 ? 'El nombre del área debe ser único.'
                                 : 'El nombre del departamento debe ser único dentro del sistema.'}
                         </small>
 
                         {currentName === nuevoNombre && (
-                            <p className="modep-warning">El nombre es igual al actual</p>
+                            <p className="dmodi-warning">El nombre es igual al actual</p>
                         )}
                     </div>
 
-                    <div className="modep-form-actions">
+                    <div className="dmodi-form-actions">
 
                         <button
                             type="button"
                             onClick={resetSelection}
-                            className="modep-btn-secondary modep-btn-with-icon"
+                            className="dmodi-btn-secondary dmodi-btn-with-icon"
                             disabled={formLoading}
                         >
                             <FaArrowLeft />
@@ -372,11 +372,11 @@ function ModificarDepartamento() {
                         <button
                             type="submit"
                             disabled={formLoading || currentName === nuevoNombre}
-                            className="modep-btn-primary modep-btn-with-icon modep-btn-save"
+                            className="dmodi-btn-primary dmodi-btn-with-icon dmodi-btn-save"
                         >
                             {formLoading ? (
                                 <>
-                                    <FaSpinner className="modep-spinner-icon" />
+                                    <FaSpinner className="dmodi-spinner-icon" />
                                     <span>Guardando...</span>
                                 </>
                             ) : (
@@ -401,17 +401,17 @@ function ModificarDepartamento() {
         if (!openArea) return null
 
         return (
-            <div className="modep-form-card modep-hover-lift">
+            <div className="dmodi-form-card dmodi-hover-lift">
 
-                <div className="modep-card-header">
-                    <h2 className="modep-form-title">
-                        <FaFolder className="modep-title-icon" />
+                <div className="dmodi-card-header">
+                    <h2 className="dmodi-form-title">
+                        <FaFolder className="dmodi-title-icon" />
                         Área: {openArea.nombre}
                     </h2>
 
                     <button
                         onClick={() => handleSelectEntity(openArea, 'area')}
-                        className="modep-btn-secondary modep-btn-with-icon"
+                        className="dmodi-btn-secondary dmodi-btn-with-icon"
                     >
                         <FaEdit />
                         <span>Modificar Área</span>
@@ -419,47 +419,47 @@ function ModificarDepartamento() {
                 </div>
 
                 {/* BUSCADOR */}
-                <div className="modep-form-group modep-search-group">
-                    <div className="modep-input-with-icon">
-                        <FaSearch className="modep-input-icon" />
+                <div className="dmodi-form-group dmodi-search-group">
+                    <div className="dmodi-input-with-icon">
+                        <FaSearch className="dmodi-input-icon" />
                         <input
                             type="text"
                             placeholder={`Buscar departamento...`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="modep-form-input"
+                            className="dmodi-form-input"
                         />
                     </div>
                 </div>
 
                 {filteredDepartments.length === 0 ? (
-                    <div className="modep-empty-state">
-                        <FaCity className="modep-empty-icon" />
-                        <h3 className="modep-empty-title">
+                    <div className="dmodi-empty-state">
+                        <FaCity className="dmodi-empty-icon" />
+                        <h3 className="dmodi-empty-title">
                             {searchTerm ? "SIN COINCIDENCIAS" : "SIN DEPARTAMENTOS"}
                         </h3>
                     </div>
                 ) : (
-                    <div className="modep-list-container">
+                    <div className="dmodi-list-container">
 
-                        <div className="modep-list-header">
+                        <div className="dmodi-list-header">
                             <FaDatabase />
                             <span>Total: {filteredDepartments.length}</span>
                         </div>
 
-                        <div className="modep-list-content">
+                        <div className="dmodi-list-content">
 
                             {filteredDepartments.map(dep => (
-                                <div key={dep.id} className="modep-list-item">
+                                <div key={dep.id} className="dmodi-list-item">
 
-                                    <div className="modep-item-content">
-                                        <FaBuilding className="modep-item-icon" />
+                                    <div className="dmodi-item-content">
+                                        <FaBuilding className="dmodi-item-icon" />
                                         <span>{dep.d_nombre}</span>
                                     </div>
 
                                     <button
                                         onClick={() => handleSelectEntity(dep, 'departamento')}
-                                        className="modep-btn-primary modep-btn-sm"
+                                        className="dmodi-btn-primary dmodi-btn-sm"
                                     >
                                         <FaEdit />
                                         <span>Modificar</span>
@@ -472,10 +472,10 @@ function ModificarDepartamento() {
                     </div>
                 )}
 
-                <div className="modep-footer-actions">
+                <div className="dmodi-footer-actions">
                     <button
                         onClick={navigateToMainSelection}
-                        className="modep-btn-secondary modep-btn-with-icon"
+                        className="dmodi-btn-secondary dmodi-btn-with-icon"
                     >
                         <FaArrowLeft />
                         <span>Volver a Áreas</span>
@@ -490,22 +490,22 @@ function ModificarDepartamento() {
         LISTA DE ÁREAS
     ----------------------------------------------*/
     const renderSelectionMode = () => (
-        <div className="modep-form-card modep-hover-lift">
+        <div className="dmodi-form-card dmodi-hover-lift">
 
-            <h2 className="modep-form-title">
+            <h2 className="dmodi-form-title">
                 Seleccionar Área
             </h2>
 
             {/* BUSCADOR */}
-            <div className="modep-form-group modep-search-group">
-                <div className="modep-input-with-icon">
-                    <FaSearch className="modep-input-icon" />
+            <div className="dmodi-form-group dmodi-search-group">
+                <div className="dmodi-input-with-icon">
+                    <FaSearch className="dmodi-input-icon" />
                     <input
                         type="text"
                         placeholder="Buscar área..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="modep-form-input"
+                        className="dmodi-form-input"
                         disabled={loading || estructura.length === 0}
                     />
                 </div>
@@ -513,39 +513,39 @@ function ModificarDepartamento() {
 
             {/* --- LISTA / VACÍO --- */}
             {estructura.length === 0 ? (
-                <div className="modep-empty-state">
-                    <FaDatabase className="modep-empty-icon" />
-                    <h3 className="modep-empty-title">SIN REGISTROS</h3>
-                    <p className="modep-empty-message">No hay áreas registradas.</p>
+                <div className="dmodi-empty-state">
+                    <FaDatabase className="dmodi-empty-icon" />
+                    <h3 className="dmodi-empty-title">SIN REGISTROS</h3>
+                    <p className="dmodi-empty-message">No hay áreas registradas.</p>
                 </div>
             ) : filteredAreas.length === 0 ? (
-                <div className="modep-empty-state">
-                    <FaSearch className="modep-empty-icon" />
-                    <h3 className="modep-empty-title">SIN COINCIDENCIAS</h3>
-                    <p className="modep-empty-message">
+                <div className="dmodi-empty-state">
+                    <FaSearch className="dmodi-empty-icon" />
+                    <h3 className="dmodi-empty-title">SIN COINCIDENCIAS</h3>
+                    <p className="dmodi-empty-message">
                         {`No se encontraron áreas para "${searchTerm}"`}
                     </p>
                 </div>
             ) : (
-                <div className="modep-list-container">
+                <div className="dmodi-list-container">
                     {filteredAreas.map(area => (
-                        <div key={area.id} className="modep-area-card">
-                            <div className="modep-area-content">
+                        <div key={area.id} className="dmodi-area-card">
+                            <div className="dmodi-area-content">
 
-                                <div className="modep-area-header">
-                                    <FaFolder className="modep-area-icon" />
-                                    <span className="modep-area-title">{area.nombre}</span>
+                                <div className="dmodi-area-header">
+                                    <FaFolder className="dmodi-area-icon" />
+                                    <span className="dmodi-area-title">{area.nombre}</span>
                                 </div>
 
-                                <div className="modep-area-subtitle">
-                                    {area.departamentos?.length || 0} departamento
+                                <div className="dmodi-area-subtitle">
+                                    {area.departamentos?.length || 0} departamentos
                                 </div>
 
                             </div>
 
                             <button
                                 onClick={() => navigateToAreaDepartments(area)}
-                                className="modep-btn-primary modep-btn-with-icon"
+                                className="dmodi-btn-primary dmodi-btn-with-icon"
                             >
                                 <span>Ver Departamentos</span>
                                 <FaChevronRight />
@@ -589,7 +589,7 @@ function ModificarDepartamento() {
             titulo="MODIFICAR DEPARTAMENTO / ÁREA"
             sidebar={<MenuDinamico activeRoute="gestion_estructura" />}
         >
-            <div className="modep-container">
+            <div className="dmodi-container">
                 {content}
             </div>
         </Layout>

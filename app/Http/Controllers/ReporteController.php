@@ -16,9 +16,9 @@ class ReporteController extends Controller
         $nombreArchivo = 'reporte_superusuario.pdf';
         ignore_user_abort(false);
 
-        // 1. Parámetros de filtro
+        // 1. Parámetros de filtro (inalterado)
         $departamentosString = $request->query('departamentos');
-        $tipoProyecto        = $request->query('tipoProyecto', 'Ambos');
+        $tipoProyecto        = $request->query('tipoProyecto', 'Ambos'); 
         $fechaInicio         = $request->query('fechaInicio');
         $fechaFin            = $request->query('fechaFin');
         $anio                = $request->query('anio');
@@ -31,7 +31,7 @@ class ReporteController extends Controller
         $depIds = explode(',', $departamentosString);
         $mesNumero = $mes ? (int) substr($mes, 0, 2) : null;
 
-        // 2. Usuario que genera el reporte
+        // 2. Usuario que genera el reporte (inalterado)
         $usuarioGeneraNombre = 'Desconocido';
         if (Auth::check()) {
             $usuario = Auth::user();
@@ -41,7 +41,7 @@ class ReporteController extends Controller
             }
         }
 
-        // 3. Jefes de cada departamento
+        // 3. Jefes de cada departamento (inalterado)
         $jefesPorDepartamento = DB::table('usuario as u')
             ->join('c_usuario as cu', 'u.id_usuario', '=', 'cu.id_usuario')
             ->where('u.rol', 'Jefe')
@@ -49,7 +49,8 @@ class ReporteController extends Controller
             ->select('cu.id_departamento', DB::raw("CONCAT(cu.u_nombre, ' ', cu.a_paterno, ' ', cu.a_materno) as nombre"))
             ->pluck('nombre', 'cu.id_departamento');
 
-        // 4. Construcción de fechas según filtro
+        // 4. Construcción de fechas según filtro (inalterado)
+        // Las variables $fechaInicioObj y $fechaFinObj siempre contienen el rango EXACTO del usuario
         try {
             if ($anio && !$mes) {
                 $fechaInicioObj = Carbon::create($anio, 1, 1)->startOfDay();
@@ -67,53 +68,94 @@ class ReporteController extends Controller
 
         $proyectos = collect();
 
-        // 5. Determinar el trimestre actual de la BD principal
+        // 5. Determinar el trimestre actual de la BD principal (3 meses)
         $hoy = Carbon::now();
         $mesActual = $hoy->month;
         $trimestreActual = ceil($mesActual / 3);
         $inicioTrimestreActual = Carbon::create($hoy->year, ($trimestreActual - 1) * 3 + 1, 1)->startOfDay();
         $finTrimestreActual    = Carbon::create($hoy->year, $trimestreActual * 3, 1)->endOfMonth()->endOfDay();
 
-        // 6. CONSULTA BD PRINCIPAL (Trimestre actual)
-        if ($fechaFinObj >= $inicioTrimestreActual) {
-            $inicio = max($fechaInicioObj, $inicioTrimestreActual);
-            $fin    = $fechaFinObj;
+        // -------------------------------------------------------------------------
+        // FUNCIÓN AUXILIAR CON LA LÓGICA DE FILTRADO CORREGIDA
+        // -------------------------------------------------------------------------
 
+        $applyDateAndStatusFilter = function ($queryBuilder, $inicio, $fin, $tipoProyecto) {
+            
+            $queryBuilder->where(function ($q) use ($tipoProyecto, $inicio, $fin) {
+                
+                // --- 1. Lógica para proyectos FINALIZADOS ---
+                // Se aplica si el filtro es 'Finalizado' O 'Ambos'
+                if ($tipoProyecto === 'Finalizado' || $tipoProyecto === 'Ambos') {
+                    $q->where(function ($q1) use ($inicio, $fin) {
+                        $q1->where('p_estatus', 'Finalizado')
+                           // Los finalizados SÍ deben tener su fecha de fin en el rango
+                           ->whereBetween('pf_fin', [$inicio, $fin]);
+                    });
+                }
+
+                // --- 2. Lógica para proyectos EN PROCESO ---
+                // Se aplica si el filtro es 'En proceso' O 'Ambos'
+                if ($tipoProyecto === 'En proceso' || $tipoProyecto === 'Ambos') {
+                    // Usamos orWhere si ya se aplicó una condición previa (i.e., tipoProyecto es 'Ambos')
+                    $method = ($tipoProyecto === 'Ambos') ? 'orWhere' : 'where'; 
+                    
+                    $q->$method(function ($q2) use ($fin) {
+                        $q2->where('p_estatus', 'En proceso')
+                           // REGLA CLAVE: El proyecto En proceso debe haber iniciado antes o en la fecha de fin del filtro,
+                           // SIN IMPORTAR SU pf_fin futura. Esto funciona bien para rangos grandes o pequeños (mensuales).
+                           ->where('pf_inicio', '<=', $fin);
+                    });
+                }
+            });
+        };
+
+
+        // -------------------------------------------------------------------------
+        // 6. CONSULTA BD PRINCIPAL (Trimestre actual)
+        // -------------------------------------------------------------------------
+        
+        // ❗ Si el filtro cae dentro del trimestre actual (la BD principal)
+        $inicioPrincipal = max($fechaInicioObj, $inicioTrimestreActual);
+        $finPrincipal    = $fechaFinObj;
+
+        if ($fechaFinObj >= $inicioTrimestreActual) {
+            
             $query = Proyecto::on('pgsql')->whereIn('id_departamento', $depIds);
 
-            if ($tipoProyecto !== 'Ambos') {
-                $query->where('p_estatus', $tipoProyecto === 'Finalizados' ? 'Finalizado' : 'En proceso');
-            }
-
-            $query->whereBetween('pf_fin', [$inicio, $fin]);
+            // Aplica los filtros de estatus y fecha
+            $applyDateAndStatusFilter($query, $inicioPrincipal, $finPrincipal, $tipoProyecto); 
 
             $proyectos = $proyectos->merge(
                 $query->with(['departamento.area', 'encargado'])
-                      ->withCount(['tareas', 'tareasCompletadas'])
-                      ->get()
+                    ->withCount(['tareas', 'tareasCompletadas'])
+                    ->get()
             );
         }
 
+        // -------------------------------------------------------------------------
         // 7. CONSULTA BD HISTÓRICA (Trimestres anteriores)
+        // -------------------------------------------------------------------------
+        
+        // ❗ Si el filtro abarca fechas anteriores al trimestre actual (la BD histórica)
+        $inicioHistorico = $fechaInicioObj;
+        $finHistorico    = min($fechaFinObj, $inicioTrimestreActual->copy()->subSecond());
+
         if ($fechaInicioObj < $inicioTrimestreActual) {
-            $inicio = $fechaInicioObj;
-            $fin    = min($fechaFinObj, $inicioTrimestreActual->copy()->subSecond());
 
             $query = Proyecto::on('pgsql_second')->whereIn('id_departamento', $depIds);
 
-            if ($tipoProyecto !== 'Ambos') {
-                $query->where('p_estatus', $tipoProyecto === 'Finalizados' ? 'Finalizado' : 'En proceso');
-            }
-
-            $query->whereBetween('pf_fin', [$inicio, $fin]);
+            // Aplica los filtros de estatus y fecha
+            $applyDateAndStatusFilter($query, $inicioHistorico, $finHistorico, $tipoProyecto); 
 
             $proyectos = $proyectos->merge(
                 $query->with(['departamento.area', 'encargado'])
-                      ->withCount(['tareas', 'tareasCompletadas'])
-                      ->get()
+                    ->withCount(['tareas', 'tareasCompletadas'])
+                    ->get()
             );
         }
-
+        // -------------------------------------------------------------------------
+        
+        
         if (connection_aborted()) {
             return response()->json(['message' => 'El usuario canceló la descarga.'], 499);
         }
@@ -127,7 +169,7 @@ class ReporteController extends Controller
             ], 400);
         }
 
-        // 8. Procesar resultados
+        // 8. Procesar resultados (Grouping, Avance, Responsable - Inalterado)
         $proyectosAgrupados = [];
 
         foreach ($proyectos as $p) {
@@ -144,15 +186,15 @@ class ReporteController extends Controller
 
             $proyectosAgrupados[$areaNombre][$estado][] = $p;
         }
-
-        // Ordenar por pf_fin
+        
+        // Reordenación
         foreach ($proyectosAgrupados as $area => &$estados) {
             foreach ($estados as $estado => &$lista) {
                 usort($lista, fn($a, $b) => strtotime($a->pf_fin) - strtotime($b->pf_fin));
             }
         }
 
-        // 9. Preparar datos para la vista PDF
+        // 9. Preparar datos para la vista PDF (El $tipoProyecto se envía directamente)
         $data = [
             'proyectosAgrupados' => $proyectosAgrupados,
             'filtros' => compact('tipoProyecto', 'fechaInicio', 'fechaFin', 'anio', 'mes'),

@@ -12,10 +12,13 @@ import {
     FaLock, FaClipboardCheck
 } from 'react-icons/fa';
 
+// CONSTANTE PARA EL LÍMITE MÁXIMO
+const MAX_USOS_INVITACION = 50;
+
 const ROLES = [
     { value: 'Usuario', name: 'Usuario' },
     { value: 'Jefe', name: 'Jefe' },
-    { value: 'Superusuario', name: 'Superusuario' },
+    { value: 'Superusuario', name:'Superusuario' },
     { value: 'Administrador', name: 'Administrador' }
 ];
 
@@ -47,6 +50,7 @@ function GenerarInvitacion() {
     const [selectedDepText, setSelectedDepText] = useState("Selecciona un departamento");
     const [isDepOpen, setIsDepOpen] = useState(false);
 
+    // Cantidad de usos (inicia en 1)
     const [cantidad, setCantidad] = useState(1);
     const [link, setLink] = useState('');
     const [loading, setLoading] = useState(true);
@@ -204,8 +208,6 @@ function GenerarInvitacion() {
                 
                 setAreas(areasData);
                 
-                // Si existe un idArea en el estado (por recarga parcial, aunque no lo persistimos), 
-                // actualiza el texto seleccionado.
                 if (idArea && areasData.length > 0) {
                     const areaSeleccionada = areasData.find(area => area.id_area === idArea);
                     if (areaSeleccionada) {
@@ -251,30 +253,31 @@ function GenerarInvitacion() {
         }
     }, [idArea, areas, idDepartamento]);
 
-    // Manejar cambio en cantidad
+    // 1. Manejar cambio en cantidad (Permite temporalmente '' o 0 para la edición móvil/teclado)
     const handleCantidadChange = (e) => {
         if (!camposHabilitados) return;
 
         const value = e.target.value;
         
-        if (value === '') {
-            setCantidad(1);
-            setErrorCantidad('');
-            return;
-        }
+        // Permitir cadena vacía o valores que no son números válidos (se validan al hacer submit/onBlur)
+        setCantidad(value);
+        setErrorCantidad('');
+    };
+
+    // 2. Función para forzar el valor al mínimo (1) o al máximo (50) si se pierde el foco
+    const handleBlurCantidad = () => {
+        if (!camposHabilitados) return;
+
+        let finalValue = parseInt(cantidad);
         
-        const numValue = parseInt(value);
-        
-        if (isNaN(numValue) || numValue < 1) {
+        if (isNaN(finalValue) || finalValue < 1) {
             setCantidad(1);
-            setTimedError(setErrorCantidad, 'La cantidad debe ser al menos 1');
-        } else if (numValue > 100) {
-            setCantidad(100);
-            setTimedError(setErrorCantidad, 'La cantidad máxima es 100');
+        } else if (finalValue > MAX_USOS_INVITACION) { // APLICAR EL NUEVO MÁXIMO
+            setCantidad(MAX_USOS_INVITACION);
         } else {
-            setCantidad(numValue);
-            setErrorCantidad('');
+            setCantidad(finalValue);
         }
+        setErrorCantidad('');
     };
 
     const handleGenerar = async () => {
@@ -289,6 +292,7 @@ function GenerarInvitacion() {
 
         let hasError = false;
 
+        // Validaciones del formulario
         if (!rol) {
             setTimedError(setErrorRol, "Por favor, selecciona un tipo de usuario (rol).");
             hasError = true;
@@ -301,8 +305,15 @@ function GenerarInvitacion() {
             setTimedError(setErrorDepartamento, "Por favor, selecciona un departamento.");
             hasError = true;
         }
-        if (cantidad < 1) {
-            setTimedError(setErrorCantidad, "La cantidad mínima de registros es 1.");
+        
+        // VALIDACIÓN CLAVE: Asegurar que la cantidad sea numérica y entre 1 y MAX_USOS_INVITACION
+        const finalCantidad = parseInt(cantidad);
+
+        if (isNaN(finalCantidad) || finalCantidad < 1) {
+            setTimedError(setErrorCantidad, "La cantidad mínima de registros es 1. Por favor, ingresa un número válido.");
+            hasError = true;
+        } else if (finalCantidad > MAX_USOS_INVITACION) { // APLICAR EL NUEVO MÁXIMO
+             setTimedError(setErrorCantidad, `La cantidad máxima de registros es ${MAX_USOS_INVITACION}.`);
             hasError = true;
         }
         
@@ -312,6 +323,7 @@ function GenerarInvitacion() {
         }
 
         if (hasError) return;
+        // FIN DE VALIDACIONES. Si no hay errores, procedemos.
 
         try {
             const headers = { "Content-Type": "application/json" };
@@ -324,7 +336,7 @@ function GenerarInvitacion() {
                     rol,
                     id_departamento: idDepartamento,
                     creado_por: creadoPorId, // ID del administrador logueado
-                    max_usos: cantidad
+                    max_usos: finalCantidad // Usamos la cantidad validada
                 })
             });
 
@@ -349,6 +361,7 @@ function GenerarInvitacion() {
             mostrarExito("Error de conexión al generar la invitación.", 4000);
         }
     };
+    // ... (El resto de funciones se mantiene)
 
     const handleCopiar = () => {
         if (!link) return;
@@ -428,7 +441,8 @@ function GenerarInvitacion() {
         };
     }, []);
 
-    // Mostrar mensaje de acceso denegado
+    // Mostrar mensaje de acceso denegado (el resto del render se mantiene igual)
+
     if (accessDenied) {
         return (
             <Layout titulo="ACCESO DENEGADO" sidebar={<MenuDinamico tipo="generar" />}>
@@ -611,24 +625,23 @@ function GenerarInvitacion() {
                                             <input
                                                 type="number"
                                                 min="1"
-                                                max="100"
+                                                max={MAX_USOS_INVITACION} // Límite de 50
                                                 step="1"
                                                 className="cantidad-input"
                                                 value={cantidad}
                                                 onChange={handleCantidadChange}
                                                 disabled={!camposHabilitados}
-                                                onBlur={() => {
-                                                    if (cantidad < 1) setCantidad(1);
-                                                    if (cantidad > 100) setCantidad(100);
-                                                }}
+                                                onBlur={handleBlurCantidad}
                                                 onKeyDown={(e) => {
-                                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                                    // Bloquea caracteres no deseados en móviles
+                                                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
                                                         e.preventDefault();
                                                     }
                                                 }}
                                             />
                                             <div className="cantidad-info">
-                                                <small>Mínimo: 1 | Máximo: 100 registros</small>
+                                                {/* Mensaje de info actualizado */}
+                                                <small>Mínimo: 1 | Máximo: {MAX_USOS_INVITACION} registros</small>
                                             </div>
                                         </div>
                                     </div>
