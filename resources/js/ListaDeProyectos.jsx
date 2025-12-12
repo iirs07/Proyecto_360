@@ -54,7 +54,7 @@ function ListaDeProyectos() {
     if (!fechaFin) return { dias: 0, texto: 'Sin fecha', tipo: 'neutral' };
     
     const hoy = new Date();
-    const fin = new Date(fechaFin + "T00:00");
+    const fin = new Date(fechaFin + "T23:59:59");
     const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
     
     if (diffDays < 0) {

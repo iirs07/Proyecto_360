@@ -11,17 +11,16 @@ import EmptyState from "../components/EmptyState";
 import ConfirmModal from "../components/ConfirmModal";
 import { useRolNavigation } from "./utils/navigation";
 
-// --- FUNCIÓN AUXILIAR useDebounce (SOLUCIÓN AL PROBLEMA DE RENDIMIENTO) ---
+
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    // Establecer un temporizador (timeout) que actualizará el valor después de 'delay'
+
     const handler = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
-    // Limpiar el temporizador si el valor cambia (el usuario sigue escribiendo)
     return () => {
       clearTimeout(handler);
     };
@@ -29,14 +28,13 @@ const useDebounce = (value, delay) => {
 
   return debouncedValue;
 };
-// --- FIN FUNCIÓN AUXILIAR useDebounce ---
 
 function DesbloquearProyectos() {
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // --- ESTADO LOCAL PARA LA INTERFAZ ---
+
   const [proyectosExpandidos, setProyectosExpandidos] = useState([]); 
   const [tareasSeleccionadas, setTareasSeleccionadas] = useState({});
 
@@ -135,18 +133,12 @@ function DesbloquearProyectos() {
     obtenerProyectosCompletados();
   }, [anio, mes, searchTerm, navigate]);
 
-
-  // El filtrado en el frontend todavía es útil para una retroalimentación visual inmediata
-  // mientras se escribe.
   const proyectosFiltrados = proyectos.filter(p =>
     p.p_nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
   
-  // Condición para mostrar el loader
   const mostrarLoader = loading;
 
-
-  // --- LÓGICA DE MANEJO DE ESTADO LOCAL (sin cambios) ---
 
   const handleExpandirProyecto = (idProyecto) => {
     if (!proyectosExpandidos.includes(idProyecto)) {
@@ -187,12 +179,10 @@ function DesbloquearProyectos() {
   // --- PASO 2: EJECUTAR REACTIVACIÓN ---
   // -------------------------------------------------------------
   const ejecutarReactivacion = async () => {
-    if (!idProyectoAReactivar) return; // Seguridad
+    if (!idProyectoAReactivar) return; 
 
     const token = sessionStorage.getItem("jwt_token");
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
-    
-    // Obtenemos las tareas usando el ID guardado en el estado
     const tareasParaAbrir = tareasSeleccionadas[idProyectoAReactivar] || [];
 
     try {
@@ -226,12 +216,10 @@ function DesbloquearProyectos() {
             // CERRAR MODAL Y LIMPIAR
             setModalConfirmacionOpen(false);
             setIdProyectoAReactivar(null);
-            
-            // Opcional: Toast de éxito
-            // alert("Proyecto reactivado correctamente."); 
+        
         } else {
             alert("Error al reactivar: " + (data.mensaje || "Intente de nuevo"));
-            setModalConfirmacionOpen(false); // Cerramos el modal incluso si falla para que pueda reintentar
+            setModalConfirmacionOpen(false); 
         }
 
     } catch (error) {
@@ -241,8 +229,6 @@ function DesbloquearProyectos() {
     }
   };
 
-
-  // --- MANEJO DE IMÁGENES (sin cambios) ---
   const handleVerEvidencias = (tarea, fechaFinProyecto) => {
     setTareaActual(tarea);
     setEvidencias(tarea.evidencias || []);
@@ -318,9 +304,7 @@ function DesbloquearProyectos() {
     >
       <div className="contenedor-global">
 
-        {/* --- BARRA DE BÚSQUEDA Y FILTROS --- */}
-        {/* Muestra la barra si hay proyectos O si la búsqueda/filtros están activos */}
-        {(proyectos.length > 0 || anio !== "" || mes !== "" || searchTerm !== "") && (
+      
           <div className="barra-busqueda-dp-container mb-4">
             <p className="subtitulo-global">Gestiona y reactiva proyectos finalizados e históricos</p>
             
@@ -363,7 +347,7 @@ function DesbloquearProyectos() {
 
             
              <div className="barra-buscador-texto">
-    {/* ⬅️ AÑADE ESTE ÍCONO DE LUPA DECORATIVO */}
+   
     <span className="barra-busqueda-dp-icon">
         <FaSearch /> 
     </span>
@@ -391,9 +375,6 @@ function DesbloquearProyectos() {
                 
               </div>
             </div>
-
-       
-        )}
 
         <div className="dp-lista">
           {mostrarLoader ? ( 
