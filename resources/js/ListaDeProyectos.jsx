@@ -256,14 +256,14 @@ function ListaDeProyectos() {
       </div>
     );
   };
-return (
+
+ return (
   <Layout
-    titulo={proyectos.length === 0 ? "" : "Proyectos Activos"}
-    subtitle={proyectos.length === 0 ? "" : "Visualiza y gestiona todos tus proyectos en un solo lugar"}
-    sidebar={proyectos.length === 0 ? null : <MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
+    titulo={proyectos.length > 0 ? "Proyectos Activos" : ""}
+    subtitle={proyectos.length > 0 ? "Visualiza y gestiona todos tus proyectos en un solo lugar" : ""}
+    sidebar={<MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
   >
     <div className="ldp-container">
-
       {loading ? (
         <div className="loader-container">
           <div className="loader-logo"><img src={logo3} alt="Cargando" /></div>
@@ -271,7 +271,6 @@ return (
           <div className="loader-spinner"></div>
         </div>
       ) : proyectos.length === 0 ? (
-        
         <EmptyState
           titulo="No hay proyectos activos"
           mensaje="Cuando se asignen proyectos, aparecerán aquí."
@@ -279,11 +278,9 @@ return (
           onVolver={volverSegunRol}
           icono={logo3}
         />
-
       ) : (
-        
-        // Se muestra TODO el diseño solo cuando SÍ hay proyectos
         <>
+          {/* TODO el contenido de la interfaz de proyectos solo se renderiza si hay proyectos */}
           <div className="ldp-header">
             <div className="ldp-header-content">
               <div className="ldp-header-title">
@@ -305,7 +302,10 @@ return (
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     {searchTerm && (
-                      <button className="ldp-search-clear" onClick={() => setSearchTerm("")}>
+                      <button
+                        className="ldp-search-clear"
+                        onClick={() => setSearchTerm("")}
+                      >
                         <FiX />
                       </button>
                     )}
@@ -320,16 +320,32 @@ return (
                     <MdOutlineSort />
                     Ordenar por
                   </button>
-                  
+
                   {showSortOptions && (
                     <div className="ldp-sort-dropdown">
-                      <button className={`ldp-sort-option ${sortBy === 'fecha' ? 'active' : ''}`}
-                        onClick={() => { setSortBy('fecha'); setShowSortOptions(false); }}>
+                      <button 
+                        className={`ldp-sort-option ${sortBy === 'fecha' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('fecha'); setShowSortOptions(false); }}
+                      >
                         <FiCalendar /> Fecha de vencimiento
                       </button>
-                      <button className={`ldp-sort-option ${sortBy === 'nombre' ? 'active' : ''}`}
-                        onClick={() => { setSortBy('nombre'); setShowSortOptions(false); }}>
+                      <button 
+                        className={`ldp-sort-option ${sortBy === 'nombre' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('nombre'); setShowSortOptions(false); }}
+                      >
                         <FiFilter /> Nombre
+                      </button>
+                      <button 
+                        className={`ldp-sort-option ${sortBy === 'tareas' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('tareas'); setShowSortOptions(false); }}
+                      >
+                        <FaTasks /> Cantidad de tareas
+                      </button>
+                      <button 
+                        className={`ldp-sort-option ${sortBy === 'prioridad' ? 'active' : ''}`}
+                        onClick={() => { setSortBy('prioridad'); setShowSortOptions(false); }}
+                      >
+                        <FaExclamationTriangle /> Prioridad
                       </button>
                     </div>
                   )}
@@ -337,6 +353,14 @@ return (
               </div>
             </div>
           </div>
+
+          {searchTerm && (
+            <div className="ldp-search-results">
+              <span className="ldp-results-count">
+                {filteredAndSortedProyectos.length} {filteredAndSortedProyectos.length === 1 ? 'resultado' : 'resultados'} para "{searchTerm}"
+              </span>
+            </div>
+          )}
 
           <div className="container">
             <div className="row g-4">
@@ -347,7 +371,6 @@ return (
               ))}
             </div>
           </div>
-
         </>
       )}
     </div>
