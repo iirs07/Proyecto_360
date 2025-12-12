@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimesCircle } from "react-icons/fa"; 
+import { FaTimesCircle, FaCheckSquare, FaRegSquare, FaCalendarAlt, FaCalendarDay, FaCalendarWeek, FaHourglassHalf, FaClipboardCheck } from "react-icons/fa"; 
 import { useNavigate } from "react-router-dom";
 import "../css/global.css";
 import "../css/ReporteSuperUsuario.css";
@@ -15,7 +15,10 @@ export default function ReporteSuperUsuario() {
     const [areas, setAreas] = useState([]);
     const [seleccionados, setSeleccionados] = useState([]);
     const [areasAbiertas, setAreasAbiertas] = useState({});
-    const [tipoProyecto, setTipoProyecto] = useState("Ambos");
+    
+    // ⬇️ AJUSTADO: Estado usa los valores 'Ambos', 'Finalizado', 'En proceso'
+    const [tipoProyecto, setTipoProyecto] = useState("Ambos"); 
+
     const [periodo, setPeriodo] = useState("Rango");
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
@@ -24,14 +27,15 @@ export default function ReporteSuperUsuario() {
     const [isLoading, setIsLoading] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationProgress, setGenerationProgress] = useState(0);
-    const [errorMessage, setErrorMessage] = useState(''); // Estado de error para mensaje en interfaz
+    const [errorMessage, setErrorMessage] = useState(''); 
 
     // 🟢 REFERENCIAS CLAVE
     const progressIntervalRef = useRef(null);
     const abortControllerRef = useRef(null); 
 
     const navigate = useNavigate();
-    const token = sessionStorage.getItem('jwt_token');
+    // ✅ Uso de sessionStorage para el token de sesión
+    const token = sessionStorage.getItem('jwt_token'); 
 
     // 🟢 VARIABLE DE ENTORNO PARA LA URL BASE DE LA API
     const API_URL = import.meta.env.VITE_API_URL;
@@ -65,11 +69,10 @@ export default function ReporteSuperUsuario() {
         }
 
         const fetchAreas = async () => {
-            try {
-                // Autenticación con Bearer Token - USANDO VARIABLE DE ENTORNO
+             try {
                 const response = await fetch(`${API_URL}/api/departamentos`, {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}` // ✅ Usando token de sessionStorage
                     }
                 });
                 
@@ -106,18 +109,34 @@ export default function ReporteSuperUsuario() {
     // === FIN CARGA DE DATOS ===
 
 
-    // === FUNCIONES DE MANEJO DE ESTADOS (CORREGIDAS para limpiar el error) ===
+    // === LÓGICA DE SELECCIONAR TODO ===
+    const isAllSelected = seleccionados.length > 0 && areas.every(area => 
+        area.departamentos.every(dep => seleccionados.includes(dep.id_departamento))
+    );
+
+    const toggleSelectAll = () => {
+        setErrorMessage('');
+        if (isAllSelected) {
+            setSeleccionados([]);
+        } else {
+            const allDepIds = areas.flatMap(area => 
+                area.departamentos.map(dep => dep.id_departamento)
+            );
+            setSeleccionados(allDepIds);
+        }
+    };
+    // ===================================
+
+    // === FUNCIONES DE MANEJO DE ESTADOS ===
     const toggleDepartamento = (depId) => {
-        setErrorMessage(''); // Limpiar error al interactuar
+        setErrorMessage('');
         setSeleccionados((prev) =>
-            prev.includes(depId)
-                ? prev.filter((d) => d !== depId)
-                : [...prev, depId]
+            prev.includes(depId) ? prev.filter((d) => d !== depId) : [...prev, depId]
         );
     };
 
     const toggleArea = (area) => {
-        setErrorMessage(''); // Limpiar error al interactuar
+        setErrorMessage(''); 
         const depIds = area.departamentos.map((dep) => dep.id_departamento);
         const allSelected = depIds.every((id) => seleccionados.includes(id));
         setSeleccionados((prev) => allSelected ? prev.filter((id) => !depIds.includes(id)) : [...new Set([...prev, ...depIds])]);
@@ -128,8 +147,9 @@ export default function ReporteSuperUsuario() {
     };
 
     const handlePeriodoChange = (t) => {
-        setErrorMessage(''); // Limpiar error al cambiar periodo
+        setErrorMessage('');
         setPeriodo(t);
+        // Limpiamos campos irrelevantes para el nuevo tipo de periodo
         if (t === "Año") {
             setMes(""); setFechaInicio(""); setFechaFin("");
         } else if (t === "Mes") {
@@ -139,8 +159,12 @@ export default function ReporteSuperUsuario() {
         }
     };
 
+    const handleProyectoStateChange = (e) => {
+        setErrorMessage('');
+        setTipoProyecto(e.target.value);
+    };
 
-    // 🟢 FUNCIÓN para simular el progreso (0% al 99%)
+    // 🟢 FUNCIÓN para simular el progreso
     const simulateProgress = () => {
         setGenerationProgress(0); 
         let progress = 0;
@@ -159,7 +183,7 @@ export default function ReporteSuperUsuario() {
         progressIntervalRef.current = interval; 
     };
     
-    // 🟢 FUNCIÓN para cancelar la generación (Ahora cancela el fetch)
+    // 🟢 FUNCIÓN para cancelar la generación
     const handleCancelGeneration = () => {
         if (abortControllerRef.current) {
             abortControllerRef.current.abort(); 
@@ -172,21 +196,24 @@ export default function ReporteSuperUsuario() {
         }
         setIsGenerating(false);
         setGenerationProgress(0);
+        setErrorMessage('');
         console.log("Generación de reporte cancelada por el usuario.");
     };
 
 
-    // ⬇️ FUNCIÓN handleGenerarReporte (con AbortController y Validación Completa) ⬇️
+    // ⬇️ FUNCIÓN handleGenerarReporte (Optimizado) ⬇️
     const handleGenerarReporte = async () => {
-        setErrorMessage(''); // Limpiar error al iniciar nuevo intento
+        setErrorMessage('');
 
-        // 1. Validación de Selección
+        const tipoProj = tipoProyecto; 
+
+        // 1. Validación de Departamento
         if (seleccionados.length === 0) {
             setErrorMessage("⚠ Error: Selecciona al menos un departamento para generar el reporte.");
             return;
         }
         
-        let urlFiltros = `?tipoProyecto=${tipoProyecto}&departamentos=${seleccionados.join(",")}`;
+        let urlFiltros = `?tipoProyecto=${tipoProj}&departamentos=${seleccionados.join(",")}`;
         let alertaPeriodo = "";
 
         // 2. Lógica de validación COMPLETA de periodos
@@ -206,8 +233,9 @@ export default function ReporteSuperUsuario() {
             if (!fechaInicio || !fechaFin) {
                 alertaPeriodo = 'Rango de fechas (Inicio y Fin)'; 
             } else {
+                // ✅ Validación de rango de fechas
                 if (new Date(fechaInicio) > new Date(fechaFin)) {
-                    setErrorMessage("⚠  Error: La fecha de inicio no puede ser posterior a la fecha de fin.");
+                    setErrorMessage("⚠  Error: La fecha de inicio no puede ser posterior a la fecha de fin.");
                     return;
                 }
                 urlFiltros += `&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`; 
@@ -239,7 +267,6 @@ export default function ReporteSuperUsuario() {
                 signal: signal 
             }); 
             
-            // 🟢 Limpiar referencias al finalizar la solicitud (EXITOSA)
             if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
             abortControllerRef.current = null; 
 
@@ -252,6 +279,7 @@ export default function ReporteSuperUsuario() {
                 const errorText = await response.text();
                 let errorMessageText = `(${response.status}) Error desconocido.`;
                 try {
+                    // Intenta parsear JSON para errores detallados del backend
                     const errorJson = JSON.parse(errorText);
                     errorMessageText = errorJson.message || errorMessageText;
                 } catch(e) { /* Si no es JSON, usa el error desconocido */ }
@@ -272,9 +300,9 @@ export default function ReporteSuperUsuario() {
             }, 500);
 
         } catch (error) {
-            // 🛑 MANEJO DE ABORTERROR
+            // 🛑 MANEJO DE ABORTERROR (Cancelación)
             if (error.name === 'AbortError') {
-                // Cancelación intencional, no mostrar error.
+                // Cancelación intencional.
             } else {
                 handleCancelGeneration();
                 setErrorMessage(`❌ Ocurrió un error en la generación: ${error.message}`); 
@@ -321,9 +349,20 @@ export default function ReporteSuperUsuario() {
                 <div className="main-form-container">
                     
                     <div className="filtros-grid">
-                        {/* === 1. Áreas === */}
-                         <div className="form-section area-selection-panel">
+                        
+                        {/* === COLUMNA 1: DEPARTAMENTOS === */}
+                        <div className="form-section area-selection-panel">
                             <label className="titulo-seccion"><strong>1. Seleccionar Áreas / Departamentos</strong></label>
+                            
+                            {/* ⬇️ BOTÓN DE SELECCIONAR TODO */}
+                            <button
+                                className={`btn-seleccionar-todo ${isAllSelected ? 'active' : ''}`}
+                                onClick={toggleSelectAll}
+                            >
+                                {isAllSelected ? <FaCheckSquare /> : <FaRegSquare />}
+                                {isAllSelected ? ' Deseleccionar Todos' : ' Seleccionar Todos'}
+                            </button>
+                            
                             <div className="areas-list-scroll">
                                 {areas.map((area) => (
                                     <div key={area.id} className="area-item-contenedor">
@@ -366,88 +405,131 @@ export default function ReporteSuperUsuario() {
                             </div>
                         </div>
 
-                        {/* === 2. Período === */}
-                        <div className="form-section periodo-section">
-                            <label className="titulo-seccion"><strong>2. Seleccionar Periodo</strong></label>
-                            <div className="periodo-tipo-tabs">
-                                {["Año", "Mes", "Rango"].map((t) => (
-                                    <button key={t} className={`periodo-tab ${periodo === t ? "active" : ""}`} onClick={() => handlePeriodoChange(t)} >
-                                        {t === "Rango" ? "Rango de fechas" : t}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="periodo-inputs">
-                                {periodo === "Año" && (
-                                    <div className="input-group-field">
-                                        <label htmlFor="select-anio">Año:</label>
-                                        <select 
-                                            id="select-anio" 
-                                            value={anio} 
-                                            onChange={(e) => {setAnio(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
-                                            className="input-anio"
+                        {/* === COLUMNA 2: COMBINADA (Periodo y Estado apilados) === */}
+                        <div className="combined-filters-column">
+                            
+                            {/* SECCIÓN 2: PERÍODO (CALENDARIO) */}
+                            <div className="form-section periodo-section">
+                                <label className="titulo-seccion"><strong>2. Seleccionar Periodo (Calendario)</strong></label>
+                                <div className="periodo-tipo-tabs">
+                                    {[{t: "Rango", icon: <FaCalendarWeek />, label: "Rango de fechas"}, 
+                                      {t: "Mes", icon: <FaCalendarDay />, label: "Mes"}, 
+                                      {t: "Año", icon: <FaCalendarAlt />, label: "Año"}
+                                    ].map(({ t, icon, label }) => (
+                                        <button 
+                                            key={t} 
+                                            className={`periodo-tab ${periodo === t ? "active" : ""}`} 
+                                            onClick={() => handlePeriodoChange(t)} 
                                         >
-                                            <option value="">-- Seleccionar año --</option>
-                                            {listaAnios.map((a) => (<option key={a} value={a}>{a}</option>))}
-                                        </select>
-                                    </div>
-                                )}
-                                {periodo === "Mes" && (
-                                    <div className="input-group-field">
-                                        <label htmlFor="select-mes">Mes:</label>
-                                        <div className="mes-inputs">
+                                            {icon} {label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="periodo-inputs">
+                                    {periodo === "Año" && (
+                                        <div className="input-group-field">
+                                            <label htmlFor="select-anio">Año:</label>
                                             <select 
-                                                id="select-mes-year" 
+                                                id="select-anio" 
                                                 value={anio} 
-                                                onChange={(e) => {setAnio(e.target.value); setMes(""); setErrorMessage('');}} // 🟢 Limpieza de error
+                                                onChange={(e) => {setAnio(e.target.value); setErrorMessage('');}}
+                                                className="input-anio"
                                             >
-                                                <option value="">-- Año --</option>
+                                                <option value="">-- Seleccionar año --</option>
                                                 {listaAnios.map((a) => (<option key={a} value={a}>{a}</option>))}
                                             </select>
-                                            <select 
-                                                id="select-mes" 
-                                                value={mes} 
-                                                onChange={(e) => {setMes(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
-                                                disabled={!anio}
-                                            >
-                                                <option value="">-- Mes --</option>
-                                                {listaMeses.map((m) => (<option key={m.value} value={m.value}>{m.label}</option>))}
-                                            </select>
                                         </div>
-                                    </div>
-                                )}
-                                {periodo === "Rango" && (
-                                    <div className="rango-fechas-inputs">
-                                        <label>Inicio:</label>
-                                        <input 
-                                            type="date" 
-                                            value={fechaInicio} 
-                                            onChange={(e) => {setFechaInicio(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
-                                        />
-                                        <label>Fin:</label>
-                                        <input 
-                                            type="date" 
-                                            value={fechaFin} 
-                                            onChange={(e) => {setFechaFin(e.target.value); setErrorMessage('');}} // 🟢 Limpieza de error
-                                        />
-                                    </div>
-                                )}
+                                    )}
+                                    {periodo === "Mes" && (
+                                        <div className="input-group-field">
+                                            <label htmlFor="select-mes">Mes:</label>
+                                            <div className="mes-inputs">
+                                                <select 
+                                                    id="select-mes-year" 
+                                                    value={anio} 
+                                                    onChange={(e) => {setAnio(e.target.value); setMes(""); setErrorMessage('');}}
+                                                >
+                                                    <option value="">-- Año --</option>
+                                                    {listaAnios.map((a) => (<option key={a} value={a}>{a}</option>))}
+                                                </select>
+                                                <select 
+                                                    id="select-mes" 
+                                                    value={mes} 
+                                                    onChange={(e) => {setMes(e.target.value); setErrorMessage('');}}
+                                                    disabled={!anio}
+                                                >
+                                                    <option value="">-- Mes --</option>
+                                                    {listaMeses.map((m) => (<option key={m.value} value={m.value}>{m.label}</option>))}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {periodo === "Rango" && (
+                                        <div className="rango-fechas-inputs">
+                                            <label>Inicio:</label>
+                                            <input 
+                                                type="date" 
+                                                value={fechaInicio} 
+                                                onChange={(e) => {setFechaInicio(e.target.value); setErrorMessage('');}} 
+                                            />
+                                            <label>Fin:</label>
+                                            <input 
+                                                type="date" 
+                                                value={fechaFin} 
+                                                onChange={(e) => {setFechaFin(e.target.value); setErrorMessage('');}} 
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                            
+                            {/* SECCIÓN 3: ESTADO DEL PROYECTO */}
+                            <div className="form-section tipo-proyecto-section">
+                                <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
+                                
+                                <div className="toggle-buttons-group radio-group">
+                                    {/* Opción Ambos */}
+                                    <label className={`radio-label ${tipoProyecto === 'Ambos' ? 'selected' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="tipoProyecto"
+                                            value="Ambos"
+                                            checked={tipoProyecto === 'Ambos'}
+                                            onChange={handleProyectoStateChange}
+                                            className="hidden-radio"
+                                        />
+                                        <span className="radio-content"><FaCheckSquare /> Ambos</span>
+                                    </label>
 
-                        {/* === 3. Tipo de Proyecto === */}
-                        <div className="form-section tipo-proyecto-section">
-                            <label className="titulo-seccion"><strong>3. Estado del Proyecto</strong></label>
-                           <select 
-                                value={tipoProyecto} 
-                                onChange={(e) => {setTipoProyecto(e.target.value); setErrorMessage('');}}
-                                className="input-estado"
-                            >
-                                <option value="Finalizados">Finalizados</option>
-                                <option value="En proceso">En proceso</option>
-                                <option value="Ambos">Ambos</option>
-                            </select>
+                                    {/* Opción Finalizado (CORREGIDO VALUE) */}
+                                    <label className={`radio-label ${tipoProyecto === 'Finalizado' ? 'selected' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="tipoProyecto"
+                                            value="Finalizado" // ✅ Valor estandarizado
+                                            checked={tipoProyecto === 'Finalizado'}
+                                            onChange={handleProyectoStateChange}
+                                            className="hidden-radio"
+                                        />
+                                        <span className="radio-content"><FaClipboardCheck /> Finalizado</span> 
+                                    </label>
 
+                                    {/* Opción En proceso (CORREGIDO VALUE) */}
+                                    <label className={`radio-label ${tipoProyecto === 'En proceso' ? 'selected' : ''}`}>
+                                        <input
+                                            type="radio"
+                                            name="tipoProyecto"
+                                            value="En proceso" // ✅ Valor estandarizado
+                                            checked={tipoProyecto === 'En proceso'}
+                                            onChange={handleProyectoStateChange}
+                                            className="hidden-radio"
+                                        />
+                                        <span className="radio-content"><FaHourglassHalf /> En proceso</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
 
@@ -480,7 +562,7 @@ export default function ReporteSuperUsuario() {
                                 <button
                                     className="btn-generar"
                                     onClick={handleGenerarReporte}
-                                    // El botón se habilita si hay seleccionados Y no hay un errorMessage activo.
+                                    // Deshabilitado si no hay departamentos o si hay un mensaje de error
                                     disabled={seleccionados.length === 0 || !!errorMessage} 
                                 >
                                     Generar Reporte
@@ -488,8 +570,7 @@ export default function ReporteSuperUsuario() {
                                 {/* MOSTRAR MENSAJE DE ERROR/ADVERTENCIA FIJO */}
                                 {(seleccionados.length === 0 || errorMessage) && (
                                     <p className="alerta-seleccion">
-                                        {/* Muestra el error específico O la advertencia inicial */}
-                                        {errorMessage || "⚠ Selecciona al menos un departamento para habilitar el reporte."}
+                                        {errorMessage || "Selecciona al menos un departamento para habilitar el reporte."}
                                     </p>
                                 )}
                             </>

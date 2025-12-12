@@ -41,7 +41,6 @@ import EliminarUsuario from "./ModificarUsuario";
 import ModificarUsuario from "./EliminarUsuario";
 import Invitacion from './Invitacion';
 import NuevoDepartamento from './NuevoDepartamento';
-import ListaDepartamento from './ListaDepartamento';
 import ModificarDepartamento from './ModificarDepartamento';
 import Admin from './Admin';
 
@@ -87,7 +86,6 @@ function App() {
 
           {/* INTERFACES PARA EL ROL DE UN ADMINISTRADOR*/}
           <Route path="/NuevoDepartamento" element={<NuevoDepartamento />} />
-          <Route path="/ListaDepartamento" element={<ListaDepartamento />} />
           <Route path="/ModificarDepartamento" element={<ModificarDepartamento />} />
           <Route path="/Admin" element={<Admin />} />
 

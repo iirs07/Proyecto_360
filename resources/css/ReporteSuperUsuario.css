@@ -1,5 +1,9 @@
+/* =========================================================================
+   CONTENEDOR GLOBAL
+   ========================================================================= */
+
 .reporte-container {
-    padding: 10px 35px; /* Reducido padding del contenedor externo */
+    padding: 15px 35px; 
     position: relative;
     z-index: 5;
 }
@@ -9,9 +13,9 @@
    ========================================================================= */
 
 .main-form-container {
-    padding: 20px; /* Reducido de 25px a 20px */
+    padding: 25px; 
     background-color: #ffffff;
-    border-radius: 14px; /* Reducido a 14px */
+    border-radius: 14px; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 10;
@@ -19,19 +23,19 @@
     flex-direction: column;
     align-items: center;
     font-family: 'Poppins', sans-serif;
-    max-width: 920px; 
+    max-width: 1200px; 
     margin: 0 auto;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .filtros-grid {
     display: grid;
-    /* Mantenemos la proporción, pero el contenedor es más chico */
-    grid-template-columns: 2.5fr 1.8fr 1.5fr;
+    /* PROPORCIÓN FINAL: 4fr (Departamentos) vs 3fr (Combinada) */
+    grid-template-columns: 4fr 3fr; 
     width: 100%;
-    gap: 15px; /* Reducido el espacio entre columnas */
-    margin-bottom: 20px; /* Reducido margen inferior */
-    align-items: stretch;
+    gap: 30px; 
+    margin-bottom: 30px; 
+    align-items: flex-start; /* Alinea los ítems al inicio de la cuadrícula */
 }
 
 @media (max-width: 1000px) {
@@ -40,8 +44,17 @@
     }
 }
 
+/* Contenedor que apila las Secciones 2 y 3 (Periodo y Estado) */
+.combined-filters-column {
+    display: flex;
+    flex-direction: column;
+    /* Espacio entre la caja de Periodo (Sección 2) y la caja de Estado (Sección 3) */
+    gap: 30px; 
+    width: 100%; 
+}
+
 .form-section {
-    padding: 18px 12px; 
+    padding: 20px 15px;
     border: 1px solid #d5b690;
     border-radius: 10px; 
     background-color: #fff;
@@ -54,28 +67,62 @@
     color: #861542;
     border-bottom: 2px solid #d5b690;
     display: block;
-    margin-bottom: 15px;
-    font-size: 15px;
+    margin-bottom: 18px; 
+    font-size: 16px; 
     font-weight: 600;
-    padding-bottom: 6px;
+    padding-bottom: 8px; 
 }
 
 /* =========================================================================
    SECCIÓN 1: ÁREAS / DEPARTAMENTOS
    ========================================================================= */
 
-.areas-list-scroll { 
-    max-height: 300px; /* ✅ MODIFICADO: Aumentado el alto máximo (de 250px a 300px) para más presencia vertical. */
-    overflow-y: auto; 
-    padding-right: 6px; 
+.area-selection-panel {
+    grid-column: 1 / 2;
 }
 
+/* Botón Seleccionar Todo */
+.btn-seleccionar-todo {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    background-color: #fce4ec; 
+    border: 1px solid #861542;
+    border-radius: 18px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #861542;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-seleccionar-todo:hover {
+    background-color: #861542;
+    color: white;
+}
+
+.btn-seleccionar-todo.active {
+    background-color: #861542;
+    color: white;
+    border-color: #861542;
+}
+
+.areas-list-scroll { 
+    max-height: 400px;
+    overflow-y: auto; 
+    padding-right: 8px; 
+}
+
+/* Estilos de elementos en lista */
 .area-header {
-    /* Padding reducido para hacerlo más compacto */
-    padding: 8px 12px;
+    padding: 10px 12px; 
     border-radius: 18px;
     font-size: 14px;
-    margin-bottom: 5px; /* Reducido margen */
+    margin-bottom: 8px; 
     display: flex; 
     align-items: center; 
     cursor: pointer; 
@@ -92,33 +139,32 @@
 }
 
 .area-header input[type="checkbox"] { 
-  width: 16px; 
-  height: 16px; 
-  flex-shrink: 0; 
-  margin-right: 8px; 
+    width: 16px; 
+    height: 16px; 
+    flex-shrink: 0; 
+    margin-right: 8px; 
 }
 .area-nombre { 
-  flex-grow: 1; 
-  padding-left: 5px; 
-  margin-right: auto; 
-  font-family: 'Poppins', sans-serif; 
+    flex-grow: 1; 
+    padding-left: 5px; 
+    font-family: 'Poppins', sans-serif; 
 }
 .area-header .flecha-area { 
-  flex-shrink: 0; 
-  padding-left: 10px; 
-  font-size: 1em; 
-  color: #861542; 
+    flex-shrink: 0; 
+    padding-left: 10px; 
+    font-size: 1em; 
+    color: #861542; 
 } 
 
 /* Sub-departamentos */
 .area-departamentos-submenu { 
-  padding-left: 15px; 
-  border-left: 2px dotted #d5b690; 
-  margin-top: 4px; 
+    padding-left: 20px; 
+    border-left: 2px dotted #d5b690; 
+    margin-top: 6px; 
 }
 .departamento-label {
     font-size: 14px;
-    padding: 2px 0; /* Reducido padding vertical */
+    padding: 4px 0; 
     display: flex; 
     align-items: flex-start; 
     font-weight: 400; 
@@ -129,35 +175,36 @@
     font-family: 'Poppins', sans-serif;
 }
 .departamento-label input[type="checkbox"] { 
-  width: 16px; 
-  height: 16px; 
-  margin: 0; 
-  padding: 0;
-  margin-top: 2px; 
-  flex-shrink: 0; 
+    width: 16px; 
+    height: 16px; 
+    margin: 0; 
+    padding: 0;
+    margin-top: 2px; 
+    flex-shrink: 0; 
 }
 .departamento-label .departamento-texto-contenido { 
-  flex-grow: 1; 
-  display: block; 
-  margin: 0; 
-  padding: 0; 
-  line-height: inherit; }
+    flex-grow: 1; 
+    display: block; 
+    margin: 0; 
+    padding: 0; 
+    line-height: inherit; 
+}
 
 
 /* =========================================================================
-   SECCIÓN 2 & 3: PERÍODO Y ESTADO (UNIFORMIDAD EN INPUTS)
+   SECCIÓN 2: PERÍODO (Calendario)
    ========================================================================= */
 
 .periodo-tipo-tabs { 
-  display: flex; 
-  justify-content: space-between; 
-  width: 100%; 
-  gap: 6px; 
-  margin-bottom: 12px; 
-  padding-bottom: 5px; 
+    display: flex; 
+    justify-content: space-between; 
+    width: 100%; 
+    gap: 15px; 
+    margin-bottom: 25px; 
+    padding-bottom: 5px; 
 }
 .periodo-tab {
-    padding: 6px 0; /* Reducido padding vertical */
+    padding: 10px 0; 
     flex-grow: 1; 
     border: 1px solid #d0d0d0; 
     background-color: #f0f0f0; 
@@ -167,24 +214,26 @@
     font-family: 'Poppins', sans-serif; 
     text-align: center;
     font-size: 14px; color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
-.periodo-tab:hover { 
-  background-color: rgba(134, 21, 66, 0.1);
-}
+.periodo-tab:hover { background-color: rgba(134, 21, 66, 0.1); }
 
 .periodo-tab.active { 
-  background-color: #861542; 
-  color: #d5b690; 
-  border-color: #861542; 
-  box-shadow: 0 2px 5px rgba(134, 21, 66, 0.3); }
+    background-color: #861542; 
+    color: #d5b690; 
+    border-color: #861542; 
+    box-shadow: 0 2px 5px rgba(134, 21, 66, 0.3); 
+}
 
-/* 🚨 Inputs de Fecha/Año/Mes y Selects (Estilo de Login aplicado) */
+/* Estilos de inputs de fecha/año/mes */
 .periodo-inputs select,
-.periodo-inputs input[type="date"],
-.tipo-proyecto-section .input-estado {
-    padding: 6px 12px; /* Reducido padding interno */
+.periodo-inputs input[type="date"] {
+    padding: 10px 12px; 
     border: 2px solid #861542;
-    border-radius: 18px; /* Reducido redondez */
+    border-radius: 18px; 
     width: 100%;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
@@ -192,52 +241,151 @@
     color: #000;
     font-size: 14px;
     display: block;
-    margin-top: 5px;
+    margin-top: 8px; 
 }
+.mes-inputs { 
+    display: flex; 
+    gap: 15px; 
+}
+.mes-inputs select {
+    margin-top: 0; 
+}
+
 .rango-fechas-inputs { 
-  display: grid; 
-  grid-template-columns: 1fr; 
-  gap: 6px; 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 15px; 
 }
-.rango-fechas-inputs label { 
-  font-weight: 600; 
-  margin-top: 5px; 
-  color: #861542; 
-  display: block; 
-  font-size: 14px; 
+.rango-fechas-inputs label, .input-group-field label { 
+    font-weight: 600; 
+    margin-top: 10px; 
+    color: #861542; 
+    display: block; 
+    font-size: 14px; 
 }
-.input-group-field label { 
-  font-weight: 600; 
-  margin-top: 5px; 
-  color: #861542; 
-  display: block; 
-  font-size: 14px; 
-}
+
 /* =========================================================================
-   BOTÓN GENERAR REPORTE (Ajustado)
+   SECCIÓN 3: ESTADO (Radio Buttons Estilizados - Vertical)
    ========================================================================= */
+
+/* Contenedor para los radio buttons */
+.toggle-buttons-group {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px; 
+    margin-bottom: 20px; 
+}
+
+/* Ocultar el input de radio nativo */
+.hidden-radio {
+    display: none;
+}
+
+/* Estilo del label que funciona como botón */
+.radio-label {
+    width: 100%; 
+    cursor: pointer;
+    text-align: center;
+    padding: 12px 10px; 
+    border: 2px solid #d5b690;
+    background-color: #fff;
+    border-radius: 18px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    font-weight: 600;
+    font-size: 14px;
+    color: #861542;
+}
+
+.radio-label:hover {
+    background-color: #fce4ec; 
+}
+
+/* Estilo del label cuando el radio está seleccionado */
+.radio-label.selected {
+    background-color: #861542; 
+    color: #d5b690; 
+    border-color: #861542;
+    box-shadow: 0 2px 5px rgba(134, 21, 66, 0.4);
+}
+
+/* Contenido interno del botón/label (para los íconos) */
+.radio-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; 
+}
+
+.estado-actual-info {
+    font-size: 0.95em; 
+    color: #6c757d;
+    text-align: center;
+    padding: 8px 0;
+    border-top: 1px solid #eee; 
+    margin-top: 10px;
+}
+
+/* =========================================================================
+   BOTÓN GENERAR REPORTE, ALERTA Y PROGRESO
+   ========================================================================= */
+
 .boton-generar-section {
     width: 100%;
-    max-width: 800px;
-    margin: 25px auto 0;
+    /* Dejamos el max-width amplio para que la barra se vea larga */
+    max-width: 800px; 
+    margin: 35px auto 0; 
     padding: 0;
     text-align: center;
-    /* Necesario para centrar el contenido (botón o barra) */
     display: flex; 
     flex-direction: column;
     align-items: center;
 }
 
-.btn-generar {
-    /* Colores y forma originales */
+/* Bar y Contenedor */
+.progress-container {
+    /* Mantenemos el contenedor amplio para la barra larga */
     width: 100%;
-    max-width: 190px; 
-    padding: 8px 20px;
-    background-color: #861542; /* Color principal de tu tema */
+    max-width: 550px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.progress-bar-wrapper {
+    width: 100%;
+    /* ❗ AJUSTE CLAVE: Altura reducida para hacerla más delgada */
+    height: 15px; 
+    background-color: #fce4ec; 
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.progress-bar-label { font-weight: bold; color: #861542; margin-bottom: 5px; }
+
+.progress-ba { 
+    height: 100%; 
+    background-color: #861542; 
+    transition: width 0.15s linear; 
+    border-radius: 12px 0 0 12px; 
+}
+.btn-cancelar { display: flex; align-items: center; padding: 8px 15px; font-size: 1em; font-weight: 600; border: 2px solid #861542; border-radius: 6px; background-color: white; color: #861542; cursor: pointer; transition: all 0.2s ease; }
+.btn-cancelar:hover { background-color: #861542; color: white; }
+.icon-cancelar { margin-right: 8px; }
+
+
+/* Botón Generar (no está en el progress-container, solo para referencia) */
+.btn-generar {
+    width: 100%;
+    max-width: 220px; 
+    padding: 10px 20px;
+    background-color: #861542; 
     color: white;
     border: none;
-    border-radius: 20px;
-    font-size: 15px; 
+    border-radius: 8px; 
+    font-size: 16px; 
     font-weight: 700;
     margin: 0 auto; 
     display: flex;
@@ -247,88 +395,11 @@
     font-family: 'Poppins', sans-serif;
     cursor: pointer;
 }
+.btn-generar:hover:not(:disabled) { background-color: #6d1035; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+.btn-generar:disabled { background-color: #ccc; cursor: not-allowed; color: #a0a0a0; transform: none; box-shadow: none; }
+.alerta-seleccion { margin-top: 10px; color: #ff9800; font-size: 0.9em; font-weight: 500; }
 
-.btn-generar:hover:not(:disabled) { 
-    background-color: #861542; /* 🔴 Rojo al pasar el mouse (como solicitaste) */
-    transform: translateY(-2px); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-}
-
-.btn-generar:disabled {
-    /* Estilo de botón deshabilitado (cuando no hay departamentos) */
-    background-color: #ccc;
-    cursor: not-allowed;
-    color: #a0a0a0;
-    transform: none; /* Quitar la transformación en disabled */
-    box-shadow: none;
-}
-.alerta-seleccion {
-    margin-top: 10px;
-    color: #ff9800; /* Naranja para alerta */
-    font-size: 0.9em;
-    font-weight: 500;
-}
-
-/* -------------------------------------------------------------------------
-   Barra de Progreso y Cancelar (Usando el color principal de tu tema)
-   ------------------------------------------------------------------------- */
-
-.progress-container {
-    width: 100%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 10px;
-}
-
-.progress-bar-label {
-    font-weight: bold;
-    color: #861542; /* Color principal de tu tema */
-    margin-bottom: 5px;
-}
-
-.progress-bar-wrapper {
-    width: 100%;
-    height: 25px;
-    background-color: #fce4ec; /* Fondo muy claro basado en el color principal */
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 15px;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.progress-ba {
-    height: 100%;
-    background-color: #861542; /* 🟢 Color principal de tu tema para el avance */
-    transition: width 0.15s linear; /* Transición lineal más suave para el 99% */
-    border-radius: 12px 0 0 12px;
-}
-
-/* Botón de Cancelar */
-.btn-cancelar {
-    display: flex;
-    align-items: center;
-    padding: 8px 15px;
-    font-size: 1em;
-    font-weight: 600;
-    border: 2px solid #861542; 
-    border-radius: 6px;
-    background-color: white;
-    color: #861542;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-cancelar:hover {
-    background-color: #861542;
-    color: white;
-}
-
-.icon-cancelar {
-    margin-right: 8px;
-}
-/* Cambia el color de la palomita y el fondo del checkbox seleccionado */
+/* AJUSTES FINALES */
 input[type="checkbox"] {
-    accent-color: #861542; /* Cambia aquí al color que quieras */
+    accent-color: #861542;
 }
