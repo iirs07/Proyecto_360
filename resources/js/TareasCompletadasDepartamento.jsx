@@ -34,8 +34,8 @@ const OPCIONES_FILTRO = [
 // Color para estado "Finalizado"
 const ESTADO_FINALIZADO = {
     icon: <FaCheckCircle />,
-    color: "#059669",        // VERDE fuerte (Green-600)
-    bgColor: "#d1fae5",      // Fondo verde muy claro
+    color: "#27ae60",       
+    bgColor: "#c4ffddff",     
     texto: "Finalizado"
 };
 
@@ -176,7 +176,7 @@ function TareasFinalizadas() {
 
                 {!loading && proyectos.length > 0 && (
                     <>
-                        {/* CONTENEDOR DE FILTROS */}
+                 
                         <div className="tf-filtros-container mb-4">
                             <div className="tf-search-filter-wrapper">
                                 <div className="tf-search-box">
@@ -217,7 +217,6 @@ function TareasFinalizadas() {
                             )}
                         </div>
 
-                        {/* LISTADO DE PROYECTOS Y TAREAS */}
                         <div className="tf-tareas-contenedor">
                             {proyectosFiltradosYBuscados.length === 0 ? (
                                 
@@ -230,14 +229,14 @@ function TareasFinalizadas() {
                                     return (
                                         <div key={proyecto.id_proyecto} className="tf-proyecto-card">
                                             {/* HEADER DEL PROYECTO */}
-                                            <div className="tf-proyecto-header" style={{ backgroundColor: proyectoBg }}>
+                                            <div className="tf-proyecto-header" >
                                                 <div className="tf-proyecto-info">
-                                                    <h3 className="tf-proyecto-nombre" style={{ color: proyectoColor }}>{proyecto.p_nombre}</h3>
+                                                    <h3 className="tf-proyecto-nombre">{proyecto.p_nombre}</h3>
                                                     <div className="tf-proyecto-meta">
-                                                        <div className="tf-proyecto-meta-icon" style={{ color: proyectoColor }}>
+                                                        <div className="tf-proyecto-meta-icon" >
                                                             <FaListUl />
                                                         </div>
-                                                        <span className="tf-proyecto-tareas-count" style={{ color: proyectoColor, backgroundColor: 'rgba(134, 21, 66, 0.1)' }}>
+                                                        <span className="tf-proyecto-tareas-count" >
                                                             {tareas.length} {tareas.length === 1 ? "tarea finalizada" : "tareas finalizadas"}
                                                         </span>
                                                     </div>
@@ -291,12 +290,12 @@ function TareasFinalizadas() {
                                                                 <div className="tf-tarea-acciones-header">
                                                                     <div className="tf-tarea-info-fecha" style={{ borderColor: ESTADO_FINALIZADO.color, backgroundColor: ESTADO_FINALIZADO.bgColor }}>
                                                                         <div className="tf-tarea-fecha-completada">
-                                                                            <span className="tf-fecha-label">COMPLETADA:</span>
+                                                                            <span className="tf-fecha-label">FECHA LIMITE:</span>
                                                                             <div
                                                                                 className="tf-fecha-texto"
                                                                                 style={{ color: ESTADO_FINALIZADO.color }}
                                                                             >
-                                                                                {fechaCompletada}
+                                                                               {tarea.tf_fin || "—"}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -328,9 +327,9 @@ function TareasFinalizadas() {
                                                                                     <FaCalendarAlt className="tf-detalle-icono" />
                                                                                 </div>
                                                                                 <div className="tf-detalle-content">
-                                                                                    <p className="tf-detalle-label">Fecha de finalización</p>
+                                                                                    <p className="tf-detalle-label">el</p>
                                                                                     <div className="tf-fecha-detalle">
-                                                                                        <p className="tf-detalle-value">{fechaCompletada}</p>
+                                                                                        <p className="tf-detalle-value">{tarea.tf_completada || "—"}</p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

@@ -10,7 +10,7 @@ import {
   FaCalendarAlt,
   FaLayerGroup,
   FaExclamationTriangle,
-  FaClipboardList // Icono nuevo importado
+  FaClipboardList, 
 } from "react-icons/fa";
 import "../css/formulario.css";
 import "../css/Gestionproyectos.css";
@@ -18,7 +18,6 @@ import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
 import logo3 from "../imagenes/logo3.png";
 
-// === Componente Gráfico Circular ===
 const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   if (total === 0) {
     return (
@@ -55,7 +54,6 @@ const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   );
 };
 
-// === Función auxiliar para calcular días ===
 const calcularDiasRestantes = (fechaFin) => {
   if (!fechaFin) return null;
   
@@ -70,7 +68,6 @@ const calcularDiasRestantes = (fechaFin) => {
   return diffDays; 
 };
 
-// === Componente Tarjeta de Métrica ===
 const MetricCard = ({ icon, number, label, subtext, color, className }) => (
   <div className={`tdu-metrica-card ${className}`}>
     <div className="tdu-metrica-icono" style={{ color }}>
@@ -95,6 +92,7 @@ function GestionProyectos() {
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL;
+
 
   const agregarTarea = (idProyecto, nombreProyecto) => {
     navigate("/agregarTareas", { state: { id_proyecto: idProyecto, nombre_proyecto: nombreProyecto } });
@@ -149,14 +147,15 @@ function GestionProyectos() {
           setTareasPendientes(pendientes);
           setTareasEnProceso(enProceso);
 
-         const proyectosConMetricas = (data.proyectos || []).map((proyecto) => {
+      const proyectosConMetricas = (data.proyectos || []).map((proyecto) => {
     const tareasDelProyecto = (data.tareas || []).filter(
       (t) => t.id_proyecto === proyecto.id_proyecto
     );
-    const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
 
     const proyectoFinalizado =
       (proyecto.p_estatus || "").toLowerCase() === "finalizado";
+
+    const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
 
     return {
       ...proyecto,
@@ -170,11 +169,9 @@ function GestionProyectos() {
         (t) => (t.t_estatus || "").toLowerCase() === "en proceso"
       ).length,
       total_tareas: tareasDelProyecto.length,
-
-     
       prioridad: proyectoFinalizado
         ? "ninguna"
-        : diasRestantes !== null && diasRestantes < 7
+        : diasRestantes !== null && diasRestantes < 3
         ? "alta"
         : "normal",
     };
@@ -417,29 +414,34 @@ function GestionProyectos() {
             ) : (
               <div className="tdj-proyecto-grid">
                 {filteredProyectos.map((proyecto) => {
+                  const estatus = (proyecto.p_estatus || "").toUpperCase();
+const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
+
+const progreso =
+  proyecto.total_tareas > 0
+    ? Math.round(
+        (proyecto.tareas_completadas / proyecto.total_tareas) * 100
+      )
+    : 0;
+
                   const sinTareas = proyecto.total_tareas === 0;
 
-                  // 1. Calculamos progreso
-                  const progreso =
-                    proyecto.total_tareas > 0
-                      ? Math.round((proyecto.tareas_completadas / proyecto.total_tareas) * 100)
-                      : 0;
-
-                  // 2. Calculamos días restantes
-                  const diasRestantes = calcularDiasRestantes(proyecto.pf_fin);
+            
                   const esVencido = diasRestantes !== null && diasRestantes < 0 && progreso < 100;
 
-                  // 3. Definimos clases de borde (statusClass)
-                  let statusClass = "pendiente";
-                  if (sinTareas) {
-                      statusClass = "sin-definir";
-                  } else if (progreso === 100) {
-                      statusClass = "completado";
-                  } else if (esVencido) {
-                      statusClass = "vencido";
-                  } else if (progreso >= 50) {
-                      statusClass = "progreso";
-                  }
+                 let statusClass = "pendiente";
+
+if (estatus === "FINALIZADO") {
+  statusClass = "completado";
+} else if (estatus === "EN PROCESO") {
+  statusClass = "progreso";
+} else if (estatus === "PENDIENTE") {
+  statusClass = "pendiente";
+} else {
+  statusClass = "sin-definir";
+}
+
+
 
                   let estadoTiempoClass = "";
                   if (progreso === 100) {
@@ -463,6 +465,9 @@ function GestionProyectos() {
                           )}
                         </div>
                         <div className="tdj-proyecto-meta">
+                        <span className={`tdj-estatus-proyecto ${statusClass}`}>
+    {proyecto.p_estatus || "En Proceso"}
+  </span>
                           <span className="tdj-total-tareas">
                             {sinTareas ? "Sin tareas" : `${proyecto.total_tareas} tareas`}
                           </span>
@@ -474,7 +479,7 @@ function GestionProyectos() {
                             </div>
                           )}
 
-                          {/* Badge de Vencido */}
+                        
                           {!sinTareas && esVencido && (
                              <div className="tdj-prioridad-badge" style={{background: '#dc3545', color: 'white'}}>
                                 <FaExclamationTriangle size={10} style={{ marginRight: '4px' }} />
@@ -482,7 +487,6 @@ function GestionProyectos() {
                              </div>
                           )}
 
-                          {/* Badge de Urgente */}
                           {!sinTareas && !esVencido && proyecto.prioridad === 'alta' && proyecto.p_estatus && proyecto.p_estatus.toLowerCase() !== 'finalizado' && (
   <div className="tdj-prioridad-badge alta">
     <FaExclamationTriangle size={10} />
@@ -510,20 +514,24 @@ function GestionProyectos() {
                         ) : (
                             <div className="tdj-detalles-metricas">
                               <div className="tdj-metrica-item">
-                                <div className="tdj-metrica-dot tdj-completada"></div>
-                                <span>Completadas</span>
-                                <strong>{proyecto.tareas_completadas}</strong>
-                              </div>
-                              <div className="tdj-metrica-item">
-                                <div className="tdj-metrica-dot tdj-progreso"></div>
-                                <span>En Progreso</span>
-                                <strong>{proyecto.tareas_en_progreso}</strong>
-                              </div>
-                              <div className="tdj-metrica-item">
-                                <div className="tdj-metrica-dot tdj-pendiente"></div>
-                                <span>Pendientes</span>
-                                <strong>{proyecto.tareas_pendientes}</strong>
-                              </div>
+                                 <div className="tdu-metrica-item">
+                                  <div className="tdu-metrica-dot tdu-completada"></div>
+                                 <span>Completadas</span></div>
+  <strong>{proyecto.tareas_completadas}</strong>
+</div>
+
+<div className="tdj-metrica-item">
+  <div className="tdu-metrica-dot tdu-progreso"></div>
+  <span>En Progreso</span>
+  <strong>{proyecto.tareas_en_progreso}</strong>
+</div>
+
+<div className="tdj-metrica-item">
+       <div className="tdu-metrica-dot tdu-pendiente"></div>
+  <span>Pendientes</span>
+  <strong>{proyecto.tareas_pendientes}</strong>
+</div>
+
                             </div>
                         )}
                       </div>
@@ -531,12 +539,12 @@ function GestionProyectos() {
                       <div className="tdj-proyecto-info">
                         <div className="tdj-dias">
                           <div className="tdj-dias-item">
-                            <FaCalendarAlt size={12} />
+<FaCalendarAlt size={12} color="#861542" />
                             <span>Inicio:</span>
                             <strong>{proyecto.pf_inicio || "—"}</strong>
                           </div>
                           <div className="tdj-dias-item">
-                            <FaCalendarAlt size={12} />
+                            <FaHourglassHalf size={12} color="#861542" />
                             <span>Fin:</span>
                             <strong>{proyecto.pf_fin || "—"}</strong>
                           </div>
@@ -544,9 +552,8 @@ function GestionProyectos() {
 
                         {!sinTareas && diasRestantes !== null && (
                           <div className="tdj-tiempo-restante">
-                            <span className={`tdj-tiempo-label ${estadoTiempoClass}`}>
+                            <span className= "tdj-tiempo-label ${estadoTiempoClass">
                                {(() => {
-                                 if (progreso === 100) return "Proyecto Finalizado";
                                  if (diasRestantes < 0) return `Venció hace ${Math.abs(diasRestantes)} días`;
                                  if (diasRestantes === 0) return "Último día (Hoy)";
                                  return `${diasRestantes} días restantes`;
@@ -561,7 +568,6 @@ function GestionProyectos() {
                           className="tdj-btn-primary"
                           onClick={() => {
                             if (sinTareas) {
-                              console.log("Enviando nombre:", proyecto.p_nombre);
                               agregarTarea(proyecto.id_proyecto,proyecto.p_nombre);
                             } else {
                               verTareas(proyecto.id_proyecto, proyecto.p_nombre);

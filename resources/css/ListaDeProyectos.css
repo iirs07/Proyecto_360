@@ -1,12 +1,8 @@
-/* =========================== Contenedor Principal ============================ */
-.ldp-container {
-  padding: 0;
-  min-height: 100vh;
-}
+
 
 .ldp-content {
   padding: 2rem;
-  max-width: 1400px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -23,7 +19,7 @@
 }
 
 .ldp-header-content {
-  max-width: 1400px;
+  max-width: 900px;
   margin: 0 auto;
   z-index: 3;
   position: relative;
@@ -224,16 +220,17 @@
   color: #ef4444;
 }
 
-/* =========================== Grid de Proyectos ============================ */
 .ldp-projects-grid {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  width: 100%;
+  display: flex;           /* usamos flex para centrar las tarjetas */
+  flex-wrap: wrap;         /* para que si hay más de una tarjeta se vaya a otra fila */
+  justify-content: center; /* centra las tarjetas horizontalmente */
+  gap: 1.5rem;             /* espacio entre tarjetas */
 }
 
 /* =========================== Tarjeta de Proyecto ============================ */
 .ldp-proyecto-card {
+  width: 900px;            /* ancho fijo de la tarjeta */
+  max-width: 100%;         /* evita desbordamiento en pantallas pequeñas */
   background: #ffffff;
   border-radius: 16px;
   padding: 1.5rem;
@@ -244,7 +241,7 @@
   flex-direction: column;
   gap: 1.5rem;
   overflow: hidden;
-   z-index: 3;
+  z-index: 3;
   position: relative;
   border-color: #31687442;
 }
@@ -562,8 +559,6 @@ flex: 1;
 
 /* =========================== Media Queries  ============================ */
 
-
-/* Tablets y Laptops pequeñas (max 1024px) */
 @media (max-width: 1024px) {
   .ldp-content {
     padding: 1.5rem;
@@ -581,7 +576,7 @@ flex: 1;
   
   .ldp-search-container, 
   .ldp-sort-container { 
-    max-width: 100%; 
+    max-width: 900px; 
   }
 
     .ldp-title-section {
@@ -594,7 +589,6 @@ flex: 1;
   }
 }
 
-/* Móviles Grandes y Tablets Verticales (max 768px) */
 @media (max-width: 768px) {
   .ldp-content {
     padding: 1rem;
@@ -648,7 +642,6 @@ flex: 1;
   }
 }
 
-/* Móviles Pequeños (max 480px) */
 @media (max-width: 480px) {
   .ldp-project-title {
     font-size: 1.1rem;

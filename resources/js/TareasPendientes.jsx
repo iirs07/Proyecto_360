@@ -119,14 +119,19 @@ function TareasPendientes() {
         fetchTareasPendientes();
     }, []);
 
-    const calcularDiasRestantes = (fechaFin) => {
-        if (!fechaFin) return Infinity;
-        const hoy = new Date();
-        const fin = new Date(fechaFin);
-        hoy.setHours(0, 0, 0, 0);
-        fin.setHours(0, 0, 0, 0);
-        return Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
-    };
+  const calcularDiasRestantes = (fechaFin) => {
+    if (!fechaFin) return Infinity;
+
+    const ahora = new Date();
+    const fin = new Date(fechaFin);
+
+    ahora.setHours(12, 0, 0, 0);
+    fin.setHours(12, 0, 0, 0);
+
+    return Math.ceil((fin - ahora) / (1000 * 60 * 60 * 24)) + 1;
+
+};
+
 
     const getEstadoVencimiento = (fechaFin) => {
         const dias = calcularDiasRestantes(fechaFin);
@@ -380,7 +385,7 @@ function TareasPendientes() {
                                                                                 <div className="tp-detalle-content">
                                                                                     <p className="tp-detalle-label">Fecha de vencimiento</p>
                                                                                     <div className="tp-fecha-detalle">
-                                                                                        <p className="tp-detalle-value">{fechaFormateada}</p>
+                                                                                        <p className="tp-detalle-value">{tarea.tf_fin}</p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

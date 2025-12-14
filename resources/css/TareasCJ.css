@@ -33,6 +33,7 @@
     padding: 20px 32px;
     border-bottom: 2px solid rgba(134, 21, 66, 0.1); 
     box-sizing: border-box;
+    background: #d1fae5;
 }
 
 .tf-proyecto-info {
@@ -42,7 +43,7 @@
 }
 
 .tf-proyecto-nombre {
-    font-size: 1.4rem; 
+    font-size: 1.2rem; 
     font-weight: 800; 
     line-height: 1.3;
     margin-bottom: 12px;

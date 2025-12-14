@@ -269,17 +269,7 @@ function EliminarProyectos() {
                     </div>
 
                     {/* ALERTAS */}
-                    {estaVencido ? (
-                      <div className="eliminar-info-item">
-                        <FaExclamationTriangle className="eliminar-alert-icon expired" />
-                        <div className="eliminar-info-content">
-                          <div className="eliminar-info-label eliminar-alert-label">Estado</div>
-                          <div className="eliminar-info-value eliminar-alert-text expired">¡Vencido!</div>
-                        </div>
-                      </div>
-                    ) : esProximo && diasRestantes <= 3 ? (
-                      null
-                    ) : null}
+                    
                   </div>
 
                   {/* ACCIONES - BOTÓN ELIMINAR */}

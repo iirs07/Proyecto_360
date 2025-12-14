@@ -6,7 +6,6 @@
   overflow: hidden;
 }
 
-/* ======== FORM TITULO ======== */
 .tdj-form-titulo {
   text-align: center;
   margin-bottom: 2rem;
@@ -45,7 +44,7 @@
   gap: 1.2rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-left: 4px solid transparent;
+ 
 }
 
 .tdj-metrica-card:hover {
@@ -156,7 +155,6 @@
   font-weight: 600;
 }
 
-/* ======== GRID DE PROYECTOS MEJORADO ======== */
 .tdj-proyecto-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -173,7 +171,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
-  border-left: 6px solid #861542;
 }
 
 .tdj-proyecto-card-encabezado:hover {
@@ -195,7 +192,6 @@
   border-left-color: #dc3545;
 }
 
-/* ======== ENCABEZADO MEJORADO ======== */
 .tdj-proyecto-header {
   display: flex;
   align-items: flex-start;
@@ -222,6 +218,7 @@
   line-height: 1.4;
   margin: 0;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .tdj-proyecto-meta {
@@ -288,6 +285,7 @@
 .tdj-metrica-item span {
   flex: 1;
   color: #666;
+  font-weight: bold;
 }
 
 .tdj-metrica-item strong {
@@ -308,23 +306,23 @@
 
 /* ======== GRÁFICA CIRCULAR ======== */
 .tdj-grafica-circular {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 100px;
+  height:100px;
+  border-radius: 80%;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6; /* color de fondo por defecto */
+  background: #f3f4f6; 
   overflow: hidden;
 }
 
 .tdj-grafica-circular::before {
   content: '';
   position: absolute;
-  width: 60%;
-  height: 60%;
-  border-radius: 50%;
+  width: 50%;
+  height: 50%;
+  border-radius: 80%;
   background: #fff; 
   z-index: 1;
 }
@@ -371,11 +369,13 @@
   align-items: center;
   gap: 0.5rem;
   color: #666;
+  font-weight: bold;
 }
 
 .tdj-dias-item strong {
-  color: #000;
+  color: #666;
   margin-left: 0.2rem;
+  font-weight: bold;
 }
 
 .tdj-tiempo-restante {
@@ -460,7 +460,6 @@
   background: white;
   padding: 25px;
   border-radius: 20px; 
-  /* X=5, Y=5, Blur=0 */
 box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   margin-bottom: 25px;
   border: 2px solid #f0f0f1;
@@ -483,7 +482,6 @@ transform: translateY(-3px);
   letter-spacing: -0.5px;
 }
 
-/* Badge del porcentaje total */
 .tdu-progreso-badge {
   background-color: #f0fdf4;
   color: #000;
@@ -494,16 +492,15 @@ transform: translateY(-3px);
   border: 1px solid #dcfce7;
 }
 
-/* Contenedor de la barra (La "Pista") */
 .tdu-progreso-barra-container {
   width: 100%;
   height: 24px; /* Más alta para mayor impacto visual */
   background: #f1f5f9; /* Gris muy claro */
-  border-radius: 12px; /* Píldora completa */
+  border-radius: 12px;
   overflow: hidden;
   margin: 20px 0;
   display: flex;
-  padding: 4px; /* Truco: Padding interno para crear efecto de "borde" flotante */
+  padding: 4px; 
   box-sizing: border-box; 
 }
 
@@ -512,12 +509,11 @@ transform: translateY(-3px);
   height: 100%;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  cursor: default; /* Cursor de ayuda al pasar el mouse */
+  cursor: default; 
 }
 
-/* Separadores visuales entre segmentos */
 .tdu-progreso-segmento:not(:last-child) {
-  border-right: 3px solid #f1f5f9; /* Crea el efecto de "bloques separados" */
+  border-right: 3px solid #f1f5f9; 
 }
 
 /* Redondeo inteligente */
@@ -531,7 +527,6 @@ transform: translateY(-3px);
   border-bottom-right-radius: 8px;
 }
 
-/* COLORES CON GRADIENTES (Más modernos) */
 .tdu-progreso-segmento.completada {
   background: #28a745;
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
@@ -547,10 +542,7 @@ transform: translateY(-3px);
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
 }
 
-/* LEYENDA INFERIOR */
 
-
-/* Colores de los puntos de la leyenda */
 .tdu-dot-legend.completada { background-color: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); }
 .tdu-dot-legend.progreso { background-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); }
 .tdu-dot-legend.pendiente { background-color: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
@@ -567,7 +559,7 @@ transform: translateY(-3px);
 .tdu-progreso-stat {
   display: flex;
   align-items: center;
-  gap: 8px; /* Espacio entre el punto y el texto */
+  gap: 8px; 
 }
 
 .tdu-dot-legend {
@@ -595,7 +587,7 @@ transform: translateY(-3px);
 .tdu-legend-label {
   font-size: 0.8rem;
   color: #000;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 
@@ -614,19 +606,16 @@ transform: translateY(-3px);
   background-color: #fafafa; 
 }
 
-/* Hacemos el título un poco menos intenso en proyectos vacíos */
 .tdj-proyecto-card-encabezado.sin-definir .tdj-proyecto-titulo {
   color: #555;
 }
 
-/* 3. Badge de "Requiere Configuración" */
 .tdj-prioridad-badge.alerta-config {
   background: #fff3cd;
   color: #856404;
   border: 1px solid #ffeeba;
 }
 
-/* 4. Ajuste para cuando el Donut Chart está vacío (N/A) */
 .tdj-grafica-circular.tdj-sin-tareas {
   background: #e9ecef;
   border: 2px solid #dee2e6;
@@ -649,10 +638,19 @@ transform: translateY(-3px);
 .tdj-tiempo-label.vencido {
     color: #dc3545; /* Rojo */
 }
+.tdj-estatus-proyecto.completado {
+  color: #28a745;
+  font-weight: bold;
+   background-color: #ffffff;
+}
 
-/* Bordes izquierdos de las tarjetas según estado */
+.tdj-estatus-proyecto.progreso {
+  color: #ffc107;
+  font-weight: bold;
+   background-color: #ffffff;
+}
 .tdj-proyecto-card-encabezado {
-    border-left: 5px solid transparent; /* Base */
+    border-left: 8px solid transparent; 
 }
 
 .tdj-proyecto-card-encabezado.completado {
@@ -665,21 +663,17 @@ transform: translateY(-3px);
     border-left-color: #dc3545; 
 }
 .tdj-proyecto-card-encabezado.vencido {
-    border-left-color: #8b0000; /* Rojo oscuro */
+    border-left-color: #8b0000; 
 }
 .tdj-proyecto-card-encabezado.sin-definir {
-    border-left-color: #6c757d; /* Gris */
+    border-left-color: #6c757d; 
 }
-/* ======== AJUSTES RESPONSIVOS (ESTRICTAMENTE VERTICAL) ======== */
+/* ======== AJUSTES RESPONSIVOS ======== */
 @media (max-width: 768px) {
-
-  /* 1. Tarjeta: Ajustes generales */
   .tdj-proyecto-card-encabezado {
     padding: 1rem;
     height: auto;
   }
-
-  /* 2. Encabezado Principal: Columna (Título arriba, Grupo Meta abajo) */
   .tdj-proyecto-header {
     display: flex;
     flex-direction: column !important;
@@ -687,8 +681,6 @@ transform: translateY(-3px);
     gap: 0.5rem;
     width: 100%;
   }
-
-  /* Título: Ocupa todo el ancho y permite saltos de línea */
   .tdj-proyecto-titulo-seccion {
     width: 100%;
   }
@@ -700,29 +692,23 @@ transform: translateY(-3px);
     word-wrap: break-word;
     margin-bottom: 0.2rem;
   }
-
-  /* 3. GRUPO META (Badge y Tareas): AQUÍ ESTÁ LA CLAVE */
-  /* Lo ponemos en COLUMNA para que el Badge quede arriba y las tareas abajo */
   .tdj-proyecto-meta {
     width: 100%;
     display: flex;
-    flex-direction: column !important; /* <--- ESTO FUERZA UNO POR FILA */
-    align-items: flex-start !important; /* Alineados a la izquierda */
+    flex-direction: column !important; 
+    align-items: flex-start !important; 
     justify-content: flex-start;
-    gap: 0.6rem; /* Espacio vertical entre el badge y el texto de tareas */
+    gap: 0.6rem; 
     margin-top: 0.2rem;
     border-top: none; 
   }
-
-  /* El Badge (Estado) */
   .tdj-prioridad-badge {
     align-self: flex-start; 
     margin: 0;
     font-size: 0.75rem;
-    display: inline-block; /* Asegura que respete su tamaño */
+    display: inline-block; 
   }
-  
-  /* El Contador de tareas (Debajo del badge) */
+
   .tdj-total-tareas {
     align-self: flex-start;
     margin: 0;
@@ -730,12 +716,9 @@ transform: translateY(-3px);
     color: #555;
     background: transparent;
     padding: 0;
-    /* Esto asegura que se lea todo el texto sin cortarse */
     white-space: normal; 
     text-align: left;
   }
-
-  /* 4. Cuerpo (Gráfica + Métricas): Lado a lado */
   .tdj-proyecto-body {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -762,7 +745,6 @@ transform: translateY(-3px);
     border-bottom: 1px dashed #eee;
   }
 
-  /* 5. Info Inferior (Fechas) */
   .tdj-proyecto-info {
     flex-direction: column;
     gap: 0.8rem;
@@ -788,8 +770,6 @@ transform: translateY(-3px);
     width: 100%;
     text-align: center;
   }
-
-  /* 6. Botones y Progreso */
   .tdj-proyecto-footer {
     margin-top: 1rem;
   }
@@ -806,3 +786,4 @@ transform: translateY(-3px);
     gap: 1rem;
   }
 }
+

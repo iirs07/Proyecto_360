@@ -262,7 +262,6 @@
   font-weight: 600;
 }
 
-/* === Grid de proyectos (Estilos de Tarjeta) === */
 .tdu-proyecto-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -300,10 +299,10 @@
 }
 
 /* Borde izquierdo según estado */
-.tdu-proyecto-card-encabezado.completado { border-left: 6px solid #27ae60; }
-.tdu-proyecto-card-encabezado.progreso { border-left: 6px solid #f39c12; }
-.tdu-proyecto-card-encabezado.pendiente { border-left: 6px solid #dc3545; }
-.tdu-proyecto-card-encabezado.vencido { border-left: 6px solid #8b0000; }
+.tdu-proyecto-card-encabezado.completado { border-left: 8px solid #27ae60; }
+.tdu-proyecto-card-encabezado.progreso { border-left: 8px solid #f39c12; }
+.tdu-proyecto-card-encabezado.pendiente { border-left: 8px solid #dc3545; }
+.tdu-proyecto-card-encabezado.vencido { border-left: 8px solid #8b0000; }
 
 /* Header del proyecto */
 .tdu-project-header {
@@ -336,7 +335,6 @@
   font-weight: bold;
 }
 
-/* Meta info (Badges, tareas count) */
 .tdu-proyecto-meta {
   display: flex;
   flex-direction: column;
@@ -370,7 +368,6 @@
 .tdu-prioridad-badge.media { background-color: #ff9500; color: #fff; }
 .tdu-prioridad-badge.baja { background-color: #27ae60; color: #fff; }
 
-/* Cuerpo del proyecto (Gráfica y métricas) */
 .tdu-proyecto-body {
   display: flex;
   align-items: center;
@@ -450,7 +447,6 @@
   font-weight: 700;
 }
 
-/* Info: Fechas y Tiempo restante */
 .tdu-proyecto-info {
   display: flex;
   align-items: center;
@@ -493,7 +489,6 @@
 .tdu-tiempo-label.finalizado { color: #27ae60; font-weight: 700; }
 .tdu-tiempo-label.vencido { color: #dc3545; font-weight: 700; }
 
-/* Footer: Botón */
 .tdu-proyecto-footer {
   margin-top: auto;
   display: flex;
@@ -559,7 +554,7 @@
 /* Contenedor del Título y el Badge */
 .tdu-proyecto-titulo-badge {
   display: flex;
-  justify-content: space-between; /* Título a la izquierda, Badge a la derecha */
+  justify-content: space-between; 
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 0.5rem;
@@ -577,40 +572,32 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* === ESTILOS DINÁMICOS DEL BADGE === */
-
-/* En proceso (Naranja: #f39c12) */
 .tdu-proyecto-badge.en-proceso {
   background-color: #f39c12; 
   color: #ffffff;                             
   border: 1px solid rgba(243, 156, 18, 0.3);
 }
 
-/* Finalizado (Verde: #27ae60) */
 .tdu-proyecto-badge.finalizado {
-  background-color: rgba(39, 174, 96, 0.15); /* Verde muy suave */
-  color: #27ae60;                            /* Verde fuerte */
+  background-color: rgba(39, 174, 96, 0.15); 
+  color: #27ae60;                            
   border: 1px solid rgba(39, 174, 96, 0.3);
 }
 
-/* (Opcional) Vencido - Si en futuro lo necesitas */
 .tdu-proyecto-badge.vencido {
   background-color: #fee2e2;
   color: #b91c1c;
   border: 1px solid #fecaca;
 }
-/* === NUEVOS ESTADOS SIMPLIFICADOS === */
 
-/* Borde lateral */
 .tdu-proyecto-card-encabezado.finalizado {
-  border-left: 6px solid #27ae60; /* Verde */
+  border-left: 6px solid #27ae60; 
 }
 
 .tdu-proyecto-card-encabezado.en-proceso {
-  border-left: 6px solid #f1c40f; /* Amarillo */
+  border-left: 6px solid #f1c40f; 
 }
 
-/* Badge */
 .tdu-proyecto-badge.finalizado {
   background-color: #27ae60;
   color: white;

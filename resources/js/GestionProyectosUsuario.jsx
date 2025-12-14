@@ -342,11 +342,10 @@ let statusClass = estatusGlobal === "Finalizado"
                     <div className="tdu-project-header">
                       <div className="tdu-proyecto-titulo-seccion">
                         
-                        {/* CONTENEDOR TÍTULO + BADGE */}
+                      
                         <div className="tdu-proyecto-titulo-badge">
                           <h3 className="tdu-proyecto-titulo">{proyecto.p_nombre}</h3>
-                          
-                          {/* BADGE CON CLASE DINÁMICA */}
+                        
                           <span className={`tdu-proyecto-badge ${claseBadge}`}>
                             {estatusGlobal}
                           </span>
@@ -378,20 +377,23 @@ let statusClass = estatusGlobal === "Finalizado"
                       </div>
                       <div className="tdu-detalles-metricas">
                         <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-completada"></div><span>Completadas</span><strong>{proyecto.tareas_completadas}</strong></div>
-                        <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-progreso"></div><span>En Progreso</span><strong>{proyecto.tareas_en_progreso}</strong></div>
-                        <div className="tdu-metrica-item"><div className="tdu-metrica-dot tdu-pendiente"></div><span>Pendientes</span><strong>{proyecto.tareas_pendientes}</strong></div>
+                        <div className="tdu-metrica-item">
+                          <div className="tdu-metrica-dot tdu-progreso"></div>
+                            <span>En Progreso</span><strong>{proyecto.tareas_en_progreso}</strong></div>
+                        <div className="tdu-metrica-item">
+                          <div className="tdu-metrica-dot tdu-pendiente"></div><span>Pendientes</span><strong>{proyecto.tareas_pendientes}</strong></div>
                       </div>
                     </div>
 
                     <div className="tdu-proyecto-info">
                       <div className="tdu-dias">
-                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><div>
+                        <div className="tdu-dias-item"><FaCalendarAlt size={12} color="#861542" /><div>
   <strong>
     Inicio: {proyecto.pf_inicio || "—"}
   </strong>
 </div>
 </div>
-                        <div className="tdu-dias-item"><FaCalendarAlt size={12} /><div>
+                        <div className="tdu-dias-item"><FaHourglassHalf size={12} color="#861542" /><div>
   <strong>
     Fin: {proyecto.pf_fin || "—"}
   </strong>
