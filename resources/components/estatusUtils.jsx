@@ -1,13 +1,9 @@
-// Contenido de: estatusUtils.jsx (VERSIÓN MEJORADA)
-
-// Colores FUERTES (Texto, Borde, Íconos de Alerta)
 export const STATUS_COLORS = {
-    'EN PROCESO': '#ffc107', // Amarillo (Fuerte)
-    'FINALIZADO': '#28a745', // Verde (Fuerte)
-    'DEFAULT': '#6c757d',    // Gris
+    'EN PROCESO': '#ffc107', // Amarillo (Fuerte)
+'FINALIZADO': '#28a745', // Verde (Fuerte)
+ 'DEFAULT': '#6c757d', 
 };
 
-// Nuevos colores PASTEL (Fondo de las etiquetas de estatus)
 export const STATUS_BG_COLORS = {
     'EN PROCESO': '#fff3cd', // Amarillo muy pálido
     'FINALIZADO': '#d4edda', // Verde muy pálido
@@ -16,7 +12,7 @@ export const STATUS_BG_COLORS = {
 
 // Función para obtener la clase CSS del borde (mantener igual)
 export const getBorderClase = (estatus) => {
-    // ... (mantener el código actual)
+
     const estatusNormalizado = estatus ? estatus.toLowerCase() : 'default';
 
     switch (estatusNormalizado) {
@@ -38,12 +34,12 @@ export const getPStatusTagStyle = (estatus) => {
     const bgColor = STATUS_BG_COLORS[estatusKey];
 
     return {
-        backgroundColor: bgColor, // Usa el color pastel para el fondo
-        color: color, // El texto usa el color fuerte (mejora contraste y conexión)
-        border: `1px solid ${color}`, // Borde sutil
-        padding: '2px 8px',
-        borderRadius: '5px',
-        fontSize: '0.85rem',
+backgroundColor: bgColor, 
+ color: color, 
+        border: `2px solid ${color}`, 
+padding: '2px 8px',
+borderRadius: '5px',
+fontSize: '0.85rem',
         fontWeight: 'bold',
     };
 };

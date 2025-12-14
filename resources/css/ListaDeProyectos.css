@@ -221,16 +221,16 @@
 }
 
 .ldp-projects-grid {
-  display: flex;           /* usamos flex para centrar las tarjetas */
-  flex-wrap: wrap;         /* para que si hay más de una tarjeta se vaya a otra fila */
-  justify-content: center; /* centra las tarjetas horizontalmente */
-  gap: 1.5rem;             /* espacio entre tarjetas */
+  display: flex;          
+  flex-wrap: wrap;         
+  justify-content: center; 
+  gap: 1.5rem;             
 }
 
 /* =========================== Tarjeta de Proyecto ============================ */
 .ldp-proyecto-card {
-  width: 900px;            /* ancho fijo de la tarjeta */
-  max-width: 100%;         /* evita desbordamiento en pantallas pequeñas */
+  width: 900px;           
+  max-width: 100%;         
   background: #ffffff;
   border-radius: 16px;
   padding: 1.5rem;

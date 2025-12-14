@@ -249,14 +249,12 @@ public function Proyectos(Request $request)
         }
 
         $idDepartamento = $usuario->id_departamento;
-
-        // Obtener proyectos con el conteo de tareas y su estatus
         $proyectos = DB::table('proyectos as p')
             ->leftJoin('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
             ->select('p.*', 'p.p_estatus', DB::raw('COUNT(t.id_tarea) as total_tareas'))
             ->where('p.id_departamento', $idDepartamento)
             ->whereIn('p.p_estatus', ['En proceso', 'Finalizado'])
-            ->groupBy('p.id_proyecto', 'p.p_nombre', 'p.id_departamento', 'p.p_estatus') // agrupa por columnas de proyecto
+            ->groupBy('p.id_proyecto', 'p.p_nombre', 'p.id_departamento', 'p.p_estatus') 
             ->get();
 
         return response()->json([
@@ -435,11 +433,9 @@ public function CambiarStatusProyectoTerminado(Request $request, $id)
 
 public function reabrirProyecto($id)
 {
-    // Definimos las conexiones para que sea fácil de leer
     $dbPrincipal = DB::connection('pgsql');
     $dbArchivo   = DB::connection('pgsql_second');
 
-    // Iniciamos transacción para que todo pase o nada pase
     $dbPrincipal->beginTransaction();
     $dbArchivo->beginTransaction();
 

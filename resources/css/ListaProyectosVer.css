@@ -1,12 +1,11 @@
+/* ======= GENERAL UTILIDADES ======= */
 .lp-info-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centrar contenido */
+  align-items: center; 
   text-align: center;
-  width: 100%;
 }
 
-/* ======= FILTROS ======= */
 .lp-filtros-container {
   background: white;
   border-radius: 14px;
@@ -14,14 +13,11 @@
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   border: 1px solid #e9ecef;
-  max-width: 700px;
-  width: 100%;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
   position: relative;
   z-index: 4;
-  
 }
 
 .lp-search-filter-wrapper {
@@ -30,11 +26,10 @@
   align-items: center;
   margin-bottom: 0.8rem;
   width: 100%; 
-  
 }
 
 .lp-search-box {
-  flex: 1; /* Mantener */
+  flex: 1; 
   position: relative;
   display: flex;
   align-items: center;
@@ -84,7 +79,6 @@
   color: #495057;
 }
 
-
 .lp-filter-box {
   display: flex;
   align-items: center;
@@ -121,7 +115,7 @@
   display: grid;
   gap: 1.2rem;
   margin-top: 0.8rem;
- justify-content: center;
+  justify-content: center;
   max-width: 650px; 
   width: 100%;
   margin-left: auto;
@@ -132,16 +126,16 @@
 /* ======= TARJETAS ======= */
 .lp-proyecto-card {
   background: white;
-  border-radius: 5px;
-  padding: 1.2rem; /* REDUCIDO */
+  border-radius: 15px;
+  padding: 1.2rem;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
   border: 1px solid #e9ecef;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   z-index: 3;
-  display: flex; /* Habilitar Flexbox */
-  flex-direction: column; /* Apilar los hijos verticalmente */
+  display: flex; 
+  flex-direction: column; 
   justify-content: space-between;
 }
 
@@ -155,7 +149,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 5px;
+  width: 6px;
   height: 100%;
   transition: width 0.3s ease;
 }
@@ -168,24 +162,36 @@
 .lp-proyecto-card.borde-finalizado::before { background: #28a745; }
 .lp-proyecto-card.borde-pendiente::before { background: #6c757d; }
 
-/* ======= HEADER TARJETA ======= */
+/* ======= HEADER TARJETA (NUEVO) ======= */
 .lp-proyecto-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   margin-bottom: 1rem;
   padding-bottom: 0.7rem;
   border-bottom: 2px solid #f1f3f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fila superior con Titulo izquierda y Estatus derecha */
+.lp-header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: 15px; /* Espacio para que no se peguen */
 }
 
 .lp-proyecto-nombre {
-  font-size: 1.2rem; /* REDUCIDO */
+  font-size: 1.2rem;
   font-weight: 700;
   color: #212529;
   margin: 0;
   line-height: 1.2;
-  flex: 1;
   text-transform: uppercase;
+  text-align: left;
+}
+
+.lp-proyecto-status-badge {
+  flex-shrink: 0; 
 }
 
 .lp-proyecto-status-badge span {
@@ -194,42 +200,47 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  display: inline-block;
+}
+
+.lp-proyecto-descripcion {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280; 
+  font-weight: 500;
+  text-transform: none; 
+  line-height: 1.5;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 /* ======= INFO GRID ======= */
 .lp-proyecto-info-grid {
-  display: grid;
+   display: grid;
   gap: 0.8rem;
   margin-bottom: 1rem;
- 
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .lp-info-item {
   display: flex;
-  flex-direction: column; /* Cambiar a columna para centrar verticalmente */
-  align-items: center; /* Centrar horizontalmente */
-  justify-content: center; /* Centrar verticalmente */
-  gap: 0.3rem; /* Reducir espacio entre icono y texto */
-  padding: 0.8rem 0.5rem; /* Ajustar padding */
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 0.3rem;
+  padding: 0.8rem 0.5rem;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #e9ecef;
   transition: all 0.2s ease;
-  text-align: center; /* Asegurar que el texto esté centrado */
-  min-height: 80px; /* Altura mínima para consistencia */
- 
-    display: flex;
-    flex-direction: column; 
-    align-items: center;    /* Centra el contenido horizontalmente (icono, label, value) */
-    justify-content: center; 
-
+  text-align: center; 
+  min-height: 80px; 
 }
 
 .pm-info-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centrar contenido */
+  align-items: center; 
   text-align: center;
   width: 100%;
 }
@@ -253,14 +264,10 @@
 }
 
 .lp-info-value {
-    font-size: 0.85rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #212529;
   text-align: left;
-}
-
-.lp-alert-item .alert-icon {
-  font-size: 1rem;
 }
 
 /* ======= ACCIONES ======= */
@@ -287,66 +294,31 @@
   border-radius: 10px;
   cursor: pointer;
 }
+
+/* ======= MEDIA QUERIES (ESCRITORIO) ======= */
 @media (min-width: 992px) {
   .lp-filtros-container {
-    max-width: 1100px; 
+    max-width: 700px;
   }
-  .lp-proyectos-grid { 
-    max-width: 1100px; 
-    grid-template-columns: 1fr; 
+  .lp-proyectos-grid {
+    max-width: 900px;
+    grid-template-columns: 1fr;
     margin-left: auto;
     margin-right: auto;
   }
   
   .lp-proyecto-info-grid {
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: flex-start; 
-    gap: 2rem; 
-    margin-bottom: 1rem; 
-    padding-top: 0.5rem; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+    gap: 2rem;
+    margin-bottom: 1rem;
+    padding-top: 0.5rem;
   }
-  .lp-proyecto-info-grid .info-item {
-    flex: 0 0 auto;
-    min-width: 150px;
-    padding: 0.5rem 0.8rem;
-  }
+
+.lp-info-item {  
+  flex: 0 0 auto;
+  min-width: 150px;
+  padding: 0.5rem 0.8rem;
 }
-/*
-====================================
-  MEDIA QUERIES 
-====================================
-*/
-@media (min-width: 992px) {
-  
-    .lp-filtros-container {
-        max-width: 900px; 
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .lp-proyectos-grid {
-        max-width: 1100px; 
-        grid-template-columns: 1fr; 
-        
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-   
-    .lp-proyecto-info-grid {
-        display: flex; 
-        flex-wrap: wrap; 
-        justify-content: center; 
-        gap: 2rem; 
-        margin-bottom: 1rem; 
-        padding-top: 0.5rem; 
-   
-    }
-    .lp-proyecto-info-grid .info-item {
-        flex: 0 0 auto;
-        min-width: 150px;
-        padding: 0.5rem 0.8rem;
-    }
-  }
-
-
+}

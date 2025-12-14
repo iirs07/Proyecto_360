@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File; // <--- NO OLVIDES ESTO
+use Illuminate\Support\Facades\File; 
 use Carbon\Carbon;
 
 class MoverDatosTrimestrales extends Command

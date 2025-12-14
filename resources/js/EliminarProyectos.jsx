@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAutoRefresh } from "../hooks/useAutoRefresh";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/EliminarProyectos.css";
@@ -59,45 +60,56 @@ function EliminarProyectos() {
 
   const mostrarSelect = proyectos.length > 0 && proyectosFiltrados.length > 0;
 
-  useEffect(() => {
-    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
-    const idUsuario = usuario?.id_usuario;
-    const token = sessionStorage.getItem("jwt_token");
+  const cargarProyectosInicial = useCallback(async () => {
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+  const idUsuario = usuario?.id_usuario;
+  const token = sessionStorage.getItem("jwt_token");
 
-    if (!idUsuario || !token) {
-      setLoading(false);
-      return;
-    }
+  if (!idUsuario || !token) {
+    setLoading(false);
+    return;
+  }
 
-    fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (res.status === 401) {
-          sessionStorage.removeItem("jwt_token");
-          sessionStorage.removeItem("usuario");
-          navigate("/Login", { replace: true });
-          return { success: false, mensaje: "No autorizado" };
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data?.success) setProyectos(data.proyectos || []);
-        else {
-          console.error("Error en la respuesta:", data?.mensaje);
-          setProyectos([]);
-        }
-      })
-      .catch((err) => {
-        console.error("Error en la petición:", err);
-        setProyectos([]);
-      })
-      .finally(() => setLoading(false));
-  }, [navigate]);
+  try {
+    setLoading(true); 
+    const res = await fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json", "Content-Type": "application/json" },
+    });
+
+    const data = await res.json().catch(async () => ({ error: await res.text() }));
+    if (res.ok && data.success) setProyectos(data.proyectos || []);
+    else setProyectos([]);
+  } catch (err) {
+    console.error("Error cargando proyectos:", err);
+    setProyectos([]);
+  } finally {
+    setLoading(false);
+  }
+}, [API_URL]);
+
+const actualizarProyectos = useCallback(async () => {
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+  const idUsuario = usuario?.id_usuario;
+  const token = sessionStorage.getItem("jwt_token");
+  if (!idUsuario || !token) return;
+
+  try {
+    const res = await fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json", "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(async () => ({ error: await res.text() }));
+    if (res.ok && data.success) setProyectos(data.proyectos || []);
+  } catch (err) {
+    console.error("Error actualizando proyectos:", err);
+  }
+}, [API_URL]);
+
+useEffect(() => {
+  cargarProyectosInicial();
+}, [cargarProyectosInicial]);
+
+useAutoRefresh(actualizarProyectos, 5000);
+
 
   const confirmarEliminar = (proyecto) => {
     setProyectoAEliminar(proyecto);
@@ -213,29 +225,35 @@ function EliminarProyectos() {
               fechaFin.setHours(0, 0, 0, 0);
               hoy.setHours(0, 0, 0, 0);
 
-              const diasRestantes = Math.floor((fechaFin - hoy) / (1000 * 60 * 60 * 24));
+              const diasRestantes = Math.floor((fechaFin - hoy) / (1000 * 60 * 60 * 24)) + 1;
               const esProximo = diasRestantes >= 0;
               const estaVencido = diasRestantes < 0;
+                const mostrarDiasRestantes = p.p_estatus?.toLowerCase() !== "finalizado";
 
               return (
                 <div 
                   key={p.id_proyecto} 
                   className={`eliminar-proyecto-card ${getBorderClase(p.p_estatus)}`}
                 >
-                  {/* HEADER */}
-                  <div className="eliminar-proyecto-card-header">
-                    <h3 className="eliminar-proyecto-nombre">{p.p_nombre}</h3>
-                    <div className="eliminar-proyecto-status-badge">
-                      <span style={getPStatusTagStyle(p.p_estatus)}>
-                        {p.p_estatus || "Sin estatus"}
-                      </span>
-                    </div>
-                  </div>
+             
+<div className="eliminar-proyecto-card-header">
+  
+  <div className="eliminar-header-top">
+    <h3 className="eliminar-proyecto-nombre">{p.p_nombre}</h3>
+    <div className="eliminar-proyecto-status-badge">
+      <span style={getPStatusTagStyle(p.p_estatus)}>
+        {p.p_estatus || "Sin estatus"}
+      </span>
+    </div>
+  </div>
+  {/* -------------------------------------------------------- */}
+
+  <p className="eliminar-proyecto-descripcion">{p.descripcion}</p>
+</div>
 
                   {/* INFO */}
                   <div className="eliminar-proyecto-info-grid">
                     
-                    {/* FECHA */}
                     <div className="eliminar-info-item">
                       <FaCalendarAlt className="eliminar-info-icon" />
                       <div className="eliminar-info-content">
@@ -244,20 +262,23 @@ function EliminarProyectos() {
                       </div>
                     </div>
 
-                    {/* DÍAS RESTANTES */}
-                    <div className="eliminar-info-item">
-                      <FaHourglassHalf className="eliminar-info-icon" />
-                      <div className="eliminar-info-content">
-                        <div className="eliminar-info-label">Días restantes</div>
-                        <div className="eliminar-info-value">
-                          {estaVencido
-                            ? "Proyecto vencido"
-                            : diasRestantes === 0
-                              ? "Hoy"
-                              : `${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
-                        </div>
-                      </div>
-                    </div>
+                  
+                  
+{mostrarDiasRestantes && (
+  <div className="eliminar-info-item">
+    <FaHourglassHalf className="eliminar-info-icon" />
+    <div className="eliminar-info-content">
+      <div className="eliminar-info-label">Días restantes</div>
+      <div className="eliminar-info-value">
+        {estaVencido
+          ? "Proyecto vencido"
+          : diasRestantes === 0
+            ? "Hoy"
+            : `${diasRestantes} día${diasRestantes > 1 ? "s" : ""}`}
+      </div>
+    </div>
+  </div>
+)}
 
                     {/* TAREAS */}
                     <div className="eliminar-info-item">

@@ -296,6 +296,43 @@ function DesbloquearProyectos() {
     setBusqueda(""); 
     setSearchTerm(""); 
   };
+const EstadoSinProyectosActuales = () => {
+  return (
+    <div style={{
+      position: 'relative',
+      zIndex: 3,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '60vh',
+      padding: '2rem',
+      borderRadius: '20px', // esquinas más redondeadas
+      border: '3px dashed #6c757d', // borde punteado más visible
+      backgroundColor: '#ffffff',
+      boxShadow: '0 6px 12px rgba(0,0,0,0.15)', // sombra más marcada
+      maxWidth: '500px', // ancho máximo para centrar mejor
+      margin: '0 auto', // centrado horizontal
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        color: '#adb5bd'
+      }}>
+
+ 
+        <FaSearch style={{ marginBottom: '1rem', opacity: 0.5 }} size={100} />
+        <h3 style={{ fontSize: '1.2rem', color: '#6c757d', fontWeight: 600 }}>
+          No hay proyectos finalizados en este periodo
+        </h3>
+        <p style={{ fontSize: '0.9rem', maxWidth: '400px' }}>
+          Utiliza los filtros de <b>Año</b> y <b>Mes</b> en la barra superior para consultar el historial.
+        </p>
+      </div>
+    </div>
+  );
+};
 
   return (
     <Layout
@@ -351,7 +388,6 @@ function DesbloquearProyectos() {
     <span className="barra-busqueda-dp-icon">
         <FaSearch /> 
     </span>
-    {/* ------------------------------------------- */}
     <input
         type="text"
         placeholder="Buscar proyectos..."
@@ -494,20 +530,14 @@ function DesbloquearProyectos() {
             })
           ) : (searchTerm !== "" || anio !== "" || mes !== "") ? (
            
-              <div style={{ textAlign: 'center', marginTop: '40px', width: '100%' }}>
+              <div style={{ textAlign: 'center', width: '100%' }}>
                  <div className="buscador-dp-resultados-info">
                     No se encontraron proyectos que coincidan con los criterios seleccionados.
                  </div>
               </div>
           ) : (
            
-             <EmptyState
-                titulo="LISTA DE PROYECTOS"
-                mensaje="Actualmente no tienes proyectos finalizados."
-                botonTexto="Volver al Tablero"
-                onVolver={volverSegunRol} 
-                icono={logo3}
-             />        
+            <EstadoSinProyectosActuales onVolver={volverSegunRol} />     
           )}
         </div>
       </div>
