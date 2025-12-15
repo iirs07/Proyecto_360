@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAutoRefresh } from "../hooks/useAutoRefresh";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
 import "../css/EliminarProyectos.css";
@@ -24,6 +25,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import { getPStatusTagStyle, getBorderClase } from "../components/estatusUtils";
 
 function EliminarProyectos() {
+  useAuthGuard();
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
@@ -73,7 +75,8 @@ function EliminarProyectos() {
   try {
     setLoading(true); 
     const res = await fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json", "Content-Type": "application/json" },
+      headers: { Authorization: `Bearer ${token}`, 
+      Accept: "application/json", "Content-Type": "application/json" },
     });
 
     const data = await res.json().catch(async () => ({ error: await res.text() }));
@@ -91,18 +94,39 @@ const actualizarProyectos = useCallback(async () => {
   const usuario = JSON.parse(sessionStorage.getItem("usuario"));
   const idUsuario = usuario?.id_usuario;
   const token = sessionStorage.getItem("jwt_token");
+
   if (!idUsuario || !token) return;
 
   try {
-    const res = await fetch(`${API_URL}/api/proyectos/general?usuario=${idUsuario}`, {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json", "Content-Type": "application/json" },
-    });
-    const data = await res.json().catch(async () => ({ error: await res.text() }));
-    if (res.ok && data.success) setProyectos(data.proyectos || []);
+    const res = await fetch(
+      `${API_URL}/api/proyectos/general?usuario=${idUsuario}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (res.status === 401) {
+      sessionStorage.clear();
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    const data = await res.json().catch(async () => ({
+      error: await res.text(),
+    }));
+
+    if (res.ok && data.success) {
+      setProyectos(data.proyectos || []);
+    }
   } catch (err) {
     console.error("Error actualizando proyectos:", err);
   }
-}, [API_URL]);
+}, [API_URL, navigate]);
+
 
 useEffect(() => {
   cargarProyectosInicial();

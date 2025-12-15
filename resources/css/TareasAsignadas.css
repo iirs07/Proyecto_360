@@ -127,7 +127,6 @@
 /* =========================== Tarjetas de tareas ============================ */
 .tu-tareas-contenedor {
   width: 100%;
-  max-width: 900px;
 }
 
 .tu-tareas-lista {
@@ -138,13 +137,14 @@
 
 .tu-tarea-card {
   background: #ffffff;
-  border: 1px solid #e9ecef;
+  border: 2px solid #e9ecef;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   border-left: 4px solid #6c757d;
   z-index: 2;
+    max-width: 900px;
 }
 
 .tu-tarea-card:hover {

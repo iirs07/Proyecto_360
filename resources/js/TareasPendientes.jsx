@@ -23,10 +23,10 @@ import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
 import SelectDinamico from "../components/SelectDinamico";
 import { useRolNavigation } from "./utils/navigation";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
-// Color principal del header de la app
 const PRIMARY_COLOR = "#861542";
-const PRIMARY_LIGHT_BG = "#fef0f8"; // Fondo muy claro para el proyecto-header
+const PRIMARY_LIGHT_BG = "#fef0f8"; 
 
 const OPCIONES_FILTRO = [
     { value: "all", label: "Todos los estados" },
@@ -36,9 +36,7 @@ const OPCIONES_FILTRO = [
     { value: "pendiente", label: "Pendiente (Más de 3 días)" },
 ];
 
-/**
- * FUNCIÓN DE ESTADO VISUAL (Sin cambios, ya implementa tu paleta)
- */
+
 const getEstadoVisual = (estado) => {
     switch (estado) {
         case "vencida":
@@ -65,6 +63,7 @@ const getEstadoVisual = (estado) => {
 };
 
 function TareasPendientes() {
+    useAuthGuard();
     const [busqueda, setBusqueda] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("all");
     const [proyectos, setProyectos] = useState([]);
@@ -213,7 +212,7 @@ function TareasPendientes() {
 
                 {!loading && proyectos.length > 0 && (
                     <>
-                        {/* CONTENEDOR DE FILTROS */}
+                     
                         <div className="tp-filtros-container mb-4">
                             <div className="tp-search-filter-wrapper">
                                 <div className="tp-search-box">
@@ -254,7 +253,7 @@ function TareasPendientes() {
                             )}
                         </div>
 
-                        {/* LISTADO DE PROYECTOS Y TAREAS */}
+                     
                         <div className="tp-tareas-contenedor">
                             {proyectosFiltradosYBuscados.length === 0 ? (
                                 <div className="tp-no-resultados">
@@ -271,7 +270,7 @@ function TareasPendientes() {
 
                                     return (
                                         <div key={proyecto.id_proyecto} className="tp-proyecto-card">
-                                            {/* HEADER DEL PROYECTO - Usa el color principal de la app */}
+                                        
                                             <div className="tp-proyecto-header" style={{ backgroundColor: proyectoBg }}>
                                                 <div className="tp-proyecto-info">
                                                     <h3 className="tp-proyecto-nombre" style={{ color: proyectoColor }}>{proyecto.p_nombre}</h3>
@@ -286,7 +285,7 @@ function TareasPendientes() {
                                                 </div>
                                             </div>
 
-                                            {/* LISTA DE TAREAS */}
+                                        
                                             <div className="tp-tareas-lista">
                                                 {tareas.map((tarea) => {
                                                     const estado = tarea.estadoVencimiento;
@@ -333,19 +332,17 @@ function TareasPendientes() {
                                                                         <span
                                                                             className="tp-tarea-estatus-header"
                                                                             style={{
-                                                                                backgroundColor: PRIMARY_LIGHT_BG,
-                                                                                color: PRIMARY_COLOR,
+                                                               backgroundColor: PRIMARY_LIGHT_BG,
+                                                                       color: PRIMARY_COLOR,
                                                                             }}
-                                                                        >
+                                                               >
                                                                             {tarea.t_estatus}
                                                                         </span>
                                                                     </div>
                                                                 </div>
-
-                                                                {/* DÍAS Y ACCIONES */}
                                                                 <div className="tp-tarea-acciones-header">
-                                                                    <div className="tp-tarea-info-dias" style={{ borderColor: estadoVisual.color, backgroundColor: estadoVisual.bgColor }}>
-                                                                        <div className="tp-tarea-dias-restantes">
+                                                                <div className="tp-tarea-info-dias" style={{ borderColor: estadoVisual.color, backgroundColor: estadoVisual.bgColor }}>
+                                                               <div className="tp-tarea-dias-restantes">
                                                                             <span className="tp-dias-label">VENCE:</span>
                                                                             <div
                                                                                 className="tp-dias-texto"
@@ -361,29 +358,29 @@ function TareasPendientes() {
                                                                 </div>
                                                             </div>
 
-                                                            {/* DETALLES EXPANDIBLES */}
-                                                            {isExpanded && (
+                                               
+                                             {isExpanded && (
                                                                 <div className="tp-tarea-detalles-wrapper">
-                                                                    <div className="tp-tarea-detalles">
+                                                     <div className="tp-tarea-detalles">
                                                                         <div className="tp-detalles-grid">
                                                                             {/* Asignado a */}
-                                                                            <div className="tp-detalle-item">
-                                                                                <div className="tp-detalle-icono-container-column">
+                                                                   <div className="tp-detalle-item">
+                                                                       <div className="tp-detalle-icono-container-column">
                                                                                     <FaUser className="tp-detalle-icono" />
-                                                                                </div>
+                                                                          </div>
                                                                                 <div className="tp-detalle-content">
-                                                                                    <p className="tp-detalle-label">Asignado a</p>
+                                                                             <p className="tp-detalle-label">Asignado a</p>
                                                                                     <p className="tp-detalle-value">{tarea.nombre_usuario_asignado || "No asignado"}</p>
                                                                                 </div>
                                                                             </div>
 
-                                                                            {/* Fecha de vencimiento */}
-                                                                            <div className="tp-detalle-item">
-                                                                                <div className="tp-detalle-icono-container-column">
+                                    
+                                                                      <div className="tp-detalle-item">
+                                                                             <div className="tp-detalle-icono-container-column">
                                                                                     <FaCalendarAlt className="tp-detalle-icono" />
-                                                                                </div>
+                                                                           </div>
                                                                                 <div className="tp-detalle-content">
-                                                                                    <p className="tp-detalle-label">Fecha de vencimiento</p>
+                                                                                 <p className="tp-detalle-label">Fecha de vencimiento</p>
                                                                                     <div className="tp-fecha-detalle">
                                                                                         <p className="tp-detalle-value">{tarea.tf_fin}</p>
                                                                                     </div>

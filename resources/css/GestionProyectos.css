@@ -625,10 +625,9 @@ transform: translateY(-3px);
   color: #adb5bd;
   font-size: 0.8rem;
 }
-/* Estilos para el texto de fecha */
 .tdj-tiempo-label {
     font-weight: bold;
-    color: #4a5568; /* Color normal */
+    color: #4a5568; 
 }
 
 .tdj-tiempo-label.finalizado {
@@ -636,18 +635,26 @@ transform: translateY(-3px);
 }
 
 .tdj-tiempo-label.vencido {
-    color: #dc3545; /* Rojo */
+    color: #dc3545; 
 }
 .tdj-estatus-proyecto.completado {
   color: #28a745;
   font-weight: bold;
-   background-color: #ffffff;
+  background-color: #ffffff;
+  border: 5px;
+  padding: 2px 8px;
+  font-size:  0.85rem;
+  border: #28a745 2px solid; 
 }
 
 .tdj-estatus-proyecto.progreso {
   color: #ffc107;
   font-weight: bold;
-   background-color: #ffffff;
+   background-color: #fff3cd;
+  border-radius: 15px;
+  padding: 2px 8px;
+   font-size:  0.85rem;
+    border: #ffc107 2px solid; 
 }
 .tdj-proyecto-card-encabezado {
     border-left: 8px solid transparent; 

@@ -48,10 +48,8 @@ function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }) {
           <h3 id="modal-title" className="confirm-modal-title">{title}</h3>
         </div>
         
-        {/* Mensaje */}
         <p id="modal-description" className="confirm-modal-message">{message}</p>
         
-        {/* Botones de acción */}
         <div className="confirm-modal-buttons">
           <button className="cancel-btn" onClick={onCancel}>
             Cancelar

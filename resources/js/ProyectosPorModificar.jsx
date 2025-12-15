@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "../hooks/useAutoRefresh";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
@@ -14,6 +15,7 @@ import { useRolNavigation } from "./utils/navigation";
 import { getPStatusTagStyle, getBorderClase } from "../components/estatusUtils";
 
 function ProyectosListaModificar() {
+  useAuthGuard();
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);

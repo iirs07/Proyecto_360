@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
-import EmptyState from "../components/EmptyState";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import ConfirmModal from "../components/ConfirmModal";
 import { useRolNavigation } from "./utils/navigation";
 
@@ -30,6 +30,7 @@ const useDebounce = (value, delay) => {
 };
 
 function DesbloquearProyectos() {
+   useAuthGuard();
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,20 +38,16 @@ function DesbloquearProyectos() {
 
   const [proyectosExpandidos, setProyectosExpandidos] = useState([]); 
   const [tareasSeleccionadas, setTareasSeleccionadas] = useState({});
-
-  // --- ESTADOS PARA EL MODAL DE CONFIRMACIÓN (NUEVO) ---
   const [modalConfirmacionOpen, setModalConfirmacionOpen] = useState(false);
   const [idProyectoAReactivar, setIdProyectoAReactivar] = useState(null);
-
   // --- FILTROS ---
   const [anio, setAnio] = useState("");
   const [mes, setMes] = useState("");
 
-  const [searchTerm, setSearchTerm] = useState(""); // lo que se envía al fetch
+  const [searchTerm, setSearchTerm] = useState(""); 
 
-  // Función que se llama cuando el usuario da clic al botón de buscar
   const handleBuscarClick = () => {
-    setSearchTerm(busqueda); // actualiza el término de búsqueda que dispara el fetch
+    setSearchTerm(busqueda); 
   };
 
   const debouncedBusqueda = useDebounce(busqueda, 500); // 500ms de retraso
@@ -92,7 +89,7 @@ function DesbloquearProyectos() {
             let url;
             const usuarioIdQuery = `usuario_id=${usuario.id_usuario}`;
 
-            if (anio || mes || searchTerm) {  // <-- usamos searchTerm
+            if (anio || mes || searchTerm) {  
                 url = `${API_URL}/api/proyectos/completados/buscar?${usuarioIdQuery}`;
                 if (anio) url += `&anio=${anio}`;
                 if (mes) url += `&mes=${mes}`;
@@ -306,12 +303,12 @@ const EstadoSinProyectosActuales = () => {
       alignItems: 'center',
       height: '60vh',
       padding: '2rem',
-      borderRadius: '20px', // esquinas más redondeadas
-      border: '3px dashed #6c757d', // borde punteado más visible
+      borderRadius: '20px', 
+      border: '3px dashed #6c757d', 
       backgroundColor: '#ffffff',
-      boxShadow: '0 6px 12px rgba(0,0,0,0.15)', // sombra más marcada
-      maxWidth: '500px', // ancho máximo para centrar mejor
-      margin: '0 auto', // centrado horizontal
+      boxShadow: '0 6px 12px rgba(0,0,0,0.15)', 
+      maxWidth: '500px',
+      margin: '0 auto', 
     }}>
       <div style={{
         display: 'flex',

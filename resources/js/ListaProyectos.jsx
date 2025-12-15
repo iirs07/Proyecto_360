@@ -37,14 +37,18 @@ function ListaProyectos() {
     { value: "fecha_lejana", label: "Fecha más lejana" },
   ];
 
-  // Función para cargar proyectos desde la API con loader
   const cargarProyectos = useCallback(async () => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     const token = sessionStorage.getItem("jwt_token");
     const idUsuario = usuario?.id_usuario;
 
-    if (!idUsuario) return alert("Usuario no encontrado.");
-    if (!token) return alert("No hay token de autenticación, inicia sesión.");
+
+    if (!token) {
+  sessionStorage.clear();
+  navigate("/login");
+  return;
+}
+
 
     try {
       setLoading(true);

@@ -12,15 +12,16 @@ import PdfViewer from "./PdfViewer";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 function Reporte() {
+     useAuthGuard();
   const [pdfUrl, setPdfUrl] = useState(null);
   const [mostrarVisor, setMostrarVisor] = useState(false);
   const [errores, setErrores] = useState({});
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
-  
-  // ESTADOS para el filtro de Mes y Año
+
   const [mesSeleccionado, setMesSeleccionado] = useState(null); 
   const [anioSeleccionado, setAnioSeleccionado] = useState(null);
   
@@ -447,7 +448,7 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
                       <ErrorMensaje mensaje={errores.fechaInicio} />
                     </div>
                   )}
-                    {/* FECHA DE FIN / LÍMITE */}
+                  
                   <div className={requiereFechaInicio ? "col-md-6 d-flex flex-column" : "col-12 d-flex flex-column"}>
                     <label className="form-label fw-semibold">
                       {requiereFechaInicio ? "Fecha de fin:" : "Fecha límite (Hasta):"}
@@ -460,7 +461,7 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
                       showYearDropdown
                       dropdownMode="select"
                       locale={es}
-                     maxDate={requiereFechaInicio ? new Date() : null} // Limita a hoy si requiere inicio (vencidas, completadas, mods)
+                     maxDate={requiereFechaInicio ? new Date() : null} 
         minDate={requiereFechaInicio ? (fechaInicio || null) : new Date()}
                       customInput={<CalendarButton />}
                       className="w-100"
@@ -472,7 +473,7 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
             </div>
           )}
 
-          {/* SECCIÓN 4: BARRA DE PROGRESO */}
+  
           {cargando && (
             <div className="reportes-seccion mb-4 p-3 border rounded-3">
               <div className="reportes-d-progress-contenedor">
@@ -499,20 +500,20 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
             <div className="d-flex flex-column flex-md-row justify-content-center gap-3">
               <button 
                 type="button"
-                // 💡 CAMBIO CLAVE 5: Llama a limpiarYCancelar para manejar el Abort
+           
                 onClick={limpiarYCancelar} 
                 className={cargando ? "btn btn-primary btn-md-custom px-4 py-2" : "btn btn-secondary btn-md-custom px-4 py-2"}
-                disabled={false} // Siempre puede usarse para Limpiar o Cancelar
+                disabled={false}
                 style={{ position: 'relative', zIndex: 5 }}
               >
                 {cargando ? (
-                  // MUESTRA CANCELAR
+
                   <>
                     <FaTimes className="me-2" /> 
                     Cancelar Operación
                   </>
                 ) : (
-                  // MUESTRA LIMPIAR FILTROS
+            
                   <>
                     <FaBars className="me-2" />
                     Limpiar Filtros
@@ -544,8 +545,7 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
             </div>
           </div>
         </div>
-        
-        {/* VISOR DE PDF */}
+       
         {mostrarVisor && pdfUrl && (
           <PdfViewer
             pdfUrl={pdfUrl}

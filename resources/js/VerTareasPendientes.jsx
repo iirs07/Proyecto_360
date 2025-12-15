@@ -167,8 +167,7 @@ function VerTareasPendientes() {
         if (esLaUltimaTarea) {
             navigate("/TareasenProceso");
         } else {
-            // Si quedan tareas, nos quedamos aquí y solo quitamos el mensaje de éxito
-            setTimeout(() => setTareaCompletada(false), 3000); 
+            setTimeout(() => setTareaCompletada(false), 1000); 
         }
         
       } else {
@@ -235,20 +234,21 @@ function VerTareasPendientes() {
       titulo="TAREAS POR REVISAR"
       sidebar={<MenuDinamico activeRoute="enproceso" />}
     >
-      <div className="vtp-contenedor-pagina">
-    {proyecto && proyecto.tareas && proyecto.tareas.length > 0 && (
-  <div className="vtp-header-proyecto-banner">
-    <div className="vtp-banner-content">
-      <span className="vtp-badge-estado">
-        <span className="vtp-dot-indicador"></span> Proyecto Activo
-      </span>
-      <h1 className="vtp-nombre-proyecto">
-        {proyecto.p_nombre}
-      </h1>
+<div className="vtp-contenedor-pagina">
+  {tareasFiltradas?.length > 0 && (
+    <div className="vtp-header-proyecto-banner">
+      <div className="vtp-banner-content">
+        <span className="vtp-badge-estado">
+          <span className="vtp-dot-indicador"></span> Proyecto Activo
+        </span>
+        <h1 className="vtp-nombre-proyecto">
+          {proyecto.p_nombre}
+        </h1>
+      </div>
+      <div className="vtp-banner-deco"></div>
     </div>
-    <div className="vtp-banner-deco"></div>
-  </div>
-)}
+  )}
+
         <div className="vtp-lista-tareas-container">
           <div className="vtp-lista-tareas">
             {tareasFiltradas?.length > 0 ? (

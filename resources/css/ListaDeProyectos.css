@@ -244,6 +244,7 @@
   z-index: 3;
   position: relative;
   border-color: #31687442;
+  margin: 0 auto;
 }
 
 .ldp-proyecto-card:hover {

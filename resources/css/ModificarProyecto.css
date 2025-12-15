@@ -24,8 +24,11 @@
   border-color: #dc3545;
   background-image: none;
 }
+.mp-alerta-zindex {
+  position: relative; 
+  z-index: 3;
+}
 
-/* Estado guardado mejorado */
 .mp-estado-guardado {
   font-size: 15px;
   margin-bottom: 15px;
@@ -40,13 +43,13 @@
   font-weight: 500;
   transition: all 0.3s ease;
 }
-/* Contenedor para centrar el EstadoGuardado */
+
 .mp-estado-guardado-wrapper {
   display: flex;
-  justify-content: center; /* Centrado horizontal */
-  align-items: center;     /* Centrado vertical si hace falta */
-  margin-bottom: 15px;     /* separación debajo */
-  width: 100%;             /* ocupa todo el ancho disponible */
+  justify-content: center; 
+  align-items: center;    
+  margin-bottom: 15px;    
+  width: 100%;             
 }
 
 

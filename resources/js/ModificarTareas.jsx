@@ -9,10 +9,12 @@ import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import SelectDinamico from "../components/SelectDinamico";
 
 
 function ModificarTareas() {
+  useAuthGuard();
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
 const API_URL = import.meta.env.VITE_API_URL;
@@ -25,7 +27,6 @@ const API_URL = import.meta.env.VITE_API_URL;
   { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
 ];
 
-  // --- 1. CARGA DE DATOS ---
   useEffect(() => {
   const fetchTareasPorProyecto = async () => {
     try {
@@ -94,7 +95,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     })
     .filter(({ mostrar }) => mostrar);
 
-  // --- 3. ACCIONES ---
  const handleModificarTarea = (tarea) => {
   navigate("/EditarTareas", { state: { tarea } });
 };
@@ -103,11 +103,11 @@ const API_URL = import.meta.env.VITE_API_URL;
   return (
     <Layout titulo="MODIFICAR TAREAS" sidebar={<MenuDinamico activeRoute="modificar" />}>
   <div className="contenedor-global">
-    {/* Barra de búsqueda y select */}
+
     {proyectos.length > 0 && (
       <div className="tp-filtros-container mb-4">
   <div className="tp-search-filter-wrapper">
-    {/* Input de búsqueda */}
+ 
     <div className="tp-search-box">
       <FaSearch className="tp-search-icon" />
       <input
@@ -128,7 +128,6 @@ const API_URL = import.meta.env.VITE_API_URL;
       )}
     </div>
 
-    {/* Select de filtros */}
     <div className="tp-filter-box">
       <FaFilter className="tp-filter-icon" />
       <SelectDinamico
@@ -142,7 +141,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     </div>
   </div>
 
-  {/* Info de resultados */}
   {(busqueda || filtro !== "alfabetico") && (
     <div className="tp-search-results-info">
       <span className="tp-results-count">{proyectosFiltrados.length}</span>{" "}

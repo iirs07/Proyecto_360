@@ -69,6 +69,12 @@ function NuevoProyecto() {
       ref.current.style.height = ref.current.scrollHeight + 'px';
     }
   };
+useEffect(() => {
+  const token = sessionStorage.getItem("jwt_token");
+  if (!token) {
+    navigate("/Login", { replace: true });
+  }
+}, [navigate]);
 
   useEffect(() => {
     ajustarAltura(nombreProyectoRef);
@@ -242,7 +248,7 @@ function NuevoProyecto() {
             </div>
           )}
 
-          {/* Sección de información básica */}
+      
           <FieldCard>
            <h3 className="nv-seccion-titulo mb-4 d-flex align-items-center gap-2">
     <span className="nv-seccion-icono">

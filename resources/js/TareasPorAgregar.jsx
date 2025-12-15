@@ -9,9 +9,11 @@ import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
 import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import SelectDinamico from "../components/SelectDinamico";
 
 function TareasPorAgregar() {
+  useAuthGuard();
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState("alfabetico");
   const [proyectos, setProyectos] = useState([]);
@@ -20,49 +22,56 @@ function TareasPorAgregar() {
   const { volverSegunRol } = useRolNavigation();
   const API_URL = import.meta.env.VITE_API_URL;
 
-
-
   const opciones = [
     { value: "alfabetico", label: "Orden alfabético (A-Z)" },
     { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
   ];
 
   useEffect(() => {
-    const fetchProyectosUsuario = async () => {
-      const usuario = JSON.parse(sessionStorage.getItem("usuario"));
-      const token = sessionStorage.getItem("jwt_token");
-      const idUsuario = usuario?.id_usuario;
+  const fetchProyectosUsuario = async () => {
+    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+    const token = sessionStorage.getItem("jwt_token");
+    const idUsuario = usuario?.id_usuario;
 
-      if (!idUsuario || !token) {
-        setLoading(false);
+    if (!idUsuario || !token) {
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/agregar/tareas?usuario=${idUsuario}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 401) {
+        sessionStorage.clear();
+        navigate("/Login", { replace: true });
         return;
       }
 
-      try {
-       const res = await fetch(`${API_URL}/api/agregar/tareas?usuario=${idUsuario}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`, 
-          },
-        });
+      const data = await res.json().catch(async () => ({ error: await res.text() }));
 
-        const data = await res.json();
-
-        if (data.success) {
-          setProyectos(data.proyectos || []);
-        } else {
-          console.error("Error al cargar proyectos:", data.mensaje);
-        }
-      } catch (err) {
-        console.error("Error al cargar proyectos:", err);
-      } finally {
-        setLoading(false);
+      if (res.ok && data.success) {
+        setProyectos(data.proyectos || []);
+      } else if (!data.success) {
+        console.error("Error al cargar proyectos:", data.mensaje || data);
       }
-    };
+    } catch (err) {
+      console.error("Error al cargar proyectos:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProyectosUsuario();
-  }, []);
+  fetchProyectosUsuario();
+}, []);
+
 
   const handleAgregarTarea = (idProyecto, nombreProyecto) => {
     navigate("/AgregarTareas", { 

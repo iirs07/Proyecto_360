@@ -25,12 +25,9 @@ export const getBorderClase = (estatus) => {
     }
 };
 
-// Función para obtener el estilo en línea de la etiqueta (Cambiado para usar fondos pastel)
 export const getPStatusTagStyle = (estatus) => {
     const estatusKey = estatus?.toUpperCase() || 'DEFAULT';
-    // Color del texto (Fuerte)
     const color = STATUS_COLORS[estatusKey]; 
-    // Color del fondo (Pastel)
     const bgColor = STATUS_BG_COLORS[estatusKey];
 
     return {
@@ -40,6 +37,6 @@ backgroundColor: bgColor,
 padding: '2px 8px',
 borderRadius: '5px',
 fontSize: '0.85rem',
-        fontWeight: 'bold',
+fontWeight: 'bold',
     };
 };

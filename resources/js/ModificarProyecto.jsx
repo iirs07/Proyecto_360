@@ -16,7 +16,6 @@ import ConfirmModal from "../components/ConfirmModal";
 
 registerLocale("es", es);
 
-// Botón de calendario reutilizable
 const CalendarButton = React.forwardRef(({ value, onClick, disabled }, ref) => (
   <button
     type="button"
@@ -248,13 +247,17 @@ const API_URL = import.meta.env.VITE_API_URL;
         </div>
 
         {guardadoExitoso && (
-          <div className="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
-            <FaSave />
-            <div>
-              <strong>¡Proyecto modificado exitosamente!</strong> Ahora puede agregar tareas o ver todos los proyectos.
-            </div>
-          </div>
-        )}
+  <div
+    className="alert alert-success d-flex align-items-center gap-2 mb-4 mp-alerta-zindex"
+    role="alert"
+  >
+    <FaSave />
+    <div>
+      <strong>¡Proyecto modificado exitosamente!</strong> Ahora puede agregar tareas o ver todos los proyectos.
+    </div>
+  </div>
+)}
+
 
         {errorServidor && <div className="alert alert-danger">{errorServidor}</div>}
 
@@ -310,6 +313,8 @@ const API_URL = import.meta.env.VITE_API_URL;
                   customInput={<CalendarButton />}
                 />
                 <ErrorMensaje mensaje={errores.inicio} />
+             
+
               </div>
             </div>
 
@@ -333,6 +338,7 @@ const API_URL = import.meta.env.VITE_API_URL;
                   customInput={<CalendarButton />}
                 />
                 <ErrorMensaje mensaje={errores.fin} />
+                <ErrorMensaje mensaje={errores.fechas} />
               </div>
             </div>
           </div>

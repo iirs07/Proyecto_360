@@ -10,8 +10,10 @@ import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 function ListaDeProyectos() {
+  useAuthGuard();
   const navigate = useNavigate(); 
   const [proyectos, setProyectos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -259,7 +261,7 @@ function ListaDeProyectos() {
 
  return (
   <Layout
-    titulo={proyectos.length > 0 ? "Proyectos Activos" : ""}
+    titulo="Mis proyectos"
     subtitle={proyectos.length > 0 ? "Visualiza y gestiona todos tus proyectos en un solo lugar" : ""}
     sidebar={<MenuDinamico activeRoute="proyectos-en-los-que-participas" />}
   >
@@ -272,7 +274,7 @@ function ListaDeProyectos() {
         </div>
       ) : proyectos.length === 0 ? (
         <EmptyState
-          titulo="No hay proyectos activos"
+          titulo="Aún no eres parte de ningún proyecto"
           mensaje="Cuando se asignen proyectos, aparecerán aquí."
           botonTexto="Volver al Tablero"
           onVolver={volverSegunRol}
@@ -280,7 +282,7 @@ function ListaDeProyectos() {
         />
       ) : (
         <>
-          {/* TODO el contenido de la interfaz de proyectos solo se renderiza si hay proyectos */}
+        
           <div className="ldp-header">
             <div className="ldp-header-content">
               <div className="ldp-header-title">

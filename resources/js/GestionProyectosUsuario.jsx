@@ -17,8 +17,8 @@ import "../css/Gestionproyectosusuario.css";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import logo3 from "../imagenes/logo3.png";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
-// === Componente del gráfico circular de tareas ===
 const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   if (total === 0) {
     return (
@@ -53,7 +53,6 @@ const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   );
 };
 
-// === Componente de tarjeta de métricas ===
 const MetricCard = ({ icon, number, label, subtext, className }) => (
   <div className={`tdu-metrica-card ${className}`}>
     <div className="tdu-metrica-icono">{icon}</div>
@@ -66,7 +65,6 @@ const MetricCard = ({ icon, number, label, subtext, className }) => (
   </div>
 );
 
-// Función auxiliar para calcular días
 const calcularDiasRestantes = (fechaFin) => {
   if (!fechaFin) return null;
   
@@ -82,6 +80,7 @@ const calcularDiasRestantes = (fechaFin) => {
 };
 
 function GestionProyectosUsuario() {
+  useAuthGuard();
   const navigate = useNavigate();
    const API_URL = import.meta.env.VITE_API_URL;
   const [proyectos, setProyectos] = useState([]);
@@ -138,12 +137,11 @@ function GestionProyectosUsuario() {
     obtenerDatos();
   }, [navigate]);
 
-  // === Filtro por búsqueda ===
+ 
   const filteredProyectos = proyectos.filter((proyecto) =>
     (proyecto.p_nombre || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // === Porcentaje global de completitud ===
   const porcentajeCompletitud =
     conteos.total > 0 ? Math.round((conteos.completadas / conteos.total) * 100) : 0;
   const pctCompletadas = conteos.total > 0 ? (conteos.completadas / conteos.total) * 100 : 0;
@@ -329,7 +327,6 @@ let statusClass = estatusGlobal === "Finalizado"
   : "en-proceso";
 
 
-                // 2. Color del texto de tiempo restante
                 let estadoTiempoClass = esProyectoFinalizado ? "finalizado" : esVencido ? "vencido" : "";
 
                 let claseBadge = estatusGlobal === "Finalizado" 

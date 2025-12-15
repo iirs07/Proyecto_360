@@ -1,7 +1,7 @@
 import React, { useState, forwardRef, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import { FaCalendarAlt, FaFilePdf, FaTimesCircle } from "react-icons/fa"; // Agregué icono de cancelar
+import { FaCalendarAlt, FaFilePdf, FaTimesCircle } from "react-icons/fa";
 import ErrorMensaje from "../components/ErrorMensaje";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
@@ -13,6 +13,7 @@ import '../css/calendario.css';
 import PdfViewer from "./PdfViewer";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 const CalendarButton = forwardRef(({ value, onClick }, ref) => (
   <button
@@ -29,6 +30,7 @@ const CalendarButton = forwardRef(({ value, onClick }, ref) => (
 ));
 
 function ReportesTareasCompletadas() {
+  useAuthGuard();
   const [pdfUrl, setPdfUrl] = useState(null);
   const [mostrarVisor, setMostrarVisor] = useState(false);
   const [errores, setErrores] = useState({});
@@ -39,7 +41,6 @@ function ReportesTareasCompletadas() {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
   
-  // REFS PARA CANCELACIÓN
   const abortControllerRef = useRef(null);
   const intervaloRef = useRef(null);
 
@@ -57,14 +58,13 @@ function ReportesTareasCompletadas() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // NUEVA FUNCIÓN PARA CANCELAR
   const cancelarGeneracion = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort(); 
     }
     
     if (intervaloRef.current) {
-      clearInterval(intervaloRef.current); // Detiene la barra de progreso
+      clearInterval(intervaloRef.current); 
     }
 
     setCargando(false);
@@ -97,14 +97,13 @@ function ReportesTareasCompletadas() {
     if (fechaInicio) url += `&fechaInicio=${fechaInicio.toISOString().split("T")[0]}`;
     if (fechaFin) url += `&fechaFin=${fechaFin.toISOString().split("T")[0]}`;
 
-    // Usamos el ref para el intervalo
     intervaloRef.current = setInterval(() => {
       setProgreso(prev => (prev >= 90 ? prev : prev + 10));
     }, 200);
 
     try {
       const response = await fetch(url, {
-        signal: abortControllerRef.current.signal, // Conectamos el abortController
+        signal: abortControllerRef.current.signal, 
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/pdf",
@@ -144,7 +143,7 @@ function ReportesTareasCompletadas() {
 
     } catch (error) {
       if (error.name === 'AbortError') {
-        // El usuario canceló manualmente, no hacemos nada o mostramos un toast leve
+        
         console.log("Petición abortada correctamente.");
       } else {
         console.error("Error inesperado al generar el PDF:", error);
@@ -275,7 +274,6 @@ function ReportesTareasCompletadas() {
     )}
   </button>
 
-  {/* Botón Cancelar */}
   {cargando && (
     <button 
       type="button"

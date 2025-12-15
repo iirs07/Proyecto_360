@@ -26,7 +26,7 @@
 
 .tep-kpi-card {
     background: white;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 20px 30px;
     display: flex;
     align-items: center;
@@ -147,9 +147,11 @@
 }
 
 .tep-badge-status.process {
-    background: #fff7ed;
+    background: #fff3cd;
     color: #ffc107;
-    border: 1px solid #ffedd5;
+    border: 2px solid #ffc107;
+      padding: 2px 8px;
+  font-size:  0.85rem;
 }
 
 .tep-badge-status.completed {

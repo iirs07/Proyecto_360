@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLayers, FiCheckCircle, FiList, FiX } from "react-icons/fi";
-import { LuClock3 } from "react-icons/lu";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import { FaSearch, FaRegCalendarAlt, FaArrowRight } from "react-icons/fa";
 import "../css/tareasenProceso.css";
 import "../css/global.css";
@@ -13,6 +13,7 @@ import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 
 function TareasenProceso() {
+  useAuthGuard();
   const [cargando, setCargando] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [proyectos, setProyectos] = useState([]);
@@ -24,56 +25,22 @@ function TareasenProceso() {
    const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    const usuario = JSON.parse(sessionStorage.getItem("usuario"));
-    if (!usuario?.id_usuario) return;
+  const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+  const token = sessionStorage.getItem("jwt_token");
 
-    const obtenerProyectos = async () => {
-      const token = sessionStorage.getItem("jwt_token");
-      if (!token) return;
+  if (!usuario?.id_usuario || !token) {
+    navigate("/Login", { replace: true });
+    return;
+  }
 
-      setLoading(true);
-      try {
-        const res = await fetch(
-  `${API_URL}/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!res.ok) {
-          const errorData = await res.json();
-          console.error("Error al obtener proyectos:", errorData);
-          return;
-        }
-
-        const data = await res.json();
-        if (data.success) setProyectos(data.proyectos);
-      } catch (error) {
-        console.error("Error de red:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    obtenerProyectos();
-  }, []);
-
-  const handleCompletarTareaProyecto = async (idProyecto) => {
-    const token = sessionStorage.getItem("jwt_token");
-    if (!token) return;
-
-    setCargando(true);
+  const obtenerProyectos = async () => {
+    setLoading(true);
 
     try {
-     const res = await fetch(
-  `${API_URL}/api/proyectos/${idProyecto}/finalizar`,
+      const res = await fetch(
+        `${API_URL}/api/tareas-proyectos-jefe?usuario=${usuario.id_usuario}`,
         {
-          method: "PUT",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -82,19 +49,68 @@ function TareasenProceso() {
         }
       );
 
-      const data = await res.json();
+      if (res.status === 401) {
+        sessionStorage.clear();
+        navigate("/Login", { replace: true });
+        return;
+      }
 
-      if (data.success) {
-        setProyectos((prev) => prev.filter((p) => p.id_proyecto !== idProyecto));
-      } else {
-        alert(data.mensaje || "No se pudo finalizar el proyecto");
+      const data = await res.json().catch(async () => ({ error: await res.text() }));
+
+      if (res.ok && data.success) {
+        setProyectos(data.proyectos || []);
+      } else if (!data.success) {
+        console.error("Error al obtener proyectos:", data);
       }
     } catch (error) {
       console.error("Error de red:", error);
     } finally {
-      setCargando(false);
+      setLoading(false);
     }
   };
+
+  obtenerProyectos();
+}, []);
+
+  const handleCompletarTareaProyecto = async (idProyecto) => {
+  const token = sessionStorage.getItem("jwt_token");
+  if (!token) {
+    navigate("/Login", { replace: true });
+    return;
+  }
+
+  setCargando(true);
+
+  try {
+    const res = await fetch(`${API_URL}/api/proyectos/${idProyecto}/finalizar`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (res.status === 401) {
+      sessionStorage.clear();
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    const data = await res.json().catch(async () => ({ error: await res.text() }));
+
+    if (res.ok && data.success) {
+      setProyectos((prev) => prev.filter((p) => p.id_proyecto !== idProyecto));
+    } else {
+      alert(data.mensaje || "No se pudo finalizar el proyecto");
+    }
+  } catch (error) {
+    console.error("Error de red:", error);
+  } finally {
+    setCargando(false);
+  }
+};
+
 
   const handleVerTareas = (proyecto) => {
     sessionStorage.setItem("proyectoSeleccionado", JSON.stringify(proyecto));
@@ -110,11 +126,16 @@ function TareasenProceso() {
   };
 
   const formatearFecha = (fecha) => {
-    if (!fecha) return "Sin fecha";
-    return new Date(fecha).toLocaleDateString("es-ES", {
-      day: "2-digit", month: "short", year: "numeric"
-    });
-  };
+  if (!fecha) return "Sin fecha";
+
+  const fechaLocal = new Date(`${fecha}T00:00:00`);
+
+  return fechaLocal.toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
   const todasLasTareasFinalizadas = (p) => {
     if (!p.tareas || p.tareas.length === 0) return false;

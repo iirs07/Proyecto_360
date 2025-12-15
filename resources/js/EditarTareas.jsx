@@ -5,22 +5,17 @@ import es from "date-fns/locale/es";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
-// IMPORTACIONES DE ESTILOS Y COMPONENTES
 import "../css/agregartareas.css";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
 import { useRolNavigation } from "./utils/navigation";
 
-// IMPORTACIONES DE ICONOS
 import { FaCalendarAlt, FaUser, FaUsers, FaFileAlt, FaSave, FaTimes, FaRegClock } from "react-icons/fa";
 import logo3 from "../imagenes/logo3.png";
 
 registerLocale("es", es);
 
-// =======================================================
-// COPIA: Componente para el botón de calendario
-// =======================================================
 const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   <button
     type="button"
@@ -126,11 +121,13 @@ const API_URL = import.meta.env.VITE_API_URL;
   
   const token = sessionStorage.getItem("jwt_token");
   
-  // =======================================================
-  // EFECTOS
-  // =======================================================
+ const formatFechaLocal = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
-  // ===== FETCH DEPARTAMENTOS Y TAREA INICIAL (AJUSTADO PARA EL USUARIO) =====
   useEffect(() => {
     const fetchInicial = async () => {
       if (!tareaId) {
@@ -168,7 +165,7 @@ const API_URL = import.meta.env.VITE_API_URL;
           setDepartamentoSeleccionado(depId);
           setUsuarioSeleccionado(userId);
 
-          // 🟢 AJUSTE CLAVE: Inicializar usuarioSeleccionadoInfo con los datos de la tarea si existen
+    
           if (t.usuario) {
             setUsuarioSeleccionadoInfo({
               id_usuario: userId,
@@ -318,9 +315,9 @@ const API_URL = import.meta.env.VITE_API_URL;
       setLoading(true);
       const tareaActualizada = {
         t_nombre: nombre,
-        t_descripcion: descripcion,
-        tf_inicio: fechaInicio.toISOString().split("T")[0],
-        tf_fin: fechaFin.toISOString().split("T")[0],
+        descripcion: descripcion,
+        tf_inicio: formatFechaLocal(fechaInicio),
+  tf_fin: formatFechaLocal(fechaFin),
         id_usuario: parseInt(usuarioSeleccionado),
         id_departamento: parseInt(departamentoSeleccionado),
       };
@@ -362,10 +359,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     }
     navigate(-1);
   };
-  
-  // =======================================================
-  // LOADER
-  // =======================================================
+ 
   if (loadingInicial) {
     return (
       <div className="loader-container">
@@ -377,10 +371,7 @@ const API_URL = import.meta.env.VITE_API_URL;
       </div>
     );
   }
-  
-  // =======================================================
-  // RENDER
-  // =======================================================
+
   return (
     <Layout titulo="MODIFICAR TAREA" sidebar={<MenuDinamico activeRoute="Lista de Tareas" />}>
       <div className="agregartareas-contenedor">
@@ -671,7 +662,7 @@ const API_URL = import.meta.env.VITE_API_URL;
             </button>
           </div>
           
-          {/* Pie de página de acciones */}
+    
           <div className="mt-4 pt-3 border-top">
             <div className="agregartareas-form-status d-flex justify-content-between align-items-center">
               <small className="agregartareas-text-muted">

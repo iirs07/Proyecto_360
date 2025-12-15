@@ -20,10 +20,9 @@ import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
 import SelectDinamico from "../components/SelectDinamico";
 import { useRolNavigation } from "./utils/navigation";
-
-// Color principal del header de la app
+import { useAuthGuard } from "../hooks/useAuthGuard";
 const PRIMARY_COLOR = "#861542";
-const PRIMARY_LIGHT_BG = "#fef0f8"; // Fondo muy claro para el proyecto-header
+const PRIMARY_LIGHT_BG = "#fef0f8"; 
 
 // Opciones de orden alfabético
 const OPCIONES_FILTRO = [
@@ -40,6 +39,7 @@ const ESTADO_FINALIZADO = {
 };
 
 function TareasFinalizadas() {
+    useAuthGuard();
     const [busqueda, setBusqueda] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("az");
     const [proyectos, setProyectos] = useState([]);
@@ -286,7 +286,7 @@ function TareasFinalizadas() {
                                                                     </div>
                                                                 </div>
 
-                                                                {/* FECHA Y ACCIONES */}
+                                                                
                                                                 <div className="tf-tarea-acciones-header">
                                                                     <div className="tf-tarea-info-fecha" style={{ borderColor: ESTADO_FINALIZADO.color, backgroundColor: ESTADO_FINALIZADO.bgColor }}>
                                                                         <div className="tf-tarea-fecha-completada">
@@ -334,23 +334,23 @@ function TareasFinalizadas() {
                                                                                 </div>
                                                                             </div>
 
-                                                                            {/* Departamento */}
+                                                            
                                                                             {tarea.nombre_departamento_usuario_asignado && (
-                                                                                <div className="tf-detalle-item">
-                                                                                    <div className="tf-detalle-icono-container-column">
-                                                                                        <FaBuilding className="tf-detalle-icono" />
+                                                                       <div className="tf-detalle-item">
+                                                                       <div className="tf-detalle-icono-container-column">
+                                                                               <FaBuilding className="tf-detalle-icono" />
                                                                                     </div>
-                                                                                    <div className="tf-detalle-content">
-                                                                                        <p className="tf-detalle-label">Departamento</p>
+                                                                         <div className="tf-detalle-content">
+                                                                             <p className="tf-detalle-label">Departamento</p>
                                                                                         <p className="tf-detalle-value">{tarea.nombre_departamento_usuario_asignado}</p>
                                                                                     </div>
-                                                                                </div>
+                                                                       </div>
                                                                             )}
-                                                                        </div>
-                                                                    </div>
+                                                              </div>
                                                                 </div>
+                                                            </div>
                                                             )}
-                                                        </div>
+                                                    </div>
                                                     );
                                                 })}
                                             </div>

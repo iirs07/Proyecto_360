@@ -91,7 +91,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/EliminarTareasPorDepartamento', [TareasDirectorController::class, 'EliminarTareasPorDepartamento']);
     Route::delete('EliminarTarea/{idTarea}', [TareasDirectorController::class, 'eliminarTarea']);
     Route::get('/tareas/{idTarea}', [TareasDirectorController::class, 'show']);
-    Route::put('/tareas/{id}', [TareasDirectorController::class, 'update']);
+    Route::put('/tareas/{id}', [TareasDirectorController::class, 'updateTareas']);
     Route::delete('/usuarios/{id_usuario}', [DepartamentoDirectorController::class, 'eliminarUsuario']);
     Route::put('/usuarios/{id_usuario}/correo', [DepartamentoDirectorController::class, 'actualizarCorreo']);
     Route::get('/usuarios/{id_usuario}', [DepartamentoDirectorController::class, 'obtenerUsuario']);

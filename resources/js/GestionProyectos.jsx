@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react"; 
 import { useNavigate } from "react-router-dom";
 import { useAutoRefresh } from "../hooks/useAutoRefresh";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import {
   FaPlus,
   FaCheckCircle,
@@ -88,6 +89,7 @@ const MetricCard = ({ icon, number, label, subtext, color, className }) => (
 );
 
 function GestionProyectos() {
+   useAuthGuard();
   const navigate = useNavigate();
   const [proyectos, setProyectos] = useState([]);
   const [tareasCompletadas, setTareasCompletadas] = useState([]);
@@ -96,7 +98,9 @@ function GestionProyectos() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
+  const [loadingInicial, setLoadingInicial] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
+  
 
   const agregarTarea = (idProyecto, nombreProyecto) => {
     navigate("/agregarTareas", {
@@ -111,22 +115,26 @@ function GestionProyectos() {
     navigate("/ListaDeTareas", { state: { id_proyecto: idProyecto } });
   };
 
- 
-  const obtenerDatos = useCallback(async () => {
-    const user = JSON.parse(sessionStorage.getItem("usuario"));
-    if (user) setUsuario(user);
+ useEffect(() => {
+  const usuarioData = JSON.parse(sessionStorage.getItem("usuario"));
+  setUsuario(usuarioData);
+}, []);
 
-    if (!user?.id_usuario) {
-      setLoading(false);
-      return;
-    }
+  const obtenerDatos = useCallback(async () => {
+    const token = sessionStorage.getItem("jwt_token");
+const usuario = JSON.parse(sessionStorage.getItem("usuario"));
+
+if (!token || !usuario?.id_usuario) {
+  navigate("/Login", { replace: true });
+  return;
+}
+
 
     try {
       
-      const token = sessionStorage.getItem("jwt_token");
 
       const res = await fetch(
-        `${API_URL}/api/dashboard-departamento?usuario=${user.id_usuario}`,
+        `${API_URL}/api/dashboard-departamento?usuario=${usuario.id_usuario}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,6 +142,12 @@ function GestionProyectos() {
           },
         }
       );
+      
+  if (res.status === 401) {
+    sessionStorage.clear();
+    navigate("/Login", { replace: true });
+    return;
+  }
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -389,23 +403,16 @@ function GestionProyectos() {
             className="tdu-metrica-en-progreso"
           />
 
-          {estadisticas.proyectosVacios > 0 ? (
-            <MetricCard
-              icon={<FaClipboardList size={28} />}
-              number={estadisticas.proyectosVacios}
-              label="Por Planificar"
-              subtext="Proyectos sin tareas"
-              className="tdu-metrica-sin-definir"
-            />
-          ) : (
-            <MetricCard
-              icon={<FaLayerGroup size={28} />}
-              number={estadisticas.totalTareas}
-              label="Total de Tareas"
-              subtext="Todas las actividades"
-              className="tdu-metrica-total"
-            />
-          )}
+         {estadisticas.proyectosVacios > 0 && (
+  <MetricCard
+    icon={<FaClipboardList size={28} />}
+    number={estadisticas.proyectosVacios}
+    label="Por Planificar"
+    subtext="Proyectos sin tareas"
+    className="tdu-metrica-sin-definir"
+  />
+)}
+
         </div>
 
         <BarraProgresoGeneral />
@@ -610,8 +617,8 @@ function GestionProyectos() {
                         </div>
 
                         {!sinTareas && diasRestantes !== null && (
-                          <div className="tdj-tiempo-restante">
-                            <span className={`tdj-tiempo-label ${estadoTiempoClass}`}>
+                         
+                            <span className={`tdj-tiempo-restante ${estadoTiempoClass}`}>
                               {(() => {
                                 if (diasRestantes < 0)
                                   return `Venció hace ${Math.abs(
@@ -622,7 +629,6 @@ function GestionProyectos() {
                                 return `${diasRestantes} días restantes`;
                               })()}
                             </span>
-                          </div>
                         )}
                       </div>
 

@@ -9,8 +9,10 @@ import { FaUserMinus } from "react-icons/fa";
 import EmptyState from "../components/EmptyState";
 import logo3 from "../imagenes/logo3.png";
 import ConfirmModal from "../components/ConfirmModal";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 export default function EliminarUsuario() {
+  useAuthGuard();
   const [usuarios, setUsuarios] = useState([]);
   const [loadingInicial, setLoadingInicial] = useState(true);
   const [loadingEliminar, setLoadingEliminar] = useState(null);
@@ -22,70 +24,89 @@ const API_URL = import.meta.env.VITE_API_URL;
   const usuarioLogueado = JSON.parse(sessionStorage.getItem("usuario"));
   const idUsuario = usuarioLogueado?.id_usuario;
 
-  useEffect(() => {
-    if (!idUsuario) {
-      setError("Usuario no encontrado. Por favor, inicia sesión.");
-      setLoadingInicial(false);
+ useEffect(() => {
+  if (!idUsuario) {
+    setError("Usuario no encontrado. Por favor, inicia sesión.");
+    setLoadingInicial(false);
+    return;
+  }
+
+  const fetchUsuarios = async () => {
+    const token = sessionStorage.getItem("jwt_token");
+    if (!token) {
+      navigate("/Login", { replace: true });
       return;
     }
 
-    const fetchUsuarios = async () => {
-      const token = sessionStorage.getItem("jwt_token");
-      if (!token) {
-        setError("Usuario no autorizado.");
-        setLoadingInicial(false);
+    setLoadingInicial(true);
+
+    try {
+      const res = await axios.get(
+        `${API_URL}/api/usuarios/departamento/${idUsuario}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          validateStatus: (status) => true, 
+        }
+      );
+
+      if (res.status === 401) {
+        sessionStorage.clear();
+        navigate("/Login", { replace: true });
         return;
       }
 
-      try {
-       const res = await axios.get(
-  `${API_URL}/api/usuarios/departamento/${idUsuario}`,{
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      setUsuarios(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setError("Error al obtener los usuarios.");
+    } finally {
+      setLoadingInicial(false);
+    }
+  };
 
-        console.log("Usuarios recibidos:", res.data);
-        setUsuarios(res.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("Error al obtener los usuarios.");
-      } finally {
-        setLoadingInicial(false);
-      }
-    };
+  fetchUsuarios();
+}, [idUsuario]);
 
-    fetchUsuarios();
-  }, [idUsuario]);
 
   const eliminarUsuario = async (id_usuario) => {
-    const token = sessionStorage.getItem("jwt_token");
-    if (!token) {
-      setError("Usuario no autorizado.");
+  const token = sessionStorage.getItem("jwt_token");
+  if (!token) {
+    navigate("/Login", { replace: true });
+    return;
+  }
+
+  try {
+    setLoadingEliminar(id_usuario);
+
+    const res = await axios.delete(`${API_URL}/api/usuarios/${id_usuario}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      validateStatus: (status) => true, 
+    });
+
+    if (res.status === 401) {
+      sessionStorage.clear();
+      navigate("/Login", { replace: true });
       return;
     }
 
-    try {
-      setLoadingEliminar(id_usuario);
-      await axios.delete(`${API_URL}/api/usuarios/${id_usuario}`,  {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUsuarios(usuarios.filter((u) => u.id_usuario !== id_usuario));
-    } catch (err) {
-      console.error(err);
-      setError("Error al eliminar el usuario.");
-    } finally {
-      setLoadingEliminar(null);
-    }
-  };
+    setUsuarios((prev) => prev.filter((u) => u.id_usuario !== id_usuario));
+  } catch (err) {
+    setError("Error al eliminar el usuario.");
+  } finally {
+    setLoadingEliminar(null);
+  }
+};
+
 
   if (loadingInicial) {
     return (
        <div className="loader-container">
-                 <div className="loader-logo">
-                   <img src={logo3} alt="Cargando" />
-                 </div>
-                 <div className="loader-texto">CARGANDO...</div>
-                 <div className="loader-spinner"></div>
-               </div>
+    <div className="loader-logo">
+     <img src={logo3} alt="Cargando" />
+     </div>
+     <div className="loader-texto">CARGANDO...</div>
+     <div className="loader-spinner"></div>
+      </div>
     );
   }
 

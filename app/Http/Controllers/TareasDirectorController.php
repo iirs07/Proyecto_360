@@ -473,7 +473,7 @@ public function tareasPendientesUsuario(Request $request)
                 ->select(
                     't.*', 
                     DB::raw("u.u_nombre || ' ' || u.a_paterno || ' ' || u.a_materno as nombre_usuario_asignado"),
-                    // 💥 NUEVO CAMPO: Nombre del departamento del usuario asignado
+                
                     'ud.d_nombre as nombre_departamento_usuario_asignado' 
                 )
                 ->where('t.id_proyecto', $proyecto->id_proyecto)
@@ -900,7 +900,7 @@ public function eliminarTarea($idTarea)
     }
 }
 
-public function update(Request $request, $idTarea)
+public function updateTareas(Request $request, $idTarea)
 {
     try {
         $tarea = Tarea::find($idTarea);

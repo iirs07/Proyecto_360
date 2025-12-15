@@ -24,14 +24,11 @@ function TareasAsignadas() {
   
   const refs = useRef({});
   const navigate = useNavigate();
-  const location = useLocation(); // Hook para recibir los datos
+  const location = useLocation(); 
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
-  // ---------------------------------------------------------
-  // VALIDACIÓN DE ACCESO Y CONFIGURACIÓN INICIAL
-  // ---------------------------------------------------------
   useEffect(() => {
     const token = sessionStorage.getItem("jwt_token");
     
@@ -48,14 +45,14 @@ function TareasAsignadas() {
     
     }
   }, [navigate, location]); 
-  // ---------------------------------------------------------
+
 
 
   const fetchTareas = async () => {
     const token = sessionStorage.getItem("jwt_token");
     const usuarioString = sessionStorage.getItem("usuario");
     
-    // Si falta algo esencial, no hacemos el fetch (la redirección del otro useEffect se encargará)
+
     if (!token || !usuarioString || !proyectoActual) return;
 
     const usuario = JSON.parse(usuarioString);
@@ -74,7 +71,9 @@ function TareasAsignadas() {
       }
 
       const data = await res.json();
-      if (data.success) setTareas(data.tareas);
+      if (data.success) 
+        console.log("RESPUESTA BACKEND:", data);
+        setTareas(data.tareas);
     } catch (err) {
       console.error("Error al cargar tareas:", err);
     }
@@ -154,7 +153,7 @@ function TareasAsignadas() {
 
       if (res.ok && data?.success) {
         handleCancelar();    
-        await fetchTareas();  // Recarga tareas
+        await fetchTareas(); 
       } else {
         alert(`Error al subir el archivo: ${data?.error || data?.message || "Intente nuevamente"}`);
       }
@@ -254,7 +253,7 @@ function TareasAsignadas() {
        titulo="TAREAS ASIGNADAS"
        sidebar={<MenuDinamico activeRoute="tareas-asignadas" />}
      >
-      {/* Asegúrate de tener el import arriba: import { FaClipboardCheck } from "react-icons/fa"; */}
+    
 
 <div className="tu-banner-container">
   <div className="tu-banner-icon-bg">
@@ -264,12 +263,10 @@ function TareasAsignadas() {
   <div className="container"> 
     <div className="tu-banner-content">
       
-      {/* 2. TÍTULO CON FLEXBOX */}
+
       <div className="tu-titulo-wrapper">
         <h1 className="tu-banner-titulo">{nombreProyecto}</h1>
-        <span className="tu-icon-wrapper">
-          <FaClipboardCheck />
-        </span>
+      
       </div>
 
       <p className="tu-banner-subtitulo">

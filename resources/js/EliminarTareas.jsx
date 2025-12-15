@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo3 from "../imagenes/logo3.png";
 import "../css/global.css";
-import "../css/EliminarTareas.css"; // Mantendremos este archivo, ¡pero su contenido será el de ModificarTareas.css!
+import "../css/EliminarTareas.css"; 
 import { FaTrash, FaSearch, FaTasks, FaCalendarAlt, FaEdit, FaFilter} from "react-icons/fa";
 import { FiX } from "react-icons/fi";
 import Layout from "../components/Layout";
@@ -10,10 +10,12 @@ import MenuDinamico from "../components/MenuDinamico";
 import EmptyState from "../components/EmptyState";
 import { useRolNavigation } from "./utils/navigation";
 import SelectDinamico from "../components/SelectDinamico";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 import ConfirmModal from "../components/ConfirmModal";
 
 
 function EliminarTareas() {
+   useAuthGuard();
   const navigate = useNavigate();
   const { volverSegunRol } = useRolNavigation();
   const [modalOpen, setModalOpen] = useState(false);
@@ -23,17 +25,18 @@ function EliminarTareas() {
   const [loading, setLoading] = useState(true);
   const [filtro, setFiltro] = useState("alfabetico");
 const API_URL = import.meta.env.VITE_API_URL;
+
   const opciones = [
     { value: "alfabetico", label: "Orden alfabético (A-Z)" },
     { value: "alfabetico_desc", label: "Orden alfabético (Z-A)" },
-    // Mantenemos las opciones de filtro de EliminarTareas
+ 
     { value: "fecha_proxima", label: "Fecha más próxima" },
     { value: "fecha_lejana", label: "Fecha más lejana" },
   ];
 
   // --- 1. CARGA DE DATOS ---
   useEffect(() => {
-    // Mantenemos la lógica de carga, ajustando el endpoint si es necesario
+    
     const fetchTareasPorProyecto = async () => {
       try {
         const usuario = JSON.parse(sessionStorage.getItem("usuario"));
@@ -205,7 +208,7 @@ const API_URL = import.meta.env.VITE_API_URL;
             <div className="loader-spinner"></div>
           </div>
         ) : proyectos.length === 0 ? (
-          // EmptyState solo cuando backend NO devolvió proyectos
+      
           <EmptyState
             titulo="ELIMINAR TAREAS"
             mensaje="No hay proyectos disponibles."
@@ -214,7 +217,7 @@ const API_URL = import.meta.env.VITE_API_URL;
             icono={logo3}
           />
         ) : (
-          //Renderizamos los proyectos filtrados usando clases 'mt-'
+       
           proyectosFiltrados.map(({ proyecto, tareas }) => (
             <div key={proyecto.id_proyecto} className="mt-card">
               <h5 className="mt-nombre-proyecto">{proyecto.p_nombre}</h5>
@@ -245,9 +248,8 @@ const API_URL = import.meta.env.VITE_API_URL;
                             Vence: {tarea.tf_fin || tarea.fechaVencimiento}
                           </span>
 
-                          {/* Botón de Eliminar con la clase de Modificar y el icono correcto */}
                           <button
-                            className="mt-btn-modificar-tarea" // ¡Usamos la clase de Modificar!
+                            className="mt-btn-modificar-tarea" 
                             onClick={() => handleEliminarClick(tarea)}
                            
                           >

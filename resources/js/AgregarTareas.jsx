@@ -26,10 +26,7 @@ const CalendarButton = React.forwardRef(({ value, onClick }, ref) => (
   </button>
 ));
 
-// =======================================================
-// CORRECCIÓN 1: El componente TaskCard ahora usa la clase CSS correcta
-// para eliminar el padding interno no deseado.
-// =======================================================
+
 const TaskCard = ({ children, title, icon, className = "" }) => (
   <div className={`agregartareas-task-card ${className}`}>
     {title && (
@@ -419,10 +416,6 @@ setCamposModificados({});
 
       <div className="agregartareas-form-content-panel p-4 rounded"> 
        
-        {/* ======================================================= */}
-        {/* TaskCard 1: Información de la Tarea */}
-        {/* Le aplicamos mb-4 a la tarjeta completa. */}
-        {/* ======================================================= */}
         <TaskCard title={<span className="agregartareas-task-card-title">Información de la Tarea</span>}
   icon={<FaFileAlt color="#861542" />} className="mb-4"> 
           <div className="mb-4">
