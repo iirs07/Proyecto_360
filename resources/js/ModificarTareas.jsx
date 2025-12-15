@@ -160,7 +160,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     <div className="loader-spinner"></div>
   </div>
 ) : proyectos.length === 0 ? (
-  // EmptyState solo cuando backend NO devolvió proyectos
   <EmptyState
     titulo="MODIFICAR TAREAS"
     mensaje="No hay proyectos disponibles."
@@ -169,7 +168,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     icono={logo3}
   />
 ) : (
-  //Renderizamos los proyectos filtrados
+
   proyectosFiltrados.map(({ proyecto, tareas }) => (
     <div key={proyecto.id_proyecto} className="mt-card">
       <h5 className="mt-nombre-proyecto">{proyecto.p_nombre}</h5>

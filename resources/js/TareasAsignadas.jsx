@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react"; // 1. Importar useCallback
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaClipboardCheck } from "react-icons/fa";
@@ -9,6 +9,7 @@ import "../css/TareasAsignadas.css";
 import SelectDinamico from "../components/SelectDinamico";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
+import { useAutoRefresh } from "../hooks/useAutoRefresh"; // 2. Importar el hook
 
 function TareasAsignadas() {
   const [subiendo, setSubiendo] = useState(false);
@@ -29,6 +30,7 @@ function TareasAsignadas() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
 
+  // Efecto para verificar sesión y obtener datos del location
   useEffect(() => {
     const token = sessionStorage.getItem("jwt_token");
     
@@ -42,24 +44,27 @@ function TareasAsignadas() {
 
     } else {
       navigate("/ListaDeProyectos", { replace: true });
-    
     }
   }, [navigate, location]); 
 
 
-
-  const fetchTareas = async () => {
+  // 3. Refactorizamos fetchTareas con useCallback e isBackground
+  const fetchTareas = useCallback(async (isBackground = false) => {
     const token = sessionStorage.getItem("jwt_token");
     const usuarioString = sessionStorage.getItem("usuario");
     
-
     if (!token || !usuarioString || !proyectoActual) return;
 
     const usuario = JSON.parse(usuarioString);
 
     try {
+      // Solo mostramos el spinner si NO es background (carga inicial o manual)
+      if (!isBackground) {
+        setLoading(true);
+      }
+
       const res = await fetch(
-  `${API_URL}/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
+        `${API_URL}/api/tareas/${proyectoActual.id_proyecto}/usuario/${usuario.id_usuario}`,
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
       );
 
@@ -71,21 +76,34 @@ function TareasAsignadas() {
       }
 
       const data = await res.json();
-      if (data.success) 
-        console.log("RESPUESTA BACKEND:", data);
+      if (data.success) {
+        // console.log("RESPUESTA BACKEND:", data); // Comentado para limpiar consola
         setTareas(data.tareas);
+      }
     } catch (err) {
       console.error("Error al cargar tareas:", err);
+    } finally {
+      // Solo quitamos el spinner si lo habíamos puesto
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
-  };
+  }, [API_URL, proyectoActual, navigate]); // Dependencias importantes
 
   
+  // 4. Efecto para Carga Inicial (con Spinner)
   useEffect(() => {
     if (proyectoActual) {
-      setLoading(true);
-      fetchTareas().finally(() => setLoading(false));
+      fetchTareas(false); 
     }
-  }, [proyectoActual]);
+  }, [proyectoActual, fetchTareas]);
+
+  // 5. Hook de Auto Refresco (Silencioso)
+  useAutoRefresh(() => {
+    if (proyectoActual) {
+      fetchTareas(true);
+    }
+  }, 5000);
 
 
   const getUrgenciaTarea = (fechaFin) => {
@@ -143,7 +161,7 @@ function TareasAsignadas() {
 
     try {
       setSubiendo(true);
-   const res = await fetch(`${API_URL}/api/evidencias`, {
+      const res = await fetch(`${API_URL}/api/evidencias`, {
         method: "POST",
         body: formData,
         headers: { Authorization: `Bearer ${token}` }
@@ -153,7 +171,9 @@ function TareasAsignadas() {
 
       if (res.ok && data?.success) {
         handleCancelar();    
-        await fetchTareas(); 
+        // Aquí dejamos el fetch normal (con loading) o background según prefieras. 
+        // Normalmente tras una acción del usuario está bien ver que se actualiza.
+        await fetchTareas(false); 
       } else {
         alert(`Error al subir el archivo: ${data?.error || data?.message || "Intente nuevamente"}`);
       }
@@ -254,7 +274,6 @@ function TareasAsignadas() {
        sidebar={<MenuDinamico activeRoute="tareas-asignadas" />}
      >
     
-
 <div className="tu-banner-container">
   <div className="tu-banner-icon-bg">
     <FaClipboardCheck />

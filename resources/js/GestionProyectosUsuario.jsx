@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react"; 
 import { useNavigate } from "react-router-dom";
 import {
   FaProjectDiagram,
@@ -18,6 +18,8 @@ import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import logo3 from "../imagenes/logo3.png";
 import { useAuthGuard } from "../hooks/useAuthGuard";
+import { useAutoRefresh } from "../hooks/useAutoRefresh"; 
+
 
 const TaskDonutChart = ({ completadas, pendientes, enProceso, total }) => {
   if (total === 0) {
@@ -82,7 +84,8 @@ const calcularDiasRestantes = (fechaFin) => {
 function GestionProyectosUsuario() {
   useAuthGuard();
   const navigate = useNavigate();
-   const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL;
+  
   const [proyectos, setProyectos] = useState([]);
   const [conteos, setConteos] = useState({
     completadas: 0,
@@ -93,51 +96,67 @@ function GestionProyectosUsuario() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [usuario, setUsuario] = useState(null);
-  useEffect(() => {
+
+
+  const obtenerDatos = useCallback(async (isBackground = false) => {
     const userData = JSON.parse(sessionStorage.getItem("usuario"));
     if (!userData?.id_usuario) return;
-    
-    setUsuario(userData);
 
-    const obtenerDatos = async () => {
-      try {
+    setUsuario((prev) => (prev ? prev : userData));
+
+    try {
+ 
+      if (!isBackground) {
         setLoading(true);
-        const token = sessionStorage.getItem("jwt_token");
+      }
 
-       const res = await fetch(
-  `${API_URL}/api/usuario/tareas?usuario=${userData.id_usuario}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          }
-        );
+      const token = sessionStorage.getItem("jwt_token");
 
-        if (res.status === 401) {
-          sessionStorage.removeItem("jwt_token");
-          sessionStorage.removeItem("usuario");
-          navigate("/Login", { replace: true });
-          return;
+      const res = await fetch(
+        `${API_URL}/api/usuario/tareas?usuario=${userData.id_usuario}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
         }
+      );
 
-        const data = await res.json();
-        const proyectosAPI = data.proyectos || [];
-        const conteosAPI = data.conteos || {};
+      if (res.status === 401) {
+        sessionStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("usuario");
+        navigate("/Login", { replace: true });
+        return;
+      }
 
-        setProyectos(proyectosAPI);
-        setConteos(conteosAPI);
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-      } finally {
+      const data = await res.json();
+      const proyectosAPI = data.proyectos || [];
+      const conteosAPI = data.conteos || {};
+
+      setProyectos(proyectosAPI);
+      setConteos(conteosAPI);
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+    } finally {
+      // Solo desactivamos loading si lo habíamos activado
+      if (!isBackground) {
         setLoading(false);
       }
-    };
+    }
+  }, [API_URL, navigate]); // Dependencias de la función
 
-    obtenerDatos();
-  }, [navigate]);
+  // 4. Efecto para la Carga Inicial (con Loading)
+  useEffect(() => {
+    obtenerDatos(false); // false = muestra loading
+  }, [obtenerDatos]);
 
- 
+  // 5. Hook para Auto Refresco (sin Loading)
+  useAutoRefresh(() => {
+    obtenerDatos(true); // true = modo silencioso (background)
+  }, 5000);
+
+  // --- El resto del renderizado sigue igual ---
+
   const filteredProyectos = proyectos.filter((proyecto) =>
     (proyecto.p_nombre || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -148,7 +167,6 @@ function GestionProyectosUsuario() {
   const pctEnProceso = conteos.total > 0 ? (conteos.en_progreso / conteos.total) * 100 : 0; 
   const pctPendientes = conteos.total > 0 ? (conteos.pendientes / conteos.total) * 100 : 0;
 
-  // === Navegar a la vista de tareas ===
   const irATareas = (idProyecto, nombreProyecto) => {
     navigate("/TareasAsignadas", { 
       state: { 
@@ -191,7 +209,6 @@ function GestionProyectosUsuario() {
           </div>
         </div>
 
-        {/* === MÉTRICAS SUPERIORES === */}
         <div className="tdu-metrica-grid">
           <MetricCard
             icon={<FaLayerGroup size={24} />}
@@ -253,7 +270,6 @@ function GestionProyectosUsuario() {
             )}
           </div>
           
-          {/* === LEYENDA CON DOTS (Corregido) === */}
           <div className="tdu-progreso-stats">
             <div className="tdu-progreso-stat">
               <div className="tdu-metrica-dot tdu-completada"></div>
@@ -270,7 +286,6 @@ function GestionProyectosUsuario() {
           </div>
         </div>
 
-        {/* === BUSCADOR GLOBAL === */}
         {proyectos.length > 0 && (
           <div className="barra-busqueda-global-container mb-4">
             <div className="barra-busqueda-global-wrapper">
@@ -283,10 +298,10 @@ function GestionProyectosUsuario() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {searchTerm && (
-                            <button className="buscador-clear-global" onClick={() => setSearchTerm("")}>
-                              <FiX />
-                            </button>
-                          )}
+                <button className="buscador-clear-global" onClick={() => setSearchTerm("")}>
+                  <FiX />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -319,19 +334,19 @@ function GestionProyectosUsuario() {
                   : 0;
                 
                 const estatusGlobal = proyecto.p_estatus || "En proceso";
-const diasRestantes = calcularDiasRestantes(proyecto.fecha_fin);
-const esProyectoFinalizado = estatusGlobal === "Finalizado";
-const esVencido = !esProyectoFinalizado && diasRestantes !== null && diasRestantes < 0;
-let statusClass = estatusGlobal === "Finalizado"
-  ? "finalizado"
-  : "en-proceso";
+                const diasRestantes = calcularDiasRestantes(proyecto.fecha_fin);
+                const esProyectoFinalizado = estatusGlobal === "Finalizado";
+                const esVencido = !esProyectoFinalizado && diasRestantes !== null && diasRestantes < 0;
+                let statusClass = estatusGlobal === "Finalizado"
+                  ? "finalizado"
+                  : "en-proceso";
 
 
                 let estadoTiempoClass = esProyectoFinalizado ? "finalizado" : esVencido ? "vencido" : "";
 
                 let claseBadge = estatusGlobal === "Finalizado" 
-  ? "finalizado" 
-  : "en-proceso";
+                  ? "finalizado" 
+                  : "en-proceso";
 
 
                 return (
@@ -385,17 +400,17 @@ let statusClass = estatusGlobal === "Finalizado"
                     <div className="tdu-proyecto-info">
                       <div className="tdu-dias">
                         <div className="tdu-dias-item"><FaCalendarAlt size={12} color="#861542" /><div>
-  <strong>
-    Inicio: {proyecto.pf_inicio || "—"}
-  </strong>
-</div>
-</div>
+                          <strong>
+                            Inicio: {proyecto.pf_inicio || "—"}
+                          </strong>
+                        </div>
+                        </div>
                         <div className="tdu-dias-item"><FaHourglassHalf size={12} color="#861542" /><div>
-  <strong>
-    Fin: {proyecto.pf_fin || "—"}
-  </strong>
-</div>
-</div>
+                          <strong>
+                            Fin: {proyecto.pf_fin || "—"}
+                          </strong>
+                        </div>
+                        </div>
                       </div>
                       {diasRestantes !== null && (
                         <div className="tdu-tiempo-restante">

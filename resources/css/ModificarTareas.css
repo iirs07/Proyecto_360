@@ -1,42 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ================================
-   FUENTES Y CONFIGURACIÓN GLOBAL
-================================ */
-body, input, button, select {
+body {
   font-family: 'Poppins', sans-serif;
-  color: #2d3748;
+  color: #2b3674;
   margin: 0;
-  padding: 0;
 }
 
 .contenedor-global {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 10px 15px;
+  gap: 30px;
 }
-
-/* ================================
-   TARJETAS DE PROYECTOS
-================================ */
+.tp-filtros-container {
+  max-width: 600px; 
+  width: 100%;       
+  margin-left: auto; 
+  margin-right: auto;
+}
 .mt-card {
   background: #ffffff;
-  border-radius: 12px; 
-  padding: 20px;
-  margin: 20px auto;
-  width: 100%;
-  box-shadow: 0 4px 15px rgba(134, 21, 66, 0.1);
+  border-radius: 20px;
+  border: 2px solid #eaeaea;
+  padding: 30px;
+  box-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
   position: relative;
-  border: 1px solid #e6e2e8;
-  transition: all 0.3s ease;
-  overflow: hidden;
   z-index: 3;
+  overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
 .mt-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(134, 21, 66, 0.2);
 }
 
 .mt-card::before {
@@ -44,191 +41,158 @@ body, input, button, select {
   position: absolute;
   top: 0;
   left: 0;
-  width: 6px; 
-  height: 100%;
-  background: linear-gradient(180deg, #861542, #a83267);
-  border-radius: 12px 0 0 12px;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, #861542, #b91d5b);
 }
 
-/* ================================
-   TITULARES
-================================ */
 .mt-nombre-proyecto {
-  font-size: 21px;
+  font-size: 1.4rem;
   font-weight: 700;
-  text-align: left;
-  margin-bottom: 15px;
-  color:#000;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.mt-nombre-tarea {
-  font-size: 16px;
-  font-weight: 600;
-  color: #000;
-  margin-bottom: 0;
+  color: #1b2559;
+  margin: 0 0 5px 0;
   text-transform: uppercase;
 }
 
-/* ================================
-   INFO DE TARJETA
-================================ */
 .mt-info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 15px;
-  
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f4f7fe;
 }
 
 .mt-info-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
-  color: #000;
-  justify-content: center;
+  font-size: 0.9rem;
+  color: #a3aed0;
+  font-weight: 500;
+  
 }
 
-
 .mt-info-icon {
-  font-size: 1.5rem;
   color: #861542;
 }
 
-/* ================================
-   LISTA DE TAREAS
-================================ */
 .mt-tareas-lista {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
 }
 
 .mt-item-en-proceso {
-  background: #fff;
-  border-radius: 10px;
-  padding: 12px 15px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  background-color: #f8f9fa; 
+  border-radius: 15px;
+  padding: 20px;
+  border: 1px solid transparent;
   transition: all 0.2s ease;
-  border: 1px solid #f0e6eb;
+  border: 2px solid #eaeaea;
 }
 
 .mt-item-en-proceso:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(134,21,66,0.12);
+  background-color: #fff;
   border-color: #861542;
+  box-shadow: 0 5px 15px rgba(134, 21, 66, 0.08);
 }
 
-/* ================================
-   HEADER DE TAREA
-================================ */
+
 .mt-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.mt-icono-estado {
-  font-size: 1.6rem;
+.mt-nombre-tarea {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2b3674;
+  text-transform: uppercase;
 }
 
-/* ================================
-   FOOTER DE TAREA
-================================ */
 .mt-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 15px;
 }
 
 .mt-estatus {
-  padding: 6px 12px;
-  border-radius: 18px;
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  background: #fde8f0;
+  letter-spacing: 0.5px;
+  background-color: #fff0f6; 
   color: #861542;
+   border-radius: 20px;
 }
 
 .mt-fecha {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #861542;
-  background: #fdf0f5;
-  padding: 5px 10px;
-  border-radius: 10px;
+  font-size: 0.75rem; 
+  color: #861542;          
+  background: #fff0f6;     
+  padding: 6px 14px;       
+ color: #861542;
+   border-radius: 20px;      
+  font-weight: 600;       
 }
 
 .mt-fecha-icon {
-  font-size: 1rem;
   color: #861542;
 }
 
 /* ================================
-   BOTONES
+   BOTÓN MODIFICAR
 ================================ */
 .mt-btn-modificar-tarea {
-  padding: 8px 16px;
-  background: #861542;
+  background: linear-gradient(135deg, #861542 0%, #a01a50 100%);
   color: white;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 13px;
+  border: none;
+  border-radius: 12px; /* Botón bien redondeado */
+  padding: 10px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(134, 21, 66, 0.25); /* Sombra de color */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .mt-btn-modificar-tarea:hover {
-  background: linear-gradient(90deg, #861542, #a83267);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(134,21,66,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(134, 21, 66, 0.35);
 }
 
-/* ================================
-   BUSCADOR
-================================ */
-
-
-/* ================================
-   ANIMACIONES
-================================ */
-@keyframes pulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+.mt-btn-modificar-tarea:active {
+  transform: scale(0.98);
 }
 
-@keyframes bounce {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
+
 
 /* ================================
    RESPONSIVE
 ================================ */
 @media (max-width: 768px) {
-  .mt-card { padding: 15px; }
-  .mt-nombre-proyecto { font-size: 18px; }
-  .barra-busqueda-global-input { font-size: 13px; }
-  .mt-tareas-lista { gap: 10px; }
-  .mt-footer { gap: 8px; }
-  .mt-btn-modificar-tarea { padding: 6px 12px; font-size: 12px; }
+  .mt-card {
+    padding: 20px;
+  }
+
+  .mt-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mt-btn-modificar-tarea {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
 }
-
-

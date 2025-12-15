@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import logo3 from "../imagenes/logo3.png";
 import { FiX, FiCalendar, FiFilter } from "react-icons/fi";
@@ -11,6 +11,7 @@ import { useRolNavigation } from "./utils/navigation";
 import MenuDinamico from "../components/MenuDinamico";
 import Layout from "../components/Layout";
 import { useAuthGuard } from "../hooks/useAuthGuard";
+import { useAutoRefresh } from "../hooks/useAutoRefresh"; 
 
 function ListaDeProyectos() {
   useAuthGuard();
@@ -91,60 +92,76 @@ function ListaDeProyectos() {
     });
   };
 
-  useEffect(() => {
-    const cargarProyectos = async () => {
-      const token = sessionStorage.getItem("jwt_token");
-      const usuario = JSON.parse(sessionStorage.getItem("usuario") || "{}");
-      const idUsuario = usuario.id_usuario;
+  // 3. Refactorizamos la función de carga con useCallback
+  // Acepta isBackground (false = carga inicial con spinner, true = silencioso)
+  const cargarProyectos = useCallback(async (isBackground = false) => {
+    const token = sessionStorage.getItem("jwt_token");
+    const usuario = JSON.parse(sessionStorage.getItem("usuario") || "{}");
+    const idUsuario = usuario.id_usuario;
 
-      if (!token) {
+    if (!token) {
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    if (!idUsuario) {
+      if (!isBackground) setLoading(false);
+      return;
+    }
+
+    try {
+      // Solo mostramos loading si NO es background
+      if (!isBackground) {
+        setLoading(true);
+      }
+
+      const res = await fetch(
+        `${API_URL}/api/proyectos/jefe?usuario=${idUsuario}`, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (res.status === 401) {
+        sessionStorage.clear();
         navigate("/Login", { replace: true });
         return;
       }
 
-      if (!idUsuario) {
-        setLoading(false);
-        return;
-      }
+      if (!res.ok) throw new Error(`Error ${res.status}`);
 
-      try {
-        const res = await fetch(
-          `${API_URL}/api/proyectos/jefe?usuario=${idUsuario}`, {
-            headers: { 
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          }
-        );
+      const data = await res.json();
 
-        if (res.status === 401) {
-          sessionStorage.clear();
-          navigate("/Login", { replace: true });
-          return;
-        }
+      const proyectosConTareas = (data.proyectos || [])
+        .map(p => ({
+          ...p,
+          tieneVencidos: p.tareas?.some(t => new Date(t.tf_fin) < new Date()),
+          diasInfo: getDiasRestantes(p.pf_fin)
+        }))
+        .sort((a,b) => new Date(a.pf_fin) - new Date(b.pf_fin));
 
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-
-        const data = await res.json();
-
-        const proyectosConTareas = (data.proyectos || [])
-          .map(p => ({
-            ...p,
-            tieneVencidos: p.tareas?.some(t => new Date(t.tf_fin) < new Date()),
-            diasInfo: getDiasRestantes(p.pf_fin)
-          }))
-          .sort((a,b) => new Date(a.pf_fin) - new Date(b.pf_fin));
-
-        setProyectos(proyectosConTareas);
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
+      setProyectos(proyectosConTareas);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      // Solo quitamos el loading si lo habíamos puesto
+      if (!isBackground) {
         setLoading(false);
       }
-    };
+    }
+  }, [API_URL, navigate]); // Dependencias del useCallback
 
-    cargarProyectos();
-  }, [navigate]);
+  // 4. Carga Inicial (muestra Loading)
+  useEffect(() => {
+    cargarProyectos(false); 
+  }, [cargarProyectos]);
+
+  // 5. Auto Refresco cada 5 segundos (silencioso)
+  useAutoRefresh(() => {
+    cargarProyectos(true);
+  }, 5000);
 
   const filteredAndSortedProyectos = useMemo(() => {
     let filtered = proyectos.filter(p =>
@@ -170,9 +187,10 @@ function ListaDeProyectos() {
     const statusInfo = statusConfig[status] || statusConfig["En proceso"];
     const tareasInfo = contarTareas(proyecto.tareas);
     const diasInfo = proyecto.diasInfo || getDiasRestantes(proyecto.pf_fin);
-    const completionPercentage = proyecto.tareas?.length > 0 
-      ? Math.round((proyecto.tareas.filter(t => t.t_estatus === 'Finalizado').length / proyecto.tareas.length) * 100)
-      : 0;
+    // Nota: completionPercentage estaba definido pero no usado en el return original, lo dejé comentado por limpieza
+    // const completionPercentage = proyecto.tareas?.length > 0 
+    //   ? Math.round((proyecto.tareas.filter(t => t.t_estatus === 'Finalizado').length / proyecto.tareas.length) * 100)
+    //   : 0;
 
     return (
       <div className="ldp-proyecto-card" key={proyecto.id_proyecto}>
@@ -201,7 +219,7 @@ function ListaDeProyectos() {
         </div>
 
         <div className="ldp-card-body">
-         
+          
 
           <div className="ldp-stats-grid">
             <div className="ldp-stat-card">
@@ -214,7 +232,7 @@ function ListaDeProyectos() {
               </div>
             </div>
 
-           
+            
 
             <div className="ldp-stat-card">
               <div className="ldp-stat-icon-wrapper">
@@ -382,7 +400,6 @@ function ListaDeProyectos() {
 }
 
 export default ListaDeProyectos;
-
 
 
 

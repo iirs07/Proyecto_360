@@ -364,15 +364,13 @@
 
 .tu-modal-content-preview {
   display: flex;
-  flex-direction: column;
-  max-width: 600px;
+  flex-direction: column; /* Apila: Header, Body, Footer */
+  max-height: 90vh;       /* Altura máxima de la ventana */
   width: 100%;
-  max-height: 90vh;
-  border-radius: 16px; 
+  max-width: 600px;
   background: #fff;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  overflow: hidden;
-  position: relative;
+  border-radius: 16px;
+  overflow: hidden;       /* Mantiene todo dentro de los bordes redondos */
 }
 
 /* Header Limpio */
@@ -413,13 +411,15 @@
   color: #fff;
   transform: rotate(90deg); 
 }
-/* Cuerpo del Modal */
 .tu-modal-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1.5rem;
-  background: #f8fafc; 
+  flex: 1;            
+  min-height: 0;      
+  display: flex;      
+  align-items: center; 
+  justify-content: center; 
+  padding: 1rem;
+  background: #f8fafc;
+  overflow: hidden;     
 }
 
 .tu-modal-body img {
@@ -436,6 +436,9 @@
   font-size: 0.9rem;
   color: #64748b;
   text-align: center;
+  padding: 0 1.5rem;        
+  width: 100%;              
+  overflow-wrap: break-word; 
 }
 
 /* Footer de Botones */

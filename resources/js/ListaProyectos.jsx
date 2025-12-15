@@ -72,7 +72,6 @@ function ListaProyectos() {
     }
   }, [API_URL]);
 
-  // Función para actualizar proyectos sin mostrar loader (para auto-refresh)
   const actualizarProyectos = useCallback(async () => {
     const usuario = JSON.parse(sessionStorage.getItem("usuario"));
     const token = sessionStorage.getItem("jwt_token");

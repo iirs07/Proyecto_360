@@ -551,7 +551,7 @@
   margin: 0 auto;
   line-height: 1.5;
 }
-/* Contenedor del Título y el Badge */
+
 .tdu-proyecto-titulo-badge {
   display: flex;
   justify-content: space-between; 
@@ -560,7 +560,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* El estilo BASE del Badge */
 .tdu-proyecto-badge {
   font-size: 0.75rem;
   font-weight: 800;

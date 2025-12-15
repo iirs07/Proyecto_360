@@ -180,7 +180,6 @@ function TareasPorAgregar() {
             icono={logo3}
           />
         ) : (
-          // Renderizamos los proyectos con clases específicas para AgregarT
           proyectosFiltrados.map((p) => (
             <div key={p.proyecto.id_proyecto} className="at-card">
               <h5 className="at-nombre-proyecto">{p.proyecto.p_nombre}</h5>
