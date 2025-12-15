@@ -164,9 +164,10 @@ useEffect(() => {
         const res = await fetch(`${API_URL}/api/GuardarNuevoProyecto`, {
             method: "POST",
             headers: { 
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}` 
-            },
+    "Content-Type": "application/json; charset=UTF-8",
+    "Authorization": `Bearer ${token}` 
+},
+
             body: JSON.stringify(proyecto)
         });
 
@@ -423,7 +424,6 @@ useEffect(() => {
               )}
             </div>
 
-            {/* Leyenda de campos requeridos */}
             <div className="mt-4 pt-3 border-top text-center">
               <small className="nv-text-muted">
                 <span className="nv-campo-requerido me-1">*</span> Campos obligatorios

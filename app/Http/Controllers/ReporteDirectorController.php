@@ -76,12 +76,20 @@ $authUsuario = \App\Models\CUsuario::with('departamento')->find($idUsuario);
 
     switch ($tipo) {
         case 'modificaciones':
-            $inicio = $inicio ?? Carbon::now()->startOfDay();
-            $fin = $fin ?? Carbon::now()->endOfDay();
-            $inicio_db = $inicio;
-            $fin_db = $fin;
+    $inicio = $inicio ?? Carbon::now()->startOfDay();
+    $fin = $fin ?? Carbon::now()->endOfDay();
+    $inicio_db = $inicio;
+    $fin_db = $fin;
 
-            $query = HistorialModificacion::join('proyectos', 'historial_modificaciones.id_proyecto', '=', 'proyectos.id_proyecto')
+    // BD principal
+    if ($fin_db >= $inicioTrimestreActual->toDateString()) {
+        $inicioPrincipal = $inicio_db && $inicio_db >= $inicioTrimestreActual->toDateString()
+            ? $inicio_db
+            : $inicioTrimestreActual->toDateString();
+
+        $movimientos = $movimientos->merge(
+            HistorialModificacion::on('pgsql')
+                ->join('proyectos', 'historial_modificaciones.id_proyecto', '=', 'proyectos.id_proyecto')
                 ->join('c_usuario', 'historial_modificaciones.id_usuario', '=', 'c_usuario.id_usuario')
                 ->leftJoin('tareas', 'historial_modificaciones.id_tarea', '=', 'tareas.id_tarea')
                 ->select(
@@ -92,16 +100,46 @@ $authUsuario = \App\Models\CUsuario::with('departamento')->find($idUsuario);
                     'c_usuario.a_materno',
                     'tareas.t_nombre as tarea'
                 )
-                ->whereBetween('historial_modificaciones.created_at', [$inicio_db, $fin_db]);
+                ->whereBetween('historial_modificaciones.created_at', [$inicioPrincipal, $fin_db])
+                ->when($idDepartamento, fn($q) =>
+                    $q->where('proyectos.id_departamento', $idDepartamento)
+                )
+                ->get()
+        );
+    }
 
-            if ($idDepartamento) {
-                $query->where('proyectos.id_departamento', $idDepartamento);
-            }
+    if ($inicio_db && $inicio_db < $inicioTrimestreActual->toDateString()) {
+        $finHistorico = $fin_db && $fin_db < $inicioTrimestreActual->toDateString()
+            ? $fin_db
+            : $inicioTrimestreActual->copy()->subSecond()->toDateString();
 
-            $movimientos = $query->orderBy('historial_modificaciones.created_at', 'DESC')->get();
-            $nombreArchivo = 'Reporte_Historial_Modificaciones.pdf';
-            $vistaPDF = 'pdf.ReporteModificaciones';
-            break;
+        $movimientos = $movimientos->merge(
+            HistorialModificacion::on('pgsql_second')
+                ->join('proyectos', 'historial_modificaciones.id_proyecto', '=', 'proyectos.id_proyecto')
+                ->join('c_usuario', 'historial_modificaciones.id_usuario', '=', 'c_usuario.id_usuario')
+                ->leftJoin('tareas', 'historial_modificaciones.id_tarea', '=', 'tareas.id_tarea')
+                ->select(
+                    'historial_modificaciones.*',
+                    'proyectos.p_nombre as proyecto',
+                    'c_usuario.u_nombre as usuario_nombre',
+                    'c_usuario.a_paterno',
+                    'c_usuario.a_materno',
+                    'tareas.t_nombre as tarea'
+                )
+                ->whereBetween('historial_modificaciones.created_at', [$inicio_db, $finHistorico])
+                ->when($idDepartamento, fn($q) =>
+                    $q->where('proyectos.id_departamento', $idDepartamento)
+                )
+                ->get()
+        );
+    }
+
+    $movimientos = $movimientos->sortByDesc('created_at')->values();
+
+    $nombreArchivo = 'Reporte_Historial_Modificaciones.pdf';
+    $vistaPDF = 'pdf.ReporteModificaciones';
+    break;
+
 
         case 'completadas':
             $inicio = $inicio ?? null;
@@ -181,8 +219,6 @@ $authUsuario = \App\Models\CUsuario::with('departamento')->find($idUsuario);
             $vistaPDF = 'pdf.ReportesDirector';
             break;
     }
-
-    // Generación de PDF
     $mpdf = new Mpdf([
         'format' => 'Letter',
         'margin_top' => 20,
@@ -194,7 +230,7 @@ $authUsuario = \App\Models\CUsuario::with('departamento')->find($idUsuario);
 
 
     $mpdf->showImageErrors = true;
-    $mpdf->SetWatermarkImage(public_path('imagenes/logo2.png'), 0.1, [150, 200], 'C');
+    $mpdf->SetWatermarkImage(public_path('imagenes/logo2.png'), 0.06, [150, 200], 'C');
     $mpdf->showWatermarkImage = true;
 
     $cssPath = resource_path('css/PdfDirector.css');

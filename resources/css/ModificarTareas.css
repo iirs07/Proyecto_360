@@ -22,7 +22,7 @@ body {
 }
 .mt-card {
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 15px;
   border: 2px solid #eaeaea;
   padding: 30px;
   box-shadow: 0px 18px 40px rgba(112, 144, 176, 0.12);
@@ -41,17 +41,21 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 6px;
-  background: linear-gradient(90deg, #861542, #b91d5b);
+  width: 6px;          /* grosor del borde */
+  height: 100%;        /* toda la altura */
+  background: linear-gradient(180deg, #861542, #b91d5b);
 }
 
 .mt-nombre-proyecto {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #1b2559;
+  color: #000;
   margin: 0 0 5px 0;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;      
+  justify-content: center; 
+  text-align: center;
 }
 
 .mt-info {
@@ -64,9 +68,13 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
-  color: #a3aed0;
+  font-size: 1rem;
+  color: #000;
   font-weight: 500;
+  display: flex;
+  align-items: center;      /* Centrado vertical */
+  justify-content: center;  /* Centrado horizontal */
+  text-align: center;
   
 }
 
@@ -106,7 +114,7 @@ body {
 .mt-nombre-tarea {
   font-size: 1.05rem;
   font-weight: 600;
-  color: #2b3674;
+  color: #000;
   text-transform: uppercase;
 }
 
@@ -121,7 +129,7 @@ body {
 .mt-estatus {
   display: inline-block;
   padding: 6px 14px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -134,7 +142,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem; 
+  font-size: 0.85rem; 
   color: #861542;          
   background: #fff0f6;     
   padding: 6px 14px;       

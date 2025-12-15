@@ -55,8 +55,6 @@
 }
 
 
-
-/* Anchos específicos para cada columna */
 th:nth-child(1), td:nth-child(1) { width: 20%; } /* Proyecto */
 th:nth-child(2), td:nth-child(2) { width: 25%; } /* Tarea */
 th:nth-child(3), td:nth-child(3) { width: 15%; } /* Fecha Vencimiento */

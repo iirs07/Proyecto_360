@@ -16,9 +16,9 @@
     }
 }
 .btn-calendario {
-    height: 38px; /* Altura más estándar */
-    font-size: 0.95rem; /* Fuente ligeramente más pequeña */
-    padding: 0.5rem 0.75rem; /* Padding más compacto */
+    height: 38px; 
+    font-size: 0.95rem; 
+    padding: 0.5rem 0.75rem; 
 
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
@@ -28,7 +28,7 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .btn-calendario .text {
-    font-size: 0.9rem; /* Asegura que el placeholder también sea compacto */
+    font-size: 0.9rem; 
 }
 .btn-calendario:hover {
     border-color: #861542;
@@ -49,8 +49,17 @@
 
 .mi-boton {
   background-color: #861542;
-  color: #fff; /* texto blanco */
+  color: #fff; 
   border: 2px solid #861542;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+.mi-boton-cancelar {
+  background-color: #861542;
+  color: #fff; 
+  border: 2px solid #ffe5ef4f;
   border-radius: 8px;
   padding: 0.5rem 1.5rem;
   font-weight: 600;
@@ -65,16 +74,12 @@
 
 .mi-boton:active,
 .mi-boton:focus {
-  background-color: #861542; /* color de fondo al hacer clic */
-  border-color: #861542;     /* borde consistente */
-  color: #fff;               /* texto blanco */
-  outline: none;             /* opcional, quita el borde de enfoque predeterminado */
+  background-color: #861542; 
+  border-color: #861542;     
+  color: #fff;             
+  outline: none;            
 }
 
-
-/* ==========================
-    BARRA DE PROGRESO
-========================== */
 .reportes-d-progress-contenedor {
     margin-top: 30px;
     max-width: 500px;
@@ -133,7 +138,7 @@
     color: #999;
 }
 
-/* Los estilos de .reportes-d-boton-form ya no se usan directamente, pero mantenemos los relacionados al progreso y z-index */
+
 .reportes-d-boton-wrapper {
     margin-top: 30px;
 }
@@ -185,25 +190,15 @@
     filter: none !important; 
 }
 
-/* 2. CORRECCIÓN de :hover (Al pasar el ratón) */
 .form-check-input:hover {
-    /* Mantenemos un borde de tu color de marca para indicar interactividad */
     border-color: #861542 !important; 
-    
-    /* Eliminamos la sombra al hacer hover si no la quieres, o puedes poner una más sutil */
     box-shadow: none !important;
-    
-    /* Sobrescribimos el filtro de color de hover de Bootstrap */
     filter: none !important;
 }
 
-
-/* 3. ESTILO CUANDO ESTÁ MARCADO */
 .form-check-input:checked {
-    background-color: #861542 !important; /* Importante para que el fondo sea el correcto */
-    border-color: #861542 !important; /* Importante para que el borde sea el correcto */
-    
-    /* El background-image con el SVG blanco debe ser !important si Bootstrap lo sobrescribe */
+    background-color: #861542 !important; 
+    border-color: #861542 !important; 
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e") !important;
 }
 .form-check-label {

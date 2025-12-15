@@ -32,7 +32,7 @@ function Reporte() {
   const [cargando, setCargando] = useState(false);
   const [progreso, setProgreso] = useState(0);
 const API_URL = import.meta.env.VITE_API_URL;
-  // Referencia para el AbortController
+
   const abortControllerRef = useRef(null); 
   
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const API_URL = import.meta.env.VITE_API_URL;
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
   const [botonHover, setBotonHover] = useState(false); 
 
-  // OPCIONES para el Radio Button
+
   const opcionesReporte = [
     { value: "vencidas", label: "Tareas Vencidas" },
     { value: "proximas", label: "Próximas a Vencer" },
@@ -50,7 +50,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     { value: "modificaciones", label: "Historial de Modificaciones" } 
   ];
 
-  // OPCIONES para el Selector de Método
+
   const opcionesMetodo = [
     { value: "ninguno", label: "Seleccionar Filtro de Tiempo" }, 
     { value: "rango", label: "Por Rango de Fechas" },
@@ -75,7 +75,7 @@ const API_URL = import.meta.env.VITE_API_URL;
   React.useEffect(() => {
     const handleClickOutside = (event) => {
       if (selectRef.current && !selectRef.current.contains(event.target)) {
-        // Lógica de clic fuera
+   
       }
     };
 
@@ -85,28 +85,22 @@ const API_URL = import.meta.env.VITE_API_URL;
     };
   }, []);
 
-
-    // 💡 NUEVO useEffect para manejar la advertencia de recarga/cierre
     React.useEffect(() => {
         const handleBeforeUnload = (event) => {
             if (cargando) {
-                // El navegador mostrará un mensaje genérico para evitar que el usuario pierda el trabajo
                 event.preventDefault();
-                event.returnValue = ''; // Necesario para navegadores antiguos/compatibilidad
+                event.returnValue = '';
                 return '¿Estás seguro de que quieres salir? Se perderá el progreso de la generación del PDF.';
             }
         };
 
-        // Si la carga está activa, añadimos el listener
         if (cargando) {
             window.addEventListener('beforeunload', handleBeforeUnload);
         }
-
-        // Función de limpieza: eliminamos el listener al desmontar o si cargando es false
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
         };
-    }, [cargando]); // Dependencia: se ejecuta cada vez que 'cargando' cambia
+    }, [cargando]); 
   
   const limpiarFiltrosFecha = () => {
     setFechaInicio(null);
@@ -116,7 +110,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     setErrores({});
   };
   
-  // FUNCIÓN PARA LIMPIAR TODO Y CANCELAR SI ES NECESARIO
   const limpiarYCancelar = () => {
     if (cargando && abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -141,7 +134,6 @@ const API_URL = import.meta.env.VITE_API_URL;
     setMostrarVisor(false);
   };
 
-  // Función de cambio para los rangos de fecha
   const handleRangoFechaChange = (setter, key) => (date) => {
     setter(date);
     setErrores(prev => ({ ...prev, [key]: undefined })); 
@@ -495,14 +487,13 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
             </div>
           )}
 
-          {/* SECCIÓN 5: BOTONES */}
           <div className="reportes-seccion p-3">
             <div className="d-flex flex-column flex-md-row justify-content-center gap-3">
               <button 
                 type="button"
            
                 onClick={limpiarYCancelar} 
-                className={cargando ? "btn btn-primary btn-md-custom px-4 py-2" : "btn btn-secondary btn-md-custom px-4 py-2"}
+                className={cargando ? "btn mi-boton-cancelar btn-md-custom px-4 py-2" : "btn btn-secondary btn-md-custom px-4 py-2"}
                 disabled={false}
                 style={{ position: 'relative', zIndex: 5 }}
               >

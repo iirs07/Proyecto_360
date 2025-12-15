@@ -9,7 +9,7 @@
    </table>
     <div class="rd-header-center">
         <div class="rd-titulo">H. Ayuntamiento de Minatitlán, Ver.</div>
-        <div class="rd-subtitulo">Sistema de Gestión de Tareas</div>
+        <div class="rd-subtitulo">Sistema de Gestión de Proyectos</div>
         <div class="rd-subtitulo">
     Departamento: {{ ucwords(strtolower($usuario['departamento'] ?? '')) }}
 </div>
