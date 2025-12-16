@@ -4,7 +4,6 @@
   position: relative;
 }
 
-/* === Sección de bienvenida === */
 .tdu-seccion-bienvenida {
   background: linear-gradient(135deg, #861542 0%, #a02a5e 100%);
   border-radius: 16px;
@@ -15,6 +14,9 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 8px 32px rgba(134, 21, 66, 0.2);
+}
+.tdu-departamento {
+  text-transform: uppercase;
 }
 
 .tdu-bienvenida-content h1 {

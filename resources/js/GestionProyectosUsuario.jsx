@@ -85,7 +85,7 @@ function GestionProyectosUsuario() {
   useAuthGuard();
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
-  
+  const [departamento, setDepartamento] = useState(null);
   const [proyectos, setProyectos] = useState([]);
   const [conteos, setConteos] = useState({
     completadas: 0,
@@ -132,9 +132,11 @@ function GestionProyectosUsuario() {
       const data = await res.json();
       const proyectosAPI = data.proyectos || [];
       const conteosAPI = data.conteos || {};
+      const departamentoAPI = data.departamento || null;
 
       setProyectos(proyectosAPI);
       setConteos(conteosAPI);
+      setDepartamento(departamentoAPI);
     } catch (error) {
       console.error("Error al obtener datos:", error);
     } finally {
@@ -196,6 +198,9 @@ function GestionProyectosUsuario() {
         <div className="tdu-seccion-bienvenida">
           <div className="tdu-bienvenida-content">
             <h1>¡HOLA, {usuario?.nombre || "Usuario"}!</h1>
+            <p>
+    Depto. <strong className="tdu-departamento">{departamento?.d_nombre || "—"}</strong>
+  </p>
             <p>Resumen de proyectos y tareas</p>
           </div>
           <div className="tdu-bienvenido-stats">

@@ -99,6 +99,9 @@ public function ListaDeTareas($idProyecto)
         )
         ->where('id_departamento', $departamentoId)
         ->get();
+        $departamento = \DB::table('c_departamento')
+    ->where('id_departamento', $departamentoId)
+    ->first();
 
     $proyectosIds = $proyectos->pluck('id_proyecto');
 
@@ -129,6 +132,7 @@ public function ListaDeTareas($idProyecto)
     });
 
     return response()->json([
+        'departamento' => $departamento, 
         'proyectos' => $proyectos,
         'tareas' => $tareas,
         'conteos' => $conteos,

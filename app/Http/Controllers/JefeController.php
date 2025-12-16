@@ -105,11 +105,26 @@ public function obtenerTareasPendientes($idProyecto, $idUsuario)
 // METODO QUE DEVELVE EL NUMERO DE TAREAS Y DATOS DEL PROYECTO DE UN USUARIO
 public function tareasPorUsuario(Request $request)
 {
-    $usuarioId = $request->query('usuario');
+   $usuarioId = $request->query('usuario');
 
     if (!$usuarioId) {
         return response()->json(['error' => 'Usuario no especificado'], 400);
     }
+
+    // Obtener usuario
+    $usuario = \DB::table('c_usuario')
+        ->where('id_usuario', $usuarioId)
+        ->first();
+
+    if (!$usuario) {
+        return response()->json(['error' => 'Usuario no encontrado'], 404);
+    }
+
+    // Obtener departamento
+    $departamento = \DB::table('c_departamento')
+        ->where('id_departamento', $usuario->id_departamento)
+        ->select('id_departamento', 'd_nombre')
+        ->first();
     
     $proyectos = \DB::table('tareas')
         ->join('proyectos', 'tareas.id_proyecto', '=', 'proyectos.id_proyecto')
@@ -144,6 +159,7 @@ public function tareasPorUsuario(Request $request)
     ];
 
     return response()->json([
+        'departamento' => $departamento,
         'proyectos' => $proyectos,
         'conteos' => $conteos
     ]);

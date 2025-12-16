@@ -5,6 +5,12 @@
   color: #333;
   overflow: hidden;
 }
+.tdj-departamento {
+  color: white;
+  align-items: center;
+  text-transform: uppercase;
+}
+
 
 .tdj-form-titulo {
   text-align: center;

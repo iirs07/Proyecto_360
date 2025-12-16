@@ -17,7 +17,10 @@ VALUES (1, 'Sofia', 'Romay', 'Hernandez', '2281234567', NOW(), NOW());
 
 INSERT INTO usuario (id_usuario_login, rol, correo, contrasena, created_at, updated_at)
 VALUES (1, 'Jefe', 'sofiahromay@gmail.com', '$2y$12$1jGasv5F9cZQIJmVmekVjeS72nVFeHXKI660/8NJFsKgS6MvsvMzK', NOW(), NOW());
-
+INSERT INTO c_usuario (id_departamento, u_nombre, a_paterno, a_materno, telefono, created_at, updated_at)
+VALUES (2, 'Coral', 'Hernandez', 'Romay', '2299876543', NOW(), NOW());
+INSERT INTO usuario (id_usuario_login, rol, correo, contrasena, created_at, updated_at)
+VALUES (2, 'Jefe', 'coralsofia2003@outlook.com', '$2y$12$1jGasv5F9cZQIJmVmekVjeS72nVFeHXKI660/8NJFsKgS6MvsvMzK', NOW(), NOW());
 INSERT INTO invitaciones (token, rol, id_departamento, creado_por, max_usuarios, usuarios_registrados, usado, creado_en, expira_en)
 VALUES ('TOKEN_SUPERUSER', 'Superusuario', 1, 1, 1, 0, false, NOW(), NOW() + INTERVAL '7 days');
 INSERT INTO c_usuario (id_departamento, u_nombre, a_paterno, a_materno, telefono, created_at, updated_at)
@@ -36,6 +39,8 @@ VALUES (2, 'Usuario', 'coralsofia2003@outlook.com', '$2y$12$bMpsNd977xM.R0rNKPXK
 
 -- Dar permisos de lectura/escritura sobre todas las tablas
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO proyecto360_user;
+GRANT ALL ON SCHEMA public TO proyecto360_user;
+
 
 -- Dar permisos sobre todas las secuencias (para los SERIAL/IDs)
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO proyecto360_user;

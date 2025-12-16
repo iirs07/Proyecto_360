@@ -100,6 +100,8 @@ function GestionProyectos() {
   const [usuario, setUsuario] = useState(null);
   const [loadingInicial, setLoadingInicial] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
+  const [departamento, setDepartamento] = useState(null);
+
   
 
   const agregarTarea = (idProyecto, nombreProyecto) => {
@@ -128,11 +130,7 @@ if (!token || !usuario?.id_usuario) {
   navigate("/Login", { replace: true });
   return;
 }
-
-
     try {
-      
-
       const res = await fetch(
         `${API_URL}/api/dashboard-departamento?usuario=${usuario.id_usuario}`,
         {
@@ -151,6 +149,9 @@ if (!token || !usuario?.id_usuario) {
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
+      if (data.departamento) {
+  setDepartamento(data.departamento);
+}
 
       if (data) {
         const completadas = (data.tareas || []).filter(
@@ -360,6 +361,11 @@ if (!token || !usuario?.id_usuario) {
         <div className="tdu-seccion-bienvenida">
           <div className="tdu-bienvenida-content">
             <h1>¡HOLA, {usuario?.nombre || "Usuario"}!</h1>
+            {departamento?.d_nombre && (
+    <p className="tdj-departamento">
+      Depto. <strong>{departamento.d_nombre}</strong>
+    </p>
+  )}
             <p>Resumen de proyectos y tareas</p>
           </div>
         </div>
