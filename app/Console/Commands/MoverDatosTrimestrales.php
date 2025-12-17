@@ -52,7 +52,6 @@ class MoverDatosTrimestrales extends Command
         DB::transaction(function () use ($dbPrincipal, $dbCopia, $fecha_inicio, $fecha_fin, $proyectos, $proyectosIds, $listaEvidencias) {
 
             // A) Sincronizar tablas maestras (Usuarios, Areas, etc.)
-            // ... (Tu código existente de tablas maestras va aquí) ...
             $tablasMaestras = ['c_areas' => 'id', 'c_departamento' => 'id_departamento', 'c_usuario' => 'id_usuario', 'usuario' => 'id_usuario'];
             foreach ($tablasMaestras as $tabla => $pk) {
                 $datos = $dbPrincipal->table($tabla)->get();
@@ -84,7 +83,7 @@ class MoverDatosTrimestrales extends Command
             // Copiar Historial
             $historial = $dbPrincipal->table('historial_modificaciones')->whereIn('id_proyecto', $proyectosIds)->get();
             foreach ($historial as $fila) {
-                // Ajusta 'id_historial' si tu PK es diferente
+   
                 $dbCopia->table('historial_modificaciones')->updateOrInsert(['id_historial' => $fila->id_historial], (array)$fila);
             }
 

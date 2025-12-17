@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('tareas:revisar')
-    ->dailyAt('11:00')
+    ->dailyAt('01:35')
     ->withoutOverlapping()
     ->appendOutputTo(storage_path('logs/tareas-command.log'));
 

@@ -19,9 +19,9 @@ class RevisarTareas extends Command
         // tu código original NO la detectaría hasta pasados 2 días.
         $ahora = Carbon::now();
 
-        $tareasVencidas = Tarea::with('usuarioLogin') // Optimización de rendimiento
+        $tareasVencidas = Tarea::with('usuarioLogin') 
             ->where('tf_fin', '<', $ahora)
-            ->where('t_estatus', 'Pendiente') // Sigue pendiente aunque ya venció
+            ->where('t_estatus', 'Pendiente') 
             ->get();
 
         $contador = 0;
@@ -30,8 +30,7 @@ class RevisarTareas extends Command
             $usuario = $tarea->usuarioLogin;
 
             if ($usuario && $usuario->correo) {
-                // Aquí NO cambiamos el estatus a 'vencida' ni usamos un booleano 'notificada'.
-                // Al dejarla 'pendiente', mañana el comando la volverá a encontrar y enviará otro correo.
+                
                 
                 try {
                     $usuario->notify(new TareaVencida($tarea));

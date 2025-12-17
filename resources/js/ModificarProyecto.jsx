@@ -13,6 +13,7 @@ import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
 import ErrorMensaje from "../components/ErrorMensaje";
 import ConfirmModal from "../components/ConfirmModal";
+import { parseISO } from "date-fns";
 
 registerLocale("es", es);
 
@@ -86,8 +87,8 @@ const API_URL = import.meta.env.VITE_API_URL;
         .then(res => res.ok ? res.json() : Promise.reject("Error al cargar"))
         .then(data => {
           const proyecto = data.proyecto;
-          const inicio = proyecto.pf_inicio ? new Date(proyecto.pf_inicio) : null;
-          const fin = proyecto.pf_fin ? new Date(proyecto.pf_fin) : null;
+          const inicio = proyecto.pf_inicio ? parseISO(proyecto.pf_inicio) : null;
+const fin = proyecto.pf_fin ? parseISO(proyecto.pf_fin) : null;
 
           setDatosOriginales({ ...proyecto, pf_inicio: inicio, pf_fin: fin });
 

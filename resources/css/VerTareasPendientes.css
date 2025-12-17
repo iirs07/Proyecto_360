@@ -144,6 +144,9 @@
   margin: 0 0 16px 0;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+   overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;
 }
 
 .vtp-tarea-descripcion,

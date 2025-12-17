@@ -228,7 +228,7 @@ function TareasFinalizadas() {
 
                                     return (
                                         <div key={proyecto.id_proyecto} className="tf-proyecto-card">
-                                            {/* HEADER DEL PROYECTO */}
+                                           
                                           <div className="tf-proyecto-header">
     <div className="tf-proyecto-info">
         <h3 className="tf-proyecto-nombre">{proyecto.p_nombre}</h3>
@@ -243,7 +243,7 @@ function TareasFinalizadas() {
 </div>
 
 
-                                            {/* LISTA DE TAREAS */}
+                                          
                                             <div className="tf-tareas-lista">
                                                 {tareas.map((tarea) => {
                                                     const fechaCompletada = getFechaCompletada(tarea.tf_fin || tarea.fechaFinalizacion);

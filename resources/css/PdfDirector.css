@@ -21,12 +21,18 @@
         font-weight: bold;
         color: #861542;
         margin-bottom: 5px;
+         overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;
     }
 
     .rd-header-center .rd-subtitulo {
         font-size: 14px;
         font-weight: bold;
         margin: 2px 0;
+         overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;
     }
 
     .rd-divider {

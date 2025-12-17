@@ -177,15 +177,21 @@
 .tu-tarea-titulo-container {
   flex: 1;
   min-width: 0;
+  overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;  
 }
 
 .tu-tarea-nombre {
-   font-size: 1.2rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1f2937;
   line-height: 1.2;
   text-transform: uppercase;
   letter-spacing: -0.01em;
+  overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;    
 }
 
 .tu-tarea-badges {
@@ -364,13 +370,13 @@
 
 .tu-modal-content-preview {
   display: flex;
-  flex-direction: column; /* Apila: Header, Body, Footer */
-  max-height: 90vh;       /* Altura máxima de la ventana */
+  flex-direction: column; 
+  max-height: 90vh;       
   width: 100%;
   max-width: 600px;
   background: #fff;
   border-radius: 16px;
-  overflow: hidden;       /* Mantiene todo dentro de los bordes redondos */
+  overflow: hidden;       
 }
 
 /* Header Limpio */
@@ -438,7 +444,9 @@
   text-align: center;
   padding: 0 1.5rem;        
   width: 100%;              
-  overflow-wrap: break-word; 
+  overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;  
 }
 
 /* Footer de Botones */

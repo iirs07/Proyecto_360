@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../css/global.css";
 import "../css/ListaDeTareas.css";
 import logo3 from "../imagenes/logo3.png";
+import { useAutoRefresh } from "../hooks/useAutoRefresh";
 import {
     FaSearch,
     FaCalendarAlt,
@@ -24,7 +25,6 @@ import EmptyState from "../components/EmptyState";
 import SelectDinamico from "../components/SelectDinamico";
 import { useLocation } from "react-router-dom";
 
-// Color principal del header de la app
 const PRIMARY_COLOR = "#861542";
 const PRIMARY_LIGHT_BG = "#fef0f8";
 
@@ -44,7 +44,7 @@ const calcularDiasRestantes = (fechaFin) => {
     const fin = new Date(fechaFin);
     hoy.setHours(0, 0, 0, 0);
     fin.setHours(0, 0, 0, 0);
-    return Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+    return Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24))+1;
 };
 
 /**
@@ -125,44 +125,52 @@ function ListaDeTareasProyecto() {
     const [nombreProyecto, setNombreProyecto] = useState("");
     const location = useLocation();
  const API_URL = import.meta.env.VITE_API_URL;
-    useEffect(() => {
-        const cargarTareas = async () => {
-            let idProyecto = location.state?.id_proyecto || sessionStorage.getItem("id_proyecto");
-            if (idProyecto) sessionStorage.setItem("id_proyecto", idProyecto);
+   // 1. Modifica cargarTareas para aceptar un parámetro opcional
+const cargarTareas = async (sinLoading = false) => {
+    let idProyecto = location.state?.id_proyecto || sessionStorage.getItem("id_proyecto");
+    if (idProyecto) sessionStorage.setItem("id_proyecto", idProyecto);
 
-            const token = sessionStorage.getItem("jwt_token");
-            if (!idProyecto || !token) {
-                setLoading(false);
-                return;
-            }
+    const token = sessionStorage.getItem("jwt_token");
+    if (!idProyecto || !token) {
+        if (!sinLoading) setLoading(false);
+        return;
+    }
 
-            setLoading(true);
-            try {
-               const res = await fetch(
-  `${API_URL}/api/proyectos/${idProyecto}/lista-tareas`,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                const data = await res.json();
-                if (res.ok && data.tareas) {
-                    setTareas(data.tareas);
-                    setNombreProyecto(data.tareas[0]?.proyectoNombre || "Proyecto");
-                } else {
-                    setTareas([]);
-                }
-            } catch (err) {
-                console.error(err);
-                setTareas([]);
-            } finally {
-                setLoading(false);
+    if (!sinLoading) setLoading(true); // solo activa loading si no es refresco
+
+    try {
+        const res = await fetch(
+            `${API_URL}/api/proyectos/${idProyecto}/lista-tareas`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
             }
-        };
-        cargarTareas();
-    }, [location.state]);
+        );
+        const data = await res.json();
+        if (res.ok && data.tareas) {
+            setTareas(data.tareas);
+            setNombreProyecto(data.tareas[0]?.proyectoNombre || "Proyecto");
+        } else {
+            setTareas([]);
+        }
+    } catch (err) {
+        console.error(err);
+        setTareas([]);
+    } finally {
+        if (!sinLoading) setLoading(false);
+    }
+};
+
+// 2. Llamada inicial (con loading)
+useEffect(() => {
+    cargarTareas();
+}, [location.state]);
+
+// 3. Auto-refresh cada 5 segundos sin mostrar loading
+useAutoRefresh(() => cargarTareas(true), 5000);
+
 
     const getTextoDiasRestantes = (dias) => {
         if (dias === Infinity || dias === undefined) return "Sin fecha";
@@ -334,8 +342,8 @@ function ListaDeTareasProyecto() {
                                                         className="ltp-tarea-header"
                                                         onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
                                                     >
-                                                        {/* ÍCONO DE ESTADO */}
-                                                        <div className="ltp-tarea-estado-container">
+                                        
+                                    <div className="ltp-tarea-estado-container">
                                                             <div
                                                                 className="ltp-tarea-estado-indicador"
                                                                 style={{ 
@@ -419,10 +427,10 @@ function ListaDeTareasProyecto() {
                                                                                     : "Fecha de finalización"}
                                                                             </p>
                                                                             <div className="ltp-fecha-detalle">
-                                                                                <p className="ltp-detalle-value">
-                                                                                    {tarea.fechaFormateada}
-                                                                                </p>
-                                                                            </div>
+    <p className="ltp-detalle-value">
+        {tarea.tf_fin || "—"}
+    </p>
+</div>
                                                                         </div>
                                                                     </div>
 

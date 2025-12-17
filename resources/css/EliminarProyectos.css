@@ -183,6 +183,9 @@
   line-height: 1.2;
   text-transform: uppercase;
   text-align: left;
+  overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;
 
 }
 

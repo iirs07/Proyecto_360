@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react"; // 1. Importar useCallback
+import React, { useState, useEffect, useRef, useCallback } from "react"; 
 import { FaBars, FaUpload, FaClock, FaExclamationTriangle, FaFileAlt, FaCalendarDay, FaAngleDown } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaClipboardCheck } from "react-icons/fa";
@@ -9,7 +9,7 @@ import "../css/TareasAsignadas.css";
 import SelectDinamico from "../components/SelectDinamico";
 import Layout from "../components/Layout";
 import MenuDinamico from "../components/MenuDinamico";
-import { useAutoRefresh } from "../hooks/useAutoRefresh"; // 2. Importar el hook
+import { useAutoRefresh } from "../hooks/useAutoRefresh"; 
 
 function TareasAsignadas() {
   const [subiendo, setSubiendo] = useState(false);
@@ -106,14 +106,20 @@ function TareasAsignadas() {
   }, 5000);
 
 
-  const getUrgenciaTarea = (fechaFin) => {
-    const ahora = new Date();
-    const fin = new Date(fechaFin);
+ const getUrgenciaTarea = (fechaFin) => {
+  const ahora = new Date();
+  const [año, mes, dia] = fechaFin.split('-');
+  const fin = new Date(año, mes - 1, dia, 23, 59, 59);
 
-    if (fin < ahora) return { nivel: "vencida", icono: <FaExclamationTriangle />, texto: "Vencida" };
-    if (fin.toDateString() === ahora.toDateString()) return { nivel: "venceHoy", icono: <FaClock />, texto: "Vence hoy" };
-    return { nivel: "proxima", icono: <FaClock />, texto: "Próxima a vencer" };
-  };
+  if (fin < ahora) return { nivel: "vencida", icono: <FaExclamationTriangle />, texto: "Vencida" };
+  const finHoy = new Date(año, mes - 1, dia, 23, 59, 59);
+  if (ahora <= finHoy && ahora >= new Date(año, mes - 1, dia, 0, 0, 0)) {
+    return { nivel: "venceHoy", icono: <FaClock />, texto: "Vence hoy" };
+  }
+
+  return { nivel: "proxima", icono: <FaClock />, texto: "Próxima a vencer" };
+};
+
 
   const getEstadoTarea = (estatus) => {
     switch (estatus) {
@@ -246,7 +252,11 @@ function TareasAsignadas() {
                 <div className="tu-tarea-detalles">
                   <div className="tu-detalle-item">
                     <FaCalendarDay className="tu-detalle-icon" />
-                    <span className="tu-detalle-texto">Vence: <strong>{new Date(tarea.tf_fin).toLocaleDateString('es-ES')}</strong></span>
+                   {(() => {
+  const [año, mes, dia] = tarea.tf_fin.split('-');
+  const fin = new Date(año, mes-1, dia); 
+  return <span className="tu-detalle-texto">Vence: <strong>{fin.toLocaleDateString('es-ES')}</strong></span>;
+})()}
                   </div>
                   <div className="tu-detalle-item">
                     <FaFileAlt className="tu-detalle-icon" />

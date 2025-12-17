@@ -49,6 +49,9 @@
     max-width: 100%;
     text-transform: uppercase;
     color: #000000;
+     overflow-wrap: break-word;  
+  word-wrap: break-word;      
+  word-break: break-word;
 }
 
 .tp-proyecto-meta {
