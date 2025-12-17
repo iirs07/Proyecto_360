@@ -418,9 +418,9 @@ export default function DepProProceso() {
                                             </div>
                                         ) : (
                                             <div className="proyecto-proceso-sin-tareas">
-                                                <FaTasks className="sin-tareas-mini-icon" />
-                                                <span>Sin tareas asignadas</span>
-                                            </div>
+                                            <FaTasks className="sin-tareas-mini-icon" />
+                                            <span>Sin tareas asignadas</span>
+                                        </div>
                                         )}
                                     </div>
                                 </div>

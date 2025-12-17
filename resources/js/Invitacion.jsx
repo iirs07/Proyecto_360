@@ -346,10 +346,10 @@ function Invitacion() {
                 method: "POST",
                 headers,
                 body: JSON.stringify({
-                    rol: 'Usuario', // Forzamos rol Usuario para Jefes
-                    id_departamento: idDepartamento, // Departamento SELECCIONADO del área
-                    creado_por: creadoPorId, // *** CORREGIDO: USAMOS EL ID REAL DEL JEFE LOGUEADO ***
-                    max_usos: finalCantidad // Usamos la cantidad validada
+                    rol: 'Usuario',
+                    id_departamento: idDepartamento, 
+                    creado_por: creadoPorId, 
+                    max_usos: finalCantidad 
                 })
             });
 
