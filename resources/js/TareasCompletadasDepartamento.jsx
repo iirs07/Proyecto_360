@@ -229,19 +229,19 @@ function TareasFinalizadas() {
                                     return (
                                         <div key={proyecto.id_proyecto} className="tf-proyecto-card">
                                             {/* HEADER DEL PROYECTO */}
-                                            <div className="tf-proyecto-header" >
-                                                <div className="tf-proyecto-info">
-                                                    <h3 className="tf-proyecto-nombre">{proyecto.p_nombre}</h3>
-                                                    <div className="tf-proyecto-meta">
-                                                        <div className="tf-proyecto-meta-icon" >
-                                                            <FaListUl />
-                                                        </div>
-                                                        <span className="tf-proyecto-tareas-count" >
-                                                            {tareas.length} {tareas.length === 1 ? "tarea finalizada" : "tareas finalizadas"}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                          <div className="tf-proyecto-header">
+    <div className="tf-proyecto-info">
+        <h3 className="tf-proyecto-nombre">{proyecto.p_nombre}</h3>
+
+        <div className="tf-proyecto-meta">
+            <span className="tf-proyecto-tareas-count">
+                <FaListUl className="tf-proyecto-tareas-icon" />
+               {proyecto.tareas_finalizadas} finalizadas / {proyecto.total_tareas} tareas
+            </span>
+        </div>
+    </div>
+</div>
+
 
                                             {/* LISTA DE TAREAS */}
                                             <div className="tf-tareas-lista">

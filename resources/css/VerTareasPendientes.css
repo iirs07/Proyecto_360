@@ -1,9 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-.vtp-lista-tareas {
-  width: 900px;
+/* ==============================
+   CONTENEDORES PRINCIPALES
+============================== */
+.vtp-lista-tareas,
+.vtp-lista-tareas-container {
+  width: 100%;
+  max-width: 900px;
   margin: 1rem auto;
   padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 3;
+  position: relative;
 }
 
 .vtp-titulo-proyecto {
@@ -11,126 +19,111 @@
   margin: 1rem auto 30px;
   padding: 0 20px;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
+/* ==============================
+   LABELS Y NOMBRE DE PROYECTO
+============================== */
 .vtp-label-proyecto {
   font-size: 0.8rem;
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 700;
-  font-family: 'Poppins', sans-serif;
   display: block;
   margin-bottom: 5px;
   text-align: center;
 }
 
+.vtp-nombre-proyecto {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.6;
+  margin: 0;
+  text-align: left;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* ==============================
+   BANNER PROYECTO
+============================== */
 .vtp-header-proyecto-banner {
-    background: #861542 ;
-     border-radius: 0 0 20px 20px;
-    padding: 3rem; 
-    margin-bottom: 2.5rem;
-    position: relative;
-    z-index: 3;
-    overflow: hidden; 
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    justify-content: center;
-    box-shadow: 0 15px 35px -5px rgba(134, 21, 66, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #861542;
+  border-radius: 0 0 20px 20px;
+  padding: 3rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  box-shadow: 0 15px 35px -5px rgba(134, 21, 66, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .vtp-banner-content {
-    max-width: 95%; 
-    z-index: 2;
-    position: relative;
+  max-width: 95%;
+  z-index: 2;
+  position: relative;
 }
 
 .vtp-badge-estado {
-    display: inline-flex;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.15); 
-    backdrop-filter: blur(8px);
-    padding: 6px 14px;
-    border-radius: 30px; 
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-bottom: 1.5rem; 
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: white;
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
 }
 
 .vtp-dot-indicador {
-    height: 8px;
-    width: 8px;
-    background-color: #4ade80; 
-    border-radius: 50%;
-    margin-right: 10px;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+  height: 8px;
+  width: 8px;
+  background-color: #4ade80;
+  border-radius: 50%;
+  margin-right: 10px;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
 }
 
-.vtp-nombre-proyecto {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    line-height: 1.6; 
-    
-    margin: 0;
-    text-align: left;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Sombra suave para legibilidad */
-}
-
-/* DECORACIÓN SUTIL */
-/* Círculo grande suave a la derecha */
+/* DECORACIÓN SUTIL DEL BANNER */
 .vtp-banner-deco {
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 70%);
-    border-radius: 50%;
-    z-index: 1;
-    pointer-events: none;
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0) 70%);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
 }
 
-/* AJUSTE RESPONSIVE */
-@media (max-width: 768px) {
-    .vtp-header-proyecto-banner {
-        padding: 2rem;
-        border-radius: 16px;
-    }
-    .vtp-nombre-proyecto {
-        font-size: 1.25rem;
-        line-height: 1.5;
-    }
-}
-
-.vtp-lista-tareas-container {
-  margin: 0 auto;   
-  width: 100%;
-}
-
-
-
-
-
+/* ==============================
+   ITEMS DE TAREA
+============================== */
 .vtp-item-tarea {
   background: white;
   border: 1px solid #e2e8f0;
-  border-left: 4px solid #FFC107;
+  border-left: 6px solid #f1c40f;
   border-radius: 12px;
   padding: 24px;
   margin: 0 auto 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
-  z-index: 3;
   position: relative;
 }
 
@@ -139,7 +132,6 @@
   transform: translateY(-1px);
 }
 
-/* HEADER SIMPLE Y CLARO */
 .vtp-tarea-header {
   margin-bottom: 20px;
 }
@@ -154,7 +146,8 @@
   letter-spacing: -0.01em;
 }
 
-.vtp-tarea-descripcion {
+.vtp-tarea-descripcion,
+.descripcion-tarea {
   margin: 0;
   padding: 16px 20px;
   background: #f8fafc;
@@ -165,24 +158,35 @@
   font-size: 0.85rem;
   font-weight: 500;
   line-height: 1.6;
-  text-wrap: pretty;
   text-transform: uppercase;
-}
-.descripcion-tarea {
-  text-transform: uppercase; 
-  font-size: 13px;          
-  letter-spacing: 0.8px;    
-  line-height: 1.6;        
-  color: #555555;        
-  font-weight: 500;       
+  letter-spacing: 0.8px;
 }
 
-/* ACCIONES - MEJOR ESTRUCTURADO */
+/* ==============================
+   ACCIONES DE TAREA
+============================== */
 .vtp-acciones-tarea {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.vtp-subido-por {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.vtp-icono-usuario {
+  color: #861542;
+  font-size: 20px;
 }
 
 .vtp-accion-finalizar {
@@ -195,11 +199,10 @@
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   transition: all 0.3s ease;
-  width: fit-content;
 }
 
 .vtp-accion-finalizar:hover {
-  border-color: #FFC107;
+  border-color: #f1c40f;
   background: #fffdf5;
 }
 
@@ -218,7 +221,9 @@
   margin: 0;
 }
 
-/* FOOTER ORGANIZADO EN UNA LÍNEA */
+/* ==============================
+   FOOTER DE TAREA
+============================== */
 .vtp-tarea-footer {
   display: flex;
   justify-content: space-between;
@@ -226,6 +231,7 @@
   padding-top: 16px;
   border-top: 1px solid #f1f5f9;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .vtp-info-adicional {
@@ -235,7 +241,6 @@
   flex-wrap: wrap;
 }
 
-/* BADGE SIMPLE */
 .vtp-badge-estatus {
   padding: 6px 12px;
   border-radius: 16px;
@@ -243,22 +248,12 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.vtp-badge-estatus.en-proceso {
-  background: #FFC107;
-  color: #422006;
-}
-
-.vtp-badge-estatus.pendiente {
-  background: #94a3b8;
   color: white;
 }
 
-.vtp-badge-estatus.finalizada {
-  background: #10b981;
-  color: white;
-}
+.vtp-badge-estatus.en-proceso { background-color: #f1c40f; }
+.vtp-badge-estatus.pendiente { background-color: #94a3b8; }
+.vtp-badge-estatus.finalizada { background-color: #10b981; }
 
 .vtp-fecha-limpia {
   display: flex;
@@ -273,12 +268,9 @@
   border: 1px solid #e2e8f0;
 }
 
-.vtp-icono-fecha {
-  color: #FFC107;
-  font-size: 0.9rem;
-}
+.vtp-icono-fecha { color: #FFC107; font-size: 0.9rem; }
 
-/* BOTÓN EVIDENCIAS CLARO */
+/* BOTÓN EVIDENCIAS */
 .vtp-btn-evidencias {
   background: #861542;
   color: white;
@@ -289,7 +281,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -311,70 +302,9 @@
   text-align: center;
 }
 
-/* RESPONSIVE MEJORADO */
-@media (max-width: 768px) {
-  .vtp-lista-tareas {
-    padding: 0 15px;
-  }
-  
-  .vtp-titulo-proyecto {
-    padding: 0 15px;
-    margin-bottom: 20px;
-  }
-  
-  .vtp-nombre-proyecto {
-    font-size: 1.5rem;
-  }
-  
-  .vtp-item-tarea {
-    padding: 20px;
-    margin-bottom: 16px;
-  }
-  
-  .vtp-tarea-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .vtp-info-adicional {
-    justify-content: space-between;
-    width: 100%;
-  }
-  
-  .vtp-btn-evidencias {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .vtp-accion-finalizar {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .vtp-tarea-nombre {
-    font-size: 1.1rem;
-  }
-  
-  .vtp-info-adicional {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .vtp-tarea-descripcion {
-    padding: 12px;
-    font-size: 0.85rem;
-  }
-  
-  .vtp-nombre-proyecto {
-    font-size: 1.3rem;
-  }
-}
-
-/* ESTILOS PARA SIN TAREAS */
+/* ==============================
+   ESTADO VACÍO
+============================== */
 .vtp-no-tareas-mensaje {
   text-align: center;
   padding: 60px 40px;
@@ -390,14 +320,14 @@
   font-size: 1.5rem;
   font-weight: 700;
 }
-/* ==============================
-   MODAL VTP 
-============================== */
 
+/* ==============================
+   MODAL EVIDENCIAS
+============================== */
 .vtp-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75); /* Oscuridad ajustada */
+  background: rgba(0,0,0,0.75);
   backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
@@ -409,41 +339,34 @@
 
 .vtp-modal-content {
   background: white;
-  border-radius: 16px; /* Curvas más suaves (antes 12px) */
-  max-width: 900px; /* Un poco más ancho para consistencia */
+  border-radius: 16px;
+  max-width: 900px;
   width: 100%;
-  max-height: 95vh; /* Altura flexible */
-  padding: 0; /* Quitamos padding global para manejarlo por secciones */
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-height: 95vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
-/* HEADER LIMPIO */
 .vtp-modal-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: space-between; /* Alineación extremos */
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
-  background: white;
-  flex-shrink: 0;
 }
 
 .vtp-modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2d3748; 
+  color: #2d3748;
   text-transform: uppercase;
 }
 
-/* BOTÓN CERRAR*/
 .vtp-modal-cerrar {
-  position: static; 
-  background: #4a5568; 
+  background: #4a5568;
   color: white;
   border: none;
   border-radius: 50%;
@@ -452,29 +375,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
   cursor: pointer;
+  font-size: 1.2rem;
   transition: all 0.2s ease;
-  flex-shrink: 0;
 }
 
 .vtp-modal-cerrar:hover {
   background: #2d3748;
   transform: rotate(90deg);
-  color: white;
 }
 
-/* ESTATUS  */
-.vtp-modal-estatus {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  margin-left: 10px;
-}
-
-/* CUERPO */
 .vtp-evidencias-container {
   display: flex;
   flex-direction: column;
@@ -484,18 +394,9 @@
   overflow-y: auto;
 }
 
-.vtp-evidencias-navegacion {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
 .vtp-imagen-container {
   width: 100%;
-  max-height: 65vh; 
+  max-height: 65vh;
   min-height: 200px;
   background: #f8fafc;
   border-radius: 8px;
@@ -512,12 +413,11 @@
   object-fit: contain;
 }
 
-/* BOTONES NAVEGACIÓN  */
 .vtp-btn-navegacion {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.8); 
+  background: rgba(255,255,255,0.8);
   border: 1px solid #e2e8f0;
   border-radius: 50%;
   width: 40px;
@@ -537,21 +437,79 @@
 
 .vtp-btn-navegacion:hover {
   background: #fff;
-  color: #861542; 
+  color: #861542;
   transform: translateY(-50%) scale(1.1);
 }
 
-/* FOOTER INFO */
 .vtp-evidencias-info {
   margin-top: 0.5rem;
   font-size: 0.85rem;
   color: #64748b;
   text-align: center;
-  background: transparent; 
+  background: transparent;
   border: none;
 }
 
+/* ==============================
+   ANIMACIONES
+============================== */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+@media (max-width: 768px) {
+  .vtp-acciones-tarea {
+    flex-direction: column; /* apila todo vertical */
+    align-items: flex-start;
+    gap: 12px; /* espacio entre filas */
+  }
+
+  .vtp-subido-por {
+    width: 100%; /* ocupa toda la fila */
+    justify-content: flex-start;
+  }
+
+  .vtp-accion-finalizar {
+    flex-direction: column; /* checkbox y label separados */
+    align-items: flex-start;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .vtp-accion-finalizar input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .vtp-accion-finalizar label {
+    display: block; 
+    width: 100%; /* label ocupa toda la fila */
+  }
+
+  .vtp-btn-evidencias {
+    width: 100%; /* botón ocupa 100% en pantallas pequeñas */
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .vtp-accion-finalizar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .vtp-accion-finalizar label {
+    display: block;
+    width: 100%;
+    white-space: normal;
+  }
+
+  .vtp-btn-evidencias {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+

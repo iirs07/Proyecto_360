@@ -306,7 +306,6 @@ useEffect(() => {
   limpiarCampos(true);
   setCamposModificados({});
 
-  // 🔥 Solo oculta el mensaje después de 3 segundos
   timer = setTimeout(() => {
     setMostrarMensaje(false);
   }, 3000);
@@ -347,10 +346,15 @@ setCamposModificados({});
     navigate(-1);
   };
 
-  const handleInputChange = (campo) => {
-    setErrores(prev => ({ ...prev, [campo]: null }));
-    setCamposModificados(prev => ({ ...prev, [campo]: true }));
-  };
+ const handleInputChange = (campo) => {
+    // Lógica existente
+    setErrores(prev => ({ ...prev, [campo]: null }));
+    setCamposModificados(prev => ({ ...prev, [campo]: true }));
+    if (tareaGuardada) {
+      setTareaGuardada(false);
+      setMostrarMensaje(false); 
+    }
+  };
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
@@ -644,61 +648,63 @@ setCamposModificados({});
  
       <div className="agregartareas-actions-panel p-4 rounded mt-4">
 
-        <div className="d-flex flex-wrap gap-2 justify-content-center">
-         
+        <div className="d-flex flex-wrap gap-2 justify-content-center">
+          
+          {/* 1. Botón Cancelar (Siempre visible) */}
+          <button
+            type="button"
+            className="agregartareas-btn-action agregartareas-btn-cancel d-flex align-items-center justify-content-center gap-2"
+            onClick={handleCancelar}
+            disabled={loadingTarea}
+          >
+            <FaTimes />
+            Cancelar
+          </button>
 
-          <button
-            type="button"
-            className="agregartareas-btn-action agregartareas-btn-cancel d-flex align-items-center justify-content-center gap-2"
-            onClick={handleCancelar}
-            disabled={loadingTarea}
-          >
-            <FaTimes />
-            Cancelar
-          </button>
- <button
-            type="button"
-            className="agregartareas-btn-action agregartareas-btn-save d-flex align-items-center justify-content-center gap-2"
-            onClick={handleGuardar}
-            disabled={loadingTarea}
-          >
-            {loadingTarea ? (
-              <>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Guardando…
-              </>
-            ) : (
-              <>
-                <FaSave />
-                Guardar Tarea
-              </>
-            )}
-          </button>
-        </div>
+          {/* 2. Botón Guardar (Solo visible si NO se ha guardado aún) */}
+          {!tareaGuardada && (
+            <button
+              type="button"
+              className="agregartareas-btn-action agregartareas-btn-save d-flex align-items-center justify-content-center gap-2"
+              onClick={handleGuardar}
+              disabled={loadingTarea}
+            >
+              {loadingTarea ? (
+                <>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Guardando…
+                </>
+              ) : (
+                <>
+                  <FaSave />
+                  Guardar Tarea
+                </>
+              )}
+            </button>
+          )}
 
-        {tareaGuardada && !loadingTarea && (
-          <div className="mt-3 d-flex justify-content-center">
-            <button
-              type="button"
-              className="agregartareas-btn-action agregartareas-btn-list d-flex align-items-center justify-content-center gap-2"
-              onClick={() => navigate("/ListaDeTareas", { state: { id_proyecto } })}
-            >
-              <FaListAlt />
-              Ver Tareas
-            </button>
-          </div>
-        )}
+          {tareaGuardada && !loadingTarea && (
+            <button
+              type="button"
+              className="agregartareas-btn-action agregartareas-btn-list d-flex align-items-center justify-content-center gap-2"
+              onClick={() => navigate("/ListaDeTareas", { state: { id_proyecto } })}
+            >
+              <FaListAlt />
+              Ver Tareas
+            </button>
+          )}
 
-        {/* Estado del formulario */}
-        <div className="mt-4 pt-3 border-top">
-          <div className="agregartareas-form-status d-flex justify-content-between align-items-center">
-         
-            <small className="agregartareas-text-muted">
-              <span className="agregartareas-required-field me-1">*</span> Obligatorio
-            </small>
-          </div>
-        </div>
-      </div>
+        </div>
+
+        {/* Estado del formulario */}
+        <div className="mt-4 pt-3 border-top">
+          <div className="agregartareas-form-status d-flex justify-content-between align-items-center">
+            <small className="agregartareas-text-muted">
+              <span className="agregartareas-required-field me-1">*</span> Obligatorio
+            </small>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </Layout>

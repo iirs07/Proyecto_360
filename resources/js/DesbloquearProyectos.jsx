@@ -386,12 +386,18 @@ const EstadoSinProyectosActuales = () => {
         <FaSearch /> 
     </span>
     <input
-        type="text"
-        placeholder="Buscar proyectos..."
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        className="barra-busqueda-dp-input"
-    />
+    type="text"
+    placeholder="Buscar proyectos..."
+    value={busqueda}
+    onChange={(e) => setBusqueda(e.target.value)}
+    onKeyDown={(e) => {
+        if (e.key === "Enter") {
+            handleBuscarClick(); 
+        }
+    }}
+    className="barra-busqueda-dp-input"
+/>
+
     {busqueda && (
         <button className="buscador-clear-dp" onClick={() => {
             setBusqueda("");

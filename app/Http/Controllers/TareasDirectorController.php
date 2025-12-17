@@ -172,45 +172,36 @@ public function obtenerTareasProyectosJefe(Request $request)
                 
                 ->withCount('tareas') 
                 
-                ->with(['tareas' => function($q) use ($filtroTareasVisibles) {
-                    $filtroTareasVisibles($q);
-                    $q->with('evidencias');
-                }])
+               ->with(['tareas' => function($q) use ($filtroTareasVisibles) {
+    $filtroTareasVisibles($q);
+    $q->with(['evidencias', 'usuario']); // agregamos usuario
+}])
+
                 ->where('pf_fin', '>=', $inicioTrimestreActual)
                 ->get()
         );
 
-        $proyectos = $proyectos->merge(
-            \App\Models\Proyecto::on('pgsql_second')
-                ->where('id_departamento', $idDepartamento)
-                ->whereIn('p_estatus', $estadosProyecto)
-                ->whereHas('tareas', $filtroTareasVisibles)
-             
-                ->withCount('tareas')
-                
-                ->with(['tareas' => function($q) use ($filtroTareasVisibles) {
-                    $filtroTareasVisibles($q);
-                    $q->with('evidencias');
-                }])
-                ->where('pf_fin', '<', $inicioTrimestreActual)
-                ->get()
-        );
-
         $proyectos = $proyectos->map(function($proyecto) {
-            $proyecto->total_tareas = $proyecto->tareas_count;
-            $proyecto->tareas_completadas = $proyecto->tareas
-                ->filter(function($t) {
-                    return $t->t_estatus === 'Completada';
-                })->count();
+    $proyecto->total_tareas = $proyecto->tareas_count;
+    $proyecto->tareas_completadas = $proyecto->tareas
+        ->filter(fn($t) => $t->t_estatus === 'Completada')
+        ->count();
 
-            $proyecto->tareas_a_revisar = $proyecto->tareas
-                ->filter(function($t) {
-                    return $t->t_estatus === 'En proceso'
-                           && $t->evidencias->isNotEmpty();
-                })->count();
+    $proyecto->tareas_a_revisar = $proyecto->tareas
+        ->filter(fn($t) => $t->t_estatus === 'En proceso' && $t->evidencias->isNotEmpty())
+        ->count();
 
-            return $proyecto;
-        });
+    // nombre completo del usuario que subió la tarea
+    $proyecto->tareas = $proyecto->tareas->map(function($t) {
+        $t->usuario_nombre_completo = $t->usuario 
+            ? "{$t->usuario->u_nombre} {$t->usuario->a_paterno} {$t->usuario->a_materno}" 
+            : null;
+        return $t;
+    });
+
+    return $proyecto;
+});
+
 
         return response()->json([
             'success' => true,
@@ -507,57 +498,84 @@ public function tareasPendientesUsuario(Request $request)
 public function TareasCompletadasD(Request $request)
 {
     try {
-    
+        // 1️⃣ Obtener usuario
         $idUsuario = $request->query('usuario');
         if (!$idUsuario) {
-            return response()->json(['success' => false, 'mensaje' => 'No se recibió el ID de usuario'], 400);
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'No se recibió el ID de usuario'
+            ], 400);
         }
-        $usuario = DB::table('c_usuario as u')->select('u.*')->where('u.id_usuario', $idUsuario)->first();
+
+        $usuario = DB::table('c_usuario')
+            ->where('id_usuario', $idUsuario)
+            ->first();
+
         if (!$usuario) {
-            return response()->json(['success' => false, 'mensaje' => 'Usuario no encontrado'], 404);
+            return response()->json([
+                'success' => false,
+                'mensaje' => 'Usuario no encontrado'
+            ], 404);
         }
+
         $idDepartamento = $usuario->id_departamento;
 
-        $proyectos = DB::table('proyectos as p')
-            ->join('tareas as t', 'p.id_proyecto', '=', 't.id_proyecto')
-            ->join('c_departamento as d', 'p.id_departamento', '=', 'd.id_departamento') 
+        // 2️⃣ Obtener totales de tareas por proyecto
+        $totalesPorProyecto = DB::table('tareas')
             ->select(
-                'p.*',
-                'd.d_nombre as nombre_del_departamento_del_proyecto',
-                DB::raw('COUNT(t.id_tarea) as total_tareas')
+                'id_proyecto',
+                DB::raw('COUNT(*) AS total_tareas'),
+                DB::raw("COUNT(*) FILTER (WHERE TRIM(t_estatus) = 'Completada') AS tareas_finalizadas")
+            )
+            ->groupBy('id_proyecto')
+            ->get()
+            ->keyBy('id_proyecto');
+
+        // 3️⃣ Obtener SOLO tareas completadas del departamento
+        $tareas = DB::table('tareas as t')
+            ->join('proyectos as p', 't.id_proyecto', '=', 'p.id_proyecto')
+            ->join('c_usuario as u', 't.id_usuario', '=', 'u.id_usuario')
+            ->join('c_departamento as ud', 'u.id_departamento', '=', 'ud.id_departamento')
+            ->select(
+                't.*',
+                'p.id_proyecto',
+                'p.p_nombre',
+                'p.p_estatus',
+                DB::raw("u.u_nombre || ' ' || u.a_paterno || ' ' || u.a_materno AS nombre_usuario_asignado"),
+                'ud.d_nombre AS nombre_departamento_usuario_asignado'
             )
             ->where('p.id_departamento', $idDepartamento)
-            ->where('p.p_estatus', 'Finalizado')
-           ->whereRaw("TRIM(t_estatus) = ?", ['Completada'])
-            ->groupBy('p.id_proyecto', 'd.d_nombre')
+            ->whereRaw("TRIM(t.t_estatus) = ?", ['Completada'])
+            ->orderBy('p.p_nombre')
+            ->orderBy('t.t_nombre')
             ->get();
 
-        $proyectosConTareas = [];
-        foreach ($proyectos as $proyecto) {
-            
-            $tareas = DB::table('tareas as t')
-                ->join('c_usuario as u', 't.id_usuario', '=', 'u.id_usuario')
-                ->join('c_departamento as ud', 'u.id_departamento', '=', 'ud.id_departamento')
-                ->select(
-                    't.*', 
-                    DB::raw("u.u_nombre || ' ' || u.a_paterno || ' ' || u.a_materno as nombre_usuario_asignado"),
-               
-                    'ud.d_nombre as nombre_departamento_usuario_asignado' 
-                )
-                ->where('t.id_proyecto', $proyecto->id_proyecto)
-                ->whereRaw("TRIM(t_estatus) = ?", ['Completada'])
+        // 4️⃣ Agrupar tareas por proyecto
+        $proyectos = [];
 
-                ->get();
+        foreach ($tareas as $tarea) {
+            $totales = $totalesPorProyecto[$tarea->id_proyecto] ?? null;
 
-            $proyectosConTareas[] = [
-                'proyecto' => $proyecto,
-                'tareas' => $tareas
-            ];
+            if (!isset($proyectos[$tarea->id_proyecto])) {
+                $proyectos[$tarea->id_proyecto] = [
+                    'proyecto' => [
+                        'id_proyecto' => $tarea->id_proyecto,
+                        'p_nombre' => $tarea->p_nombre,
+                        'p_estatus' => $tarea->p_estatus,
+                        'total_tareas' => $totales->total_tareas ?? 0,
+                        'tareas_finalizadas' => $totales->tareas_finalizadas ?? 0,
+                    ],
+                    'tareas' => []
+                ];
+            }
+
+            $proyectos[$tarea->id_proyecto]['tareas'][] = $tarea;
         }
 
+        // 5️⃣ Respuesta final
         return response()->json([
             'success' => true,
-            'proyectos' => $proyectosConTareas
+            'proyectos' => array_values($proyectos)
         ]);
 
     } catch (\Exception $e) {
@@ -567,6 +585,8 @@ public function TareasCompletadasD(Request $request)
         ], 500);
     }
 }
+
+
 
 public function tareasCompletadasDepartamento(Request $request)
 {

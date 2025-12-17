@@ -26,6 +26,9 @@ Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
 
+Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
+    Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
+
 // ADMINISTRADOR - Gestión de departamentos y áreas
 Route::prefix('departamentos')->group(function () {
     Route::get('/', [NuevoDepartamentoController::class, 'listar']);
@@ -82,9 +85,9 @@ Route::middleware(['jwt.auth'])->group(function () {
     
     Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);
     Route::put('/tareas/{id}/completar', [TareasDirectorController::class, 'completarTarea']);
-    Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
+    
     Route::get('tareasCompletadas/jefe', [TareasDirectorController::class, 'tareasCompletadasDepartamento']);
-    Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
+
     Route::put('/tareas/{id}/cambiar-estatus-enproceso', [TareasDirectorController::class, 'cambiarStatusTareaEnProceso']);
     Route::get('/tareasPorDepartamento', [TareasDirectorController::class, 'tareasPorDepartamento']);
     Route::get('/agregar/tareas', [TareasDirectorController::class, 'AgregarTareasDepartamento']);

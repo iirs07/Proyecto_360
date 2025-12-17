@@ -271,16 +271,16 @@ function TareasPendientes() {
                                     return (
                                         <div key={proyecto.id_proyecto} className="tp-proyecto-card">
                                         
-                                            <div className="tp-proyecto-header" style={{ backgroundColor: proyectoBg }}>
+                                            <div className="tp-proyecto-header" >
                                                 <div className="tp-proyecto-info">
-                                                    <h3 className="tp-proyecto-nombre" style={{ color: proyectoColor }}>{proyecto.p_nombre}</h3>
+                                                    <h3 className="tp-proyecto-nombre">{proyecto.p_nombre}</h3>
                                                     <div className="tp-proyecto-meta">
-                                                        <div className="tp-proyecto-meta-icon" style={{ color: proyectoColor }}>
-                                                            <FaListUl />
-                                                        </div>
-                                                        <span className="tp-proyecto-tareas-count" style={{ color: proyectoColor, backgroundColor: 'rgba(134, 21, 66, 0.1)' }}>
-                                                            {tareas.length} {tareas.length === 1 ? "tarea pendiente" : "tareas pendientes"}
-                                                        </span>
+                                                       
+                                                       <div className="tp-proyecto-tareas-count-oval" style={{ backgroundColor: 'rgba(134, 21, 66, 0.1)', color: proyectoColor }}>
+  <FaListUl style={{ marginRight: '6px' }} />
+  {tareas.length} {tareas.length === 1 ? "tarea pendiente" : "tareas pendientes"}
+</div>
+
                                                     </div>
                                                 </div>
                                             </div>

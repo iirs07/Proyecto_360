@@ -8,7 +8,8 @@ import { LuClock3 } from "react-icons/lu";
 import "../css/formulario.css";
 import "../css/VerTareasPendientes.css";
 import logo3 from "../imagenes/logo3.png"; 
-import { FiX, FiCheck, FiCalendar, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FaUserCircle } from 'react-icons/fa';
+import { FiX, FiCheck, FiCalendar, FiChevronLeft, FiChevronRight,FiUser } from "react-icons/fi";
 import ConfirmModal from "../components/ConfirmModal"; 
 
 function VerTareasPendientes() {
@@ -262,22 +263,33 @@ function VerTareasPendientes() {
                   </div>
 
        
-                  <div className="vtp-acciones-tarea">
-                    {t.t_estatus !== "Completada" && (
-                      <div className="vtp-accion-finalizar">
-                        <input
-                          type="checkbox"
-                          id={`check-${t.id_tarea}`}
-                          onChange={() => abrirModalConfirmacion(t)}
-                          checked={false} 
-                          disabled={cargando}
-                        />
-                        <label htmlFor={`check-${t.id_tarea}`}>
-                          Marcar como finalizada
-                        </label>
-                      </div>
-                    )}
-                  </div>
+                <div className="vtp-acciones-tarea">
+  {t.usuario_nombre_completo && (
+    <div className="vtp-subido-por">
+      <FaUserCircle className="vtp-icono-usuario" /> 
+      <span>
+        Subido por: <strong>{t.usuario_nombre_completo}</strong>
+      </span>
+    </div>
+  )}
+
+  {t.t_estatus !== "Completada" && (
+    <div className="vtp-accion-finalizar">
+      <input
+        type="checkbox"
+        id={`check-${t.id_tarea}`}
+        onChange={() => abrirModalConfirmacion(t)}
+        checked={false}
+        disabled={cargando}
+        className="vtp-checkbox-finalizar" 
+      />
+      <label htmlFor={`check-${t.id_tarea}`} className="vtp-label-finalizar">
+        Marcar como finalizada
+      </label>
+    </div>
+  )}
+</div>
+
 
                   <div className="vtp-tarea-footer">
                     <div className="vtp-info-adicional">
@@ -336,9 +348,6 @@ function VerTareasPendientes() {
                 <h3 style={{ margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {tareaActual.t_nombre}
                 </h3>
-                <span className={`vtp-modal-estatus ${getStatusClass(tareaActual.t_estatus)}`}>
-                  {tareaActual.t_estatus}
-                </span>
               </div>
               <button className="vtp-modal-cerrar" onClick={handleCerrarModal}>
                 <FiX />
