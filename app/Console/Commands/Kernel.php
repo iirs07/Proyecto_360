@@ -24,14 +24,14 @@ class Kernel extends ConsoleKernel
     {
         \Log::info('Schedule loaded'); // Para verificar que el scheduler se carga
 
-        // Comando pesado: mover datos trimestrales, se asegura que no se solape
+        // mover datos trimestrales, se asegura que no se solape
         $schedule->command('datos:mover-trimestral')->quarterly()->withoutOverlapping();
 
-        // Comandos rápidos, pueden ejecutarse cada minuto
+        // pueden ejecutarse cada minuto
         $schedule->command('tokens:clean')->everyMinute();
         $schedule->command('invitaciones:clean')->everyMinute();
 
-        // Test, no crítico, se ejecuta cada minuto, no es necesario bloquear solapamiento
+       
         $schedule->command('test:schedule')->everyMinute();
     }
 

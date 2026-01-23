@@ -198,18 +198,18 @@ function ProyectosListaModificar() {
                   className={`pm-proyecto-card ${getBorderClase(p.p_estatus)}`}
                 >
 
-                  <div className="pm-card-header">
-                    <div className="pm-header-top">
-                      <h5 className="pm-nombre">{p.p_nombre}</h5>
+                  <div className="lp-proyecto-card-header">
+                    <div className="lp-header-top-row">
+                      <h5 className="lp-proyecto-nombre">{p.p_nombre}</h5>
 
-                      <div className="pm-status-badge">
+                      <div className="lp-proyecto-status-badge">
                         <span style={getPStatusTagStyle(p.p_estatus)}>
                           {p.p_estatus || "Sin estatus"}
                         </span>
                       </div>
                     </div>
 
-                    <p className="pm-descripcion">{p.descripcion}</p>
+                    <p className="lp-proyecto-descripcion">{p.descripcion}</p>
                   </div>
 
                   <div className="pm-info-grid">

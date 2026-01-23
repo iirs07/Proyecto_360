@@ -305,12 +305,11 @@ function TareasFinalizadas() {
                                                                 </div>
                                                             </div>
 
-                                                            {/* DETALLES EXPANDIBLES */}
                                                             {isExpanded && (
                                                                 <div className="tf-tarea-detalles-wrapper">
                                                                     <div className="tf-tarea-detalles">
                                                                         <div className="tf-detalles-grid">
-                                                                            {/* Asignado a */}
+                                                              
                                                                             <div className="tf-detalle-item">
                                                                                 <div className="tf-detalle-icono-container-column">
                                                                                     <FaUser className="tf-detalle-icono" />
@@ -321,7 +320,7 @@ function TareasFinalizadas() {
                                                                                 </div>
                                                                             </div>
 
-                                                                            {/* Fecha de finalización */}
+                                                                           
                                                                             <div className="tf-detalle-item">
                                                                                 <div className="tf-detalle-icono-container-column">
                                                                                     <FaCalendarAlt className="tf-detalle-icono" />

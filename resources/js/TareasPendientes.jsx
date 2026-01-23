@@ -287,45 +287,34 @@ function TareasPendientes() {
 
                                         
                                             <div className="tp-tareas-lista">
-                                                {tareas.map((tarea) => {
-                                                    const estado = tarea.estadoVencimiento;
-                                                    const diasRestantes = calcularDiasRestantes(tarea.tf_fin || tarea.fechaVencimiento);
-                                                    const estadoVisual = getEstadoVisual(estado);
-
-                                                    const fechaFormateada = tarea.tf_fin || tarea.fechaVencimiento
-                                                        ? new Date(tarea.tf_fin || tarea.fechaVencimiento)
-                                                            .toLocaleDateString("es-ES", {
-                                                                day: "2-digit",
-                                                                month: "2-digit",
-                                                                year: "numeric"
-                                                            })
-                                                        : "—";
-
-                                                    const isExpanded = tareaExpandida === tarea.id_tarea;
-                                                    const textoDias = getTextoDiasRestantes(diasRestantes);
-
+    {tareas.map((tarea) => {
+        const estado = tarea.estadoVencimiento;
+            const diasRestantes = calcularDiasRestantes(tarea.tf_fin || tarea.fechaVencimiento);
+            const estadoVisual = getEstadoVisual(estado);
+            const fechaFormateada = tarea.tf_fin || tarea.fechaVencimiento
+                ? new Date(tarea.tf_fin || tarea.fechaVencimiento)
+                    .toLocaleDateString("es-ES", {
+                         day: "2-digit",
+                             month: "2-digit",year: "numeric"}): "—";
+                 const isExpanded = tareaExpandida === tarea.id_tarea;
+                     const textoDias = getTextoDiasRestantes(diasRestantes);
                                                     return (
-                                                        <div
-                                                            key={tarea.id_tarea}
-                                                            className={`tp-tarea-item ${estado} ${isExpanded ? "active" : ""}`}
-                                                            style={{ borderLeftColor: estadoVisual.color }}
+                          <div
+                             key={tarea.id_tarea}
+                                 className={`tp-tarea-item ${estado} ${isExpanded ? "active" : ""}`}
+                                     style={{ borderLeftColor: estadoVisual.color }}
                                                         >
-                                                            {/* HEADER DE TAREA - CON DÍAS Y TITULO */}
                                                             <div 
-                                                                className="tp-tarea-header"
-                                                                onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
+                    className="tp-tarea-header"
+                         onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
                                                             >
-                                                                {/* ÍCONO DE ESTADO VENCIMIENTO */}
-                                                                <div className="tp-tarea-estado-container">
-                                                                    <div
-                                                                        className="tp-tarea-estado-indicador"
+                        <div className="tp-tarea-estado-container"><div
+                         className="tp-tarea-estado-indicador"
                                                                         style={{ color: estadoVisual.color, backgroundColor: estadoVisual.bgColor }}
                                                                     >
                                                                         {estadoVisual.icon}
-                                                                    </div>
+                                </div>
                                                                 </div>
-
-                                                                {/* TÍTULO Y ESTATUS */}
                                                                 <div className="tp-tarea-info-contenido">
                                                                     <div className="tp-tarea-titulo-wrapper">
                                                                         <h4 className="tp-tarea-nombre">{tarea.t_nombre}</h4>
@@ -357,37 +346,29 @@ function TareasPendientes() {
                                                                     </div>
                                                                 </div>
                                                             </div>
-
-                                               
                                              {isExpanded && (
-                                                                <div className="tp-tarea-detalles-wrapper">
+                <div className="tp-tarea-detalles-wrapper">
                                                      <div className="tp-tarea-detalles">
-                                                                        <div className="tp-detalles-grid">
-                                                                            {/* Asignado a */}
-                                                                   <div className="tp-detalle-item">
-                                                                       <div className="tp-detalle-icono-container-column">
-                                                                                    <FaUser className="tp-detalle-icono" />
-                                                                          </div>
-                                                                                <div className="tp-detalle-content">
-                                                                             <p className="tp-detalle-label">Asignado a</p>
-                                                                                    <p className="tp-detalle-value">{tarea.nombre_usuario_asignado || "No asignado"}</p>
+              <div className="tp-detalles-grid">
+                <div className="tp-detalle-item">
+                     <div className="tp-detalle-icono-container-column">
+                          <FaUser className="tp-detalle-icono" /></div>
+                            <div className="tp-detalle-content">
+                             <p className="tp-detalle-label">Asignado a</p>
+                               <p className="tp-detalle-value">{tarea.nombre_usuario_asignado || "No asignado"}</p>
+                                  </div>
+                                  </div>
+                                    <div className="tp-detalle-item">
+                                          <div className="tp-detalle-icono-container-column">
+                                             <FaCalendarAlt className="tp-detalle-icono" />
+                                           </div>
+                                            <div className="tp-detalle-content">
+                                         <p className="tp-detalle-label">Fecha de vencimiento</p>
+                                               <div className="tp-fecha-detalle">
+                                                     <p className="tp-detalle-value">{tarea.tf_fin}</p>
+                                                   </div>
                                                                                 </div>
                                                                             </div>
-
-                                    
-                                                                      <div className="tp-detalle-item">
-                                                                             <div className="tp-detalle-icono-container-column">
-                                                                                    <FaCalendarAlt className="tp-detalle-icono" />
-                                                                           </div>
-                                                                                <div className="tp-detalle-content">
-                                                                                 <p className="tp-detalle-label">Fecha de vencimiento</p>
-                                                                                    <div className="tp-fecha-detalle">
-                                                                                        <p className="tp-detalle-value">{tarea.tf_fin}</p>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-
-                                                                            {/* Departamento */}
                                                                             {tarea.nombre_departamento_usuario_asignado && (
                                                                                 <div className="tp-detalle-item">
                                                                                     <div className="tp-detalle-icono-container-column">
@@ -398,22 +379,19 @@ function TareasPendientes() {
                                                                                         <p className="tp-detalle-value">{tarea.nombre_departamento_usuario_asignado}</p>
                                                                                     </div>
                                                                                 </div>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
-                    </>
-                )}
+                         )}
+                    </div>
+             </div>
+      </div>
+       )}</div>);})}
+ </div>
+   </div>
+ );
+   })
+  )}
+</div>
+ </>
+)}
             </div>
         </Layout>
     );

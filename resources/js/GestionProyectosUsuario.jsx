@@ -194,7 +194,7 @@ function GestionProyectosUsuario() {
       sidebar={<MenuDinamico activeRoute="gestion-proyectosusuario" />}
     >
       <div className="tdu-contenido">
-        {/* === HEADER BIENVENIDA === */}
+      
         <div className="tdu-seccion-bienvenida">
           <div className="tdu-bienvenida-content">
             <h1>¡HOLA, {usuario?.nombre || "Usuario"}!</h1>
@@ -439,7 +439,7 @@ function GestionProyectosUsuario() {
                           onClick={() => irATareas(proyecto.id_proyecto, proyecto.p_nombre)}
                         >
                           <FaTasks className="tdu-btn-icon" />
-                          Ver Mis Tareas
+                          Ver Tareas
                         </button>
                       )}
                     </div>

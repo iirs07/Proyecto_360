@@ -26,6 +26,8 @@ Route::post('/RegistroPaso2/invitado', [RegistroPaso2Controller::class, 'paso2']
 Route::post('/password-reset/send-token', [PasswordResetController::class, 'sendToken']); 
 Route::post('/password-reset', [PasswordResetController::class, 'reset']); 
 
+
+Route::get('proyectos/completados/buscar', [TareasDirectorController::class, 'obtenerProyectosCompletados']);
 Route::get('tareas-proyectos-jefe', [TareasDirectorController::class, 'obtenerTareasProyectosJefe']);
     Route::get('tareasFinalizadas/departamento', [TareasDirectorController::class, 'TareasCompletadasD']);
 
@@ -80,7 +82,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/proyectos/{id}/completar', [NuevoProyectoController::class, 'completar']);
     Route::put('/proyectos/{id}/finalizar', [NuevoProyectoController::class, 'CambiarStatusProyecto']);
     Route::put('/proyectos/{id}/cambiar-status', [NuevoProyectoController::class, 'CambiarStatusProyectoTerminado']);
-    Route::get('proyectos/completados/buscar', [TareasDirectorController::class, 'obtenerProyectosCompletados']);
+    
     Route::get('proyectos/completados/recientes', [TareasDirectorController::class, 'obtenerProyectosCompletadosRecientes']);
     
     Route::post('/AgregarTareas', [NuevoProyectoController::class, 'AgregarTareas']);

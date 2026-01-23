@@ -57,8 +57,8 @@ const getEstadoVisual = (estado, fechaFin) => {
     if (est === "finalizado" || est === "completada") {
         return {
             icon: <FaCheckCircle />,
-            color: "#059669",        // VERDE
-            bgColor: "#d1fae5",      // Fondo verde claro
+            color: "#059669",        
+            bgColor: "#d1fae5",      
             texto: "Finalizado"
         };
     }
@@ -67,8 +67,8 @@ const getEstadoVisual = (estado, fechaFin) => {
     if (est === "en proceso") {
         return {
             icon: <FaClock />,
-            color: "#f59e0b",        // AMARILLO/ÁMBAR
-            bgColor: "#fef3c7",      // Fondo amarillo claro
+            color: "#f59e0b",        
+            bgColor: "#fef3c7",     
             texto: "En proceso"
         };
     }
@@ -77,10 +77,10 @@ const getEstadoVisual = (estado, fechaFin) => {
     if (est === "pendiente") {
         const diasRestantes = calcularDiasRestantes(fechaFin);
         
-        if (diasRestantes < 0) return { // VENCIDA
+        if (diasRestantes < 0) return { 
             icon: <FaExclamationTriangle />,
-            color: "#dc2626",        // ROJO
-            bgColor: "#fee2e2",      // Fondo rojo claro
+            color: "#dc2626",       
+            bgColor: "#fee2e2",     
             texto: "Vencida"
         };
         
@@ -136,8 +136,7 @@ const cargarTareas = async (sinLoading = false) => {
         return;
     }
 
-    if (!sinLoading) setLoading(true); // solo activa loading si no es refresco
-
+    if (!sinLoading) setLoading(true); 
     try {
         const res = await fetch(
             `${API_URL}/api/proyectos/${idProyecto}/lista-tareas`,
@@ -163,12 +162,10 @@ const cargarTareas = async (sinLoading = false) => {
     }
 };
 
-// 2. Llamada inicial (con loading)
 useEffect(() => {
     cargarTareas();
 }, [location.state]);
 
-// 3. Auto-refresh cada 5 segundos sin mostrar loading
 useAutoRefresh(() => cargarTareas(true), 5000);
 
 
@@ -200,15 +197,14 @@ useAutoRefresh(() => cargarTareas(true), 5000);
             };
         })
         .filter(tarea => {
-            // Filtrar por estado
+
             if (filtroEstado !== "all") {
                 const est = tarea.t_estatus?.toLowerCase().trim();
                 if (filtroEstado === "pendiente" && est !== "pendiente") return false;
                 if (filtroEstado === "en proceso" && est !== "en proceso") return false;
                 if (filtroEstado === "finalizado" && !(est === "finalizado" || est === "completada")) return false;
             }
-            
-            // Filtrar por búsqueda
+    
             if (busqueda.trim()) {
                 const termino = busqueda.toLowerCase();
                 return tarea.t_nombre?.toLowerCase().includes(termino);
@@ -252,79 +248,66 @@ useAutoRefresh(() => cargarTareas(true), 5000);
 
                 {!loading && tareas.length > 0 && (
                     <>
-                        {/* CONTENEDOR DE FILTROS */}
-                        <div className="ltp-filtros-container mb-4">
-                            <div className="ltp-search-filter-wrapper">
-                                <div className="ltp-search-box">
-                                    <FaSearch className="ltp-search-icon" />
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar tarea por nombre..."
-                                        value={busqueda}
-                                        onChange={(e) => setBusqueda(e.target.value)}
-                                        className="ltp-search-input"
+                     <div className="ltp-filtros-container mb-4">
+                        <div className="ltp-search-filter-wrapper">
+                        <div className="ltp-search-box">
+                            <FaSearch className="ltp-search-icon" />                                    <input
+                            type="text"
+                            placeholder="Buscar tarea por nombre..."
+                            value={busqueda}
+                             onChange={(e) => setBusqueda(e.target.value)}                              className="ltp-search-input"
                                     />
                                     {busqueda && (
-                                        <button
-                                            className="ltp-search-clear-btn"
-                                            onClick={() => setBusqueda("")}
-                                            aria-label="Limpiar búsqueda"
-                                        >
-                                            <FiX />
-                                        </button>
+                            <button
+              className="ltp-search-clear-btn"
+               onClick={() => setBusqueda("")}
+             aria-label="Limpiar búsqueda"
+                                        >    <FiX />
+                    </button>
                                     )}
-                                </div>
-
-                                <div className="ltp-filter-box">
-                                    <FaFilter className="ltp-filter-icon" />
-                                    <SelectDinamico
-                                        opciones={OPCIONES_FILTRO.map((o) => o.label)}
-                                        valor={OPCIONES_FILTRO.find((o) => o.value === filtroEstado)?.label}
-                                        setValor={handleSelectChange}
-                                    />
-                                </div>
-                            </div>
+ </div>
+<div className="ltp-filter-box">
+ <FaFilter className="ltp-filter-icon" />
+<SelectDinamico opciones={OPCIONES_FILTRO.map((o) => o.label)}                                
+valor={OPCIONES_FILTRO.find((o) => o.value === filtroEstado)?.label}
+setValor={handleSelectChange}
+                        />
+                        </div>
+                    </div>
 
                             {(busqueda || filtroEstado !== "all") && (
-                                <div className="ltp-search-results-info">
-                                    <span className="ltp-results-count">{totalResultados}</span>{" "}
-                                    {totalResultados === 1 ? "tarea" : "tareas"} encontrada(s).
-                                </div>
-                            )}
+                     <div className="ltp-search-results-info">                                    <span className="ltp-results-count">{totalResultados}</span>{" "}
+{totalResultados === 1 ? "tarea" : "tareas"} encontrada(s).
                         </div>
+                      )}
+                </div>
 
-                        {/* CONTENEDOR PRINCIPAL DEL PROYECTO */}
                         <div className="ltp-tareas-contenedor">
                             <div className="ltp-proyecto-card">
-                                {/* HEADER DEL PROYECTO */}
-                                <div className="ltp-proyecto-header" style={{ backgroundColor: PRIMARY_LIGHT_BG }}>
-                                    <div className="ltp-proyecto-info">
-                                        <h3 className="ltp-proyecto-nombre" style={{ color: PRIMARY_COLOR }}>
-                                            {nombreProyecto}
+                  <div className="ltp-proyecto-header" 
+                  style={{ backgroundColor: PRIMARY_LIGHT_BG }}>
+           <div className="ltp-proyecto-info">
+             <h3 className="ltp-proyecto-nombre" style={{ color: PRIMARY_COLOR }}>                                            {nombreProyecto}
                                         </h3>
-                                        <div className="ltp-proyecto-meta">
-                                            <div className="ltp-proyecto-meta-icon" style={{ color: PRIMARY_COLOR }}>
-                                                <FaTasks />
-                                            </div>
-                                            <span className="ltp-proyecto-tareas-count" style={{ 
-                                                color: PRIMARY_COLOR, 
-                                                backgroundColor: 'rgba(134, 21, 66, 0.1)' 
-                                            }}>
-                                                {tareasFiltradasYBuscadas.length} {tareasFiltradasYBuscadas.length === 1 ? "tarea registrada" : "tareas registradas"}
+                            <div className="ltp-proyecto-meta">
+                         <div className="ltp-proyecto-meta-icon" style={{ color: PRIMARY_COLOR }}>
+                                    <FaTasks />
+                                        </div>
+                                    <span className="ltp-proyecto-tareas-count" style={{ 
+                                    color: PRIMARY_COLOR, 
+                                backgroundColor: 'rgba(134, 21, 66, 0.1)'                                     }}>
+           {tareasFiltradasYBuscadas.length} {tareasFiltradasYBuscadas.length === 1 ? "tarea registrada" : "tareas registradas"}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* LISTA DE TAREAS */}
                                 <div className="ltp-tareas-lista">
-                                    {tareasFiltradasYBuscadas.length === 0 ? (
-                                        <div className="ltp-no-resultados">
-                                            <div className="ltp-no-resultados-icon">
-                                                <FaSearch />
-                                            </div>
+                      {tareasFiltradasYBuscadas.length === 0 ? (
+                           <div className="ltp-no-resultados">
+                                        <div className="ltp-no-resultados-icon">
+                                                <FaSearch />                                            </div>
                                             <h3>No se encontraron resultados</h3>
-                                            <p>Intenta con otros términos de búsqueda o cambia el filtro de estado</p>
+                     <p>Intenta con otros términos de búsqueda o cambia el filtro de estado</p>
                                         </div>
                                     ) : (
                                         tareasFiltradasYBuscadas.map((tarea) => {
@@ -333,134 +316,119 @@ useAutoRefresh(() => cargarTareas(true), 5000);
 
                                             return (
                                                 <div
-                                                    key={tarea.id_tarea}
-                                                    className={`ltp-tarea-item ${isExpanded ? "active" : ""}`}
-                                                    style={{ borderLeftColor: estadoVisual.color }}
+                      key={tarea.id_tarea}
+                    className={`ltp-tarea-item ${isExpanded ? "active" : ""}`}
+             style={{ borderLeftColor: estadoVisual.color }}
                                                 >
-                                                    {/* HEADER DE TAREA */}
                                                     <div 
-                                                        className="ltp-tarea-header"
-                                                        onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
+                className="ltp-tarea-header"
+                        onClick={() => setTareaExpandida(isExpanded ? null : tarea.id_tarea)}
                                                     >
                                         
                                     <div className="ltp-tarea-estado-container">
                                                             <div
-                                                                className="ltp-tarea-estado-indicador"
-                                                                style={{ 
-                                                                    color: estadoVisual.color, 
-                                                                    backgroundColor: estadoVisual.bgColor 
+                    className="ltp-tarea-estado-indicador"
+                                        style={{ 
+                    color: estadoVisual.color, 
+                    backgroundColor: estadoVisual.bgColor 
                                                                 }}
                                                             >
-                                                                {estadoVisual.icon}
+                    {estadoVisual.icon}
                                                             </div>
-                                                        </div>
-
-                                                        {/* TÍTULO Y ESTATUS */}
-                                                        <div className="ltp-tarea-info-contenido">
-                                                            <div className="ltp-tarea-titulo-wrapper">
-                                                                <h4 className="ltp-tarea-nombre">{tarea.t_nombre}</h4>
-                                                                <span
-                                                                    className="ltp-tarea-estatus-header"
-                                                                    style={{
-                                                                        backgroundColor: estadoVisual.bgColor,
-                                                                        color: estadoVisual.color,
+                                 </div> <div className="ltp-tarea-info-contenido">
+                              <div className="ltp-tarea-titulo-wrapper">
+                         <h4 className="ltp-tarea-nombre">{tarea.t_nombre}</h4>
+                         <span
+                             className="ltp-tarea-estatus-header"
+                            style={{
+                          backgroundColor: estadoVisual.bgColor,
+                                     color: estadoVisual.color,
                                                                     }}
                                                                 >
                                                                     {estadoVisual.texto}
                                                                 </span>
                                                             </div>
                                                         </div>
-
-                                                        {/* INFORMACIÓN DE DÍAS/FECHA */}
-                                                        <div className="ltp-tarea-acciones-header">
-                                                            <div className="ltp-tarea-info-dias" style={{ 
-                                                                borderColor: estadoVisual.color, 
-                                                                backgroundColor: estadoVisual.bgColor 
+                           <div className="ltp-tarea-acciones-header">
+                               <div className="ltp-tarea-info-dias" style={{ 
+                                 borderColor: estadoVisual.color, 
+                              backgroundColor: estadoVisual.bgColor 
                                                             }}>
-                                                                <div className="ltp-tarea-dias-restantes">
-                                                                    <span className="ltp-dias-label">
-                                                                        {tarea.t_estatus?.toLowerCase().trim() === "pendiente" ? "VENCE:" : "ESTADO:"}
-                                                                    </span>
-                                                                    <div
-                                                                        className="ltp-dias-texto"
-                                                                        style={{ color: estadoVisual.color }}
+                                    <div className="ltp-tarea-dias-restantes">
+                                     <span className="ltp-dias-label">
+            {tarea.t_estatus?.toLowerCase().trim() === "pendiente" ? "VENCE:" : "ESTADO:"}
+                 </span> <div
+                                     className="ltp-dias-texto"
+                            style={{ color: estadoVisual.color }}
                                                                     >
-                                                                        {tarea.t_estatus?.toLowerCase().trim() === "pendiente" 
-                                                                            ? tarea.textoDias 
-                                                                            : estadoVisual.texto}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="ltp-tarea-expand-icon">
-                                                                {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+                         {tarea.t_estatus?.toLowerCase().trim() === "pendiente" 
+                                ? tarea.textoDias 
+                             : estadoVisual.texto}
+                        </div>
+                            </div>
+                                </div>
+               <div className="ltp-tarea-expand-icon">
+                   {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
                                                             </div>
                                                         </div>
                                                     </div>
-
-                                                    {/* DETALLES EXPANDIBLES */}
                                                     {isExpanded && (
-                                                        <div className="ltp-tarea-detalles-wrapper">
-                                                            <div className="ltp-tarea-detalles">
-                                                                <div className="ltp-detalles-grid">
-                                                                    {/* Asignado a */}
-                                                                    <div className="ltp-detalle-item">
-                                                                        <div className="ltp-detalle-icono-container-column">
-                                                                            <FaUser className="ltp-detalle-icono" />
-                                                                        </div>
-                                                                        <div className="ltp-detalle-content">
-                                                                            <p className="ltp-detalle-label">Asignado a</p>
-                                                                            <p className="ltp-detalle-value">
-                                                                                {tarea.nombre_usuario_asignado || "No asignado"}
+                  <div className="ltp-tarea-detalles-wrapper">
+                    <div className="ltp-tarea-detalles">
+                         <div className="ltp-detalles-grid">
+                         <div className="ltp-detalle-item">
+                        <div className="ltp-detalle-icono-container-column">
+                             <FaUser className="ltp-detalle-icono" />
+                          </div>
+                            <div className="ltp-detalle-content">
+                             <p className="ltp-detalle-label">Asignado a</p>
+                                  <p className="ltp-detalle-value">
+                        {tarea.nombre_usuario_asignado || "No asignado"}
                                                                             </p>
                                                                         </div>
                                                                     </div>
-
-                                                                    {/* Fecha de vencimiento/finalización */}
-                                                                    <div className="ltp-detalle-item">
-                                                                        <div className="ltp-detalle-icono-container-column">
-                                                                            <FaCalendarAlt className="ltp-detalle-icono" />
-                                                                        </div>
-                                                                        <div className="ltp-detalle-content">
-                                                                            <p className="ltp-detalle-label">
-                                                                                {tarea.t_estatus?.toLowerCase().trim() === "pendiente" 
-                                                                                    ? "Fecha de vencimiento" 
-                                                                                    : "Fecha de finalización"}
+                           <div className="ltp-detalle-item">
+                                  <div className="ltp-detalle-icono-container-column">
+                                           <FaCalendarAlt className="ltp-detalle-icono" />
+                                                 </div>
+                                               <div className="ltp-detalle-content">
+                                             <p className="ltp-detalle-label">
+                                         {tarea.t_estatus?.toLowerCase().trim() === "pendiente" 
+                                              ? "Fecha de vencimiento" 
+                                                 : "Fecha de finalización"}
                                                                             </p>
-                                                                            <div className="ltp-fecha-detalle">
+                 <div className="ltp-fecha-detalle">
     <p className="ltp-detalle-value">
         {tarea.tf_fin || "—"}
     </p>
-</div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {/* Departamento (si existe) */}
-                                                                    {tarea.nombre_departamento_usuario_asignado && (
-                                                                        <div className="ltp-detalle-item">
-                                                                            <div className="ltp-detalle-icono-container-column">
-                                                                                <FaBuilding className="ltp-detalle-icono" />
-                                                                            </div>
-                                                                            <div className="ltp-detalle-content">
-                                                                                <p className="ltp-detalle-label">Departamento</p>
-                                                                                <p className="ltp-detalle-value">
-                                                                                    {tarea.nombre_departamento_usuario_asignado}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </>
-                )}
+</div> </div>
+                           </div>
+                   {tarea.nombre_departamento_usuario_asignado && (
+                                  <div className="ltp-detalle-item">
+                                 <div className="ltp-detalle-icono-container-column">
+                                          <FaBuilding className="ltp-detalle-icono" />
+                                         </div>
+                                       <div className="ltp-detalle-content">
+                                             <p className="ltp-detalle-label">Departamento</p>
+                                             <p className="ltp-detalle-value">
+                                            {tarea.nombre_departamento_usuario_asignado}
+                                        </p>
+                                    </div>
+                                      </div>
+                               )}
+                         </div>
+                     </div>
+            </div>
+                 )}
+            </div>
+              );
+           })
+           )}
+          </div>
+            </div>
+         </div>
+    </>
+    )}
             </div>
         </Layout>
     );

@@ -304,7 +304,6 @@ useAutoRefresh(actualizarProyectos, 5000);
   </div>
 )}
 
-                    {/* TAREAS */}
                     <div className="eliminar-info-item">
                       <FaTasks className="eliminar-info-icon" />
                       <div className="eliminar-info-content">
@@ -312,12 +311,7 @@ useAutoRefresh(actualizarProyectos, 5000);
                         <div className="eliminar-info-value">{p.total_tareas || 0}</div>
                       </div>
                     </div>
-
-                    {/* ALERTAS */}
-                    
                   </div>
-
-                  {/* ACCIONES - BOTÓN ELIMINAR */}
                   <div className="eliminar-proyecto-actions">
                     <button
                       className="eliminar-btn-icon"
@@ -341,7 +335,6 @@ useAutoRefresh(actualizarProyectos, 5000);
           ) : null}
         </div>
 
-        {/* Modal de confirmación */}
         <ConfirmModal
           isOpen={modalOpen}
           title="Confirmar eliminación"

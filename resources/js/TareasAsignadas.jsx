@@ -29,8 +29,6 @@ function TareasAsignadas() {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const toggleSidebar = () => setSidebarCollapsed(!sidebarCollapsed);
-
-  // Efecto para verificar sesión y obtener datos del location
   useEffect(() => {
     const token = sessionStorage.getItem("jwt_token");
     
@@ -47,8 +45,6 @@ function TareasAsignadas() {
     }
   }, [navigate, location]); 
 
-
-  // 3. Refactorizamos fetchTareas con useCallback e isBackground
   const fetchTareas = useCallback(async (isBackground = false) => {
     const token = sessionStorage.getItem("jwt_token");
     const usuarioString = sessionStorage.getItem("usuario");
@@ -58,7 +54,6 @@ function TareasAsignadas() {
     const usuario = JSON.parse(usuarioString);
 
     try {
-      // Solo mostramos el spinner si NO es background (carga inicial o manual)
       if (!isBackground) {
         setLoading(true);
       }
@@ -83,22 +78,18 @@ function TareasAsignadas() {
     } catch (err) {
       console.error("Error al cargar tareas:", err);
     } finally {
-      // Solo quitamos el spinner si lo habíamos puesto
       if (!isBackground) {
         setLoading(false);
       }
     }
-  }, [API_URL, proyectoActual, navigate]); // Dependencias importantes
+  }, [API_URL, proyectoActual, navigate]); 
 
-  
-  // 4. Efecto para Carga Inicial (con Spinner)
   useEffect(() => {
     if (proyectoActual) {
       fetchTareas(false); 
     }
   }, [proyectoActual, fetchTareas]);
 
-  // 5. Hook de Auto Refresco (Silencioso)
   useAutoRefresh(() => {
     if (proyectoActual) {
       fetchTareas(true);
@@ -176,9 +167,7 @@ function TareasAsignadas() {
       const data = await res.json().catch(() => null);
 
       if (res.ok && data?.success) {
-        handleCancelar();    
-        // Aquí dejamos el fetch normal (con loading) o background según prefieras. 
-        // Normalmente tras una acción del usuario está bien ver que se actualiza.
+        handleCancelar(); 
         await fetchTareas(false); 
       } else {
         alert(`Error al subir el archivo: ${data?.error || data?.message || "Intente nuevamente"}`);

@@ -120,11 +120,18 @@ const API_URL = import.meta.env.VITE_API_URL;
     setErrores({});
   };
   
-  const handleReporteSelect = (event) => {
-    setReporteSeleccionado(event.target.value);
-    setErrores(e => ({...e, reporte: undefined})); 
-    setMostrarVisor(false);
-  };
+ const handleReporteSelect = (event) => {
+  const nuevoReporte = event.target.value;
+  setReporteSeleccionado(nuevoReporte);
+  setErrores(e => ({...e, reporte: undefined})); 
+  setMostrarVisor(false);
+
+  // SI el nuevo reporte es vencidas y el método actual es mesAnio, lo reseteamos
+  if (nuevoReporte === 'vencidas' && metodoFiltrado === 'mesAnio') {
+    setMetodoFiltrado('ninguno');
+    limpiarFiltrosFecha();
+  }
+};
 
   const handleMetodoChange = (event) => {
     const nuevoMetodo = event.target.value;
@@ -197,6 +204,7 @@ const API_URL = import.meta.env.VITE_API_URL;
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
+const limitarFechaAlDiaDeHoy = ['vencidas', 'modificaciones'].includes(reporteSeleccionado);
 
 const generarPDF = async () => {
     if (!validarFormulario()) return;
@@ -354,24 +362,27 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
             <div className="row">
               <div className="col-md-8">
                 <label className="form-label fw-semibold">Método de Filtrado:</label>
-                <select
-                  className={`form-select form-control ${errores.metodoFiltrado ? 'is-invalid' : ''}`}
-                  value={metodoFiltrado}
-                  onChange={handleMetodoChange}
-                  style={{ position: 'relative', zIndex: 10 }}
-                >
-                  {opcionesMetodo.map(opcion => (
-                    <option key={opcion.value} value={opcion.value} disabled={opcion.value === 'ninguno'}>
-                      {opcion.label}
-                    </option>
-                  ))}
-                </select>
+               <select
+  className={`form-select form-control ${errores.metodoFiltrado ? 'is-invalid' : ''}`}
+  value={metodoFiltrado}
+  onChange={handleMetodoChange}
+  style={{ position: 'relative', zIndex: 10 }}
+>
+  {opcionesMetodo
+    
+    .filter(opcion => reporteSeleccionado === 'vencidas' ? opcion.value !== 'mesAnio' : true)
+    .map(opcion => (
+      <option key={opcion.value} value={opcion.value} disabled={opcion.value === 'ninguno'}>
+        {opcion.label}
+      </option>
+    ))}
+</select>
                 {errores.metodoFiltrado && <ErrorMensaje mensaje={errores.metodoFiltrado} />}
               </div>
             </div>
           </div>
 
-          {/* SECCIÓN 3: FILTROS ESPECÍFICOS (Se mantiene igual) */}
+          {/* SECCIÓN 3: FILTROS ESPECÍFICOS */}
           {metodoFiltrado !== 'ninguno' && (
             <div className="reportes-seccion mb-4 p-3 border rounded-3" 
                  style={{ 
@@ -418,50 +429,55 @@ console.log("mesSeleccionado (0-based):", mesSeleccionado, "anioSeleccionado:", 
                   </div>
                 </div>
               )}
-              
-              {metodoFiltrado === 'rango' && (
-                <div className="row g-3">
-                    {/* FECHA DE INICIO */}
-                  {requiereFechaInicio && (
-                    <div className="col-md-6 d-flex flex-column">
-                      <label className="form-label fw-semibold">Fecha de inicio:</label>
-                      <DatePicker
-                        selected={fechaInicio}
-                        onChange={handleRangoFechaChange(setFechaInicio, 'fechaInicio')}
-                        dateFormat="dd/MM/yyyy"
-                        showMonthDropdown
-                        showYearDropdown
-                        dropdownMode="select"
-                        locale={es}
-                        maxDate={fechaFin || null}
-                        customInput={<CalendarButton />}
-                        className="w-100"
-                      />
-                      <ErrorMensaje mensaje={errores.fechaInicio} />
-                    </div>
-                  )}
-                  
-                  <div className={requiereFechaInicio ? "col-md-6 d-flex flex-column" : "col-12 d-flex flex-column"}>
-                    <label className="form-label fw-semibold">
-                      {requiereFechaInicio ? "Fecha de fin:" : "Fecha límite (Hasta):"}
-                    </label>
-                    <DatePicker
-                      selected={fechaFin}
-                      onChange={handleRangoFechaChange(setFechaFin, 'fechaFin')}
-                      dateFormat="dd/MM/yyyy"
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
-                      locale={es}
-                     maxDate={requiereFechaInicio ? new Date() : null} 
-        minDate={requiereFechaInicio ? (fechaInicio || null) : new Date()}
-                      customInput={<CalendarButton />}
-                      className="w-100"
-                    />
-                    <ErrorMensaje mensaje={errores.fechaFin} />
-                  </div>
-                </div>
-              )}
+           {metodoFiltrado === 'rango' && (
+  <div className="row g-3">
+    {/* FECHA DE INICIO */}
+    {requiereFechaInicio && (
+      <div className="col-md-6 d-flex flex-column">
+        <label className="form-label fw-semibold">Fecha de inicio:</label>
+        <DatePicker
+          selected={fechaInicio}
+          onChange={handleRangoFechaChange(setFechaInicio, 'fechaInicio')}
+          dateFormat="dd/MM/yyyy"
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+          locale={es}
+          // --- CAMBIO AQUÍ ---
+          // Si es un reporte que debe limitarse a hoy (como 'vencidas'),
+          // la fecha de inicio no puede ser mayor a hoy.
+          maxDate={limitarFechaAlDiaDeHoy ? new Date() : (fechaFin || null)}
+          // -------------------
+          customInput={<CalendarButton />}
+          className="w-100"
+        />
+        <ErrorMensaje mensaje={errores.fechaInicio} />
+      </div>
+    )}
+    
+    <div className={requiereFechaInicio ? "col-md-6 d-flex flex-column" : "col-12 d-flex flex-column"}>
+      <label className="form-label fw-semibold">
+        {requiereFechaInicio ? "Fecha de fin:" : "Fecha límite (Hasta):"}
+      </label>
+      <DatePicker
+        selected={fechaFin}
+        onChange={handleRangoFechaChange(setFechaFin, 'fechaFin')}
+        dateFormat="dd/MM/yyyy"
+        showMonthDropdown
+        showYearDropdown
+        dropdownMode="select"
+        locale={es}
+        // --- CAMBIO AQUÍ (Asegúrate de que esté así) ---
+        maxDate={limitarFechaAlDiaDeHoy ? new Date() : null}
+        // ----------------------------------------------
+        minDate={fechaInicio || null}
+        customInput={<CalendarButton />}
+        className="w-100"
+      />
+      <ErrorMensaje mensaje={errores.fechaFin} />
+    </div>
+  </div>
+)}
             </div>
           )}
 

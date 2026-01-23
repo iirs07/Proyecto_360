@@ -58,12 +58,14 @@
                     <td>{!! strtoupper($mov->usuario_nombre . ' ' . $mov->a_paterno . ' ' . ($mov->a_materno ?? '')) !!}</td>
                     <td style="text-align: left;">{!! strtoupper($mov->proyecto) !!}</td>
                     <td style="text-align: left;">
-                        @if($mov->tarea)
-                            {!! strtoupper($mov->tarea) !!}
-                        @else
-                            <span>NO APLICA</span>
-                        @endif
-                    </td>
+    @if($mov->tarea)
+        {!! strtoupper($mov->tarea) !!}
+    @elseif(str_contains(strtoupper($mov->accion), 'PROYECTO'))
+        <span style="color: #666; font-size: 10px;">ACCIÓN DE NIVEL PROYECTO</span>
+    @else
+        <span>NO APLICA</span>
+    @endif
+</td>
                     <td>{!! strtoupper($mov->accion) !!}</td>
                     <td style="text-align: justify;">{!! strtoupper($mov->detalles) !!}</td>
                 </tr>

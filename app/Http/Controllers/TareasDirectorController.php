@@ -176,8 +176,6 @@ public function obtenerTareasProyectosJefe(Request $request)
     $filtroTareasVisibles($q);
     $q->with(['evidencias', 'usuario']); // agregamos usuario
 }])
-
-                ->where('pf_fin', '>=', $inicioTrimestreActual)
                 ->get()
         );
 
@@ -320,53 +318,46 @@ public function completarTarea($id)
 {
     try {
         $usuarioId = $request->query('usuario_id'); 
-        
-        // 1. Recibir los nuevos filtros, incluyendo el término de BÚSQUEDA
         $anio = $request->query('anio');
         $mes = $request->query('mes');
-        $busqueda = $request->query('busqueda'); // <--- NUEVO
+        $busqueda = $request->query('busqueda');
 
         $usuario = DB::table('c_usuario')->where('id_usuario', $usuarioId)->first();
-        // ... (manejo de error si no hay usuario) ...
+        if (!$usuario) return response()->json(['success' => false, 'message' => 'Usuario no encontrado'], 404);
 
         $idDepartamento = $usuario->id_departamento;
 
-        // 2. Pasamos $busqueda a la closure
-        $construirConsulta = function($query) use ($idDepartamento, $anio, $mes, $busqueda) { // <--- NUEVO
-            $query->where('id_departamento', $idDepartamento)
-                ->whereIn('p_estatus', ['Finalizado']);
+        $construirConsulta = function($query) use ($idDepartamento, $anio, $mes, $busqueda) {
+    // 1. Obtenemos el nombre de la conexión del padre (Proyecto)
+    $conexion = $query->getConnection()->getName();
 
-            // 3. APLICAR FILTROS DE FECHA
-            if ($anio) {
-                $query->whereYear('pf_fin', $anio);
-            }
-            if ($mes) {
-                $query->whereMonth('pf_fin', $mes);
-            }
-            
-            // 4. APLICAR FILTRO DE BÚSQUEDA POR NOMBRE (Si existe)
-            if ($busqueda) { // <--- NUEVO
-                $query->where('p_nombre', 'ILIKE', '%' . $busqueda . '%'); 
-                // Usamos ILIKE (PostgreSQL case-insensitive LIKE)
-            }
-            
-            // El resto de la consulta sigue igual...
-            return $query->whereHas('tareas')
-                // ... (el resto de las condiciones de tareas)
-                ->with(['tareas' => function($q) {
-                    $q->where('t_estatus', 'ILIKE', 'Completada')
-                      ->with('evidencias');
-                }])
-                ->withCount(['tareas as total_tareas'])
-                ->withCount(['tareas as tareas_completadas' => function($q) {
-                    $q->where('t_estatus', 'ILIKE', 'Completada');
-                }]);
-        };
+    $query->where('id_departamento', $idDepartamento)
+          ->where('p_estatus', 'Finalizado');
 
-        // Consultar ambas BDs con los filtros aplicados
-        $proyectosPrincipal = $construirConsulta(\App\Models\Proyecto::on('pgsql'))->get();
-        $proyectosHistorico = $construirConsulta(\App\Models\Proyecto::on('pgsql_second'))->get();
+    // Filtros de fecha y búsqueda
+    if ($anio) $query->whereYear('pf_fin', $anio);
+    if ($mes) $query->whereMonth('pf_fin', $mes);
+    if ($busqueda) {
+        $query->where('p_nombre', 'ILIKE', '%' . $busqueda . '%');
+    }
+    
+    // 2. Aplicamos los filtros de relación
+    // Nota: Eliminamos el ->on($conexion) dentro de los closures
+    // porque el Builder ya está vinculado a la conexión de la consulta padre.
+    return $query->whereHas('tareas') 
+        ->with(['tareas' => function($q) {
+            $q->where('t_estatus', 'ILIKE', 'Completada')
+              ->with('evidencias');
+        }])
+        ->withCount(['tareas as total_tareas'])
+        ->withCount(['tareas as tareas_completadas' => function($q) {
+            $q->where('t_estatus', 'ILIKE', 'Completada');
+        }]);
+};
 
+// 3. Ejecutamos (Aquí es donde SÍ se usa on())
+$proyectosPrincipal = $construirConsulta(\App\Models\Proyecto::on('pgsql'))->get();
+$proyectosHistorico = $construirConsulta(\App\Models\Proyecto::on('pgsql_second'))->get();
         $proyectos = $proyectosPrincipal->merge($proyectosHistorico);
 
         return response()->json([

@@ -54,35 +54,48 @@ function ListaDeProyectos() {
   };
 
   const getDiasRestantes = (fechaFin) => {
-    if (!fechaFin) return { dias: 0, texto: 'Sin fecha', tipo: 'neutral' };
-    
-    const hoy = new Date();
-    const fin = new Date(fechaFin + "T23:59:59");
-    const diffDays = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) {
-      return { 
-        dias: Math.abs(diffDays), 
-        texto: `${Math.abs(diffDays)} días de retraso`,
-        tipo: 'danger'
-      };
-    } else if (diffDays === 0) {
-      return { dias: 0, texto: 'Vence hoy', tipo: 'warning' };
-    } else if (diffDays <= 3) {
-      return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'warning' };
-    } else {
-      return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'success' };
-    }
-  };
+  if (!fechaFin) return { dias: 0, texto: 'Sin fecha', tipo: 'neutral' };
+  
+  // 1. "Hoy" a las 00:00:00 
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  
+  // 2. "Fecha de vencimiento" a las 00:00:00
+  // Usamos 00:00 para que la resta sea de días exactos (24h completas)
+  const fin = new Date(fechaFin + "T00:00:00");
+  
+  // 3. Calculamos la diferencia en milisegundos y la pasamos a días
+  const diffTime = fin - hoy;
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    // Si es -1, significa que venció ayer.
+    const diasRetraso = Math.abs(diffDays);
+    return { 
+      dias: diasRetraso, 
+      texto: `${diasRetraso} ${diasRetraso === 1 ? 'día' : 'días'} de retraso`,
+      tipo: 'danger'
+    };
+  } else if (diffDays === 0) {
+    return { dias: 0, texto: 'Vence hoy', tipo: 'warning' };
+  } else if (diffDays <= 3) {
+    return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'warning' };
+  } else {
+    return { dias: diffDays, texto: `${diffDays} días restantes`, tipo: 'success' };
+  }
+};
 
   const contarTareas = (tareas) => {
-    const hoy = new Date();
-    return {
-      total: tareas?.length || 0,
-      vencidas: tareas?.filter(t => new Date(t.tf_fin) < hoy).length || 0,
-    };
+  const hoy = new Date(); 
+  return {
+    total: tareas?.length || 0,
+    vencidas: tareas?.filter(t => {
+      if (!t.tf_fin) return false;
+      const fechaVencimiento = new Date(t.tf_fin + "T23:59:59");
+      return fechaVencimiento < hoy;
+    }).length || 0,
   };
-
+};
   const irATareas = (idProyecto, nombreProyecto) => {
     navigate("/TareasAsignadas", { 
       state: { 
@@ -92,8 +105,6 @@ function ListaDeProyectos() {
     });
   };
 
-  // 3. Refactorizamos la función de carga con useCallback
-  // Acepta isBackground (false = carga inicial con spinner, true = silencioso)
   const cargarProyectos = useCallback(async (isBackground = false) => {
     const token = sessionStorage.getItem("jwt_token");
     const usuario = JSON.parse(sessionStorage.getItem("usuario") || "{}");
@@ -110,7 +121,7 @@ function ListaDeProyectos() {
     }
 
     try {
-      // Solo mostramos loading si NO es background
+     
       if (!isBackground) {
         setLoading(true);
       }
@@ -137,8 +148,12 @@ function ListaDeProyectos() {
       const proyectosConTareas = (data.proyectos || [])
         .map(p => ({
           ...p,
-          tieneVencidos: p.tareas?.some(t => new Date(t.tf_fin) < new Date()),
-          diasInfo: getDiasRestantes(p.pf_fin)
+          // Dentro de cargarProyectos, en el .map:
+     tieneVencidos: p.tareas?.some(t => {
+      if (!t.tf_fin) return false;
+     // Forzamos que venza al final del día indicado
+      return new Date(t.tf_fin + "T23:59:59") < new Date();
+}),
         }))
         .sort((a,b) => new Date(a.pf_fin) - new Date(b.pf_fin));
 
@@ -146,14 +161,14 @@ function ListaDeProyectos() {
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      // Solo quitamos el loading si lo habíamos puesto
+     
       if (!isBackground) {
         setLoading(false);
       }
     }
-  }, [API_URL, navigate]); // Dependencias del useCallback
+  }, [API_URL, navigate]); 
 
-  // 4. Carga Inicial (muestra Loading)
+  // 4. Carga Inicial 
   useEffect(() => {
     cargarProyectos(false); 
   }, [cargarProyectos]);
@@ -187,10 +202,7 @@ function ListaDeProyectos() {
     const statusInfo = statusConfig[status] || statusConfig["En proceso"];
     const tareasInfo = contarTareas(proyecto.tareas);
     const diasInfo = proyecto.diasInfo || getDiasRestantes(proyecto.pf_fin);
-    // Nota: completionPercentage estaba definido pero no usado en el return original, lo dejé comentado por limpieza
-    // const completionPercentage = proyecto.tareas?.length > 0 
-    //   ? Math.round((proyecto.tareas.filter(t => t.t_estatus === 'Finalizado').length / proyecto.tareas.length) * 100)
-    //   : 0;
+    
 
     return (
       <div className="ldp-proyecto-card" key={proyecto.id_proyecto}>
